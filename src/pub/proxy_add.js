@@ -23,12 +23,6 @@ import {T} from './common/i18n.js';
 import './css/proxy_add.less';
 
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
-    presets_opt = Object.keys(presets).map(p=>{
-        let key = presets[p].title;
-        if (presets[p].default)
-            key = `Default (${key})`;
-        return {key, value: p};
-    });
     state = {
         zone: '',
         preset: 'session_long',
@@ -61,7 +55,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             form.ext_proxies = this.state.parsed_ips_list;
         }
         form.proxy_type = 'persist';
-        presets[form.preset].set(form);
+        presets.get(form.preset).set(form);
         const _this = this;
         return etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
@@ -144,8 +138,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                   zone={this.state.zone}
                   on_field_change={this.field_changed.bind(this)}
                   preset={this.state.preset}
-                  rule_clicked={this.rule_clicked}
-                  presets_opt={this.presets_opt}/>;
+                  rule_clicked={this.rule_clicked}/>;
         }
         else if (this.state.cur_tab=='proxy_ext')
         {
@@ -241,11 +234,11 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
 };
 
 const Lum_proxy = with_www_api(props=>{
-    const {zone, def_zone, on_field_change, preset, rule_clicked,
-        presets_opt} = props;
+    const {zone, def_zone, on_field_change, preset, rule_clicked} = props;
     const preset_tip = 'Presets is a set of preconfigured configurations '
         +'for specific purposes';
     const zone_tip = `Zone that will be used by this proxy port`;
+    const presets_opt = presets.opts();
     return <div className="lum_proxy">
           <div className="group">
             <Field icon_class="zone_icon" title="Zone">

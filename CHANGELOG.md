@@ -1,6 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.178.104 Stable
+- :star: UI and presets simplifications
+- :star: Introduced WS authorization
+
 ## 1.177.584 
+- :star: UI simplifications (reduced redundant options)
 
 ## 1.177.331 Stable
 - :bug: When using pool rotate session on 'retry' rule instead of recreating it

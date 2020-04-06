@@ -441,12 +441,12 @@ export const Preset_description = ({preset, rule_clicked})=>{
         return null;
     const rule_tip = 'Click to save a proxy port and move to this '
     +'configuration';
-    const desc = presets[preset].subtitle.replace(/ +(?= )/g, '')
+    const desc = presets.get(preset).subtitle.replace(/ +(?= )/g, '')
     .replace(/\n /g, '\n');
     return <T>{t=><div>
           <div className="desc">{t(desc)}</div>
           <ul className="bullets">
-            {(presets[preset].rules||[]).map(r=>
+            {(presets.get(preset).rules||[]).map(r=>
               <li key={r.field}>
                 <Tooltip title={t(rule_tip)}>
                   <a className="link" onClick={()=>rule_clicked(r.field)}>

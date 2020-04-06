@@ -285,9 +285,9 @@ const columns = [
             +'can target exit nodes (IPs) on specific ASNs',
     },
     {
-        key: 'max_requests',
-        title: 'Max requests',
-        type: 'text',
+        key: 'rotate_session',
+        title: 'Rotate IPs',
+        render: Boolean_cell,
         ext: true,
     },
     {

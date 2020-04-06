@@ -147,7 +147,7 @@ class Form extends Pure_component {
               </Labeled_controller>
               <Labeled_controller val={s.request_stats}
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
-                label="Enable recent stats" default
+                label="Enable recent stats" default={true}
                 tooltip={tooltips.request_stats}/>
               <Labeled_controller val={s.logs}
                 type="select_number" on_change_wrapper={this.logs_changed}

@@ -611,6 +611,79 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.177.584', v=>{
+        it('removes preset if long_availability', ()=>{
+            const conf = {
+                _defaults: {customer: 'test', token: 'token123'},
+                proxies: [
+                    {port: 24000, preset: 'long_availability'},
+                    {port: 24001, preset: 'another'},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {customer: 'test', token: 'token123'},
+                proxies: [{port: 24000}, {port: 24001, preset: 'another'}],
+            });
+        });
+        it('rnd_usr_agent_and_cookie_header -> rotating', ()=>{
+            const conf = {
+                _defaults: {customer: 'test', token: 'token123'},
+                proxies: [
+                    {port: 24000, preset: 'rnd_usr_agent_and_cookie_header'},
+                    {port: 24001, preset: 'another'},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {customer: 'test', token: 'token123'},
+                proxies: [
+                    {port: 24000, preset: 'rotating'},
+                    {port: 24001, preset: 'another'},
+                ],
+            });
+        });
+        it('max_requests -> rotate_session', ()=>{
+            const conf = {
+                _defaults: {customer: 'test', token: 'token123'},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, max_requests: 0},
+                    {port: 24001, max_requests: 1},
+                    {port: 24001, max_requests: 10},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {customer: 'test', token: 'token123'},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, rotate_session: false},
+                    {port: 24001, rotate_session: true},
+                    {port: 24001, rotate_session: true},
+                ],
+            });
+        });
+    });
+    describe_version('1.177.792', v=>{
+        it('merges session per machine into long single session', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000, preset: 'sticky_ip', sticky_ip: true},
+                    {port: 24001, preset: 'another'},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000, sticky_ip: true},
+                    {port: 24001, preset: 'another'},
+                ],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

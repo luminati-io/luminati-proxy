@@ -1,8 +1,27 @@
 [
     {
+        "ver": "1.178.104",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI and presets simplifications"
+            },
+            {
+                "type": "star",
+                "text": "Introduced WS authorization"
+            }
+        ]
+    },
+    {
         "ver": "1.177.584",
         "type": "stable/dev",
-        "changes": []
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI simplifications (reduced redundant options)"
+            }
+        ]
     },
     {
         "ver": "1.177.331",

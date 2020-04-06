@@ -54,6 +54,7 @@ conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
 conf.first_actions = '~/luminati_proxy_manager/.first_actions.json';
 conf.proxy_params = Object.keys(swagger.definitions.proxy.properties);
 conf.server_default = {
+    debug: 'full',
     port: 24000,
     zone: 'static',
     customer: process.env.LUMINATI_CUSTOMER,
@@ -68,12 +69,13 @@ conf.server_default = {
     proxy_retry: 2,
     socket_inactivity_timeout: 120000,
     preset: 'session_long',
+    route_err: 'pass_dyn',
     multiply_ips: false,
     max_ban_retries: 10,
     multiply_vips: false,
     multiply_users: false,
     multiply: 0,
-    max_requests: 0,
+    rotate_session: false,
     session_duration: 0,
     session: true,
     override_headers: true,
@@ -82,8 +84,6 @@ conf.server_default = {
     har_limit: 1024,
 };
 conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
-    api_domain: undefined,
-    api: undefined,
     www: 22999,
     www_whitelist_ips: [],
     whitelist_ips: [],
@@ -95,9 +95,6 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     reverse_lookup_dns: false,
     force: false,
     session_termination: false,
-    config: '~/luminati_proxy_manager/.luminati.json',
-    loki: '~/luminati_proxy_manager/.luminati.db',
-    cookie: '~/luminati_proxy_manager/.luminati.jar',
     high_perf: false,
     local_login: false,
     cluster: true,

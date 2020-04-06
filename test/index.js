@@ -314,53 +314,29 @@ describe('proxy', ()=>{
                 t(3);
                 t(10);
             });
-            describe('max_requests', ()=>{
+            describe('rotate_session', ()=>{
                 it('disabled', ()=>etask(function*(){
-                    l = yield lum({max_requests: '0'});
-                    assert.equal(l.session_mgr.opt.max_requests, 0);
+                    l = yield lum({rotate_session: false});
+                    assert.equal(l.session_mgr.opt.rotate_session, false);
                 }));
                 const test_call = ()=>etask(function*(){
                     const res = yield l.test({fake: 1});
                     assert.ok(res.body);
                     return res.body;
                 });
-                const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(12000);
-                    const pool_size = opt.pool_size||1;
-                    const max_requests = opt.max_requests;
-                    l = yield lum(opt);
-                    const sessions = [];
-                    for (let i=0; i<pool_size; i++)
-                    {
-                        sessions[i] = sessions[i]||[];
-                        for (let j=0; j<max_requests; j++)
-                        {
-                            const s = yield test_call();
-                            sessions[i][j] = s;
-                        }
-                    }
-                    for (let i=0; i<pool_size; i++)
-                    {
-                        const s = sessions[i][0];
-                        for (let j=1; j<max_requests; j++)
-                            assert.equal(s, sessions[i][j]);
-                    }
-                    for (let j=1; j<pool_size; j++)
-                        assert.notEqual(sessions[j-1][0], sessions[j][0]);
+                it('off, default', ()=>etask(function*(){
+                    l = yield lum({rotate_session: false});
+                    const session_a = yield test_call();
+                    const session_b = yield test_call();
+                    assert.equal(session_a, session_b);
                 }));
-                t('1, default pool', {max_requests: 1, pool_size: 1});
-                t('2, default pool', {max_requests: 2, pool_size: 2});
-                t('5, default pool', {max_requests: 5, pool_size: 5});
-                t('1, sticky_ip', {max_requests: 1, sticky_ip: true});
-                t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
-                t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
-                it('no pool size', etask._fn(function*(_this){
-                    _this.timeout(4000);
-                    l = yield lum({max_requests: 1, pool_size: 0});
-                    const s1 = yield test_call();
-                    const s2 = yield test_call();
-                    assert.notEqual(s1, s2);
+                it('on, default', ()=>etask(function*(){
+                    l = yield lum({rotate_session: true});
+                    const session_a = yield test_call();
+                    const session_b = yield test_call();
+                    assert.notEqual(session_a, session_b);
                 }));
+                // t('on, sticky_ip', {rotate_session: true, sticky_ip: true});
             });
             describe('session_duration', ()=>{
                 describe('change after specified timeout', ()=>{
@@ -1548,7 +1524,7 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 it('default pool', ()=>etask(function*(){
-                    yield prepare_lum({pool_size: 2, max_requests: 1});
+                    yield prepare_lum({pool_size: 2, rotate_session: true});
                     yield l.test({fake: 1});
                     const first_session = l.session_mgr.sessions.sessions[0];
                     yield l.test({fake: 1});
@@ -1601,7 +1577,7 @@ describe('proxy', ()=>{
                 assert.ok(l.session_mgr.sessions.sessions[0].terminated);
             }));
             it('should not terminate when rotating', etask._fn(function*(){
-                l = yield lum({pool_size: 0, max_requests: 1,
+                l = yield lum({pool_size: 0, rotate_session: true,
                     session_termination: true});
                 yield l.test({fake: {
                     status: 502,

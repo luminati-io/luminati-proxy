@@ -9,14 +9,12 @@ import {T} from '../common/i18n.js';
 import Users_modal from './users_modal.js';
 
 const route_err_opt = [
-    {key: 'Default (pass_dyn)', value: ''},
-    {key: 'pass_dyn', value: 'pass_dyn'},
+    {key: 'Default (pass_dyn)', value: 'pass_dyn'},
     {key: 'block', value: 'block'}
 ];
 
 const debug_opt = [
-    {key: 'Default (Yes)', value: ''},
-    {key: 'Yes', value: 'full'},
+    {key: 'Default (Yes)', value: 'full'},
     {key: 'No', value: 'none'},
 ];
 
@@ -25,11 +23,13 @@ export default class General extends Pure_component {
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     set_field = setdb.get('head.proxy_edit.set_field');
     proxy_connection_type_opt(t){
-        let def = this.state.defaults.proxy_connection_type=='https' ?
-            t('Default (HTTPS)') : t('Default (HTTP)');
-        return [{key: def, value: ''},
-            {key: 'HTTP', value: 'http'},
-            {key: 'HTTPS', value: 'https'}];
+        return this.state.defaults.proxy_connection_type=='https' ? [
+            {key: t('Default (HTTPS)'), value: 'https'},
+            {key: 'HTTP', value: 'http'}
+        ] : [
+            {key: t('Default (HTTP)'), value: 'http'},
+            {key: 'HTTPS', value: 'https'}
+        ];
     }
     componentDidMount(){
         this.setdb_on('head.defaults',

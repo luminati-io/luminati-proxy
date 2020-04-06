@@ -272,34 +272,34 @@ const Form = props=>{
 
 const filter_by = (option, props)=>option.startsWith(props.text);
 
-const Typeahead_wrapper = ({id, data, disabled, on_change, val})=>
-    <Typeahead id={id} options={data} maxResults={10}
-      minLength={0} disabled={disabled} selectHintOnEnter
-      filterBy={filter_by} onChange={on_change} selected={val}/>;
-
 class Customers_form extends Pure_component {
-    state = {};
+    state = {cur_customer: []};
     on_change = e=>{
         this.setState({cur_customer: e});
         this.props.select_customer(e&&e[0]);
     };
     render(){
-        return <T>{t=><div className="row customers_form">
+        return <div className="row customers_form">
               <div className="warning choose_customer">
-                {t('Please choose a customer.')}</div>
+                Please choose a customer</div>
               <div className="form-group">
-                <label htmlFor="user_customer">{t('Customer')}</label>
-                <Typeahead_wrapper id="user_customer"
-                  data={this.props.user_customers}
-                  val={this.state.cur_customer} on_change={this.on_change}/>
+                <label htmlFor="user_customer">Customer</label>
+                <Typeahead id="user_customer"
+                  options={this.props.user_customers}
+                  maxResults={10}
+                  minLength={0}
+                  selectHintOnEnter
+                  filterBy={filter_by}
+                  onChange={this.on_change}
+                  selected={this.state.cur_customer}/>
               </div>
               <button
                 onClick={this.props.select_final_customer}
                 className="btn btn_lpm btn_login"
                 disabled={this.props.saving_user}>
-                {this.props.saving_user ? t('Logging in...') : t('Log in')}
+                {this.props.saving_user ? 'Logging in' : 'Log in'}
               </button>
-            </div>}</T>;
+            </div>;
     }
 }
 

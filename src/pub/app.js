@@ -29,7 +29,7 @@ import {Modal} from './common/modals.js';
 import {report_exception} from './util.js';
 
 window.setdb = setdb;
-setdb.setMaxListeners(30);
+setdb.setMaxListeners(50);
 
 const App = withRouter(class App extends Pure_component {
     componentDidMount(){

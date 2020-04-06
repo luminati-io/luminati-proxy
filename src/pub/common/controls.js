@@ -339,11 +339,12 @@ class Select_multiple extends Pure_component {
 
 export class Yes_no extends Pure_component {
     options = t=>{
-        const default_label = this.props.default ? 'Yes' : 'No';
-        return [
-            {key: 'No', value: false},
-            {key: t('Default')+' ('+t(default_label)+')', value: ''},
-            {key: 'Yes', value: true},
+        return this.props.default ? [
+            {key: t('Default (Yes)'), value: true},
+            {key: 'No', value: false}
+        ] : [
+            {key: t('Default (No)'), value: false},
+            {key: 'Yes', value: true}
         ];
     };
     render(){

@@ -61,9 +61,7 @@ export default class Rotation extends Pure_component {
               <Tab_context.Provider value="rotation">
                 <Config type="select_number" id="pool_size"
                   note={pool_size_note}/>
-                <Config type="select_number" id="max_requests"/>
-                <T>{t=><Config type="select_number" id="session_duration"
-                  sufix={t('seconds')}/>}</T>
+                <Config type="yes_no" id="rotate_session"/>
                 <Config type="yes_no" id="sticky_ip"/>
                 <Config type="text" id="session"/>
                 <Config type="yes_no" id="session_termination"

@@ -934,11 +934,13 @@ class Cell_value extends React.Component {
         }
         else if (col=='Peer proxy')
         {
+            const ip = req.details.proxy_peer;
             const ext_proxy = (setdb.get('head.proxies_running')||[])
                 .some(p=>p.port==req.details.port && p.ext_proxies);
-            return <Tooltip_and_value val={req.details.proxy_peer}
-                tip={ext_proxy ? 'This feature is only available when using '
-                +'proxies by Luminati network' : req.details.proxy_peer}
+            const val = ip && ip.length > 15 ? `...${ip.slice(-5)}` : ip;
+            const tip = ext_proxy ? 'This feature is only available when '
+                +'using proxies by Luminati network' : ip;
+            return <Tooltip_and_value val={val} tip={tip}
                 pending={!!req.pending}/>;
         }
         else if (col=='Date')

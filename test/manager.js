@@ -14,6 +14,7 @@ process.argv.push('--dir', os.tmpdir());
 const Manager = require('../lib/manager.js');
 const cities = require('../lib/cities');
 sinon.stub(cities, 'ensure_data', ()=>null);
+sinon.stub(process, 'exit');
 const logger = require('../lib/logger.js');
 const etask = require('../util/etask.js');
 const pkg = require('../package.json');
@@ -203,7 +204,6 @@ describe('manager', ()=>{
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
         function*(_this){
-            _this.timeout(6000);
             app = yield app_with_config(config);
             const proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');

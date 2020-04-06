@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.177.584/luminati-proxy-manager-v1.177.584-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.178.104/luminati-proxy-manager-v1.178.104-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -187,31 +187,29 @@ Options:
   --sticky_ip                   Use session per requesting host to maintain IP
                                 per host              [boolean] [default: false]
   --pool_size                   Session pool size                       [number]
-  --max_requests                Maximum requests per session
-                                                           [string] [default: 0]
-  --session_duration            Maximum duration of session (seconds)
-                                                           [string] [default: 0]
+  --rotate_session              Rotate sessions on each request
+                                                      [boolean] [default: false]
   --throttle                    Throttle requests above given number    [number]
   --rules                       Proxy request rules                      [array]
   --race_reqs                   Race several requests at once and choose fastest
                                                                         [number]
   --route_err                   Block or allow requests to be automatically sent
-                                through super proxy on error            [string]
+                                through super proxy on error
+                                                  [string] [default: "pass_dyn"]
   --smtp                                                                 [array]
   --override_headers                                   [boolean] [default: true]
   --os                          Operating System of the Peer IP         [string]
   --headers                     Request headers                          [array]
-  --debug                       Luminati request debug info             [string]
+  --debug                       Luminati request debug info
+                                                      [string] [default: "full"]
   --whitelist_ips               Default for all proxies whitelist ip list for
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser
                                 admin UI                   [array] [default: []]
   --www                         HTTP and WebSocket port used for browser admin
                                 UI and request logs             [default: 22999]
-  --config                      Config file containing proxy definitions
-                   [string] [default: "~/luminati_proxy_manager/.luminati.json"]
-  --cookie                      Cookie Jar file
-                    [string] [default: "~/luminati_proxy_manager/.luminati.jar"]
+  --config                      Config file containing proxy definitions[string]
+  --cookie                      Cookie Jar file                         [string]
   --mode                        Defines a set of permissible operations within
                                 the UI/API                              [string]
   --dropin                      Create dropin mode proxy port (default: 22225)
@@ -266,8 +264,8 @@ Options:
   --multiply_ips                                                [default: false]
   --max_ban_retries                                                [default: 10]
   --multiply_vips                                               [default: false]
+  --session_duration                                                [default: 0]
   --bw_limit                                                        [default: 0]
-  --loki                      [default: "~/luminati_proxy_manager/.luminati.db"]
 ```
 
 ### Docker

@@ -7,8 +7,9 @@ import _ from 'lodash';
 import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
-import {Loader, Warnings, Loader_small, Preset_description,
-    Ext_tooltip} from '../common.js';
+import {qw} from '../../../util/string.js';
+import {Loader, Warnings, Loader_small, Preset_description, Ext_tooltip,
+    Checkbox} from '../common.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
@@ -172,12 +173,12 @@ const Index = withRouter(class Index extends Pure_component {
     };
     apply_preset = (_form, preset)=>{
         const form = Object.assign({}, _form);
-        const last_preset = form.preset ? presets[form.preset] : null;
+        const last_preset = form.preset ? presets.get(form.preset) : null;
         if (last_preset && last_preset.key!=preset && last_preset.clean)
             last_preset.clean(form);
         form.preset = preset;
-        presets[preset].set(form);
-        const disabled_fields = presets[preset].disabled||{};
+        presets.get(preset).set(form);
+        const disabled_fields = presets.get(preset).disabled||{};
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this.apply_rules(form);
         if (form.reverse_lookup===undefined)
@@ -326,8 +327,6 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.asn = Number(save_form.asn[0].id);
         else if (!save_form.asn.length)
             save_form.asn = '';
-        if (!save_form.max_requests)
-            save_form.max_requests = 0;
         if (save_form.headers)
             save_form.headers = save_form.headers.filter(h=>h.name&&h.value);
         if (save_form.session && save_form.session.replace)
@@ -462,7 +461,7 @@ class Nav extends Pure_component {
     };
     update_preset = val=>{
         this.props.on_change_preset(this.props.form, val);
-        const disabled_fields = presets[val].disabled||{};
+        const disabled_fields = presets.get(val).disabled||{};
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this._reset_fields();
     };
@@ -470,7 +469,7 @@ class Nav extends Pure_component {
         let new_preset;
         const curr_zone = this.props.form.zone;
         if (this.is_unblocker(curr_zone) && !this.is_unblocker(new_zone))
-            new_preset = Object.keys(presets).find(p=>presets[p].default);
+            new_preset = presets.get_default().key;
         else if (!this.is_unblocker(curr_zone) && this.is_unblocker(new_zone))
             new_preset = 'unblocker';
         if (this.props.form.ips.length || this.props.form.vips.length)
@@ -494,27 +493,17 @@ class Nav extends Pure_component {
         }
     };
     is_unblocker(zone_name){
-        if (!this.state.zones)
-            return false;
-        const zone = this.state.zones.zones.find(z=>z.name==zone_name)||{};
-        return zone.plan && zone.plan.type=='unblocker';
+        const get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
+        return get_curr_plan && get_curr_plan().type=='unblocker';
+    }
+    confirm_update(cb){
+        let no_confirm = localStorage.getItem('no-confirm-zone-preset');
+        if (no_confirm && JSON.parse(no_confirm))
+            return cb();
+        this.setState({confirm_action: cb}, ()=>$('#confirm_modal').modal());
     }
     render(){
-        let presets_opt;
-        // XXX krzysztof: hide this logic to presets module: filtering,
-        // preparing options
-        if (this.is_unblocker(this.props.form.zone))
-            presets_opt = [{key: presets.unblocker.title, value: 'unblocker'}];
-        else
-        {
-            presets_opt = Object.keys(presets).filter(p=>!presets[p].hidden)
-                .map(p=>{
-                let key = presets[p].title;
-                if (presets[p].default)
-                    key = `Default (${key})`;
-                return {key, value: p};
-            });
-        }
+        const opts = presets.opts(this.is_unblocker(this.props.form.zone));
         const preset = this.props.form.preset;
         const is_unblocker = this.props.plan.type=='unblocker';
         const preset_disabled = this.props.disabled || is_unblocker;
@@ -522,10 +511,12 @@ class Nav extends Pure_component {
         const is_local = href.includes('localhost')||
             href.includes('127.0.0.1');
         return <div className="nav">
-              <Select_zone val={this.props.form.zone}
-                on_change_wrapper={this.update_zone}
+              <Select_zone val={this.props.form.zone} on_change_wrapper={val=>
+                  this.confirm_update(()=>this.update_zone(val))}
                 disabled={this.props.disabled} preview/>
-              <Field i18n on_change={this.update_preset} options={presets_opt}
+              <Field i18n options={opts}
+                on_change={val=>this.confirm_update(()=>
+                  this.update_preset(val))}
                 value={preset} disabled={preset_disabled}
                 ext_tooltip={!is_unblocker} id="preset"
                 tooltip={
@@ -534,9 +525,44 @@ class Nav extends Pure_component {
               {is_local &&
                 <Open_browser_btn port={this.props.form.port}/>
               }
+              <Confirmation_modal on_ok={this.state.confirm_action}/>
             </div>;
     }
 }
+
+class Confirmation_modal extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {no_confirm: false};
+        _.bindAll(this, qw`toggle_dismiss handle_ok handle_dismiss`);
+    }
+    componentDidMount(){
+        let no_confirm = localStorage.getItem('no-confirm-zone-preset');
+        this.setState({no_confirm: !!no_confirm && JSON.parse(no_confirm)});
+    }
+    toggle_dismiss(){
+        this.setState({no_confirm: !this.state.no_confirm});
+    }
+    handle_ok(){
+        localStorage.setItem('no-confirm-zone-preset', this.state.no_confirm);
+        this.props.on_ok();
+    }
+    handle_dismiss(){
+        this.setState({no_confirm: false});
+    }
+    render(){
+        let left_item = <Checkbox text="Don't show this message again"
+            value={this.state.no_confirm} checked={!!this.state.no_confirm}
+            on_change={this.toggle_dismiss}/>;
+        return <Modal title="Confirm changing preset or zone"
+            id="confirm_modal" click_ok={this.handle_ok} ok_btn_title="Yes"
+            left_footer_item={left_item} on_hidden={this.handle_dismiss}>
+            <h4>Changing preset or zone may reset some other options. Are you
+              sure you want to continue?</h4>
+          </Modal>;
+    }
+}
+
 
 const Field = ({id, disabled, children, i18n, ext_tooltip, ...props})=>{
     const options = props.options||[];

@@ -3,7 +3,6 @@
 
 const presets = {
     session_long: {
-        default: true,
         title: 'Long single session (IP)',
         subtitle: `All requests share the same long session (IP). For
             connecting a browser to Luminati, maintaining the same IP for as
@@ -20,9 +19,8 @@ const presets = {
         ],
         disabled: {
             pool_size: true,
-            sticky_ip: true,
             session: true,
-            max_requests: true,
+            rotate_session: true,
             session_duration: true,
         },
     },
@@ -31,21 +29,24 @@ const presets = {
         subtitle: 'For changing the IP on each request',
         set: opt=>{
             opt.session = '';
-            if (!opt.session_duration)
-                opt.max_requests = opt.max_requests||1;
+            opt.rotate_session = true;
+            opt.sticky_ip = false;
+            opt.user_agent = 'random_desktop';
         },
         clean: opt=>{
-            opt.max_requests = 0;
+            opt.rotate_session = false;
             opt.session_duration = 0;
             opt.pool_size = 0;
+            opt.user_agent = '';
         },
         rules: [
-            {field: 'max_requests', label: `Sets 'Max requests' to 1. It makes
-                sense to choose any other positive number`},
+            {field: 'rotate_session', label: 'Turns on session rotation'},
         ],
         disabled: {
             sticky_ip: true,
             session: true,
+            rotate_session: true,
+            user_agent: true,
         },
     },
     unblocker: {
@@ -53,16 +54,16 @@ const presets = {
         subtitle: 'Unblocker handles IP management automatically',
         set: opt=>{
             opt.session = '';
-            opt.max_requests = 1;
+            opt.rotate_session = true;
             opt.insecure = true;
         },
         clean: opt=>{
-            opt.max_requests = 0;
+            opt.rotate_session = false;
             opt.insecure = false;
         },
         disabled: {
             pool_size: true,
-            max_requests: true,
+            rotate_session: true,
             sticky_ip: true,
             session_duration: true,
             session: true,
@@ -79,85 +80,6 @@ const presets = {
             override_headers: true,
         },
         hidden: true,
-    },
-    long_availability: {
-        title: 'Long availability',
-        subtitle: `Creates a pool of IPs and always uses the most stable IP
-            from the pool`,
-        set: opt=>{
-            if (!opt.pool_size || opt.pool_size==1)
-                opt.pool_size = 20;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.pool_size = 0;
-        },
-        rules: [
-            {field: 'pool_size', label: `Sets 'Pool size' to 20`},
-        ],
-        disabled: {
-            sticky_ip: true,
-            session: true,
-            session_duration: true,
-            max_requests: true,
-        },
-    },
-    sticky_ip: {
-        title: 'Session (IP) per machine',
-        subtitle: `Each requesting machine will have its own session (IP).
-            For connecting several computers to a single Luminati Proxy
-            Manager, each of them having its own single session (IP)`,
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.sticky_ip = true;
-            opt.max_requests = 0;
-        },
-        clean: opt=>{
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.sticky_ip = false;
-        },
-        rules: [
-            {field: 'pool_size', label: `Sets 'Pool size' to 0`},
-            {field: 'sticky_ip', label: `Enables 'Sticky Ip'`},
-            {field: 'multiply', label: `Disables 'Multiply' options`},
-        ],
-        disabled: {
-            multiply: true,
-            multiply_ips: true,
-            multiply_vips: true,
-            sticky_ip: true,
-            session: true,
-            session_duration: true,
-            pool_size: true,
-            max_requests: true,
-        },
-    },
-    rnd_usr_agent_and_cookie_header: {
-        title: 'Random User-Agent',
-        subtitle: 'Rotate User-Agent on each request',
-        set: opt=>{
-            opt.session_duration = 0;
-            opt.user_agent = 'random_desktop';
-            opt.session = '';
-            opt.ssl = true;
-            opt.override_headers = true;
-        },
-        clean: opt=>{
-            opt.pool_size = 0;
-            opt.user_agent = '';
-        },
-        disabled: {
-            user_agent: 'random_desktop',
-            sticky_ip: true,
-            session: true,
-            override_headers: true,
-        },
-        rules: [
-            {field: 'user_agent',
-                label: 'Generates random User-Agent for each request'},
-            {field: 'ssl', label: `Enables SSL analyzing`},
-        ],
     },
     shop: {
         title: 'Online shopping',
@@ -217,15 +139,33 @@ const presets = {
         set: function(opt){},
         clean: opt=>{
             opt.pool_size = 0;
-            opt.max_requests = 0;
+            opt.rotate_session = false;
             opt.session_duration = 0;
         },
     },
 };
+const default_preset = 'session_long';
+presets[default_preset].default = true;
 for (let k in presets)
 {
     presets[k].key = k;
     presets[k].subtitle = presets[k].subtitle.replace(/\s+/g, ' ')
     .replace(/\n/g, ' ');
 }
-export default presets;
+
+const E = {
+    opts: is_unblocker=>{
+        if (is_unblocker)
+            return [{key: presets.unblocker.title, value: 'unblocker'}];
+        return Object.keys(presets).filter(p=>!presets[p].hidden).map(p=>{
+            let key = presets[p].title;
+            if (presets[p].default)
+                key = `Default (${key})`;
+            return {key, value: p};
+        });
+    },
+    get: key=>presets[key],
+    get_default: ()=>presets[default_preset],
+};
+
+export default E;

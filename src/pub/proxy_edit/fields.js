@@ -201,24 +201,15 @@ export const tabs = {
                 placeholder: `e.g. test_session`,
             },
             sticky_ip: {
-                label: 'Sticky IP',
-                tooltip: `When connecting to the remote LPM server,
-                    stick sessions to each computer. Each connected
-                    computer will receive a unique session`,
+                label: 'Session per machine',
+                tooltip: `Keep separate sessions / IPs for each connecting
+                    device from an external network. Useful when the LPM is
+                    hosted on a server and multiple machines send requests`,
                 ext: true,
             },
-            max_requests: {
-                label: 'Max requests',
-                tooltip: `Change session based on number of requests - can be a
-                    range or a fixed number. when using browser it should be
-                    taken into consideration that one page-load will attempt
-                    multiple requests under the hood`,
-                ext: true,
-            },
-            session_duration: {
-                label: 'Session duration',
-                tooltip: `Make the session change automatically every X
-                    seconds`,
+            rotate_session: {
+                label: 'Rotate IPs',
+                tooltip: 'Change session/IP on each request',
                 ext: true,
             },
             session_termination: {

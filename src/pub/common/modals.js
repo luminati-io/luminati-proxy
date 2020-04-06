@@ -87,7 +87,8 @@ export class Modal extends React.Component {
                   ok_clicked={this.click_ok.bind(this)}
                   ok_btn_title={this.props.ok_btn_title}
                   ok_btn_classes={this.props.ok_btn_classes}
-                  no_cancel_btn={this.props.no_cancel_btn}/>;
+                  no_cancel_btn={this.props.no_cancel_btn}
+                  left_item={this.props.left_footer_item}/>;
         }
         const header_classes = classnames('modal-header',
             {no_header: this.props.no_header});
@@ -120,6 +121,8 @@ const Footer_default = props=>{
     const ok_title = props.ok_btn_title||'OK';
     const ok_classes = props.ok_btn_classes||'btn btn_lpm btn_lpm_primary ok';
     return <div className="default_footer">
+          {props.left_item &&
+            <span className="left_item">{props.left_item}</span>}
           {!props.no_cancel_btn &&
             <button onClick={props.cancel_clicked}
               className="btn btn_lpm cancel">
