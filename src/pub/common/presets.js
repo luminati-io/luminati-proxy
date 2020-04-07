@@ -4,9 +4,11 @@
 const presets = {
     session_long: {
         title: 'Long single session (IP)',
-        subtitle: `All requests share the same long session (IP). For
-            connecting a browser to Luminati, maintaining the same IP for as
-            long as possible`,
+        new_title: 'Browser (Puppeteer/Selenium)',
+        subtitle: `Use this preset if you want to connect from the browser
+            manually (for example Chrome/Firefox) or programatically
+            (for example Puppeteer/Selenium). All requests share the same
+            IP. You can control when you refresh the IP from the UI or API.`,
         set: opt=>{
             opt.pool_size = 1;
             opt.session = '';
@@ -14,9 +16,6 @@ const presets = {
         clean: opt=>{
             opt.pool_size = 0;
         },
-        rules: [
-            {field: 'pool_size', label: `Sets 'Pool size' to 1`},
-        ],
         disabled: {
             pool_size: true,
             session: true,
@@ -26,7 +25,11 @@ const presets = {
     },
     rotating: {
         title: 'Rotating (IPs)',
-        subtitle: 'For changing the IP on each request',
+        new_title: 'Rotating IPs (fetching API)',
+        subtitle: `Use this preset if you want to get a fresh new IP on each
+            single request. This preset also rotates the User-Agent header
+            automatically. It's the best for scraping API when you don't load
+            the full pages.`,
         set: opt=>{
             opt.session = '';
             opt.rotate_session = true;
@@ -39,9 +42,6 @@ const presets = {
             opt.pool_size = 0;
             opt.user_agent = '';
         },
-        rules: [
-            {field: 'rotate_session', label: 'Turns on session rotation'},
-        ],
         disabled: {
             sticky_ip: true,
             session: true,
@@ -51,6 +51,7 @@ const presets = {
     },
     unblocker: {
         title: 'Automatic (Unblocker)',
+        new_title: 'Automatic (Unblocker)',
         subtitle: 'Unblocker handles IP management automatically',
         set: opt=>{
             opt.session = '';
@@ -123,14 +124,6 @@ const presets = {
             session: true,
             ssl: true,
         },
-        rules: [
-            {field: 'dns', label: `Sets DNS to resolve remotely`},
-            {field: 'user_agent',
-                label: 'Generates random User-Agent for each request'},
-            {field: 'trigger_type', label: 'Creates an explanatory rule for '
-                +'post-processing each request to scrape data you need'},
-            {field: 'ssl', label: `Enables SSL analyzing`},
-        ],
     },
     custom: {
         title: 'Custom',
@@ -160,7 +153,7 @@ const E = {
         return Object.keys(presets).filter(p=>!presets[p].hidden).map(p=>{
             let key = presets[p].title;
             if (presets[p].default)
-                key = `Default (${key})`;
+                key = `${key} (default)`;
             return {key, value: p};
         });
     },

@@ -30,6 +30,18 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         cur_tab: 'proxy_lum',
         error_list: [],
     };
+    static getDerivedStateFromProps(props, state){
+        const is_unblocker = ()=>{
+            if (!state.zones)
+                return false;
+            const zone_name = state.zone || state.zones.def;
+            const zone = state.zones.zones.find(p=>p.name==zone_name) || {};
+            const plan = zone.plan || {};
+            return plan.type=='unblocker';
+        };
+        return {preset: is_unblocker() ? 'unblocker' :
+            state.preset=='unblocker' ? 'session_long' : state.preset};
+    }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies_running=>{
             if (!proxies_running)
@@ -39,7 +51,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         this.setdb_on('head.zones', zones=>{
             if (!zones)
                 return;
-            this.setState({def_zone: zones.def});
+            this.setState({zones});
         });
     }
     persist = ()=>{
@@ -118,7 +130,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             }
         });
     };
-    rule_clicked = field=>this.save({redirect: true, field});
     field_changed = id=>value=>this.setState({[id]: value});
     set_tab = id=>this.setState({cur_tab: id});
     on_hidden = ()=>this.setState({created_port: null});
@@ -127,26 +138,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             !this.state.valid_json;
         const Footer_wrapper = <Footer save_clicked={this.save}
             disabled={disabled} created_port={this.state.created_port}/>;
-        if (!this.state.proxies_running)
+        if (!this.state.proxies_running || !this.state.zones)
             return null;
-        let content;
-        if (this.state.cur_tab=='proxy_lum')
-        {
-            content = <Lum_proxy
-                  def_zone={this.state.def_zone}
-                  created_port={this.state.created_port}
-                  zone={this.state.zone}
-                  on_field_change={this.field_changed.bind(this)}
-                  preset={this.state.preset}
-                  rule_clicked={this.rule_clicked}/>;
-        }
-        else if (this.state.cur_tab=='proxy_ext')
-        {
-            content = <Ext_proxy
-                  parse_error={this.state.parse_error}
-                  ips_list={this.state.ips_list}
-                  on_field_change={this.field_changed.bind(this)}/>;
-        }
         const anim_classes = classnames('proxy_form', 'animated', {
             proxy_created: this.state.created_port,
             fadeOutUp: this.state.created_port,
@@ -159,7 +152,20 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 <div className={anim_classes}>
                   <Nav_tabs_wrapper set_tab={this.set_tab}
                     cur_tab={this.state.cur_tab}/>
-                  {content}
+                  {this.state.cur_tab=='proxy_lum' &&
+                    <Lum_proxy
+                      def_zone={this.state.zones.def}
+                      created_port={this.state.created_port}
+                      zone={this.state.zone}
+                      on_field_change={this.field_changed}
+                      preset={this.state.preset}/>
+                  }
+                  {this.state.cur_tab=='proxy_ext' &&
+                    <Ext_proxy
+                      parse_error={this.state.parse_error}
+                      ips_list={this.state.ips_list}
+                      on_field_change={this.field_changed}/>
+                  }
                 </div>
                 <Created_port port={this.state.created_port}/>
               </Modal>
@@ -234,11 +240,8 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
 };
 
 const Lum_proxy = with_www_api(props=>{
-    const {zone, def_zone, on_field_change, preset, rule_clicked} = props;
-    const preset_tip = 'Presets is a set of preconfigured configurations '
-        +'for specific purposes';
+    const {zone, def_zone, on_field_change, preset} = props;
     const zone_tip = `Zone that will be used by this proxy port`;
-    const presets_opt = presets.opts();
     return <div className="lum_proxy">
           <div className="group">
             <Field icon_class="zone_icon" title="Zone">
@@ -251,20 +254,29 @@ const Lum_proxy = with_www_api(props=>{
                 target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
             </Preview>
           </div>
-          <div className="group">
-            <Field icon_class="preset_icon" val={preset} i18n
-              options={presets_opt} title="Preset configuration"
-              on_change={on_field_change('preset')} tooltip={preset_tip}/>
-            <Preview title={presets_opt.find(p=>p.value==preset).key}>
-              <Preset_description preset={preset} rule_clicked={rule_clicked}/>
-            </Preview>
-          </div>
+          {preset!='unblocker' &&
+            <div className="group">
+              <Nav_tabs set_tab={on_field_change('preset')} cur_tab={preset}>
+                <Preset_nav_tab id="session_long"/>
+                <Preset_nav_tab id="rotating"/>
+              </Nav_tabs>
+              <Preview title={presets.get(preset).new_title}>
+                <Preset_description preset={preset}/>
+              </Preview>
+            </div>
+          }
         </div>;
 });
 
+const Preset_nav_tab = ({id, ...props})=>{
+    const preset = presets.get(id);
+    return <Nav_tab title={preset.new_title} id={id}
+      tooltip={preset.subtitle} {...props}/>;
+};
+
 const Preview = ({title, children})=>{
     return <div className="preview">
-          <div className="header"><T>{title}</T></div>
+          <div className="header">{title}</div>
           {children}
         </div>;
 };

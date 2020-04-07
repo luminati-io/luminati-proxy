@@ -47,6 +47,7 @@ describe('proxy', ()=>{
             password,
             log: 'none',
             port: 24000,
+            tls: false,
         }, opt), mgr);
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')

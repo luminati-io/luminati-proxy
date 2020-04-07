@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.178.241",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Support TLS connection between client and LPM"
+            }
+        ]
+    },
+    {
         "ver": "1.178.104",
         "type": "stable",
         "changes": [

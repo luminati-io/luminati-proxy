@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.178.241 Stable
+- :star: Support TLS connection between client and LPM
+
 ## 1.178.104 Stable
 - :star: UI and presets simplifications
 - :star: Introduced WS authorization

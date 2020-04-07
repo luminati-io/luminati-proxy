@@ -340,10 +340,10 @@ class Select_multiple extends Pure_component {
 export class Yes_no extends Pure_component {
     options = t=>{
         return this.props.default ? [
-            {key: t('Default (Yes)'), value: true},
+            {key: 'Yes (default)', value: true},
             {key: 'No', value: false}
         ] : [
-            {key: t('Default (No)'), value: false},
+            {key: 'No (default)', value: false},
             {key: 'Yes', value: true}
         ];
     };
@@ -566,7 +566,7 @@ class Select_zone extends Pure_component {
         const tooltip = preview ? '' : this.props.tooltip;
         const zone_opt = this.state.zones.zones.map(z=>{
             if (z.name==this.state.zones.def)
-                return {key: `Default (${z.name})`, value: z.name};
+                return {key: `${z.name} (default)`, value: z.name};
             return {key: z.name, value: z.name};
         });
         const selected = val || this.state.zones.def;
@@ -585,7 +585,7 @@ class Select_zone extends Pure_component {
                   }
                   <Select val={selected} type="select"
                     on_change_wrapper={on_change_wrapper} label="Default zone"
-                    tooltip={tooltip} data={zone_opt} disabled={disabled}/>
+                    data={zone_opt} disabled={disabled}/>
                 </span>
               </Tooltip>
               <T>{t=><Tooltip title={t('Refresh zones')}>

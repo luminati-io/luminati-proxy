@@ -9,12 +9,12 @@ import {T} from '../common/i18n.js';
 import Users_modal from './users_modal.js';
 
 const route_err_opt = [
-    {key: 'Default (pass_dyn)', value: 'pass_dyn'},
+    {key: 'pass_dyn (default)', value: 'pass_dyn'},
     {key: 'block', value: 'block'}
 ];
 
 const debug_opt = [
-    {key: 'Default (Yes)', value: 'full'},
+    {key: 'Yes (default)', value: 'full'},
     {key: 'No', value: 'none'},
 ];
 
@@ -24,10 +24,10 @@ export default class General extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
     proxy_connection_type_opt(t){
         return this.state.defaults.proxy_connection_type=='https' ? [
-            {key: t('Default (HTTPS)'), value: 'https'},
+            {key: t('HTTPS (default)'), value: 'https'},
             {key: 'HTTP', value: 'http'}
         ] : [
-            {key: t('Default (HTTP)'), value: 'http'},
+            {key: t('HTTP (default)'), value: 'http'},
             {key: 'HTTPS', value: 'https'}
         ];
     }

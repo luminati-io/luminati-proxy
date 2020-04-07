@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.178.104/luminati-proxy-manager-v1.178.104-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.178.241/luminati-proxy-manager-v1.178.241-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -151,6 +151,8 @@ Options:
   --users                       List of users. This option has to be used along
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
+  --tls                         Enable TLS connection support
+                                                       [boolean] [default: true]
   --har_limit                   Number of bytes to store[number] [default: 1024]
   --iface                       Interface or IP to listen on            [string]
   --customer                    Luminati customer                       [string]

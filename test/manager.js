@@ -70,6 +70,7 @@ describe('manager', ()=>{
                 args = args.concat(['--no-local_login']);
             }
             args = args.concat('--loki', '/tmp/testdb');
+            args = args.concat('--tls', 'false');
         }
         Manager.prototype.set_current_country = ()=>null;
         Manager.prototype.check_conn = ()=>null;

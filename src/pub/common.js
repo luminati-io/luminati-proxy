@@ -439,23 +439,9 @@ export const flag_with_title = (country, title)=>{
 export const Preset_description = ({preset, rule_clicked})=>{
     if (!preset)
         return null;
-    const rule_tip = 'Click to save a proxy port and move to this '
-    +'configuration';
     const desc = presets.get(preset).subtitle.replace(/ +(?= )/g, '')
-    .replace(/\n /g, '\n');
-    return <T>{t=><div>
-          <div className="desc">{t(desc)}</div>
-          <ul className="bullets">
-            {(presets.get(preset).rules||[]).map(r=>
-              <li key={r.field}>
-                <Tooltip title={t(rule_tip)}>
-                  <a className="link" onClick={()=>rule_clicked(r.field)}>
-                    {t(r.label)}</a>
-                </Tooltip>
-              </li>
-            )}
-          </ul>
-        </div>}</T>;
+        .replace(/\n /g, '\n');
+    return <div><div className="desc">{desc}</div></div>;
 };
 
 export const Ext_tooltip = with_www_api(props=>
