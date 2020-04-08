@@ -291,12 +291,6 @@ const columns = [
         ext: true,
     },
     {
-        key: 'session_duration',
-        title: 'Session duration (sec)',
-        type: 'text',
-        ext: true,
-    },
-    {
         key: 'pool_size',
         title: 'Pool size',
         type: 'number',

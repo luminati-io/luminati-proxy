@@ -77,7 +77,6 @@ conf.server_default = {
     multiply_users: false,
     multiply: 0,
     rotate_session: false,
-    session_duration: 0,
     session: true,
     override_headers: true,
     bw_limit: 0,

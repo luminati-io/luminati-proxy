@@ -339,40 +339,6 @@ describe('proxy', ()=>{
                 }));
                 // t('on, sticky_ip', {rotate_session: true, sticky_ip: true});
             });
-            describe('session_duration', ()=>{
-                describe('change after specified timeout', ()=>{
-                    const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                        l = yield lum(Object.assign({session_duration: 0.1},
-                            opt));
-                        const initial = yield l.test({fake: 1});
-                        yield etask.sleep(100);
-                        const second = yield l.test({fake: 1});
-                        assert.notEqual(initial.body, second.body);
-                    }));
-                    t('pool', {pool_size: 1});
-                    t('sticky_ip', {sticky_ip: true});
-                });
-                describe('does not change before specified timeout', ()=>{
-                    const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                        l = yield lum(Object.assign({session_duration: 1},
-                            opt));
-                        const initial = yield l.test({fake: 1});
-                        const res1 = yield l.test({fake: 1});
-                        const res2 = yield l.test({fake: 1});
-                        assert.equal(initial.body, res1.body);
-                        assert.equal(initial.body, res2.body);
-                    }));
-                    t('sticky_ip', {sticky_ip: true});
-                    t('pool 1', {pool_size: 1});
-                    it('pool 3', etask._fn(function*(_this){
-                        l = yield lum({session_duration: 0.1, pool_size: 3});
-                        yield etask.sleep(150);
-                        const res1 = yield l.test({fake: 1});
-                        const res2 = yield l.test({fake: 1});
-                        assert.equal(res1.body, res2.body);
-                    }));
-                });
-            });
             describe('fastest', ()=>{
                 const t = size=>it(''+size, etask._fn(function*(_this){
                     proxy.connection = hold_request;

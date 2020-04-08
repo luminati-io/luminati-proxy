@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.178.350 Stable
+- :star: Store configuration on Luminati servers as a backup
+
 ## 1.178.241 Stable
 - :star: Support TLS connection between client and LPM
 

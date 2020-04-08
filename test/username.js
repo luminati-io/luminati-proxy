@@ -29,4 +29,28 @@ describe('username', ()=>{
         const res = username.calculate_username(opt);
         assert.equal(res.username, 'lum-country-us-ip-1.1.1.1');
     });
+    describe('debug', ()=>{
+        it('should skip debug if default', ()=>{
+            const opt = {country: 'us', debug: 'full'};
+            const res = username.calculate_username(opt);
+            assert.equal(res.username, 'lum-country-us');
+        });
+        it('should apply debug if not default', ()=>{
+            const opt = {country: 'us', debug: 'none'};
+            const res = username.calculate_username(opt);
+            assert.equal(res.username, 'lum-country-us-debug-none');
+        });
+    });
+    describe('route_err', ()=>{
+        it('should skip route_err if default', ()=>{
+            const opt = {country: 'us', route_err: 'pass_dyn'};
+            const res = username.calculate_username(opt);
+            assert.equal(res.username, 'lum-country-us');
+        });
+        it('should apply route_err if not default', ()=>{
+            const opt = {country: 'us', route_err: 'block'};
+            const res = username.calculate_username(opt);
+            assert.equal(res.username, 'lum-country-us-route_err-block');
+        });
+    });
 });

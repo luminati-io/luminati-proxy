@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.178.350",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Store configuration on Luminati servers as a backup"
+            }
+        ]
+    },
+    {
         "ver": "1.178.241",
         "type": "stable",
         "changes": [

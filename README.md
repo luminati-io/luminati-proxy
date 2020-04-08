@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.178.241/luminati-proxy-manager-v1.178.241-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.178.350/luminati-proxy-manager-v1.178.350-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -266,7 +266,6 @@ Options:
   --multiply_ips                                                [default: false]
   --max_ban_retries                                                [default: 10]
   --multiply_vips                                               [default: false]
-  --session_duration                                                [default: 0]
   --bw_limit                                                        [default: 0]
 ```
 

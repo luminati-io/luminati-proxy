@@ -9,18 +9,12 @@ const presets = {
             manually (for example Chrome/Firefox) or programatically
             (for example Puppeteer/Selenium). All requests share the same
             IP. You can control when you refresh the IP from the UI or API.`,
-        set: opt=>{
-            opt.pool_size = 1;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.pool_size = 0;
-        },
+        set: opt=>null,
+        clean: opt=>null,
         disabled: {
             pool_size: true,
             session: true,
             rotate_session: true,
-            session_duration: true,
         },
     },
     rotating: {
@@ -38,7 +32,6 @@ const presets = {
         },
         clean: opt=>{
             opt.rotate_session = false;
-            opt.session_duration = 0;
             opt.pool_size = 0;
             opt.user_agent = '';
         },
@@ -54,7 +47,6 @@ const presets = {
         new_title: 'Automatic (Unblocker)',
         subtitle: 'Unblocker handles IP management automatically',
         set: opt=>{
-            opt.session = '';
             opt.rotate_session = true;
             opt.insecure = true;
         },
@@ -66,7 +58,6 @@ const presets = {
             pool_size: true,
             rotate_session: true,
             sticky_ip: true,
-            session_duration: true,
             session: true,
             session_termination: true,
             headers: true,
@@ -133,7 +124,6 @@ const presets = {
         clean: opt=>{
             opt.pool_size = 0;
             opt.rotate_session = false;
-            opt.session_duration = 0;
         },
     },
 };
