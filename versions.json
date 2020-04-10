@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.178.650",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Enable TLS connections support by default"
+            },
+            {
+                "type": "sparkles",
+                "text": "Support TLS connections by IP"
+            },
+            {
+                "type": "bug",
+                "text": "Fix POST requests retrying"
+            }
+        ]
+    },
+    {
         "ver": "1.178.350",
         "type": "stable",
         "changes": [

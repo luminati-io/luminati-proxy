@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.178.350",
+        "version": "1.178.650",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1457,10 +1457,6 @@
                 "ssl": {
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
-                },
-                "tls": {
-                    "type": "boolean",
-                    "description": "Enable TLS connection support"
                 },
                 "har_limit": {
                     "type": "number",

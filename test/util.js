@@ -80,4 +80,20 @@ describe('util', ()=>{
         for (const files of test_files)
             t(files);
     });
+    describe('is_eip', ()=>{
+        it('should accept any 32 long hexadecimal number with 1 char', ()=>{
+            assert.ok(util.is_eip('r'+new Array(33).join('a')));
+            assert.ok(util.is_eip('r'+new Array(33).join('1')));
+        });
+        it('should not accept strings wchich are not hexa numbers', ()=>{
+            assert.ok(!util.is_eip('r'+new Array(33).join('.')));
+            assert.ok(!util.is_eip('r'+new Array(33).join('G')));
+        });
+        it('should not accept shorter strings', ()=>{
+            assert.ok(!util.is_eip('r'+new Array(32).join('A')));
+        });
+        it('should not accept longer string', ()=>{
+            assert.ok(!util.is_eip('r'+new Array(34).join('A')));
+        });
+    });
 });

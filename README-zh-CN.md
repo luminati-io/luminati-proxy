@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.178.350-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.178.650-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -96,8 +96,6 @@ Options:
   --users                       List of users. This option has to be used along
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
-  --tls                         Enable TLS connection support
-                                                       [boolean] [default: true]
   --har_limit                   Number of bytes to store[number] [default: 1024]
   --iface                       Interface or IP to listen on            [string]
   --customer                    Luminati customer                       [string]
@@ -181,8 +179,7 @@ Options:
                                 becomes unavailable and redirect to confimration
                                 page before new IP is taken
                                                       [boolean] [default: false]
-  --api                         Alternative url to luminati API
-                                       [string] [default: "https://lum-lpm.com"]
+  --api                         Alternative url to luminati API         [string]
   --api_domain                  Alternative domain url to luminati API
                                                [string] [default: "lum-lpm.com"]
   --local_login                 Requires each browser to authenticate against
@@ -212,6 +209,7 @@ Options:
   --max_ban_retries                                                [default: 10]
   --multiply_vips                                               [default: false]
   --bw_limit                                                        [default: 0]
+  --api_domain_fallback                                   [default: "l-lpm.com"]
 ```
 
 ### Docker

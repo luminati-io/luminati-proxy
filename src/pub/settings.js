@@ -34,7 +34,17 @@ const tooltips = {
     request_stats: `Enable saving statistics to database`,
     logs: `Specify how many requests you want to keep in database. The
         limit may be set as a number or maximum database size.`,
-    log_level: 'Define how much log you want to keep in the file',
+    log_level: `Define how much log you want to see in the terminal</br>
+        <ul>
+          <li><strong>error: </strong>only error messages</li>
+          <li><strong>warn: </strong>all the above and warnings, potential
+            unsuccessful operations</li>
+          <li><strong>notice: </strong>all the above and the essential
+            notifications like creating proxy ports, refreshing sessions</li>
+          <li><strong>info: </strong>all the above and proxy requests, API
+            calls</li>
+          <li><strong>debug: </strong>all the above and debug info</li>
+        </ul>`,
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
@@ -157,7 +167,7 @@ class Form extends Pure_component {
               <Labeled_controller val={s.log}
                 type="select" on_change_wrapper={this.log_level_changed}
                 data={this.log_level_opts}
-                label="Log level" tooltip={tooltips.log_level}/>
+                label="Log level / API logs" tooltip={tooltips.log_level}/>
               <Loader_small show={this.state.saving}/>
             </div>;
     }

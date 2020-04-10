@@ -63,7 +63,6 @@ conf.server_default = {
     insecure: false,
     proxy_connection_type: 'http',
     ssl: false,
-    tls: true,
     test_url: 'http://lumtest.com/myip.json',
     proxy: 'zproxy.lum-superproxy.io',
     proxy_port: 22225,

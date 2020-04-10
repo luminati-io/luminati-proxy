@@ -4,6 +4,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const dns = require('dns');
 const net = require('net');
+const https = require('https');
 const socks = require('lum_socksv5');
 const {Netmask} = require('netmask');
 const ssl = require('../lib/ssl.js');
@@ -47,7 +48,6 @@ describe('proxy', ()=>{
             password,
             log: 'none',
             port: 24000,
-            tls: false,
         }, opt), mgr);
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')
@@ -129,11 +129,24 @@ describe('proxy', ()=>{
         sandbox.verifyAndRestore();
     }));
     describe('sanity', ()=>{
-        const t = (name, req, opt)=>it(name, etask._fn(function*(_this){
+        if (!('NODE_TLS_REJECT_UNAUTHORIZED' in process.env))
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = 1;
+        const t = (name, tls, req, opt)=>it(name+(tls ? ' tls' : ''),
+            etask._fn(
+        function*(_this){
             _this.timeout(5000);
             proxy.fake = false;
-            req = req();
+            opt = opt||{};
             l = yield lum(opt);
+            req = req();
+            if (tls)
+            {
+                sandbox.stub(process.env, 'NODE_TLS_REJECT_UNAUTHORIZED', 0);
+                if (typeof req=='string')
+                    req = {url: req};
+                req.agent = new https.Agent({servername: 'localhost'});
+                req.proxy = `https://localhost:${l.port}`;
+            }
             const res = yield l.test(req);
             assert.equal(ping.history.length, 1);
             const expected = {statusCode: 200, statusMessage: 'PONG'};
@@ -141,18 +154,21 @@ describe('proxy', ()=>{
                 Object.assign(expected, {body: req.body});
             assert_has(res, expected, 'res');
         }));
-        t('http', ()=>ping.http.url);
-        t('http post', ()=>{
-            return {url: ping.http.url, method: 'POST', body: 'test body'};
-        });
-        t('https', ()=>ping.https.url, {ssl: false});
-        t('https post', ()=>{
-            return {url: ping.https.url, method: 'POST', body: 'test body'};
-        }, {ssl: false});
-        t('https sniffing', ()=>ping.https.url, {insecure: true});
-        t('https sniffing post', ()=>{
-            return {url: ping.https.url, method: 'POST', body: 'test body'};
-        }, {insecure: true});
+        for (let tls of [false, true])
+        {
+            t('http', tls, ()=>ping.http.url);
+            t('http post', tls, ()=>{
+                return {url: ping.http.url, method: 'POST', body: 'test body'};
+            });
+            t('https', tls, ()=>ping.https.url, {ssl: false});
+            t('https post', tls,
+                ()=>({url: ping.https.url, method: 'POST', body: 'test body'}),
+                {ssl: false});
+            t('https sniffing', tls, ()=>ping.https.url, {insecure: true});
+            t('https sniffing post', tls,
+                ()=>({url: ping.https.url, method: 'POST', body: 'test body'}),
+                {insecure: true});
+        }
     });
     describe('encoding', ()=>{
         const t = (name, encoding)=>it(name, etask._fn(function*(_this){
@@ -760,6 +776,22 @@ describe('proxy', ()=>{
             status: '200',
             url: 'lumtest.com',
         }], 1);
+        it('retry post', ()=>etask(function*(){
+            proxy.fake = false;
+            let rules = [{action: {retry: true}, status: 200}];
+            l = yield lum({rules});
+            let retry_count = 0;
+            l.on('retry', opt=>{
+                if (opt.req.retry)
+                    retry_count++;
+                l.lpm_request(opt.req, opt.res, opt.head);
+                l.once('response', opt.post);
+            });
+            let opt = {url: ping.http.url, method: 'POST', body: 'test'};
+            let r = yield l.test(opt);
+            assert.equal(retry_count, 1);
+            assert.equal(r.body, 'test', 'body was sent on retry');
+        }));
     });
     describe('rules', ()=>{
         const inject_headers = (li, ip, ip_alt)=>{
