@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.179.25 Stable
+- :bug: Speed up ports initialization
+
 ## 1.178.650 Stable
 - :sparkles: Enable TLS connections support by default
 - :sparkles: Support TLS connections by IP

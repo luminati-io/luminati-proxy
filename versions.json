@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.179.25",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Speed up ports initialization"
+            }
+        ]
+    },
+    {
         "ver": "1.178.650",
         "type": "stable",
         "changes": [
