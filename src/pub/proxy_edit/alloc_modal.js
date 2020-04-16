@@ -150,17 +150,11 @@ export default class Alloc_modal extends Pure_component {
             });
             _this.loading(true);
             const data = {zone: _this.props.zone};
-            let url;
+            const url = '/api/refresh_ips';
             if (_this.props.type=='ips')
-            {
                 data.ips = vals.map(zurl.ip2num).join(' ');
-                url = '/api/refresh_ips';
-            }
             else
-            {
                 data.vips = vals;
-                url = '/api/refresh_vips';
-            }
             const res = yield ajax.json({method: 'POST', url, data});
             if (res.error || !res.ips && !res.vips)
             {

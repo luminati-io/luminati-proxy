@@ -7,6 +7,7 @@ const net = require('net');
 const https = require('https');
 const socks = require('lum_socksv5');
 const {Netmask} = require('netmask');
+const {Readable, Writable} = require('stream');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
 const lolex = require('lolex');
@@ -19,7 +20,7 @@ const requester = require('../lib/requester.js');
 const Timeline = require('../lib/timeline.js');
 const Ip_cache = require('../lib/ip_cache.js');
 const Config = require('../lib/config.js');
-const {decode_body} = require('../lib/util.js');
+const lutil = require('../lib/util.js');
 const consts = require('../lib/consts.js');
 const common = require('./common.js');
 const {assert_has, http_proxy, smtp_test_server, http_ping} = common;
@@ -724,10 +725,6 @@ describe('proxy', ()=>{
                 {proxy_connection_type: 'https'}, requester.t.Https_requester);
         });
         describe('har_limit', ()=>{
-            it('default limit is 1024', ()=>etask(function*(){
-                l = yield lum();
-                assert.equal(l.opt.har_limit, 1024);
-            }));
             it('should save whole the response', ()=>etask(function*(){
                 l = yield lum();
                 yield l.test({fake: {data: 100}});
@@ -844,7 +841,8 @@ describe('proxy', ()=>{
             assert.ok(!proxy_res.headers['content-encoding']);
             assert.equal(proxy_res.headers['content-type'],
                 'application/json; charset=utf-8');
-            const new_body = JSON.parse(decode_body(response.body).toString());
+            const new_body = JSON.parse(
+                lutil.decode_body(response.body).toString());
             assert.deepEqual(new_body, {price: '$12.99'});
             sinon.assert.calledWith(res.write, response.body[0]);
         }));
@@ -1653,5 +1651,42 @@ describe('proxy', ()=>{
         //     body: '^$', trigger_type: 'body'}];
         // t('retry rule on timeout', _.assign({}, config, {rules}),
         //     'canceled', 1, {silent_timeout: true});
+    });
+    describe('util', ()=>{
+        describe('create_count_stream', ()=>{
+            let t = (name, limit, chunks, expected)=>it(name, function(done){
+                let resp = {body_size: 0, body: []};
+                let $count = Server.create_count_stream(resp, limit);
+                let src = new Readable({
+                    read(){ this.push('1234567890'); this.push(null); }
+                });
+                let dst = new Writable({
+                    write(chunk, encoding, callback){ callback(); },
+                });
+                src.pipe($count).pipe(dst).on('finish', ()=>{
+                    assert.equal(resp.body.length, chunks);
+                    if (chunks)
+                        assert.equal(resp.body[0].length, expected);
+                    done();
+                });
+            });
+            t('disabled', -1, 0, 0);
+            t('cut', 5, 1, 5);
+            t('enough', 15, 1, 10);
+            t('unlimited', 0, 1, 10);
+            t('undefined means unlimited', undefined, 1, 10);
+        });
+        describe('decode_body', ()=>{
+            let t = (name, limit, expected)=>it(name, ()=>{
+                let buffer = Buffer.from('1234567890');
+                let body = lutil.decode_body([buffer], '', limit);
+                assert.equal(body, expected);
+            });
+            t('disabled', -1, '');
+            t('cut', 5, '12345');
+            t('enough', 15, '1234567890');
+            t('unlimited', 0, '1234567890');
+            t('undefined means unlimited', undefined, '1234567890');
+        });
     });
 });

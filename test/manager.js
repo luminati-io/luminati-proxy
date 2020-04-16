@@ -255,6 +255,12 @@ describe('manager', ()=>{
             }));
         });
     });
+    describe('default values', ()=>{
+        it('default har_limit is 1024', ()=>etask(function*(){
+            app = yield app_with_args(['--port', '24000']);
+            assert.equal(app.manager.proxy_ports[24000].opt.har_limit, 1024);
+        }));
+    });
     describe('report_bug', ()=>{
         // XXX krzysztof: get rid of this
         before(()=>{

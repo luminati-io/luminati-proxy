@@ -633,7 +633,7 @@ E.timezone = {
     SH: 'Atlantic/St_Helena',
     FK: 'Atlantic/Stanley',
     AU: 'Australia/Sydney',
-    CA: 'Canada/Eastern',
+    CA: 'America/Toronto',
     NL: 'Europe/Amsterdam',
     AD: 'Europe/Andorra',
     GR: 'Europe/Athens',
@@ -717,8 +717,8 @@ E.timezone = {
     KI: 'Pacific/Tarawa',
     TO: 'Pacific/Tongatapu',
     WF: 'Pacific/Wallis',
-    PL: 'Poland',
-    US: 'US/Eastern',
+    PL: 'Europe/Warsaw',
+    US: 'America/New_York',
 };
 E.regions = {
     AD: ['Southern Europe', 'EMEA'],

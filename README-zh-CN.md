@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.179.25-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.179.238-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -96,7 +96,6 @@ Options:
   --users                       List of users. This option has to be used along
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
-  --har_limit                   Number of bytes to store[number] [default: 1024]
   --iface                       Interface or IP to listen on            [string]
   --customer                    Luminati customer                       [string]
   --zone                        Zone                [string] [default: "static"]
@@ -173,6 +172,7 @@ Options:
   --log                         Log level           [string] [default: "notice"]
   --logs                        Enable logs for all proxies
                                                        [boolean] [default: 1000]
+  --har_limit                   Number of bytes to store[number] [default: 1024]
   --force                       Kill other instances of LPM if there are any
                                                       [boolean] [default: false]
   --session_termination         Stop sending new requests when the peer IP

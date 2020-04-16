@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.179.25/luminati-proxy-manager-v1.179.25-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.179.238/luminati-proxy-manager-v1.179.238-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -151,7 +151,6 @@ Options:
   --users                       List of users. This option has to be used along
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
-  --har_limit                   Number of bytes to store[number] [default: 1024]
   --iface                       Interface or IP to listen on            [string]
   --customer                    Luminati customer                       [string]
   --zone                        Zone                [string] [default: "static"]
@@ -228,6 +227,7 @@ Options:
   --log                         Log level           [string] [default: "notice"]
   --logs                        Enable logs for all proxies
                                                        [boolean] [default: 1000]
+  --har_limit                   Number of bytes to store[number] [default: 1024]
   --force                       Kill other instances of LPM if there are any
                                                       [boolean] [default: false]
   --session_termination         Stop sending new requests when the peer IP

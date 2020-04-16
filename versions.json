@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.179.238",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Make har_limit option configurable from settings page"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed banning IPs due to sending bad API requests"
+            }
+        ]
+    },
+    {
         "ver": "1.179.25",
         "type": "stable",
         "changes": [

@@ -47,6 +47,19 @@ E.write_e = (path, data, opt)=>etask(function*write_e(){
     yield check_file(path, opt);
     yield etask.nfn_apply(fs.writeFile, [path, data]);
 });
+E.write_atomic_e = (file, data, opt)=>etask(function*write_atomic_e(){
+    opt = opt||{};
+    yield check_file(file, opt);
+    let tmpfile = file+'.'+(1000000*Math.random()|0)+'.tmp';
+    try {
+        yield etask.nfn_apply(fs.writeFile, [tmpfile, data]);
+        yield etask.nfn_apply(fs.rename, [tmpfile, file]);
+    } catch(e){
+        E.unlink_e(tmpfile);
+        throw e;
+    }
+    return true;
+});
 E.rename_e = (old_path, new_path)=>
     etask.nfn_apply(fs.rename, [old_path, new_path]);
 E.unlink_e = path=>etask.nfn_apply(fs.unlink, [path]);

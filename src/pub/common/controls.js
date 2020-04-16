@@ -254,6 +254,11 @@ export class Select_number extends Pure_component {
     _fmt_num = n=>n && n.toLocaleString({useGrouping: true}) || n;
     _get_data = ()=>this.props.data ? this.props.data : this.opt_from_range();
     value_to_option = value=>{
+        if (value && value.label)
+            return value;
+        let option = (this.props.data||[]).find(el=>el&&el.value==value);
+        if (option)
+            return option;
         if (value==null)
             return false;
         const label = value==0 ? <T>Disabled</T> : this._fmt_num(+value);

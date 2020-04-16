@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.179.238 Stable
+- :sparkles: Make har_limit option configurable from settings page
+- :bug: Fixed banning IPs due to sending bad API requests
+
 ## 1.179.25 Stable
 - :bug: Speed up ports initialization
 

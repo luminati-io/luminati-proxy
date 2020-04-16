@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.179.25",
+        "version": "1.179.238",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -984,7 +984,7 @@
         },
         "/refresh_ips": {
             "post": {
-                "description": "Refresh allocated IPs in determined zone",
+                "description": "Refresh allocated IPs or gIPs in determined zone",
                 "tags": ["Proxy"],
                 "parameters": [
                     {
@@ -1004,6 +1004,12 @@
                                     "type": "array",
                                     "items": {"type": "string"},
                                     "example": ["10.0.0.0", "10.0.0.1"]
+                                },
+                                "vips": {
+                                    "description": "gIPs to be refreshed",
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "example": ["gIP_1", "gIP_2"]
                                 }
                             }
                         }
@@ -1019,51 +1025,6 @@
                                     "type": "array",
                                     "items": {
                                         "$ref": "#/definitions/ip_object"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/refresh_vips": {
-            "post": {
-                "description": "Refresh allocated gIPs in determined zone",
-                "tags": ["Proxy"],
-                "parameters": [
-                    {
-                        "name": "options",
-                        "in": "body",
-                        "description": "Refresh gIP options",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "zone": {
-                                    "description": "Zone",
-                                    "type": "string"
-                                },
-                                "vips": {
-                                    "description": "gIPs to be refreshed",
-                                    "type": "array",
-                                    "items": {"type": "string"},
-                                    "example": ["gip1", "gip2"]
-                                }
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "vips": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/vip_object"
                                     }
                                 }
                             }
@@ -1405,6 +1366,10 @@
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
                 },
+                "har_limit": {
+                    "type": "number",
+                    "description": "Number of bytes to store"
+                },
                 "force": {
                     "type": "boolean",
                     "description": "Kill other instances of LPM if there are any"
@@ -1457,10 +1422,6 @@
                 "ssl": {
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
-                },
-                "har_limit": {
-                    "type": "number",
-                    "description": "Number of bytes to store"
                 },
                 "iface": {
                     "type": "string",

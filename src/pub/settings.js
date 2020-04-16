@@ -34,6 +34,8 @@ const tooltips = {
     request_stats: `Enable saving statistics to database`,
     logs: `Specify how many requests you want to keep in database. The
         limit may be set as a number or maximum database size.`,
+    har_limit: `Define the limit for the size of the response body to save in
+        the logs`,
     log_level: `Define how much log you want to see in the terminal</br>
         <ul>
           <li><strong>error: </strong>only error messages</li>
@@ -48,6 +50,13 @@ const tooltips = {
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
+
+let har_limit_options = [
+    {value: -1, label: 'Disabled'},
+    {value: 1024, label: '1Kb (default)'},
+    {value: 100*1024, label: '100Kb'},
+    {value: 0, label: 'Unlimited'},
+];
 
 class Form extends Pure_component {
     state = {saving: false};
@@ -91,6 +100,10 @@ class Form extends Pure_component {
     };
     logs_changed = val=>{
         this.setState(prev=>({settings: {...prev.settings, logs: +val}}),
+            this.debounced_save);
+    };
+    har_limit_changed = val=>{
+        this.setState(prev=>({settings: {...prev.settings, har_limit: +val}}),
             this.debounced_save);
     };
     log_level_changed = val=>{
@@ -164,6 +177,11 @@ class Form extends Pure_component {
                 data={[0, 100, 1000, 10000]}
                 label="Limit for request logs" default
                 tooltip={tooltips.logs}/>
+              <Labeled_controller val={s.har_limit}
+                type="select_number" on_change_wrapper={this.har_limit_changed}
+                data={har_limit_options}
+                label="Response limit to save" default={1024}
+                tooltip={tooltips.har_limit}/>
               <Labeled_controller val={s.log}
                 type="select" on_change_wrapper={this.log_level_changed}
                 data={this.log_level_opts}

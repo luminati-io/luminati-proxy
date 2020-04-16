@@ -80,7 +80,6 @@ conf.server_default = {
     override_headers: true,
     bw_limit: 0,
     log: 'notice',
-    har_limit: 1024,
 };
 conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     www: 22999,
@@ -91,6 +90,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     no_usage_stats: false,
     request_stats: true,
     logs: 1000,
+    har_limit: 1024,
     reverse_lookup_dns: false,
     force: false,
     session_termination: false,
