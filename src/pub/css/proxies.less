@@ -1,0 +1,37 @@
+@import (reference) 'common.less';
+.proxies {
+    &.nav_header { padding: 0 15px 10px; }
+    .proxies_panel {
+        height: 100%;
+    }
+    .proxies_actions {
+        visibility: hidden;
+        display: grid;
+        grid-template-columns: 25% 25% 25% 25%;
+        .action_icon.chrome_icon { width: 18px; }
+        .trash { grid-column: 1; }
+        .duplicate { grid-column: 2; }
+        .refresh { grid-column: 3; }
+        .browser { grid-column: 4; }
+    }
+    .proxies_actions_3 {
+        visibility: hidden;
+        display: grid;
+        grid-template-columns: 33% 33% 33%;
+        .action_icon.chrome_icon { width: 18px; }
+        .trash { grid-column: 1; }
+        .duplicate { grid-column: 2; }
+        .refresh { grid-column: 3; }
+    }
+    .chrome_tr:hover {
+        .proxies_actions {
+            visibility: visible;
+        }
+        .proxies_actions_3 {
+            visibility: visible;
+        }
+    }
+}
+.proxies_panel {
+    .panel_container();
+}

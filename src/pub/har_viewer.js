@@ -1,26 +1,46 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
+import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
+import {Route, withRouter, Link} from 'react-router-dom';
+import React_tooltip from 'react-tooltip';
+import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import zescape from '../../util/escape.js';
-import $ from 'jquery';
-import {status_codes, bytes_format} from './util.js';
-import Waypoint from 'react-waypoint';
-import {Toolbar_button, Tooltip, Devider, Sort_icon,
-    with_resizable_cols} from './chrome_widgets.js';
+import {status_codes, bytes_format, report_exception} from './util.js';
+import {Waypoint} from 'react-waypoint';
+import {Toolbar_button, Devider, Sort_icon, with_resizable_cols,
+    Toolbar_container, Toolbar_row, Search_box} from './chrome_widgets.js';
+import {T} from './common/i18n.js';
 import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
-import {withRouter} from 'react-router-dom';
+import Tooltip from './common/tooltip.js';
+import ws from './ws.js';
+import './css/har_viewer.less';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
     end: ()=>$('#har_viewer').removeClass('waiting'),
 };
+
+const enable_ssl_click = port=>etask(function*(){
+    this.on('finally', ()=>{
+        loader.end();
+    });
+    loader.start();
+    yield window.fetch('/api/enable_ssl', {
+        method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({port}),
+    });
+    const proxies = yield ajax.json({url: '/api/proxies_running'});
+    setdb.set('head.proxies_running', proxies);
+});
 
 class Har_viewer extends Pure_component {
     moving_width = false;
@@ -43,9 +63,14 @@ class Har_viewer extends Pure_component {
             if (proxies)
                 this.setState({proxies});
         });
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({logs: settings.logs});
+        });
         this.etask(function*(){
             const suggestions = yield ajax.json(
                 {url: '/api/logs_suggestions'});
+            suggestions.status_codes.unshift(...[2, 3, 4, 5].map(v=>`${v}**`));
             setdb.set('head.logs_suggestions', suggestions);
         });
     }
@@ -83,10 +108,14 @@ class Har_viewer extends Pure_component {
         $(this.main_panel).removeClass('moving');
     };
     clear = ()=>{
+        const params = {};
+        if (this.props.match && this.props.match.params.port)
+            params.port = this.props.match.params.port;
+        const url = zescape.uri('/api/logs_reset', params);
         const _this = this;
         this.etask(function*(){
             loader.start();
-            yield ajax({url: '/api/logs_reset'});
+            yield ajax({url});
             _this.close_preview();
             setdb.emit_path('head.har_viewer.reset_reqs');
             loader.end();
@@ -117,41 +146,50 @@ class Har_viewer extends Pure_component {
             return null;
         const width = `calc(100% - ${this.state.tables_width}px`;
         const preview_style = {maxWidth: width, minWidth: width};
-        return <div id="har_viewer" className="har_viewer chrome">
-              <div className="main_panel vbox" ref={this.set_main_panel_ref}>
-                <Toolbar
-                  undock={this.undock}
-                  dock_mode={this.props.dock_mode}
-                  master_port={this.props.master_port}
-                  filters={this.state.filters}
-                  set_filter={this.set_filter}
-                  proxies={this.state.proxies}
-                  type_filter={this.state.type_filter}
-                  set_type_filter={this.set_type_filter}
-                  clear={this.clear}
-                  on_change_search={this.on_change_search}
-                  search_val={this.state.search}/>
-                <div className="split_widget vbox flex_auto">
-                  <Tables_container
-                    key={''+this.props.master_port}
+        const show = this.state.logs>0;
+        return <div id="har_viewer" className={(show ? 'har_viewer' :
+            'har_viewer_off')+' chrome'}>
+              {!show &&
+                <Route path={['/logs', '/proxy/:port/logs/har']}
+                  component={Logs_off_notice}/>
+              }
+              {show &&
+                <div className="main_panel vbox" ref={this.set_main_panel_ref}>
+                  <Toolbar
+                    undock={this.undock}
+                    dock_mode={this.props.dock_mode}
                     master_port={this.props.master_port}
-                    main_panel_moving={this.main_panel_moving}
-                    main_panel_stopped_moving={this.main_panel_stopped_moving}
-                    main_panel={this.main_panel}
-                    open_preview={this.open_preview}
-                    width={this.state.tables_width}
-                    search={this.state.search}
-                    type_filter={this.state.type_filter}
                     filters={this.state.filters}
-                    cur_preview={this.state.cur_preview}/>
-                  <Preview cur_preview={this.state.cur_preview}
-                    style={preview_style}
-                    close_preview={this.close_preview}/>
-                  <Tables_resizer show={!!this.state.cur_preview}
-                    start_moving={this.start_moving_width}
-                    offset={this.state.tables_width}/>
+                    set_filter={this.set_filter}
+                    proxies={this.state.proxies}
+                    type_filter={this.state.type_filter}
+                    set_type_filter={this.set_type_filter}
+                    clear={this.clear}
+                    on_change_search={this.on_change_search}
+                    search_val={this.state.search}/>
+                  <div className="split_widget vbox flex_auto">
+                    <Tables_container
+                      key={''+this.props.master_port}
+                      master_port={this.props.master_port}
+                      main_panel_moving={this.main_panel_moving}
+                      main_panel_stopped_moving=
+                        {this.main_panel_stopped_moving}
+                      main_panel={this.main_panel}
+                      open_preview={this.open_preview}
+                      width={this.state.tables_width}
+                      search={this.state.search}
+                      type_filter={this.state.type_filter}
+                      filters={this.state.filters}
+                      cur_preview={this.state.cur_preview}/>
+                    <Preview cur_preview={this.state.cur_preview}
+                      style={preview_style}
+                      close={this.close_preview}/>
+                    <Tables_resizer show={!!this.state.cur_preview}
+                      start_moving={this.start_moving_width}
+                      offset={this.state.tables_width}/>
+                  </div>
                 </div>
-              </div>
+              }
             </div>;
     }
 }
@@ -164,32 +202,56 @@ class Toolbar extends Pure_component {
             this.setState({select_visible: visible}));
         this.setdb_on('har_viewer.select_mode', actions_visible=>
             this.setState({actions_visible}));
+        this.setdb_on('head.save_settings', save_settings=>{
+            this.save_settings = save_settings;
+            if (this.disable)
+            {
+                this.disable_logs();
+                delete this.disable;
+            }
+        });
     }
     toggle_filters = ()=>
         this.setState({filters_visible: !this.state.filters_visible});
     toggle_actions = ()=>{
         setdb.set('har_viewer.select_mode', !this.state.actions_visible);
     };
+    disable_logs = ()=>{
+        if (!this.save_settings)
+        {
+            this.disable = true;
+            return;
+        }
+        const _this = this;
+        this.etask(function*(){
+            const settings = Object.assign({}, setdb.get('head.settings'));
+            settings.logs = 0;
+            yield _this.save_settings(settings);
+        });
+    };
     render(){
         const {clear, search_val, on_change_search, type_filter,
             set_type_filter, filters, set_filter, master_port, undock,
             dock_mode} = this.props;
-        return <div className="toolbar_container">
-              <Toolbar_row>
-                <Toolbar_button id="clear" tooltip="Clear" on_click={clear}/>
+        return <Toolbar_container>
+              <T>{t=><Toolbar_row>
+                <Toolbar_button id="clear" tooltip={t('Clear')}
+                  on_click={clear}/>
                 {!dock_mode &&
-                  <Toolbar_button id="docker"
-                    tooltip="Undock into separate window" on_click={undock}/>
+                  <Toolbar_button id="docker" on_click={undock}
+                    tooltip={t('Undock into separate window')}/>
                 }
-                <Toolbar_button id="filters" tooltip="Show/hide filters"
+                <Toolbar_button id="filters" tooltip={t('Show/hide filters')}
                   on_click={this.toggle_filters}
                   active={this.state.filters_visible}/>
-                <Toolbar_button id="download" tooltip="Export as HAR file"
+                <Toolbar_button id="download" tooltip={t('Export as HAR file')}
                   href="/api/logs_har"/>
                 <Toolbar_button id="actions" on_click={this.toggle_actions}
                   active={this.state.actions_visible}
-                  tooltip="Show/hide additional actions"/>
-              </Toolbar_row>
+                  tooltip={t('Show/hide additional actions')}/>
+                <Toolbar_button id="close_btn" tooltip={t('Disable')}
+                  placement="left" on_click={this.disable_logs}/>
+              </Toolbar_row>}</T>
               {this.state.actions_visible &&
                 <Toolbar_row>
                   <Actions/>
@@ -204,14 +266,9 @@ class Toolbar extends Pure_component {
                     master_port={master_port}/>
                 </Toolbar_row>
               }
-            </div>;
+            </Toolbar_container>;
     }
 }
-
-const Toolbar_row = ({children})=>
-    <div className="toolbar">
-      {children}
-    </div>;
 
 class Actions extends Pure_component {
     state = {any_checked: false};
@@ -228,9 +285,11 @@ class Actions extends Pure_component {
         if (!Object.keys(list).length)
             return;
         const uuids = Object.keys(list).filter(o=>list[o]);
+        const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
-            // XXX krzysztof: switch fetch->ajax
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e, 'har_viewer.Actions.resend');
+            }));
             yield window.fetch('/api/logs_resend', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -325,20 +384,21 @@ const Type_filter = ({name, cur, tooltip, on_click})=>
         onClick={on_click}>{name}</div>
     </Tooltip>;
 
-const Search_box = ({val, on_change})=>
-    <div className="search_box">
-      <input value={val}
-        onChange={on_change}
-        type="text"
-        placeholder="Filter"/>
-    </div>;
-
 const Tables_resizer = ({show, offset, start_moving})=>{
     if (!show)
         return null;
     return <div className="data_grid_resizer" style={{left: offset-2}}
       onMouseDown={start_moving}/>;
 };
+
+const Logs_off_notice = ()=>
+    <div>
+      <h4>
+        Request logs are disabled. You can enable it back in
+        &nbsp;
+        <Link to="/settings">General settings</Link>
+      </h4>
+    </div>;
 
 const table_cols = [
     {title: 'select', hidden: true, fixed: 27, tooltip: 'Select/unselect all'},
@@ -355,14 +415,20 @@ const table_cols = [
 ];
 const Tables_container = withRouter(with_resizable_cols(table_cols,
 class Tables_container extends Pure_component {
-    uri = '/api/logs';
-    batch_size = 30;
-    loaded = {from: 0, to: 0};
-    state = {
-        focused: false,
-        reqs: [],
-        sorted: {field: 'timestamp', dir: 1},
-    };
+    constructor(props){
+        super(props);
+        this.uri = '/api/logs';
+        this.batch_size = 30;
+        this.loaded = {from: 0, to: 0};
+        this.state = {
+            focused: false,
+            reqs: [],
+            sorted: {field: 'timestamp', dir: 1},
+        };
+        this.reqs_to_render = [];
+        this.temp_total = 0;
+        this.take_reqs_from_pool = _.throttle(this.take_reqs_from_pool, 100);
+    }
     componentDidUpdate(prev_props){
         if (this.props.search!=prev_props.search)
             this.set_new_params_debounced();
@@ -383,16 +449,7 @@ class Tables_container extends Pure_component {
                 reqs: [],
                 stats: {total: 0, sum_out: 0, sum_in: 0},
             });
-        });
-        this.setdb_on('head.har_viewer.refresh', refresh=>{
-            if (!refresh)
-                return;
-            this.loaded.to = 0;
-            this.setState({
-                reqs: [],
-                stats: {total: 0, sum_out: 0, sum_in: 0},
-            });
-        });
+        }, {init: false});
         this.setdb_on('head.har_viewer.reqs', reqs=>{
             if (reqs)
                 this.setState({reqs});
@@ -401,14 +458,7 @@ class Tables_container extends Pure_component {
             if (stats)
                 this.setState({stats});
         });
-        this.setdb_on('head.har_viewer.sub_stats', sub_stats=>
-            this.setState({sub_stats}));
-        this.setdb_on('head.ws', ws=>{
-            if (!ws||this.ws)
-                return;
-            this.ws = ws;
-            this.ws.addEventListener('message', this.on_message);
-        });
+        ws.addEventListener('message', this.on_message);
         this.setdb_on('har_viewer.select_mode', select=>{
             if (select==undefined)
                 return;
@@ -420,20 +470,20 @@ class Tables_container extends Pure_component {
     }
     willUnmount(){
         window.removeEventListener('resize', this.props.resize_columns);
-        if (this.ws)
-            this.ws.removeEventListener('message', this.on_message);
+        ws.removeEventListener('message', this.on_message);
         setdb.set('head.har_viewer.reqs', []);
         setdb.set('head.har_viewer.stats', null);
         setdb.set('har_viewer', null);
+        this.take_reqs_from_pool.cancel();
     }
     fetch_missing_data = pos=>{
-        if (this.state.stats&&this.state.stats.total&&
+        if (this.state.stats && this.state.stats.total &&
             this.state.reqs.length==this.state.stats.total)
         {
             return;
         }
         if (pos=='bottom')
-            this.get_data({skip: this.loaded.to});
+            this.get_data({skip: this.loaded.to-this.temp_total});
     };
     get_params = opt=>{
         const params = opt;
@@ -492,14 +542,14 @@ class Tables_container extends Pure_component {
             });
             setdb.set('head.har_viewer.reqs', new_reqs_unique);
             _this.loaded.to = opt.skip+reqs.length;
-            const stats = {total: res.total, sum_out: res.sum_out,
-                sum_in: res.sum_in};
-            if (!_this.state.stats||!_this.state.stats.total)
+            const stats = {
+                total: res.total+_this.temp_total,
+                sum_out: res.sum_out,
+                sum_in: res.sum_in,
+            };
+            _this.temp_total = 0;
+            if (!_this.state.stats)
                 setdb.set('head.har_viewer.stats', stats);
-            if (params.search)
-                setdb.set('head.har_viewer.sub_stats', stats);
-            else if (_this.state.sub_stats)
-                setdb.set('head.har_viewer.sub_stats', null);
         });
     };
     set_new_params = ()=>{
@@ -520,110 +570,105 @@ class Tables_container extends Pure_component {
     };
     on_focus = ()=>this.setState({focused: true});
     on_blur = ()=>this.setState({focused: false});
-    is_hidden = request=>{
-        const cur_port = request.details.port;
+    is_hidden = req=>{
+        const cur_port = req.details.port;
         const port = this.props.match.params.port;
-        if (port&&cur_port!=port)
+        if (port && cur_port!=port)
             return true;
-        if (this.port_range&&
-            (cur_port<this.port_range.from||cur_port>this.port_range.to))
+        if (this.port_range &&
+            (cur_port<this.port_range.from || cur_port>this.port_range.to))
         {
             return true;
         }
-        if (this.props.search&&!request.request.url.match(
+        if (this.props.search && !req.request.url.match(
             new RegExp(this.props.search)))
         {
             return true;
         }
-        if (this.props.type_filter&&this.props.type_filter!='All'&&
-            request.details.content_type!=this.props.type_filter.toLowerCase())
+        if (this.props.type_filter && this.props.type_filter!='All' &&
+            req.details.content_type!=this.props.type_filter.toLowerCase())
         {
             return true;
         }
-        if (this.props.filters.port&&
-            this.props.filters.port!=request.details.port)
+        if (this.props.filters.port &&
+            this.props.filters.port!=req.details.port)
         {
             return true;
         }
-        if (this.props.filters.protocol&&
-            this.props.filters.protocol!=request.details.protocol)
+        if (this.props.filters.protocol &&
+            this.props.filters.protocol!=req.details.protocol)
         {
             return true;
         }
-        if (this.props.filters.status_code&&
-            this.props.filters.status_code!=request.response.status)
+        if (this.props.filters.status_code &&
+            this.props.filters.status_code!=req.response.status)
         {
             return true;
         }
         return false;
     };
+    is_visible = r=>!this.is_hidden(r);
     on_message = event=>{
         const json = JSON.parse(event.data);
         if (json.type=='har_viewer')
             this.on_request_message(json.data);
         else if (json.type=='har_viewer_start')
             this.on_request_started_message(json.data);
-        else if (json.type=='har_viewer_abort')
-            this.on_request_aborted_message(json.data);
-    };
-    on_request_aborted_message = uuid=>{
-        const new_reqs = this.state.reqs.filter(r=>r.uuid!=uuid);
-        const delta = new_reqs.length!=this.state.reqs.length ? -1 : 0;
-        this.setState(prev=>({
-            reqs: new_reqs,
-            stats: {
-                ...prev.stats,
-                total: prev.stats.total+delta,
-            },
-        }));
     };
     on_request_started_message = req=>{
         req.pending = true;
         this.on_request_message(req);
     };
     on_request_message = req=>{
-        // XXX krzysztof: reduce updating state from 3x to 1x
-        this.setState(prev=>({
-            stats: {
-                total: prev.stats.total+(req.pending ? 1 : 0),
-                sum_out: prev.stats.sum_out+req.details.out_bw,
-                sum_in: prev.stats.sum_in+req.details.in_bw,
-            },
-        }));
-        if (this.is_hidden(req))
+        this.reqs_to_render.push(req);
+        this.take_reqs_from_pool();
+    };
+    take_reqs_from_pool = ()=>{
+        if (!this.reqs_to_render.length)
             return;
-        const sorted_field = this.props.cols.find(
-            c=>c.sort_by==this.state.sorted.field).data;
-        const dir = this.state.sorted.dir;
-        const new_size = Math.max(this.state.reqs.length, this.batch_size);
-        if (new_size>this.state.reqs.length)
-            this.loaded.to = this.loaded.to+1;
+        const reqs = this.reqs_to_render.filter(this.is_visible);
+        const all_reqs = this.reqs_to_render;
+        if (this.batch_size>this.state.reqs.length)
+        {
+            this.loaded.to = Math.min(this.batch_size,
+                this.state.reqs.length + reqs.length);
+        }
         const new_reqs_set = {};
-        [...this.state.reqs, req].forEach(r=>{
+        [...this.state.reqs, ...reqs].forEach(r=>{
             if (!new_reqs_set[r.uuid])
                 return new_reqs_set[r.uuid] = r;
             if (new_reqs_set[r.uuid].pending)
                 new_reqs_set[r.uuid] = r;
         });
-        const new_reqs = Object.values(new_reqs_set).sort((a, b)=>{
+        const sorted_field = this.props.cols.find(
+            c=>c.sort_by==this.state.sorted.field).data;
+        const dir = this.state.sorted.dir;
+        const new_reqs = Object.values(new_reqs_set)
+        .sort((a, b)=>{
             const val_a = _.get(a, sorted_field);
             const val_b = _.get(b, sorted_field);
             if (val_a==val_b)
                 return a.uuid > b.uuid ? -1*dir : dir;
             return val_a > val_b ? -1*dir : dir;
-        }).slice(0, new_size);
-        this.setState({reqs: new_reqs});
-        // XXX krzysztof: improve logic for stats and substats
-        if (this.state.sub_stats)
-        {
-            this.setState(prev=>({
-                sub_stats: {
-                    total: prev.sub_stats.total+1,
-                    sum_out: prev.sub_stats.sum_out+req.details.out_bw,
-                    sum_in: prev.sub_stats.sum_in+req.details.in_bw,
-                },
-            }));
-        }
+        }).slice(0, Math.max(this.state.reqs.length, this.batch_size));
+        this.reqs_to_render = [];
+        this.setState(prev=>{
+            const new_state = {reqs: new_reqs};
+            if (prev.stats)
+            {
+                new_state.stats = {
+                    total: prev.stats.total+
+                        all_reqs.filter(r=>r.pending).length,
+                    sum_out: prev.stats.sum_out+all_reqs.reduce((acc, r)=>
+                        acc+r.details.out_bw||0, 0),
+                    sum_in: prev.stats.sum_in+all_reqs.reduce((acc, r)=>
+                        acc+r.details.in_bw||0, 0),
+                };
+            }
+            else
+                this.temp_total += all_reqs.filter(r=>r.pending).length;
+            return new_state;
+        });
     };
     on_mouse_up = ()=>{
         this.moving_col = null;
@@ -655,8 +700,7 @@ class Tables_container extends Pure_component {
                   cur_preview={this.props.cur_preview}
                   open_preview={this.props.open_preview}/>
               </div>
-              <Summary_bar stats={this.state.stats}
-                sub_stats={this.state.sub_stats}/>
+              <Summary_bar stats={this.state.stats}/>
             </div>;
     }
 }));
@@ -667,22 +711,11 @@ class Summary_bar extends Pure_component {
             {total: 0, sum_in: 0, sum_out: 0};
         sum_out = bytes_format(sum_out)||'0 B';
         sum_in = bytes_format(sum_in)||'0 B';
-        let text;
-        if (!this.props.sub_stats)
-            text = `${total} requests | ${sum_out} sent | ${sum_in} received`;
-        else
-        {
-            let sub_total = this.props.sub_stats.total;
-            let sub_sum_out = this.props.sub_stats.sum_out;
-            let sub_sum_in = this.props.sub_stats.sum_in;
-            sub_sum_out = bytes_format(sub_sum_out)||'0 B';
-            sub_sum_in = bytes_format(sub_sum_in)||'0 B';
-            text = `${sub_total} / ${total} requests | ${sub_sum_out} /
-            ${sum_out} sent | ${sub_sum_in} / ${sum_in} received`;
-        }
+        const txt = t=>`${total} ${t('requests')} | ${sum_out} ${t('sent')} `
+            +`| ${sum_in} ${t('received')}`;
         return <div className="summary_bar">
               <span>
-                <Tooltip title={text}>{text}</Tooltip>
+                <T>{t=><Tooltip title={txt(t)}>{txt(t)}</Tooltip>}</T>
               </span>
             </div>;
     }
@@ -725,7 +758,6 @@ class Header_container extends Pure_component {
             return null;
         if (only_name)
             cols = [cols[1]];
-
         return <div className="header_container">
               <table>
                 <colgroup>
@@ -738,17 +770,22 @@ class Header_container extends Pure_component {
                 <tbody>
                   <tr>
                     {cols.map(c=>
-                      <Tooltip key={c.title} title={c.tooltip||c.title}>
-                        <th key={c.title} onClick={()=>this.click(c)}>
-                          <div>
-                            {c.title=='select' &&
-                              <Checkbox checked={this.state.checked_all}/>}
-                            {c.title!='select' && c.title}
-                          </div>
-                          <Sort_icon show={c.sort_by==sorted.field}
-                            dir={sorted.dir}/>
-                        </th>
-                      </Tooltip>
+                      <T key={c.title}>{t=>
+                        <Tooltip title={t(c.tooltip||c.title)}>
+                          <th key={c.title} onClick={()=>this.click(c)}
+                            style={{textAlign: only_name ? 'left' : null}}>
+                            <div>
+                              {c.title=='select' &&
+                                <Checkbox checked={this.state.checked_all}
+                                  // no-op to remove React warning
+                                  on_change={()=>null}/>}
+                              {c.title!='select' && t(c.title)}
+                            </div>
+                            <Sort_icon show={c.sort_by==sorted.field}
+                              dir={sorted.dir}/>
+                          </th>
+                        </Tooltip>
+                      }</T>
                     )}
                   </tr>
                 </tbody>
@@ -761,18 +798,18 @@ class Data_container extends Pure_component {
     state = {checked_all: false};
     componentDidMount(){
         this.setdb_on('head.har_viewer.dc_top', ()=>{
-            if (this.dc)
-                this.dc.scrollTop = 0;
+            if (this.dc.current)
+                this.dc.current.scrollTop = 0;
         });
         this.setdb_on('har_viewer.checked_all', checked_all=>{
             if (checked_all!=undefined)
                 this.setState({checked_all});
         });
     }
-    set_dc_ref = ref=>{ this.dc = ref; };
     handle_viewpoint_enter = ()=>{
         this.props.fetch_missing_data('bottom');
     };
+    dc = React.createRef();
     render(){
         let {cols, open_preview, cur_preview, focused, reqs} = this.props;
         const preview_mode = !!cur_preview;
@@ -783,12 +820,12 @@ class Data_container extends Pure_component {
                 return {...c, width: 'auto'};
             return {...c, width: 0};
         });
-        return <div ref={this.set_dc_ref} className="data_container">
+        return <div ref={this.dc} className="data_container">
               <table>
                 <colgroup>
                   {cols.map((c, idx)=>
                     <col key={c.title}
-                      style={{width: !preview_mode&&idx==cols.length-1 ?
+                      style={{width: !preview_mode && idx==cols.length-1 ?
                         'auto': c.width}}/>
                   )}
                 </colgroup>
@@ -796,7 +833,8 @@ class Data_container extends Pure_component {
                   cur_preview={cur_preview}
                   checked_all={this.state.checked_all} focused={focused}/>
               </table>
-              <Waypoint key={reqs.length} scrollableAncestor={this.dc}
+              <Waypoint key={reqs.length} scrollableAncestor={this.dc.current}
+                bottomOffset="-50px"
                 onEnter={this.handle_viewpoint_enter}/>
             </div>;
     }
@@ -850,7 +888,7 @@ class Data_row extends React.Component {
         });
         return <tr className={classes}>
               {cols.map((c, idx)=>
-                <td key={c.title} onClick={()=>idx!=0&&open_preview(req)}>
+                <td key={c.title} onClick={()=>idx!=0 && open_preview(req)}>
                   <Cell_value col={c.title} req={req}
                     checked_all={this.props.checked_all}/>
                 </td>
@@ -871,18 +909,18 @@ const maybe_pending = Component=>function pies(props){
 
 class Cell_value extends React.Component {
     render(){
-        const {col, req, req: {details: {timeline}}} = this.props;
+        const {col, req, req: {details: {timeline, rules}}} = this.props;
         if (col=='select')
         {
             return <Select_cell uuid={req.uuid}
               checked_all={this.props.checked_all}/>;
         }
         if (col=='Name')
-            return <Name_cell req={req} timeline={timeline}/>;
+            return <Name_cell req={req} timeline={timeline} rules={rules}/>;
         else if (col=='Status')
         {
             return <Status_code_cell status={req.response.status}
-                  pending={!!req.pending}/>;
+                  pending={!!req.pending} uuid={req.uuid} req={req}/>;
         }
         else if (col=='Proxy port')
             return <Tooltip_and_value val={req.details.port}/>;
@@ -891,12 +929,19 @@ class Cell_value extends React.Component {
         else if (col=='Time')
         {
             return <Time_cell time={req.time} url={req.request.url}
-                  pending={!!req.pending}/>;
+                  pending={!!req.pending} uuid={req.uuid}
+                  port={req.details.port}/>;
         }
         else if (col=='Peer proxy')
         {
-            return <Tooltip_and_value val={req.details.proxy_peer}
-                  pending={!!req.pending}/>;
+            const ip = req.details.proxy_peer;
+            const ext_proxy = (setdb.get('head.proxies_running')||[])
+                .some(p=>p.port==req.details.port && p.ext_proxies);
+            const val = ip && ip.length > 15 ? `...${ip.slice(-5)}` : ip;
+            const tip = ext_proxy ? 'This feature is only available when '
+                +'using proxies by Luminati network' : ip;
+            return <Tooltip_and_value val={val} tip={tip}
+                pending={!!req.pending}/>;
         }
         else if (col=='Date')
         {
@@ -909,25 +954,28 @@ class Cell_value extends React.Component {
 }
 
 class Name_cell extends Pure_component {
-    go_to_timeline = e=>setdb.emit('har_viewer.set_pane', 3);
+    go_to_rules = e=>setdb.emit('har_viewer.set_pane', 4);
     render(){
-        const {req, timeline} = this.props;
-        const rule_tip = 'At least one rule has been applied to this'
-        +' request. Click to see more details';
+        const {req, rules} = this.props;
+        const rule_tip = 'At least one rule has been applied to this '
+        +'request. Click to see more details';
         const status_check = req.details.context=='STATUS CHECK';
+        const is_ban = r=>Object.keys(r.action||{})
+            .some(a=>a.startsWith('ban_ip'));
+        const bad = (rules||[]).some(is_ban);
+        const icon_classes = classnames('small_icon', 'rules', {
+            good: !bad, bad});
         return <div className="col_name">
               <div>
                 <div className="icon script"/>
-                {timeline && timeline.length>1 &&
+                {!!rules && !!rules.length &&
                   <Tooltip title={rule_tip}>
-                    <div onClick={this.go_to_timeline}
-                      className="small_icon rules"/>
+                    <div onClick={this.go_to_rules} className={icon_classes}/>
                   </Tooltip>
                 }
                 <Tooltip title={req.request.url}>
                   <div className="disp_value">
-                    {status_check && 'status check'}
-                    {!status_check && req.request.url}
+                    {req.request.url + (status_check ? ' (status check)' : '')}
                   </div>
                 </Tooltip>
               </div>
@@ -935,28 +983,85 @@ class Name_cell extends Pure_component {
     }
 }
 
-const Status_code_cell = maybe_pending(({status})=>{
-    const desc = status_codes[status];
-    return <Tooltip title={`${status} - ${desc}`}>
-          <div className="disp_value">
-            {status}
-            {status=='unknown' && <div className="small_icon status info"/>}
-          </div>
+const Status_code_cell = maybe_pending(props=>{
+    const {status, uuid, req} = props;
+    const get_desc = ()=>{
+        const err_header = req.response.headers.find(
+            r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
+        if (status==502 && err_header)
+            return err_header.value;
+        return status=='canceled' ? '' : status_codes[status];
+    };
+    if (status=='unknown')
+    {
+        return <Encrypted_cell name="Status code" id={`s${uuid}`}
+            port={req.details.port}/>;
+    }
+    const desc = get_desc(status);
+    return <Tooltip title={`${status} ${desc}`}>
+          <div className="disp_value">{status}</div>
         </Tooltip>;
 });
 
-const Time_cell = maybe_pending(({time, url})=>{
-    if (!url.endsWith(':443')||!time)
-        return <Tooltip_and_value val={time&&time+' ms'}/>;
-    const tip = `This timing might not be accurate if the remote server held
-        the connection open. Enable SSL analyzing to fix this`;
-    return <Tooltip title={tip}>
-          <div className="disp_value">
-            {time+' ms'}
-            {url.endsWith(':443') && <div className="small_icon status info"/>}
-          </div>
-        </Tooltip>;
+const Time_cell = maybe_pending(props=>{
+    const {port, time, url, uuid} = props;
+    if (!url.endsWith(':443') || !time)
+        return <Tooltip_and_value val={time && time+' ms'}/>;
+    return <Encrypted_cell name="Timing" id={`t${uuid}`} port={port}/>;
 });
+
+class Encrypted_cell extends Pure_component {
+    state = {proxies: []};
+    componentDidMount(){
+        this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies)
+                return;
+            this.setState({proxies});
+        });
+    }
+    is_ssl_on = port=>{
+        const proxy = this.state.proxies.find(p=>p.port==port);
+        if (!proxy)
+            return false;
+        return proxy.ssl;
+    };
+    render(){
+        const {id, name, port} = this.props;
+        const ssl = this.is_ssl_on(port);
+        return <div onClick={e=>e.stopPropagation()} className="disp_value">
+              <React_tooltip id={id} type="info" effect="solid"
+                delayHide={100} delayShow={0} delayUpdate={500}
+                offset={{top: -10}}>
+                <div>
+                  {name} of this request could not be parsed because the
+                  connection is encrypted.
+                </div>
+                {!ssl &&
+                    <div style={{marginTop: 10}}>
+                      <a onClick={()=>enable_ssl_click(port)}
+                        className="link">
+                        Enable SSL analyzing
+                      </a>
+                      <span>
+                        to see {name} and other information about requests
+                      </span>
+                    </div>
+                }
+                {ssl &&
+                    <div style={{marginTop: 10}}>
+                      SSL analyzing is already turned on and all the future
+                      requestes will be decoded. This request can't be decoded
+                      retroactively
+                    </div>
+                }
+              </React_tooltip>
+              <div data-tip="React-tooltip" data-for={id}>
+                <span>unknown</span>
+                <div className="small_icon status info"/>
+              </div>
+            </div>;
+    }
+}
 
 class Select_cell extends React.Component {
     state = {checked: false};
@@ -982,7 +1087,7 @@ class Select_cell extends React.Component {
     };
     render(){
         return <Checkbox checked={this.state.checked||this.props.checked_all}
-          on_change={this.toggle}/>;
+              on_change={this.toggle}/>;
     }
 }
 

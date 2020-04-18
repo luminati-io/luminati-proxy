@@ -3,8 +3,8 @@
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (!is_node && !is_rn)
     define = self.define;
 else
@@ -24,26 +24,52 @@ function rate_limit(rl, ms, n){
     return rl.count<=n;
 }
 
-E.leaky_bucket = function leaky_bucket(size, rate){
+E.leaky_bucket = function leaky_bucket(size, rate, opt){
     this.size = size;
     this.rate = rate;
     this.time = Date.now();
     this.level = 0;
+    this.opt = opt||{};
 };
 
-E.leaky_bucket.prototype.inc = function(inc){
-    if (inc===undefined)
-        inc = 1;
+E.leaky_bucket.prototype._update_level = function(){
     var now = Date.now();
     this.level -= this.rate * (now - this.time);
     this.time = now;
     if (this.level<0)
         this.level = 0;
+};
+
+E.leaky_bucket.prototype.inc_would_exceed = function(inc){
+    if (inc===undefined)
+        inc = 1;
+    this._update_level();
+    var new_level = this.level + inc;
+    return new_level>this.size;
+};
+
+E.leaky_bucket.prototype.inc = function(inc){
+    if (inc===undefined)
+        inc = 1;
+    this._update_level();
     var new_level = this.level + inc;
     if (new_level>this.size)
         return false;
     this.level = new_level;
     return true;
+};
+
+E.leaky_bucket.prototype.inc_size = function(inc){
+    if (inc===undefined)
+        inc = 1;
+    var new_size = this.size + inc;
+    if (this.opt.min_size)
+        new_size = Math.max(new_size, this.opt.min_size);
+    if (this.opt.max_size)
+        new_size = Math.min(new_size, this.opt.max_size);
+    var factor = new_size/this.size;
+    this.size = new_size;
+    this.rate *= factor;
 };
 
 return E; }); }());

@@ -1,7 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 import JSON_viewer from './json_viewer.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -9,7 +10,10 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import classnames from 'classnames';
 import moment from 'moment';
-import $ from 'jquery';
+import {trigger_types, action_types} from '../../util/rules_util.js';
+import {Copy_btn} from './common.js';
+import './css/har_preview.less';
+import {T} from './common/i18n.js';
 
 class Preview extends Pure_component {
     panes = [
@@ -17,6 +21,7 @@ class Preview extends Pure_component {
         {id: 'preview', width: 63, comp: Pane_preview},
         {id: 'response', width: 72, comp: Pane_response},
         {id: 'timing', width: 57, comp: Pane_timing},
+        {id: 'rules', width: 50, comp: Pane_rules},
     ];
     state = {cur_pane: 0};
     select_pane = id=>{ this.setState({cur_pane: id}); };
@@ -35,7 +40,7 @@ class Preview extends Pure_component {
         return <div style={this.props.style} className="har_preview chrome">
               <div className="tabbed_pane_header">
                 <div className="left_pane">
-                  <div onClick={this.props.close_preview}
+                  <div onClick={this.props.close}
                     className="close_btn_wrapper">
                     <div className="small_icon close_btn"/>
                     <div className="medium_icon close_btn_h"/>
@@ -61,7 +66,7 @@ class Preview extends Pure_component {
 const Pane = ({id, idx, width, on_click, active})=>
     <div onClick={()=>on_click(idx)} style={{width}}
       className={classnames('pane', id, {active})}>
-      <span>{id}</span>
+      <span><T>{id}</T></span>
     </div>;
 
 const Pane_slider = ({panes, cur_pane})=>{
@@ -75,10 +80,22 @@ const Pane_slider = ({panes, cur_pane})=>{
 };
 
 class Pane_headers extends Pure_component {
+    get_curl = ()=>{
+        const req = this.props.req;
+        const {username, password, super_proxy} = req.details;
+        const headers = req.request.headers.map(h=>`-H "${h.name}: `
+            +`${h.value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+        const proxy = super_proxy ?
+            '-x '+(username||'')+':'+(password||'')+'@'+super_proxy : '';
+        const url = '"'+req.request.url+'"';
+        return ['curl', proxy, '-X', req.request.method, url, ...headers]
+            .filter(Boolean).join(' ');
+    };
     render(){
-        const {req} = this.props;
+        const req = this.props.req;
         const general_entries = [
             {name: 'Request URL', value: req.request.url},
+            {name: 'Request method', value: req.request.method},
             {name: 'Status code', value: req.response.status},
             {name: 'Super proxy IP', value: req.details.super_proxy},
             {name: 'Peer proxy IP', value: req.details.proxy_peer},
@@ -86,39 +103,74 @@ class Pane_headers extends Pure_component {
             {name: 'Password', value: req.details.password},
             {name: 'Sent from', value: req.details.remote_address},
         ].filter(e=>e.value!==undefined);
-        return <ol className="tree_outline">
-              <Preview_section title="General" pairs={general_entries}/>
-              <Preview_section title="Response headers"
-                pairs={req.response.headers}/>
-              <Preview_section title="Request headers"
-                pairs={req.request.headers}/>
-              <Body_section title="Request body"
-                body={req.request.postData&&req.request.postData.text}/>
-             </ol>;
+        return <React.Fragment>
+              <Copy_btn val={this.get_curl()} title="Copy as cURL"
+                style={{position: 'absolute', right: 5, top: 5}}
+                inner_style={{width: 'auto'}}/>
+              <ol className="tree_outline">
+                <Preview_section title="lpm_har_general"
+                  pairs={general_entries}/>
+                <Preview_section title="Response headers"
+                  pairs={req.response.headers}/>
+                <Preview_section title="Request headers"
+                  pairs={req.request.headers}/>
+                <Body_section title="Request body"
+                  body={req.request.postData && req.request.postData.text}/>
+               </ol>
+             </React.Fragment>;
     }
 }
 
 class Pane_response extends Pure_component {
     render(){
-        const content_type = this.props.req.details.content_type;
-        if (!content_type||['xhr', 'css', 'js', 'font', 'html'].includes(
-            content_type))
+        const req = this.props.req;
+        const {port, content_type} = req.details;
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
+        if (!content_type||['xhr', 'css', 'js', 'font', 'html', 'other']
+            .includes(content_type))
         {
-            return <Codemirror_wrapper req={this.props.req}/>;
+            return <Codemirror_wrapper req={req}/>;
         }
         return <No_response_data/>;
     }
 }
 
+const Encrypted_response_data = withRouter(
+class Encrypted_response_data extends Pure_component {
+    goto_ssl = ()=>{
+        this.props.history.push({
+            pathname: `/proxy/${this.props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    render(){
+        return <Pane_info>
+              <div>This request is using SSL encryption.</div>
+              <div>
+                <span>You need to turn on </span>
+                <a className="link" onClick={this.goto_ssl}>
+                  SSL analyzing</a>
+                <span> to read the response here.</span>
+              </div>
+            </Pane_info>;
+    }
+});
+
+const Pane_info = ({children})=>
+    <div className="empty_view">
+      <div className="block">{children}</div>
+    </div>;
+
 const No_response_data = ()=>
     <div className="empty_view">
-      <div>This request has no response data available.</div>
+      <div className="block">This request has no response data available.</div>
     </div>;
 
 class Codemirror_wrapper extends Pure_component {
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea, {
-            readOnly: 'nocursor',
+            readOnly: true,
             lineNumbers: true,
         });
         this.cm.setSize('100%', '100%');
@@ -161,13 +213,14 @@ class Body_section extends Pure_component {
         catch(e){ raw_body = this.props.body; }
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent_title', {open: this.state.open})}>
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
               {this.props.title}
             </li>,
             <ol key="ol"
               className={classnames('children', {open: this.state.open})}>
               {!!json && <JSON_viewer json={json}/>}
-              {!!raw_body && <Header_pair name="p" value={raw_body}/>}
+              {!!raw_body && <Header_pair name="raw-data" value={raw_body}/>}
             </ol>
         ];
     }
@@ -181,8 +234,9 @@ class Preview_section extends Pure_component {
             return null;
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent_title', {open: this.state.open})}>
-              {this.props.title}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              <T>{this.props.title}</T>
               {!this.state.open ? ` (${this.props.pairs.length})` : ''}
             </li>,
             <ol key="ol"
@@ -208,11 +262,80 @@ const Status_value = ({value})=>{
     const info = value=='unknown';
     const green = /2../.test(value);
     const yellow = /3../.test(value);
-    const red = /(4|5)../.test(value);
+    const red = /(canceled)|([45]..)/.test(value);
     const classes = classnames('small_icon', 'status', {
         info, green, yellow, red});
     return <div className="status_wrapper">
           <div className={classes}/>{value}
+        </div>;
+};
+
+class Pane_rules extends Pure_component {
+    render(){
+        const {details: {rules}} = this.props.req;
+        if (!rules || !rules.length)
+        {
+            return <Pane_info>
+                  <div>No rules have been triggered on this request.</div>
+                </Pane_info>;
+        }
+        return <div className="rules_view_wrapper">
+              <ol className="tree_outline">
+                {rules.map((r, idx)=>
+                  <Rule_preview key={idx} rule={r} idx={idx+1}/>
+                )}
+              </ol>
+            </div>;
+    }
+}
+
+class Rule_preview extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        const {rule, idx} = this.props;
+        const children_classes = classnames('children', 'timeline',
+            {open: this.state.open});
+        const first_trigger = trigger_types.find(t=>rule[t.value])||{};
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {idx}. {first_trigger.key}
+            </li>,
+            <ol key="ol" className={children_classes}>
+              <Trigger_section rule={rule}/>
+              <Action_section actions={rule.action}/>
+            </ol>
+        ];
+    }
+}
+
+const Trigger_section = ({rule})=>
+    <div className="trigger_section">
+      {trigger_types.map(t=><Trigger key={t.value} type={t} rule={rule}/>)}
+    </div>;
+
+const Trigger = ({type, rule})=>{
+    if (!rule[type.value])
+        return null;
+    return <div className="trigger">
+          {type.key}: {rule[type.value]}
+        </div>;
+};
+
+const Action_section = ({actions})=>
+    <div className="action_section">
+      {Object.keys(actions).map(a=>
+        <Action key={a} action={a} value={actions[a]}/>
+      )}
+    </div>;
+
+const Action = ({action, value})=>{
+    const key = (action_types.find(a=>a.value==action)||{}).key;
+    const val = action=='request_url' ? value&&value.url : value;
+    return <div className="action">
+          {key} {val ? `: ${val}` : ''}
         </div>;
 };
 
@@ -236,7 +359,7 @@ class Pane_timing extends Pure_component {
                 Total: {this.props.req.time} ms</div>
               {this.props.req.request.url.endsWith('443') &&
                 this.state.stats && this.state.stats.ssl_enable &&
-                <Enable_https/>
+                <Enable_https port={this.props.req.details.port}/>
               }
             </div>;
     }
@@ -272,10 +395,12 @@ class Single_timeline extends Pure_component {
         }, {last_section: -1, data: []}).data;
         const children_classes = classnames('children', 'timeline',
             {open: this.state.open});
+        const {timeline} = this.props;
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent_title', {open: this.state.open})}>
-              {this.props.timeline.port}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {timeline.port}
             </li>,
             <ol key="ol" className={children_classes}>
               <table>
@@ -322,19 +447,22 @@ const Timing_row = ({title, id, left, right, time})=>
       <td><div className="timing_bar_title">{time} ms</div></td>
     </tr>;
 
-class Enable_https extends Pure_component {
-    click = ()=>$('#enable_ssl_modal').modal();
-    render(){
-        return <div className="footer_link">
-              <a className="devtools_link" role="link" tabIndex="0"
-                target="_blank" rel="noopener noreferrer"
-                onClick={this.click}
-                style={{display: 'inline', cursor: 'pointer'}}>
-                Enable HTTPS logging
-              </a> to view this timeline
-            </div>;
-    }
-}
+const Enable_https = withRouter(props=>{
+    const click = ()=>{
+        props.history.push({
+            pathname: `/proxy/${props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    return <div className="footer_link">
+          <a className="devtools_link" role="link" tabIndex="0"
+            target="_blank" rel="noopener noreferrer"
+            onClick={click}
+            style={{display: 'inline', cursor: 'pointer'}}>
+            Enable HTTPS logging
+          </a> to view this timeline
+        </div>;
+});
 
 const is_json_str = str=>{
     let resp;
@@ -347,8 +475,11 @@ class Pane_preview extends Pure_component {
     render(){
         const content_type = this.props.req.details.content_type;
         const text = this.props.req.response.content.text;
+        const port = this.props.req.details.port;
         let json;
-        if (content_type=='xhr'&&(json = is_json_str(text)))
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
+        if (content_type=='xhr' && (json = is_json_str(text)))
             return <JSON_viewer json={json}/>;
         if (content_type=='img')
             return <Img_viewer img={this.props.req.request.url}/>;

@@ -1,0 +1,80 @@
+@import (reference) 'common.less';
+.proxy_form {
+    max-height: 500px;
+    &.animated {
+        animation-duration: 600ms;
+        -webkit-animation-duration: 600ms;
+    }
+}
+.proxy_created {
+    max-height: 0;
+    visibility: hidden;
+    transition: max-height 250ms ease 450ms, visibility 0ms ease-in 800ms;
+}
+.add_proxy_modal.modal .modal-content {
+    select { width: auto; }
+    .nav_tabs { margin-bottom: 15px; }
+    .ext_proxy {
+        textarea { width: 100%; }
+        .json_error {
+            position: relative;
+            color: #eb3a28;
+            font-size: 13px;
+            margin-left: 3px;
+            line-height: 2;
+        }
+        .json_example {
+            margin-left: 3px;
+            position: relative;
+            line-height: 1;
+            font-size: 13px;
+        }
+    }
+    .group {
+        padding-bottom: 10px;
+        &:last-child { margin-bottom: 25px; }
+    }
+    .field {
+        display: flex;
+        margin-bottom: 10px;
+        &:last-child { margin-bottom: 0; }
+        .field_header {
+            display: flex;
+            align-items: center;
+            margin-right: 12px;
+            .icon {
+                width: 26px;
+                height: 26px;
+                margin-right: 5px;
+            }
+            .zone_icon { background: url(/img/zone_icon.png); }
+            .preset_icon { background: url(/img/preset_icon.png); }
+            h4 {
+                color: @first_color;
+                font-weight: bold;
+                font-size: 17px;
+                letter-spacing: 0.5px;
+            }
+        }
+    }
+    .preview {
+        border: solid 1px @grey;
+        padding: 5px 10px;
+        border-radius: 4px;
+        .header {
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .desc {
+            font-size: 14px;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+    }
+    .howto.animated {
+        animation-duration: 750ms;
+        -webkit-animation-duration: 750ms;
+    }
+}
+

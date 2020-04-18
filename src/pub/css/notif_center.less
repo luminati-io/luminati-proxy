@@ -1,0 +1,21 @@
+@import (reference) 'common.less';
+.notif_modal {
+    .notifs {
+        h4.no_messages { text-align: center; }
+        .message {
+            width: 100%;
+            background-color: @light_grey;
+            border-radius: 2px;
+            padding: 15px;
+            margin: 10px 0;
+            .subject {
+                color: @first_color;
+                font-size: 16px;
+                font-weight: bold
+            }
+            .text { font-size: 13px; }
+            &.unread { background-color: @x_light; }
+            &.clickable { cursor: pointer; }
+        }
+    }
+}

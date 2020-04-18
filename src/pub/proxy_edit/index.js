@@ -1,48 +1,49 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '../../../www/util/pub/pure_component.js';
-import classnames from 'classnames';
+import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import _ from 'lodash';
 import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
-import zurl from '../../../util/url.js';
-import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
-    Pagination_panel, Loader_small} from '../common.js';
+import {qw} from '../../../util/string.js';
+import {Loader, Warnings, Loader_small, Preset_description, Ext_tooltip,
+    Checkbox} from '../common.js';
+import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
+import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
-import Har_viewer from '../har_viewer.js';
-import * as util from '../util.js';
-import {withRouter} from 'react-router-dom';
+import presets from '../common/presets.js';
+import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import Rules from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
-import Debug from './debug.js';
 import Rotation from './rotation.js';
 import Speed from './speed.js';
 import Headers from './headers.js';
-
-const presets = util.presets;
-const event_tracker = {};
-const ga_event = (action, label, opt={})=>{
-    const id = action+label;
-    if (!event_tracker[id] || !opt.single)
-    {
-        event_tracker[id] = true;
-        util.ga_event('proxy_edit', action, label);
-    }
-};
+import Logs from './logs.js';
+import Alloc_modal from './alloc_modal.js';
+import {map_rule_to_form} from './rules.js';
+import Tooltip from '../common/tooltip.js';
+import {Modal} from '../common/modals.js';
+import {T} from '../common/i18n.js';
+import {Select_zone} from '../common/controls.js';
+import {report_exception} from '../util.js';
+import '../css/proxy_edit.less';
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {form: {zones: {}}, warnings: [], errors: {},
-            show_loader: false, saving: false};
+        this.state = {form: {}, errors: {}, show_loader: false,
+            saving: false};
         this.debounced_save = _.debounce(this.save, 500);
+        this.debounced = [];
         setdb.set('head.proxy_edit.set_field', this.set_field);
         setdb.set('head.proxy_edit.is_valid_field', this.is_valid_field);
+        setdb.set('head.proxy_edit.is_disabled_ext_proxy',
+            this.is_disabled_ext_proxy);
         setdb.set('head.proxy_edit.goto_field', this.goto_field);
+        setdb.set('head.proxy_edit.get_curr_plan', this.get_curr_plan);
     }
     componentDidMount(){
         setdb.set('head.proxies_running', null);
@@ -57,37 +58,44 @@ const Index = withRouter(class Index extends Pure_component {
             const port = this.props.match.params.port;
             const proxy = proxies.filter(p=>p.port==port)[0];
             if (!proxy)
-                this.props.history.push('/overview');
+                return this.props.history.push('/overview');
             const form = Object.assign({}, proxy.config);
-            this.apply_preset(form, form.last_preset_applied||'session_long');
+            this.apply_preset(form, form.preset||'session_long');
             this.setState({proxies}, this.delayed_loader());
         });
-        this.setdb_on('head.consts', consts=>
-            this.setState({consts}, this.delayed_loader()));
+        this.setdb_on('head.zones', zones=>{
+            if (zones)
+                this.setState({zones}, this.delayed_loader());
+        });
         this.setdb_on('head.defaults', defaults=>
             this.setState({defaults}, this.delayed_loader()));
         this.setdb_on('head.callbacks', callbacks=>this.setState({callbacks}));
         this.setdb_on('head.proxy_edit.loading', loading=>
             this.setState({loading}));
         let state;
-        if ((state = this.props.location.state)&&state.field)
+        if ((state = this.props.location.state) && state.field)
             this.goto_field(state.field);
     }
     willUnmount(){
         setdb.set('head.proxy_edit.form', undefined);
         setdb.set('head.proxy_edit', undefined);
+        this.debounced.forEach(d=>d.cancel());
     }
-    delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
-    update_loader(){
+    update_loader = ()=>{
         this.setState(state=>{
-            const show_loader = !state.consts || !state.proxies ||
-                !state.defaults;
+            const show_loader = !state.proxies || !state.defaults ||
+                !state.zones;
             const zone_name = !show_loader &&
-                (state.form.zone||state.consts.proxy.zone.def);
+                (state.form.zone || state.zones.def);
             setdb.set('head.proxy_edit.zone_name', zone_name);
             return {show_loader};
         });
-    }
+    };
+    delayed_loader = ()=>{
+        const fn = _.debounce(this.update_loader);
+        this.debounced.push(fn);
+        return fn;
+    };
     goto_field = field=>{
         let tab;
         for (let [tab_id, tab_o] of Object.entries(tabs))
@@ -102,54 +110,51 @@ const Index = withRouter(class Index extends Pure_component {
         {
             const port = this.props.match.params.port;
             const pathname = `/proxy/${port}/${tab}`;
-            this.props.history.push({pathname});
+            this.props.history.push({pathname, state: {field}});
         }
     };
     set_field = (field_name, value, opt={})=>{
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
             return {form: new_form};
-        }, opt.skip_save ? undefined : this.debounced_save);
+        }, this.start_saving.bind(null, opt));
         setdb.set('head.proxy_edit.form.'+field_name, value);
-        this.send_ga(field_name, value);
     };
-    send_ga(id, value){
-        if (id=='zone')
-        {
-            ga_event('edit zone', value);
+    start_saving = opt=>{
+        if (opt.skip_save)
             return;
-        }
-        ga_event('edit '+id, value, {single: true});
-    }
+        this.setState({saving: true}, ()=>this.lock_nav(true));
+        this.debounced_save();
+    };
     is_valid_field = field_name=>{
-        const proxy = this.state.consts.proxy;
+        const zones = this.state.zones;
         const form = this.state.form;
-        if (!proxy)
+        if (!zones)
             return false;
         if (form.ext_proxies && all_fields[field_name] &&
             !all_fields[field_name].ext)
         {
             return false;
         }
-        const zone = form.zone||proxy.zone.def;
         if (['city', 'state'].includes(field_name) &&
             (!form.country||form.country=='*'))
         {
             return false;
         }
-        const details = proxy.zone.values.filter(z=>z.value==zone)[0];
-        const permissions = details&&details.perm.split(' ')||[];
-        const plan = details&&details.plans[details.plans.length-1]||{};
-        if (field_name=='vip')
-            return !!plan.vip;
-        if (field_name=='country'&&plan.ip_alloc_preset=='shared_block')
-            return true;
-        if (field_name=='country'&&plan.type=='static')
+        const zone = zones.zones.find(z=>z.name==(form.zone||zones.def));
+        if (!zone || !zone.plan)
             return false;
+        const permissions = zone.perm.split(' ') || [];
+        if (field_name=='vip')
+            return !!zone.plan.vip;
+        if (field_name=='country' && zone.plan.ip_alloc_preset=='shared_block')
+            return true;
+        if (field_name=='country' && zone.plan.type=='static')
+            return zone.plan.country || zone.plan.ip_alloc_preset;
         if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
             return permissions.includes(field_name);
-        if (field_name=='country'&&(plan.type=='static'||
-            ['domain', 'domain_p'].includes(plan.vips_type)))
+        if (field_name=='country' && (zone.plan.type=='static'||
+            ['domain', 'domain_p'].includes(zone.plan.vips_type)))
         {
             return false;
         }
@@ -157,34 +162,25 @@ const Index = withRouter(class Index extends Pure_component {
             return permissions.includes('asn');
         return true;
     };
+    is_disabled_ext_proxy = field_name=>{
+        const form = this.state.form;
+        if (form.ext_proxies && all_fields[field_name] &&
+            !all_fields[field_name].ext)
+        {
+            return true;
+        }
+        return false;
+    };
     apply_preset = (_form, preset)=>{
         const form = Object.assign({}, _form);
-        const last_preset = form.last_preset_applied ?
-            presets[form.last_preset_applied] : null;
-        if (last_preset&&last_preset.key!=preset&&last_preset.clean)
+        const last_preset = form.preset ? presets.get(form.preset) : null;
+        if (last_preset && last_preset.key!=preset && last_preset.clean)
             last_preset.clean(form);
-        if (form.ext_proxies)
-        {
-            form.preset = '';
-            form.zone = '';
-            form.password = '';
-        }
-        else
-        {
-            form.preset = preset;
-            form.last_preset_applied = preset;
-            presets[preset].set(form);
-            const disabled_fields = presets[preset].disabled||{};
-            setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
-        }
+        form.preset = preset;
+        presets.get(preset).set(form);
+        const disabled_fields = presets.get(preset).disabled||{};
+        setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this.apply_rules(form);
-        if (form.session===true)
-        {
-            form.session_random = true;
-            form.session = '';
-        }
-        else
-            form.session_random = false;
         if (form.reverse_lookup===undefined)
         {
             if (form.reverse_lookup_dns)
@@ -202,8 +198,8 @@ const Index = withRouter(class Index extends Pure_component {
             form.ips = [];
         if (!form.vips)
             form.vips = [];
-        if (Array.isArray(form.whitelist_ips))
-            form.whitelist_ips = form.whitelist_ips.join(',');
+        if (!form.users)
+            form.users = [];
         if (form.city && !Array.isArray(form.city) && form.state)
         {
             form.city = [{id: form.city,
@@ -219,83 +215,18 @@ const Index = withRouter(class Index extends Pure_component {
             this.original_form = form;
         form.country = (form.country||'').toLowerCase();
         form.state = (form.state||'').toLowerCase();
+        if (form.session==='true'||form.session===true)
+            delete form.session;
         this.setState({form});
         setdb.set('head.proxy_edit.form', form);
         for (let i in form)
             setdb.emit('head.proxy_edit.form.'+i, form[i]);
     };
-    // XXX krzysztof: move this logic to rules module
-    post_rule_map_to_form = rule=>{
-        const result = {};
-        const res = rule.res[0];
-        if (res.status)
-        {
-            if (!res.status_custom)
-                result.status_code = res.status.arg;
-            else
-            {
-                result.status_code = 'Custom';
-                result.status_custom = res.status.arg;
-            }
-        }
-        result.trigger_url_regex = rule.url;
-        result.trigger_type = res.trigger_type;
-        result.body_regex = res.body&&res.body.arg;
-        if (res.min_req_time)
-        {
-            const min_req_time = res.min_req_time.match(/\d+/);
-            result.min_req_time = Number(min_req_time&&min_req_time[0]);
-        }
-        if (res.max_req_time)
-        {
-            const max_req_time = res.max_req_time.match(/\d+/);
-            result.max_req_time = Number(max_req_time&&max_req_time[0]);
-        }
-        result.action = res.action_type;
-        result.retry_port = res.action.retry_port;
-        result.retry_number = res.action.retry;
-        if (res.action.fast_pool_session)
-            result.fast_pool_size = res.action.fast_pool_size;
-        if (res.action.ban_ip)
-        {
-            result.ban_ip_duration = 'custom';
-            const minutes = res.action.ban_ip.match(/\d+/);
-            result.ban_ip_custom = Number(minutes&&minutes[0]);
-        }
-        if (res.action.process)
-            result.process = JSON.stringify(res.action.process, null, '\t');
-        if (res.action.email)
-        {
-            result.send_email = true;
-            result.email = res.action.email;
-        }
-        return result;
-    };
-    pre_rule_map_to_form = rule=>{
-        const res = {
-            trigger_url_regex: rule.url,
-            action: rule.action,
-            trigger_type: rule.trigger_type,
-        };
-        if (rule.email)
-        {
-            res.send_email = true;
-            res.email = rule.email;
-        }
-        if (rule.retry_port)
-            res.retry_port = rule.retry_port;
-        if (rule.min_req_time)
-            res.min_req_time = rule.min_req_time;
-        if (rule.port)
-            res.switch_port = rule.port;
-        return res;
-    };
     apply_rules = ({rules})=>{
         if (!rules)
             return;
-        const post = (rules.post||[]).map(this.post_rule_map_to_form);
-        const pre = (rules.pre||[]).map(this.pre_rule_map_to_form);
-        const _rules = [].concat(post, pre).map((r, i)=>({...r, id: i}));
+        const _rules = rules.map(map_rule_to_form)
+        .map((r, i)=>({...r, id: i}));
         setdb.set('head.proxy_edit.rules', _rules);
     };
     set_errors = _errors=>{
@@ -317,53 +248,34 @@ const Index = withRouter(class Index extends Pure_component {
             return;
         }
         const data = this.prepare_to_save();
-        const check_url = '/api/proxy_check/'+this.props.match.params.port;
         this.saving = true;
-        this.setState({saving: true}, ()=>this.lock_nav(true));
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-                ga_event('save failed', e.message);
-                _this.setState({error_list: [{msg: 'Something went wrong'}],
-                    saving: false}, ()=>_this.lock_nav(false));
-                _this.saving = false;
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e, 'proxy_edit/index.Index.save');
+                _this.setState({error_list: [{msg: 'Something went wrong'}]});
                 $('#save_proxy_errors').modal('show');
-            });
-            // XXX krzysztof: switch fetch->ajax
-            const raw_check = yield window.fetch(check_url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data),
-            });
-            const json_check = yield raw_check.json();
-            const errors = json_check.filter(e=>e.lvl=='err');
-            _this.set_errors(errors);
-            if (errors.length)
-            {
-                ga_event('save failed', JSON.stringify(errors));
-                $('#save_proxy_errors').modal('show');
+            }));
+            this.on('finally', ()=>{
                 _this.setState({saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
-                return;
-            }
-            const warnings = json_check.filter(w=>w.lvl=='warn');
-            if (warnings.length)
-                _this.setState({warnings});
+            });
             const update_url = '/api/proxies/'+_this.props.match.params.port;
-            // XXX krzysztof: switch fetch->ajax
-            yield window.fetch(update_url, {
+            const raw_resp = yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: data}),
             });
-            _this.setState({saving: false}, ()=>_this.lock_nav(false));
-            _this.saving = false;
+            const json_resp = yield raw_resp.json();
+            if (json_resp.errors)
+            {
+                _this.set_errors(json_resp.errors);
+                return $('#save_proxy_errors').modal('show');
+            }
             if (_this.props.match.params.port!=_this.state.form.port)
             {
                 const port = _this.state.form.port;
-                const tab = _this.props.match.params.tab;
-                _this.props.history.push({pathname: `/proxy/${port}/${tab}`});
+                _this.props.history.push({pathname: `/proxy/${port}/general`});
             }
             if (_this.resave)
             {
@@ -383,19 +295,10 @@ const Index = withRouter(class Index extends Pure_component {
             {
                 save_form[field] = before_save(save_form[field]);
             }
-            if (!this.is_valid_field(field) || save_form[field]===null)
+            if (!this.is_valid_field(field)||save_form[field]===null)
                 save_form[field] = '';
         }
-        const effective = attr=>{
-            return save_form[attr]===undefined ?
-                this.state.defaults[attr] : save_form[attr];
-        };
-        save_form.zone = save_form.zone||this.state.consts.proxy.zone.def;
-        save_form.ssl = effective('ssl');
-        save_form.max_requests = effective('max_requests');
-        save_form.session_duration = effective('session_duration');
-        save_form.keep_alive = effective('keep_alive');
-        save_form.pool_size = effective('pool_size');
+        save_form.zone = save_form.zone || this.state.zones.def;
         save_form.proxy_type = 'persist';
         if (save_form.reverse_lookup=='dns')
             save_form.reverse_lookup_dns = true;
@@ -411,428 +314,272 @@ const Index = withRouter(class Index extends Pure_component {
         else
             save_form.reverse_lookup_values = '';
         delete save_form.reverse_lookup;
-        if (save_form.whitelist_ips)
-        {
-            save_form.whitelist_ips = save_form.whitelist_ips.split(',')
-            .filter(Boolean);
-        }
+        // XXX krzysztof: extract the logic of mapping specific fields
+        if (save_form.smtp)
+            save_form.smtp = save_form.smtp.filter(Boolean);
+        else
+            save_form.smtp = [];
         if (save_form.city.length)
             save_form.city = save_form.city[0].id;
         else
             save_form.city = '';
-        if (save_form.asn.length)
+        if (save_form.asn.length==1)
             save_form.asn = Number(save_form.asn[0].id);
-        else
+        else if (!save_form.asn.length)
             save_form.asn = '';
-        if (!save_form.max_requests)
-            save_form.max_requests = 0;
-        delete save_form.preset;
-        if (!save_form.session)
-            save_form.session = false;
-        if (save_form.session_random)
-            save_form.session = true;
-        delete save_form.session_random;
         if (save_form.headers)
             save_form.headers = save_form.headers.filter(h=>h.name&&h.value);
+        if (save_form.session && save_form.session.replace)
+        {
+            save_form.session = save_form.session.replace(/-/g, '')
+                .replace(/ /g, '');
+        }
         return save_form;
     };
     get_curr_plan = ()=>{
-        const zone_name = this.state.form.zone||
-            this.state.consts.proxy.zone.def;
-        // XXX krzysztof: use /api/zones instead od consts
-        const zones = this.state.consts.proxy.zone.values;
-        const curr_zone = zones.filter(p=>p.key==zone_name);
-        let curr_plan;
-        if (curr_zone.length)
-            curr_plan = curr_zone[0].plans.slice(-1)[0];
-        return curr_plan;
+        if (!this.state.zones)
+            return {};
+        const zone_name = this.state.form.zone || this.state.zones.def;
+        const zone = this.state.zones.zones.find(p=>p.name==zone_name) || {};
+        return zone.plan || {};
     };
     render(){
-        let zones = this.state.consts&&
-            this.state.consts.proxy.zone.values||[];
-        zones = zones.filter(z=>{
-            const plan = z.plans && z.plans.slice(-1)[0] || {};
-            return !plan.archive && !plan.disable;
-        });
-        let sett = setdb.get('head.settings')||{}, def;
-        if (zones[0] && !zones[0].value && (def = sett.zone||zones[0].key))
-            zones[0] = {key: `Default (${def})`, value: ''};
-        const default_zone=this.state.consts&&
-            this.state.consts.proxy.zone.def;
-        const curr_plan = this.state.consts&&this.get_curr_plan();
+        // XXX krzysztof: cleanup type (index.js rotation.js general.js)
+        const curr_plan = this.get_curr_plan();
         let type;
-        if (curr_plan&&curr_plan.type=='static')
+        if ((curr_plan.type||'').startsWith('static'))
             type = 'ips';
-        else if (curr_plan&&!!curr_plan.vip)
+        else if (curr_plan.vip)
             type = 'vips';
-        const tab = this.props.match.params.tab||'logs';
-        return <div className="proxy_edit">
+        const zone = this.state.form.zone ||
+            this.state.zones && this.state.zones.def;
+        return <T>{t=><div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
                   <Port_title port={this.props.match.params.port}
-                    name={this.state.form.internal_name}/>
+                    name={this.state.form.internal_name} t={t}/>
                   <Loader_small saving={this.state.saving}
-                    std_msg="All changes saved in LPM"
-                    std_tooltip="All changes are automatically saved to LPM"/>
+                    std_msg={t('All changes saved in LPM')}
+                    std_tooltip=
+                    {t('All changes are automatically saved to LPM')}/>
                 </div>
-                <Nav zones={zones} default_zone={default_zone}
-                  disabled={!!this.state.form.ext_proxies}
-                  form={this.state.form}
+                <Nav disabled={!!this.state.form.ext_proxies}
+                  form={this.state.form} plan={curr_plan}
                   on_change_preset={this.apply_preset}/>
-                <Nav_tabs/>
+                <Nav_tabs_wrapper/>
               </div>
-              <div className={classnames('main_window', {[tab]: true})}>
-                {this.state.consts && this.state.defaults &&
-                    this.state.proxies &&
-                  <Main_window
-                    proxy={this.state.consts&&this.state.consts.proxy}
-                    defaults={this.state.defaults}
-                    form={this.state.form}
-                    get_curr_plan={this.get_curr_plan}/>
-                }
-              </div>
+              {this.state.zones && <Main_window/>}
               <Modal className="warnings_modal" id="save_proxy_errors"
-                title="Errors:" no_cancel_btn>
+                title={t('Error')} no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
-              <Alloc_modal type={type} form={this.state.form}
-                zone={this.state.form.zone||default_zone} tab={tab}/>
-            </div>;
+              <Alloc_modal type={type} form={this.state.form} zone={zone}
+                plan={curr_plan}/>
+            </div>}</T>;
     }
 });
 
-const Port_title = ({port, name})=>{
-    if (name)
-        port = port+` (${name})`;
-    return <h3>Proxy on port {port}</h3>;
-};
-
-const Main_window = withRouter(({match: {params: {tab}}, ...props})=>{
-    let Comp;
-    switch (tab)
-    {
-    case 'target': Comp = Targeting; break;
-    case 'speed': Comp = Speed; break;
-    case 'rules': Comp = Rules; break;
-    case 'rotation': Comp = Rotation; break;
-    case 'debug': Comp = Debug; break;
-    case 'headers': Comp = Headers; break;
-    case 'general': Comp = General; break;
-    case 'logs':
-    default: Comp = Har_viewer;
-    }
-    return <Comp {...props}/>;
-});
-
-class Nav extends Pure_component {
-    set_field = setdb.get('head.proxy_edit.set_field');
-    _reset_fields = ()=>{
-        this.set_field('ips', []);
-        this.set_field('vips', []);
-        this.set_field('multiply_ips', false);
-        this.set_field('multiply_vips', false);
-        this.set_field('multiply', 1);
-    };
-    update_preset = val=>{
-        this.props.on_change_preset(this.props.form, val);
-        const disabled_fields = presets[val].disabled||{};
-        setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
-        this._reset_fields();
-        ga_event('edit preset', val);
-    };
-    update_zone = val=>{
-        const zone_name = val||this.props.default_zone;
-        setdb.set('head.proxy_edit.zone_name', zone_name);
-        const zone = this.props.zones.filter(z=>z.key==zone_name)[0]||{};
-        this.set_field('zone', val);
-        this.set_field('password', zone.password);
-        if (this.props.form.ips.length || this.props.form.vips.length)
-            this.set_field('pool_size', 0);
-        this._reset_fields();
-    };
-    render(){
-        const presets_opt = Object.keys(presets).map(p=>{
-            let key = presets[p].title;
-            if (presets[p].default)
-                key = `Default (${key})`;
-            return {key, value: p};
-        });
-        const preset = this.props.form.preset;
-        const preset_tooltip = preset&&presets[preset].subtitle
-        +(presets[preset].rules&&
-        '<ul>'+presets[preset].rules.map(r=>`<li>${r.label}</li>`).join('')
-        +'</ul>');
-        return <div className="nav">
-              <Field on_change={this.update_zone} options={this.props.zones}
-                tooltip="Zone" value={this.props.form.zone}
-                disabled={this.props.disabled}/>
-              <Field on_change={this.update_preset} tooltip={preset_tooltip}
-                options={presets_opt} value={preset}
-                disabled={this.props.disabled}/>
-            </div>;
-    }
-}
-
-const Field = ({disabled, tooltip, ...props})=>{
-    const options = props.options||[];
-    return <Tooltip title={tooltip} placement="bottom">
-          <div className="field">
-            <select value={props.value} disabled={disabled}
-              onChange={e=>props.on_change(e.target.value)}>
-              {options.map(o=>
-                <option key={o.key} value={o.value}>{o.key}</option>
-              )}
-            </select>
-          </div>
-        </Tooltip>;
-};
-
-const Nav_tabs = ()=>
-    <div className="nav_tabs">
-      <Tab_btn id="logs"/>
-      <Tab_btn id="target"/>
-      <Tab_btn id="rules"/>
-      <Tab_btn id="speed"/>
-      <Tab_btn id="rotation"/>
-      <Tab_btn id="debug"/>
-      <Tab_btn id="headers"/>
-      <Tab_btn id="general"/>
-    </div>;
-
-const Tab_btn = withRouter(class Tab_btn extends Pure_component {
-    state = {};
-    click = ()=>{
+const Nav_tabs_wrapper = withRouter(
+class Nav_tabs_wrapper extends Pure_component {
+    tabs = ['logs', 'target', 'rotation', 'speed', 'rules', 'headers',
+        'general'];
+    set_tab = id=>{
         const port = this.props.match.params.port;
-        const pathname = `/proxy/${port}/${this.props.id}`;
+        const pathname = `/proxy/${port}/${id}`;
         this.props.history.push({pathname});
     };
     render(){
-        const cur_tab = this.props.match.params.tab;
-        const active = cur_tab==this.props.id||!cur_tab&&this.props.id=='logs';
-        const btn_class = classnames('btn_tab', {active});
-        return <Tooltip title={tabs[this.props.id].tooltip}>
-              <div onClick={this.click} className={btn_class}>
-                <div className={classnames('icon', this.props.id)}/>
-                <div className="title">{tabs[this.props.id].label}</div>
-                <div className="arrow"/>
-              </div>
-            </Tooltip>;
+        return <Nav_tabs set_tab={this.set_tab}>
+              {this.tabs.map(t=><Nav_tab key={t} id={t} title={tabs[t].label}
+                tooltip={tabs[t].tooltip}/>)}
+            </Nav_tabs>;
     }
 });
 
-class Alloc_modal extends Pure_component {
-    set_field = setdb.get('head.proxy_edit.set_field');
-    state = {
-        available_list: [],
-        displayed_list: [],
-        cur_page: 0,
-        items_per_page: 20,
-    };
-    componentDidMount(){
-        this.setdb_on('head.proxy_edit.zone_name', zone_name=>
-            this.setState({available_list: []}));
-        this.setdb_on('head.proxies_running', proxies=>
-            proxies&&this.setState({proxies}));
-        $('#allocated_ips').on('show.bs.modal', this.load);
-    }
-    close = ()=>$('#allocated_ips').modal('hide');
-    load = ()=>{
-        if (this.state.available_list.length)
-            return;
-        this.loading(true);
-        const key = this.props.form.password||'';
-        let endpoint;
-        if (this.props.type=='ips')
-            endpoint = '/api/allocated_ips';
-        else
-            endpoint = '/api/allocated_vips';
-        const url = zurl.qs_add(window.location.host+endpoint,
-            {zone: this.props.zone, key});
+const Port_title = ({port, name, t})=>{
+    if (name)
+        port = port+` (${name})`;
+    return <h3>{t('Proxy on port')} {port}</h3>;
+};
+
+class Open_browser_btn extends Pure_component {
+    open_browser = ()=>{
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-                _this.loading(false);
-            });
-            const res = yield ajax.json({url});
-            let available_list;
-            if (_this.props.type=='ips')
-                available_list = res.ips;
-            else
-                available_list = res;
-            _this.setState({available_list, cur_page: 0},
-                _this.sync_selected_vals);
-            _this.loading(false);
+            const url = `/api/browser/${_this.props.port}`;
+            const res = yield window.fetch(url);
+            if (res.status==206)
+                $('#fetching_chrome_modal').modal();
         });
     };
-    sync_selected_vals = ()=>{
-        const curr_vals = this.props.form[this.props.type];
-        const new_vals = curr_vals.filter(v=>
-            this.state.available_list.includes(v));
-        this.set_field(this.props.type, new_vals);
-        this.update_multiply_and_pool_size(new_vals.length);
-        this.paginate();
-    };
-    paginate = (page=-1)=>{
-        page = page>-1 ? page : this.state.cur_page;
-        const pages = Math.ceil(
-            this.state.available_list.length/this.state.items_per_page);
-        const cur_page = Math.min(pages, page);
-        const displayed_list = this.state.available_list.slice(
-            cur_page*this.state.items_per_page,
-            (cur_page+1)*this.state.items_per_page);
-        this.setState({displayed_list, cur_page});
-    };
-    loading = loading=>{
-        setdb.set('head.proxy_edit.loading', loading);
-        this.setState({loading});
-    };
-    checked = row=>(this.props.form[this.props.type]||[]).includes(row);
-    reset = ()=>{
-        this.set_field(this.props.type, []);
-        this.set_field('pool_size', '');
-        this.set_field('multiply', 1);
-    };
-    toggle = e=>{
-        let {value, checked} = e.target;
-        const {type, form} = this.props;
-        if (type=='vips')
-            value = Number(value);
-        let new_alloc;
-        if (checked)
-            new_alloc = [...form[type], value];
-        else
-            new_alloc = form[type].filter(r=>r!=value);
-        this.set_field(type, new_alloc);
-        this.update_multiply_and_pool_size(new_alloc.length);
-    };
-    select_all = ()=>{
-        this.set_field(this.props.type, this.state.available_list);
-        this.update_multiply_and_pool_size(this.state.available_list.length);
-    };
-    refresh = ()=>{
-        const _this = this;
-        this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-                _this.loading(false);
-            });
-            _this.loading(true);
-            const data = {zone: _this.props.zone};
-            let url;
-            if (_this.props.type=='ips')
-            {
-                data.ips = _this.props.form.ips.map(zurl.ip2num).join(' ');
-                url = '/api/refresh_ips';
-            }
-            else
-            {
-                data.vips = _this.props.form.vips;
-                url = '/api/refresh_vips';
-            }
-            const res = yield ajax.json({method: 'POST', url, data});
-            if (res.error||!res.ips&&!res.vips)
-            {
-                console.log(`error: ${res.error}`);
-                return;
-            }
-            const new_vals = _this.props.type=='ips' ?
-                res.ips.map(i=>i.ip) : res.vips.map(v=>v.vip);
-            const map = _this.map_vals(_this.state.available_list, new_vals);
-            const new_ips = _this.props.form.ips.map(val=>map[val]);
-            const new_vips = _this.props.form.vips.map(val=>map[val]);
-            _this.setState({available_list: new_vals}, _this.paginate);
-            _this.set_field('ips', new_ips);
-            _this.set_field('vips', new_vips);
-            yield _this.update_other_proxies(map);
-            _this.loading(false);
-        });
-    };
-    update_other_proxies = map=>{
-        const _this = this;
-        return this.etask(function*(){
-            const proxies_to_update = _this.state.proxies.filter(p=>
-                p.zone==_this.props.zone&&p.port!=_this.props.form.port&&
-                p.proxy_type=='persist');
-            for (let i=0; i<proxies_to_update.length; i++)
-            {
-                const proxy = proxies_to_update[i];
-                const new_vals = proxy[_this.props.type].map(v=>map[v]);
-                const data = {port: proxy.port, [_this.props.type]: new_vals};
-                yield ajax({method: 'POST', url: '/api/update_ips', data});
-            }
-        });
-    };
-    map_vals = (old_vals, new_vals)=>{
-        if (old_vals.length!=new_vals.length)
-        {
-            console.log('error ips/vips length mismatch');
-            return;
-        }
-        const map = {};
-        for (let i=0; i<old_vals.length; i++)
-            map[old_vals[i]] = new_vals[i];
-        return map;
-    };
-    update_multiply_and_pool_size = size=>{
-        if (!this.props.form.multiply_ips && !this.props.form.multiply_vips)
-            this.set_field('pool_size', size);
-        else
-        {
-            this.set_field('pool_size', 1);
-            this.set_field('multiply', size);
-        }
-    };
-    update_items_per_page = items_per_page=>
-        this.setState({items_per_page}, ()=>this.paginate(0));
-    page_change = page=>this.paginate(page-1);
     render(){
-        const type_label = this.props.type=='ips' ? 'IPs' : 'vIPs';
-        let title;
-        if (this.props.tab=='general')
-        {
-            title = 'Select the '+type_label+' to multiply ('
-            +this.props.zone+')';
-        }
-        else
-            title = 'Select the '+type_label+' ('+this.props.zone+')';
-        const Footer = <div className="default_footer">
-              <button onClick={this.refresh} className="btn btn_lpm">
-                Refresh</button>
-              <button onClick={this.close}
-                className="btn btn_lpm btn_lpm_primary">OK</button>
-            </div>;
-        return <Modal id="allocated_ips" className="allocated_ips_modal"
-              title={title} footer={Footer}>
-              <Pagination_panel
-                entries={this.state.available_list}
-                items_per_page={this.state.items_per_page}
-                cur_page={this.state.cur_page}
-                page_change={this.page_change} top
-                update_items_per_page={this.update_items_per_page}>
-                <Link_icon tooltip="Unselect all"
-                  on_click={this.reset} id="unchecked"/>
-                <Link_icon tooltip="Select all" on_click={this.select_all}
-                  id="check"/>
-              </Pagination_panel>
-              {this.state.displayed_list.map(row=>
-                <Checkbox on_change={this.toggle} key={row}
-                  text={row} value={row} checked={this.checked(row)}/>
-              )}
-              <Pagination_panel
-                entries={this.state.available_list}
-                items_per_page={this.state.items_per_page}
-                cur_page={this.state.cur_page}
-                page_change={this.page_change} bottom
-                update_items_per_page={this.update_items_per_page}>
-                <Link_icon tooltip="Unselect all"
-                  on_click={this.reset} id="unchecked"/>
-                <Link_icon tooltip="Select all"
-                  on_click={this.select_all.bind(this)} id="check"/>
-              </Pagination_panel>
-            </Modal>;
+        return <T>{t=>
+              <Tooltip title={t('Open browser configured with this port')}
+                placement="bottom">
+                <button className="btn btn_lpm btn_browse"
+                  onClick={this.open_browser}>
+                  {t('Browse')}
+                  <div className="icon browse_icon"></div>
+                </button>
+              </Tooltip>
+            }</T>;
     }
 }
+
+const Main_window = withRouter(({match})=>
+    <div className="main_window">
+      <Switch>
+        <Route path={`${match.path}/target`} component={Targeting}/>
+        <Route path={`${match.path}/speed`} component={Speed}/>
+        <Route path={`${match.path}/rules`} component={Rules}/>
+        <Route path={`${match.path}/rotation`} component={Rotation}/>
+        <Route path={`${match.path}/headers`} component={Headers}/>
+        <Route path={`${match.path}/general`} component={General}/>
+        <Route path={`${match.path}/logs`} component={Logs}/>
+        <Route exact path={match.path} component={({location})=>
+          <Redirect to={`${location.pathname}/logs`}/>}/>
+      </Switch>
+    </div>
+);
+
+class Nav extends Pure_component {
+    state = {};
+    set_field = setdb.get('head.proxy_edit.set_field');
+    is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
+    componentDidMount(){
+        this.setdb_on('head.zones', zones=>zones && this.setState({zones}));
+    }
+    _reset_fields = ()=>{
+        this.set_field('ips', []);
+        this.set_field('vips', []);
+        this.set_field('users', []);
+        this.set_field('multiply_ips', false);
+        this.set_field('multiply_vips', false);
+        this.set_field('multiply_users', false);
+        this.set_field('multiply', 0);
+    };
+    update_preset = val=>{
+        this.props.on_change_preset(this.props.form, val);
+        const disabled_fields = presets.get(val).disabled||{};
+        setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
+        this._reset_fields();
+    };
+    update_zone = new_zone=>{
+        let new_preset;
+        const curr_zone = this.props.form.zone;
+        if (this.is_unblocker(curr_zone) && !this.is_unblocker(new_zone))
+            new_preset = presets.get_default().key;
+        else if (!this.is_unblocker(curr_zone) && this.is_unblocker(new_zone))
+            new_preset = 'unblocker';
+        if (this.props.form.ips.length || this.props.form.vips.length)
+            this.set_field('pool_size', 0);
+        if (new_preset)
+            this.update_preset(new_preset);
+        else
+            this._reset_fields();
+        setdb.set('head.proxy_edit.zone_name', new_zone);
+        this.set_field('zone', new_zone);
+        const save_form = Object.assign({}, this.props.form);
+        for (let field in save_form)
+        {
+            if (!this.is_valid_field(field, new_zone))
+            {
+                let v = '';
+                if (field=='city'||field=='asn')
+                    v = [];
+                this.set_field(field, v);
+            }
+        }
+    };
+    is_unblocker(zone_name){
+        const get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
+        return get_curr_plan && get_curr_plan().type=='unblocker';
+    }
+    confirm_update(cb){
+        let no_confirm = localStorage.getItem('no-confirm-zone-preset');
+        if (no_confirm && JSON.parse(no_confirm))
+            return cb();
+        this.setState({confirm_action: cb}, ()=>$('#confirm_modal').modal());
+    }
+    render(){
+        const opts = presets.opts(this.is_unblocker(this.props.form.zone));
+        const preset = this.props.form.preset;
+        const is_unblocker = this.props.plan.type=='unblocker';
+        const preset_disabled = this.props.disabled || is_unblocker;
+        const href = window.location.href;
+        const is_local = href.includes('localhost')||
+            href.includes('127.0.0.1');
+        return <div className="nav">
+              <Select_zone val={this.props.form.zone} on_change_wrapper={val=>
+                  this.confirm_update(()=>this.update_zone(val))}
+                disabled={this.props.disabled} preview/>
+              <Field i18n options={opts}
+                on_change={val=>this.confirm_update(()=>
+                  this.update_preset(val))}
+                value={preset} disabled={preset_disabled}
+                ext_tooltip={!is_unblocker} id="preset"
+                tooltip={
+                  <Preset_description preset={preset} rule_clicked={()=>0}/>
+                }/>
+              {is_local &&
+                <Open_browser_btn port={this.props.form.port}/>
+              }
+              <Confirmation_modal on_ok={this.state.confirm_action}/>
+            </div>;
+    }
+}
+
+class Confirmation_modal extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {no_confirm: false};
+        _.bindAll(this, qw`toggle_dismiss handle_ok handle_dismiss`);
+    }
+    componentDidMount(){
+        let no_confirm = localStorage.getItem('no-confirm-zone-preset');
+        this.setState({no_confirm: !!no_confirm && JSON.parse(no_confirm)});
+    }
+    toggle_dismiss(){
+        this.setState({no_confirm: !this.state.no_confirm});
+    }
+    handle_ok(){
+        localStorage.setItem('no-confirm-zone-preset', this.state.no_confirm);
+        this.props.on_ok();
+    }
+    handle_dismiss(){
+        this.setState({no_confirm: false});
+    }
+    render(){
+        let left_item = <Checkbox text="Don't show this message again"
+            value={this.state.no_confirm} checked={!!this.state.no_confirm}
+            on_change={this.toggle_dismiss}/>;
+        return <Modal title="Confirm changing preset or zone"
+            id="confirm_modal" click_ok={this.handle_ok} ok_btn_title="Yes"
+            left_footer_item={left_item} on_hidden={this.handle_dismiss}>
+            <h4>Changing preset or zone may reset some other options. Are you
+              sure you want to continue?</h4>
+          </Modal>;
+    }
+}
+
+
+const Field = ({id, disabled, children, i18n, ext_tooltip, ...props})=>{
+    const options = props.options||[];
+    return <T>{t=><div className="field" data-tip data-for={id+'tip'}>
+          <React_tooltip id={id+'tip'} type="light" effect="solid"
+            place="bottom" delayHide={0} delayUpdate={300}>
+            {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
+          </React_tooltip>
+          <select value={props.value} disabled={disabled}
+            onChange={e=>props.on_change(e.target.value)}>
+            {options.map(o=>
+              <option key={o.key} value={o.value}>
+                {i18n ? t(o.key) : o.key}
+              </option>
+            )}
+          </select>
+        </div>}</T>;
+};
 
 export default Index;

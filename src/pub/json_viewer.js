@@ -1,10 +1,11 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import classnames from 'classnames';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
+import './css/json_viewer.less';
 
-const has_children = o=>typeof o=='object'&&Object.keys(o).length;
+const has_children = o=>!!o && typeof o=='object' && Object.keys(o).length;
 
 const Viewer_wrapper = ({json})=>
     <div className="json_viewer">
@@ -14,7 +15,7 @@ const Viewer_wrapper = ({json})=>
     </div>;
 
 const Children = ({val, expanded})=>{
-    if (has_children(val)&&expanded)
+    if (has_children(val) && expanded)
     {
         return <ol className="tree_children">
               {Object.entries(val).map(e=>

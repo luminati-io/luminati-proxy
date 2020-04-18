@@ -1,5 +1,917 @@
 Luminati Proxy manager - Change Log
 
+## 1.179.238 Stable
+- :sparkles: Make har_limit option configurable from settings page
+- :bug: Fixed banning IPs due to sending bad API requests
+
+## 1.179.25 Stable
+- :bug: Speed up ports initialization
+
+## 1.178.650 Stable
+- :sparkles: Enable TLS connections support by default
+- :sparkles: Support TLS connections by IP
+- :bug: Fix POST requests retrying
+
+## 1.178.350 Stable
+- :star: Store configuration on Luminati servers as a backup
+
+## 1.178.241 Stable
+- :star: Support TLS connection between client and LPM
+
+## 1.178.104 Stable
+- :star: UI and presets simplifications
+- :star: Introduced WS authorization
+
+## 1.177.584 
+- :star: UI simplifications (reduced redundant options)
+
+## 1.177.331 Stable
+- :bug: When using pool rotate session on 'retry' rule instead of recreating it
+
+## 1.177.194 Stable
+- :bug: Fixed stability issues and crashing on auth fail
+
+## 1.176.648 Stable
+- :bug: Fixed setting default values on the UI
+
+## 1.176.452 Stable
+- :bug: Fixed authentication issues
+- :bug: Fixed /refresh_ips endpoint
+
+## 1.175.943 Stable
+- :bug: Fixed possible endless loop for https requests when all available IPs are banned
+
+## 1.175.756 Stable
+- :bug: Fixed crashing on a process start
+
+## 1.175.680 Stable
+- :star: Add IP filter to the IPs managing popup
+- :star: Add proxy filter by internal name
+- :sparkles: Autogenerate cli options for readme file
+- :sparkles: Fix /proxies/{port}/banip API endpoint to accept residential IPs
+
+## 1.174.267 Stable
+- :star: Updated User-Agent in the headers randomization
+
+## 1.174.208 Stable
+- :bug: Filter out wrong IPs from config
+- :bug: Add decoding fallback for pages wrongly encoded with raw deflate
+
+## 1.173.955 Stable
+- :star: Show IPs refresh cost in pool IPs popup
+
+## 1.173.820 Stable
+- :star: Running LPM on all the CPUs for all the presets
+- :bug: Fix bug when parallel requests might cause pool overloading
+
+## 1.173.424 Stable
+- :star: Performance optimizations
+
+## 1.173.180 Stable
+- :bug: Fixed state permission
+
+## 1.173.48 Stable
+- :bug: Fixed websocket on non-standard ports
+
+## 1.172.674 Stable
+- :bug: Add an option to set log level in the UI
+- :bug: Fixed installation script for CentOS
+
+## 1.172.386 Stable
+- :bug: Fix bug when pool might not be used after restart
+
+## 1.172.201 Stable
+- :bug: Fix untriggered rules for long requests
+
+## 1.172.46 Development Latest
+- :bug: Remove extra options from config file
+
+## 1.171.623 Development Latest
+- :star: Remove detailed debug logs
+- :bug: Fixed choosing OS on mobile zones
+
+## 1.171.545 Stable
+- :bug: Possible to choose OS when using mobile zone
+- :star: More detailed debug logs, allow to switch it per port
+
+## 1.171.435 Stable
+- :bug: Correctly show UI warnings when using --ssl true
+- :bug: Fixed statistics aggregation for HTTPS requests
+
+## 1.171.357 Stable
+- :bug: Fixed bug when reserved pool might be overloaded
+
+## 1.170.998 Development Latest
+- :bug: Stop writing extra options to the config file
+
+## 1.170.919 Stable
+- :bug: Fixed crashing when the domain name is empty
+- :star: Added limit for reconnecting on websocket
+
+## 1.170.768 Stable
+- :star: Stats optimization: using only top level domain
+
+## 1.170.700 Stable
+- :bug: Fixed deleting logs only related to the specific port
+
+## 1.170.508 Stable
+- :bug: Merged duplicated config objects to avoid config discrepancy
+- :star: Updated Chinese translations
+
+## 1.170.414 Stable
+- :bug: Fixed response tab in HAR viewer
+
+## 1.170.174 Stable
+- :bug: Fixed bug when banned ip might be re-added to the pool
+
+## 1.170.30 Stable
+- :bug: Updated error messages for google login
+- :sparkles: Added basic WS connection with Luminati servers
+- :star: HAR viewer filter can now search by session id
+
+## 1.169.751 Development Latest
+- :sparkles: Proxy resolution based on API instead of DNS
+- :sparkles: Multiple performance optimizations
+
+## 1.169.16 Development Latest
+- :bug: Fixed cannot read property 'x-luminati-ip' of undefined
+
+## 1.168.796 Development Latest
+- :star: Added support for the headers changes in Luminati API
+
+## 1.168.496 Stable
+- :star: update Chinese translations
+
+## 1.168.142 Stable
+- :bug: Fix upgrading mechanism
+
+## 1.168.67 Stable
+- :star: update alternative domain without restarting lpm
+- :star: use actual hostname in howto
+
+## 1.167.729 Stable
+- :star: turn on SSL to SP by default if connecting from CN
+
+## 1.167.493 Stable
+- :star: Improved upgrader
+- :star: Added better examples
+
+## 1.167.220 Stable
+- :bug: Fixed auto upgrader
+
+## 1.166.867 Stable
+- :bug: HAR viewer: UI improvements
+
+## 1.166.405 Stable
+- :bug: Fixed error: cannot read property 'socket2headers' of undefined
+- :bug: Fixed error: incorrect headers check
+
+## 1.165.910 Stable
+- :star: Improvements in --auto-upgrade option
+- :star: Added "Operating System" option under "Targeting" tab
+
+## 1.165.644 Stable
+- :bug: Fixes in SMTP rules
+
+## 1.165.523 Stable
+- :bug: Fixed HAR viewer: now always showing Peer IP in the columns
+
+## 1.165.449 Stable
+- :bug: Fixed check for a backup version on windows
+
+## 1.165.421 
+
+## 1.165.256 Stable
+- :sparkles: Improved upgrading mechanism
+- :star: Added --auto-upgrade option
+
+## 1.164.586 Stable
+- :star: Added request method to HAR viewer
+- :bug: Fixed logging from extension when local_login flag enabled
+
+## 1.164.431 Stable
+- :bug: Fixed MacOS --upgrade/--downgrade options
+- :star: UI improvements: added number of allocate/banned IPs
+
+## 1.164.400 Stable
+- :bug: Fixed certificate for MacOS Catalina
+- :star: Added users management API
+
+## 1.164.328 Stable
+- :star: Added support for generating custom certificates
+
+## 1.164.164 Stable
+- :sparkles: app.less stylesheet split per page/component
+
+## 1.163.916 Stable
+- :sparkles: Added OS support for submitting bug report
+- :sparkles: Improved fe_warn metrics
+
+## 1.163.762 Stable
+- :star: Added x-lpm-* headers support for country, state and city
+- :bug: Fixed external IPs rotating in SSL analyzing mode
+
+## 1.163.474 Stable
+- :star: Added --downgrade option that will downgrade LPM to the version before upgrades
+- :star: Removed usage of Google Analytics
+- :sparkles: Merged HTTP and WS to use single port
+- :sparkles: Added devtool nosources-source-map to Webpack config
+
+## 1.163.237 Stable
+- :star: Adjustments for LPM <> Extension integration
+
+## 1.163.144 Stable
+- :bug: Fix database (Lokijs) errors
+- :star: Improved the UI in the dashboard (easy to hide/show components)
+
+## 1.163.69 Stable
+- :star: Improvements in users management
+
+## 1.163.36 Stable
+- :sparkles: Introduced users management and multiplying ports by users
+
+## 1.162.728 Stable
+- :bug: Fixed initializing websocket
+
+## 1.162.700 Stable
+- :sparkles: Improved the installation for Linux and Mac OS - fetching chromium binary only when needed
+
+## 1.162.197 Stable
+- :bug: Fixed canceled requests shown in HAR viewer
+- :bug: Fixed banning/unbanning IPs banned per domain
+
+## 1.161.831 Development Latest
+- :sparkles: Added status code classes (2**, 3**, ...) filtering to HAR viewer
+- :bug: Fix running 'luminati' command without specifying whole path
+- :bug: Fixed memory leak when using rules
+
+## 1.161.309 Stable
+- :sparkles: Improve High CPU usage message
+- :sparkles: Add --show-logs feature that follows LPM daemon process logs
+- :sparkles: Canceled requests will now be saved and shown in HAR viewer
+
+## 1.161.127 Stable
+- :sparkles: Node 12 support
+
+## 1.160.911 Stable
+- :bug: Fixed WSS connections handling
+
+## 1.160.654 Stable
+- :sparkles: CPU and mem usage are now shown per LPM process in --status
+- :bug: Fixed request retry with banned IPs
+
+## 1.160.574 Stable
+- :sparkles: Added --status flag to check current proxy manager status
+
+## 1.160.316 Stable
+- :sparkles: Logs are now shown up to when the UI is ready running in daemon mode
+- :sparkles: Easy way for adding recent IPs to whitelist from the UI
+- :star: Improved logs (added port number and access denied warnings)
+
+## 1.160.116 Stable
+- :bug: Fixed rules working with SMTP
+
+## 1.159.711 Stable
+- :sparkles: Added auto restart to worker processes when they die
+- :bug: Fixed message shown when --stop-daemon is used with no daemon process
+
+## 1.159.461 Stable
+- :bug: Fixed support for SMTP connection
+
+## 1.159.270 Stable
+- :bug: Fixed carriers.json updates
+- :sparkles: Added 'any' option to ease whitelisting all IPs through the UI
+- :sparkles: Admin whitelisted IPs will now automatically be added to proxies whitelist
+- :bug: Fixed usage in China
+
+## 1.159.78 Stable
+- :bug: Fixed memory leak
+
+## 1.158.770 Stable
+- :sparkles: Updated gIP management
+
+## 1.158.722 Stable
+- :bug: Fixed upgrade for Windows
+
+## 1.158.559 Development Latest
+- :sparkles: Introduced carriers list automatic update
+
+## 1.158.189 Development Latest
+- :sparkles: Improved HTTPS requests performance
+- :bug: Fixed stats not being updated in overview panel
+
+## 1.157.566 Stable
+- :bug: Fix EventEmitter listeners issues and ECONNREFUSED errors
+
+## 1.157.534 Stable
+- :sparkles: Improved --upgrade argument behavior: it will now upgrade LPM and restart previously running daemons
+- :sparkles: Added missing carriers
+- :bug: Fixed LPM's memory usage
+
+## 1.157.243 Stable
+- :sparkles: Improved requests bandwith calculation
+
+## 1.157.37 Stable
+- :bug: Fixed connected from MLA when SSL analyzing is on
+- :bug: Fixed specific IPs selection for static shared zones
+- :bug: Fixed link tester in Docker containers
+- :bug: Fixed error handling for SOCKS5 connections between LPM and Super Proxies
+- :bug: Fixed 2-Step error shown when logging in
+
+## 1.156.820 
+- :sparkles: Added --read_only CLI option that prevents LPM from writing to the config file
+
+## 1.156.236 Stable
+- :bug: Fixed rule email sending for cluster mode
+
+## 1.156.75 Stable
+- :bug: Fixed 403 status when acessing sites that use cloudflare
+
+## 1.156.38 Stable
+- :bug: Fixed error when the first IP was whitelisted to use admin UI through the API
+- :sparkles: Swagger documentation improvements
+- :bug: Fixed LPM crash on subsequent Proxy Tester calls with unexistent proxy ports
+
+## 1.155.637 Development Latest
+- :sparkles: Improved UX and simplified UI
+
+## 1.155.475 
+- :bug: Fixed CSS on big request stats panels
+
+## 1.155.263 
+- :bug: Fixed API for bannip/unbanning IPs
+
+## 1.155.206 Stable
+- :sparkles: Improved logging
+
+## 1.155.133 Stable
+- :bug: Fixed SMTP settings in proxy port's General tab
+
+## 1.154.894 Development Latest
+- :sparkles: Added option to use SOCKS to connect LPM and Super Proxy
+- :sparkles: Dashboard UI improvements, allowing to enable/disable recent stats panel
+
+## 1.154.55 Development Latest
+- :sparkles: Added proxy port specific IPs whitelisting in General tab
+- :sparkles: Added option to unban IPs from UI in 'Banned IPs' table
+- :bug: Fixed 'Cannnot read property 'toLowerCase' of undefined' when running LPM on Docker
+
+## 1.153.629 Stable
+- :bug: Fixed error logging
+
+## 1.153.425 Stable
+- :sparkles: Reduced timeout period, improving memory management
+
+## 1.153.222 Stable
+- :sparkles: Better handling of timeout handlers
+
+## 1.153.189 Stable
+- :sparkles: Added 'High CPU usage' UI indicator and logs
+- :bug: Fixed HAR preview Timing tab ports display
+- :bug: Fixed bug in Proxies list
+
+## 1.152.345 Stable
+- :sparkles: Added rule action 'Request URL' to send a HTTP request
+- :sparkles: Improved proxies overview UX, allowing deletion of multiple ports
+- :bug: Fixed default zone handling. Changing default zone will no more affect existing ports' zones
+- :sparkles: Ban IP rule actions are now available with URL triggered rules
+
+## 1.151.641 Stable
+- :bug: Fix UI Error when accessing Targeting tab in static zones
+- :sparkles: Added option 'DNS check' to ignore requests without DNS resolution
+
+## 1.151.510 Development Latest
+- :bug: Deprecated fast_session_pool in favor of regular pool
+- :bug: Fixed whitelisting IPs with ranges using API
+
+## 1.151.372 Stable
+- :bug: Fixed WS traffic when SSL Analyzing is on
+- :bug: Fixed browser response when using Process data rule
+- :sparkles: Improved the UX of whitelisting IPs
+
+## 1.151.77 Stable
+- :bug: Fixed WSS traffic when SSL Analyzing is on
+- :bug: Fixed updating whitelist IPs in cluster mode
+
+## 1.150.854 Stable
+- :bug: Fixed duplication proxy ports
+- :star: Updated geo locations and list of available carriers
+
+## 1.150.681 Stable
+- :bug: Fixed UI crash related to Static IP columns
+- :bug: Fixed proxy ports status column on specific errors
+- :bug: Fixed install for older MacOS versions
+- :sparkles: Support for cluster mode (running on multiple CPUs) without session management
+- :sparkles: Refresh IP action is now available for static residential zones
+
+## 1.150.351 Stable
+- :sparkles: UI improvement: setting headers requires SSL Analyzing to reduce confusion
+- :bug: Fixed country targeting for static zones
+
+## 1.150.274 Stable
+- :sparkles: IP refresh price now is shown in Refresh IP action rule
+- :sparkles: Static IP column will now show IPs in the pool
+- :bug: Fix shortcut problem for Windows home directories with '&' character
+
+## 1.149.883 Stable
+- :star: Updated geo locations and list of available carriers
+- :bug: Fixed gIP allocation modal checkboxes
+
+## 1.149.626 Stable
+- :bug: Session termination has been redesigned to avoid infinite loops
+- :bug: Fixed install script for MacOS, now using Node 10.15.3
+- :bug: Fix typos in 'Report Bug' modal
+- :bug: Enforce Node 10.16.3 on Linux
+
+## 1.149.104 Stable
+- :bug: Fixed 'Cannot read property slice of undefined' on startup
+
+## 1.148.901 Stable
+- :star: Performance improvements (make use of HTTP agent to reuse open sockets
+
+## 1.148.629 Stable
+
+## 1.148.475 Stable
+
+## 1.148.367 Stable
+- :bug: bug fixes
+
+## 1.148.204 Stable
+- :star: Super proxies are resolved on each request by default
+
+## 1.148.122 Stable
+
+## 1.148.74 Stable
+- :bug: fix whitelisting
+
+## 1.147.992 Stable
+
+## 1.147.960 Stable
+- :star: add a flag to ignore SSL to super proxy errors
+
+## 1.147.813 Stable
+- :bug: Fixed overriding parameters in CLI
+
+## 1.147.705 Stable
+- :bug: Bug fixes
+
+## 1.147.566 Stable
+- :bug: UI bug fixes
+- :star: Adding UI supporting for cluster mode
+
+## 1.147.269 Stable
+- :bug: Bug fixes
+- :star: Improved error handling
+
+## 1.147.79 Stable
+- :bug: Bug fixes
+
+## 1.146.711 Stable
+- :bug: Using correct password when Waterfall rule is applied
+
+## 1.146.606 Stable
+- :bug: Fixed crashes for docker
+- :bug: Added more error handling
+
+## 1.146.377 Stable
+- :bug: fixed error: Hostname/IP does not match certificate's altnames
+- :bug: Bug fixes / UI improvements
+
+## 1.146.183 Stable
+- :star: Added support for domain param in /proxies/:port/banip and /proxies/:port/banips APIs
+
+## 1.146.158 Stable
+- :bug: Fixed LPM WS connection when accessed with https
+- :bug: Fix socket hang up errors
+
+## 1.146.94 Stable
+- :star: Added missing countries of super proxies
+- :sparkles: Show Static IPs column in multiplied proxy port overviews using a static zones
+
+## 1.145.600 Stable
+- :star: AS prefix allowed for ASN field
+
+## 1.145.154 Stable
+- :bug: Bug fixes / UI improvements
+
+## 1.144.356 Stable
+- :bug: Fixed overrding options when passing args in CLI
+
+## 1.143.768 Stable
+- :bug: Fixed persisting the order of multiplied proxy ports
+- :bug: Fixed origin IP for incoming requests on SOCKS5
+
+## 1.143.567 Stable
+- :star: UI improvements (zones list synchronization)
+
+## 1.143.412 Stable
+- :bug: Fixed whitelisting and moved it from proxy config to general settings
+
+## 1.143.166 Stable
+- :bug: Fixed error: unable to get local issuer certificate
+- :bug: Fixed overriding passwords
+
+## 1.142.833 Stable
+- :bug: Fixed empty space when there isn't open browser icon in proxies table
+- :bug: Fixed stability issues
+
+## 1.142.291 Stable
+- :bug: Fixed small bugs
+
+## 1.142.102 Stable
+- :star: Improved performance when using a big number of proxy ports
+- :bug: Fixed zones/plans details
+
+## 1.141.733 Stable
+- :star: Added api/async_req endpoint
+
+## 1.141.582 Development Latest
+- :star: Added "local_login" flag to require each browser to authenticate separately
+
+## 1.141.384 Stable
+- :bug: fixed callback leaks on overview page
+- :star: Added a button to refresh zones list/settings
+
+## 1.141.40 Stable
+- :bug: Fixed targeting for datacenter
+
+## 1.141.27 Stable
+- :bug: Fixed empty spaces (ui)
+
+## 1.140.948 Stable
+- :bug: fixed session duration combined with pool
+
+## 1.140.839 Stable
+- :star: replace HAR viewer with the message when logs are off
+
+## 1.140.560 Stable
+- :star: Improved the performance of saving configuration
+
+## 1.140.22 Stable
+- :bug: fix preserving the order on changes in DC IPs
+
+## 1.139.746 Development Latest
+- :star: More accurate BW measurement
+
+## 1.139.623 Stable
+- :bug: fix LPM response when cert is wrong and not using insecure flag
+- :sparkles: Added new Rule action: "Ban IPs globally"
+
+## 1.139.129 Stable
+- :star: Added Insecure field under General tab
+
+## 1.139.62 Stable
+
+## 1.138.758 Stable
+- :bug: Fixed targeting mobile IPs
+
+## 1.138.603 Stable
+- :star: Added support for "carrier" option in Link Tester API
+- :bug: Improved error messages
+- :bug: Fixed IP rotation for external proxies
+
+## 1.138.518 Stable
+- :bug: Super Proxy's icon flag in LPM isn't changing
+- :bug: *_chrome_icon elements are not showed correctly on Mozilla
+
+## 1.138.327 Stable
+- :bug: Fixed debug: none option to skip all the debug headers
+
+## 1.138.101 Stable
+- :bug: Fixed presence of open browser button if host is not localhost
+
+## 1.137.946 Stable
+- :bug: Fixed Waterfall rule between external proxy and Luminati proxy
+
+## 1.137.753 Stable
+- :bug: Fixes in residential pool
+- :bug: Improved order of applying rules (Waterfall always at the end)
+
+## 1.137.285 Development Latest
+- :bug: Fixed memory leaks
+
+## 1.137.113 Stable
+- :star: Improved support off adding/removing IPs in DC pool
+- :star: UI improvements in HAR viewer
+
+## 1.136.969 Stable
+- :bug: Fixed triggering certain rules for SMTP requests
+
+## 1.136.784 Development Latest
+- :star: Added support to add/remove IPs in DC pool
+- :bug: Fixed modal with IP allocation
+- :bug: Removed ES/PT translations
+
+## 1.136.517 Stable
+- :bug: Bug fixes (crashes)
+
+## 1.136.350 Stable
+- :star: Carriers are filtered based on country selection
+- :star: Simplification of proxy port config
+
+## 1.136.76 Stable
+- :bug: Bug fixes (lokijs, proxy status, creating proxy port by clicking on a feature)
+- :star: ASN codes are filtered based on country selection
+
+## 1.135.762 Stable
+- :bug: Allow for any values (IPs/domains) in SMTP field
+
+## 1.135.662 Stable
+- :star: Added Rules section to the HAR viewer
+
+## 1.135.636 Stable
+- :star: Added UI for choosing SMTP proxy targets under "General" tab
+
+## 1.135.547 Stable
+
+## 1.135.418 Stable
+- :bug: Multiple bug fixed and improved error handling
+- :star: Performance optimizations
+- :star: Stop maintaining pool on inactivity - "Idle pool" as a new option in proxy config
+
+## 1.134.429 Stable
+- :bug: Fixed some translations
+- :bug: SMTP connections more transparent
+
+## 1.134.251 Stable
+- :star: Added translations for: Russian, Spanish, Protuguese, Turkish, Korean
+
+## 1.134.15 Stable
+- :star: lightweight exe installer
+
+## 1.133.690 Stable
+- :star: UI improvements
+
+## 1.133.416 Stable
+- :star: Added support for testing SMTP
+
+## 1.132.959 Stable
+
+## 1.132.959 Stable
+- :star: List of banned IPs persists across changes in proxy port
+- :star: Sessions are automatically refreshed on banning IP
+
+## 1.132.512 Stable
+- :bug: Fix errors about sessions
+
+## 1.132.341 Stable
+- :star: Add missing translations for Chinese
+
+## 1.131.652 Stable
+- :sparkles: Introduced Chinese translations
+
+## 1.131.176 Stable
+- :bug: Fix an issue causing empty HAR logs
+
+## 1.131.19 Stable
+- :bug: Fix lokijs related crashes
+- :star: Improved sessions management
+- :star: Introduced live data on the UI
+
+## 1.130.708 Stable
+- :star: Add token based authentication at the request level
+
+## 1.130.673 Development Latest
+- :star: Stability improvements
+
+## 1.129.361 Stable
+- :bug: Fix crashes when incorrect header check
+
+## 1.128.768 Stable
+- :bug: Fix crashes in SOCKS5 when connection is closed
+- :bug: Fix issues with LokiJS
+
+## 1.128.452 Stable
+- :star: Added support for adding multiple proxies in CLI
+
+## 1.128.416 Stable
+- :bug: Fix crashes in China
+
+## 1.128.322 Stable
+- :star: Improved logs and error handling
+
+## 1.127.776 Stable
+- :star: Updated dependencies
+
+## 1.127.735 Stable
+- :star: Convenient way to use an alternative domain when it stops working
+
+## 1.127.526 Stable
+- :bug: Fix 'long availability' pool type
+
+## 1.126.871 Stable
+
+## 1.125.699 Stable
+- :bug: Fix refresh IPs rule action
+
+## 1.125.645 Stable
+- :star: Added support for 'Static residential' in UI
+- :star: Updated node and npm versions in Docker file
+
+## 1.125.539 Development Latest
+- :sparkles: Added prototype of 2captcha integration
+
+## 1.125.95 Stable
+- :star: Improved 'Download all proxy ports as CSV'
+
+## 1.124.317 Development Latest
+- :sparkles: Prepare code for pending unblocker feature
+
+## 1.124.224 Stable
+- :bug: UI bug fix
+
+## 1.124.62 Development Latest
+- :star: Improved UI in Link Tester
+- :star: Improved UI proxies list table
+
+## 1.123.411 Development Latest
+- :bug: Fixed 'SSL to superproxy'
+- :star: Resolved stability issues in China
+
+## 1.123.208 Development Latest
+
+## 1.123.8 Stable
+- :star: UI improvements: websocket automatically reconnects
+
+## 1.122.334 Stable
+- :bug: Bug fixes for Chinese users
+
+## 1.121.461 Stable
+- :bug: UI fixes in Firefox
+- :star: Updated list of User-Agent headers
+
+## 1.121.365 Stable
+- :bug: UI and bug fixes
+
+## 1.120.966 Stable
+- :bug: Fixed random-headers preset
+
+## 1.120.619 Stable
+- :bug: Fixed checking for upgrades in China
+
+## 1.120.389 Stable
+- :bug: Fixed UI: incorrect cache
+
+## 1.120.280 Stable
+
+## 1.120.149 Stable
+- :bug: Fixed installation script
+
+## 1.119.886 Stable
+- :star: Rules: added a new action - banning IPs per domains
+
+## 1.119.855 Stable
+- :bug: Fixed db errors
+
+## 1.119.748 Stable
+- :bug: Fixed default port in rules tester
+
+## 1.119.681 Stable
+- :bug: Fixed rules with external proxies
+
+## 1.119.617 Stable
+- :star: New buttons and endpoint on API for opening a new browser configured with a determined port
+- :star: Rules: tigger code is now editible
+
+## 1.119.493 Stable
+- :bug: Disabling features that dont apply to external proxies
+
+## 1.119.232 Stable
+- :star: Rules: action code is shown along with the UI options for all rules parameters
+
+## 1.118.749 Development Latest
+- :star: Rules: trigger code is shown along with the UI options for all rules parameters
+
+## 1.118.308 Stable
+- :bug: Ban IP bug fixes
+
+## 1.118.284 Development Latest
+- :star: Separation between multiple LPM instances
+- :bug: UI and bug fixes
+
+## 1.117.683 Stable
+- :bug: Fixed Ban IP when combined with Waterfall rule
+- :bug: Fixed db issues and improved db performance
+
+## 1.116.963 Stable
+- :bug: Fixed Ban IP when combined with other rules
+
+## 1.116.548 Development Latest
+- :star: support using multiple instances on the same machine
+
+## 1.116.387 Stable
+- :bug: UI bug fixes
+
+## 1.116.320 Stable
+- :star: UI improvements
+
+## 1.116.208 Stable
+- :star: Introduced token based auth for adding whitelisted IPs
+
+## 1.116.113 Stable
+- :bug: Fixed whitelist_ips in local proxy port configuration
+
+## 1.115.736 Stable
+- :bug: Bug fixes
+
+## 1.115.628 Stable
+
+## 1.114.998 Stable
+- :bug: fixed 502 erros handling with Rules
+
+## 1.114.809 Stable
+- :star: HAR viewer optimizations
+
+## 1.114.305 Stable
+- :star: New debugging tools: Sessions and banned IPs were added in 'Logs' tab
+
+## 1.114.152 Development Latest
+- :star: UI improvements in edit proxy page
+- :star: New pool type 'Long-availability'
+- :star: Session termination
+
+## 1.113.808 Stable
+- :star: Long-availability sessions pool
+
+## 1.113.585 Stable
+- :star: UI improvements
+
+## 1.113.30 Stable
+- :bug: Fixed multilevel waterfall Rule
+
+## 1.112.820 Stable
+- :star: New endpoint on API: adding multiple IPs to banlist
+
+## 1.112.806 Stable
+- :star: Added route_err option
+- :star: UI improvements
+
+## 1.112.742 Stable
+- :star: Improved HAR viewer: showing all the failed requests too
+- :star: Improved usability of Fast Sessions Pool
+
+## 1.112.498 Stable
+- :star: Further development of 25 port support
+
+## 1.112.248 Stable
+
+## 1.112.99 Stable
+- :sparkles: Updated Node and npm in Dockerfile
+
+## 1.112.2 Stable
+- :sparkles: Improved statistics
+
+## 1.111.930 Stable
+- :bug: Bug fixes
+
+## 1.111.808 Stable
+- :sparkles: Improved instructions in Howto section
+- :sparkles: Support for 'ban IP' rule for 25 port
+- :bug: Fixed running LPM without UI
+
+## 1.111.212 Stable
+- :bug: Fixed stability issues
+
+## 1.111.73 Stable
+- :bug: Bug fixes
+
+## 1.110.864 Stable
+- :bug: Fixed installation script for Mac
+
+## 1.110.817 Stable
+- :sparkles: added simple command for whitelisting IPs
+- :bug: Fixed session duration
+
+## 1.110.576 Development Latest
+- :sparkles: improved resolving conflicting proxy ports on Windows
+- :bug: Bug fixes
+
+## 1.110.470 Stable
+- :sparkles: improved resolving conflicting proxy ports
+
+## 1.110.246 Development Latest
+- :boom: All proxies will listen on 127.0.0.1 by default, unless specific interface is set or ips whitelist is defined
+- :sparkles: Add IP address from which log in was performed to whitelist ip list
+- :sparkles: improved performance
+- :bug: fixed propagating zone's password
+
+## 1.109.493 Stable
+- :bug: Fixed socks proxy security issue
+
+## 1.109.258 Stable
+- :bug: fixed UI bugs
+
+## 1.109.164 Stable
+- :bug: scrapping data fixed
+- :bug: fixed installation script
+- :star: UI improvements
+
+## 1.108.852 Stable
+- :star: UI improvements
+
+## 1.108.597 Development Latest
+- :star: UI improvements
+
 ## 1.108.399 Development Latest
 - :star: Migration to node 10.X
 - :star: Performance improvements
@@ -99,7 +1011,7 @@ Luminati Proxy manager - Change Log
 - :star: Moved 'Regexp for bypass proxy' config into Rules tab
 - :star: Moved 'Regexp for super proxy' config into Rules tab
 
-## 1.103.790 
+## 1.103.790 Stable
 - :sparkles: Added regexp generator
 
 ## 1.103.508 Stable

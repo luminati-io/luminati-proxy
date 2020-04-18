@@ -11,6 +11,22 @@ else
 define([], function(){
 var E = date_get;
 
+E.sec = {
+    NANO: 1/1e9,
+    MS: 0.001,
+    SEC: 1,
+    MIN: 60,
+    HOUR: 60*60,
+    DAY: 24*60*60,
+    WEEK: 7*24*60*60,
+    MONTH: 30*24*60*60,
+    YEAR: 365*24*60*60,
+};
+E.ms = {};
+for (var key in E.sec)
+    E.ms[key] = E.sec[key]*1000;
+var ms = E.ms;
+
 function pad(num, size){ return ('000'+num).slice(-size); }
 
 E.ms_to_dur = function(_ms){
@@ -69,10 +85,13 @@ E.init = function(){
     }
     else if (is_node && !global.mocha_running)
     {
-        // brings libuv monotonic time since process start
-        var timer = process.binding('timer_wrap').Timer;
-        adjust = Date.now()-timer.now();
-        E.monotonic = function(){ return timer.now()+adjust; };
+        var now_fn = function(){
+            var data = process.hrtime();
+            var seconds = data[0], nanos = data[1];
+            return Math.floor(seconds * E.ms.SEC + nanos * E.ms.NANO);
+        };
+        adjust = Date.now()-now_fn();
+        E.monotonic = function(){ return now_fn()+adjust; };
     }
     else
     {
@@ -120,10 +139,8 @@ E.locale = {months_long: E.months_long, months_short: E.months_short,
 E.get = date_get;
 function date_get(d, _new){
     var y, mon, day, H, M, S, _ms;
-    if (d===undefined)
-        return new Date();
     if (d==null)
-        return new Date(null);
+        return new Date();
     if (d instanceof Date)
         return _new ? new Date(d) : d;
     if (typeof d=='string')
@@ -221,21 +238,6 @@ E.from_rcs = function(d){
 };
 E.to_rcs = function(d){ return E.to_sql_sec(d).replace(/[-: ]/g, '.'); };
 
-E.sec = {
-    MS: 0.001,
-    SEC: 1,
-    MIN: 60,
-    HOUR: 60*60,
-    DAY: 24*60*60,
-    WEEK: 7*24*60*60,
-    MONTH: 30*24*60*60,
-    YEAR: 365*24*60*60,
-};
-E.ms = {};
-for (var key in E.sec)
-    E.ms[key] = E.sec[key]*1000;
-var ms = E.ms;
-
 E.align = function(d, align){
     d = E.get(d, 1);
     switch (align.toUpperCase())
@@ -258,6 +260,7 @@ E.align = function(d, align){
 
 E.add = function(d, dur){
     d = E.get(d, 1);
+    dur = normalize_dur(dur);
     if (dur.year)
         d.setUTCFullYear(d.getUTCFullYear()+dur.year);
     if (dur.month)
@@ -268,6 +271,19 @@ E.add = function(d, dur){
     });
     return d;
 };
+
+function normalize_dur(dur){
+    var aliases = {
+        years: 'year', months: 'month', days: 'day',
+        hours: 'hour', minutes: 'min', seconds: 'sec',
+        minute: 'min', mins: 'min', second: 'sec', secs: 'sec',
+        y: 'year', mo: 'month', d: 'day', h: 'hour', m: 'min', s: 'sec',
+    };
+    var norm = {};
+    for (var k in dur)
+        norm[aliases[k]||k] = dur[k];
+    return norm;
+}
 
 E.describe_interval = function(_ms){
     return _ms<2*ms.MIN ? Math.round(_ms/ms.SEC)+' sec' :
@@ -422,6 +438,20 @@ E.strptime = function(str, fmt){
             fun(matched[idx+1]);
     }
     return d;
+};
+
+// tz in format shh:mm (for exmpl +01:00, -03:45)
+E.apply_tz = function(date, tz, opt){
+    if (!date)
+        return date;
+    date = E.get(date);
+    tz = (tz||E.local_tz).replace(':', '');
+    opt = opt||{};
+    var timezone = +tz.slice(1, 3)*E.ms.HOUR+tz.slice(3, 5)*E.ms.MIN;
+    var sign = tz.slice(0, 1) == '+' ? 1 : -1;
+    if (opt.inverse)
+        sign *= -1;
+    return new Date(date.getTime()+sign*timezone);
 };
 
 var utc_local = {
@@ -589,12 +619,15 @@ E.strftime = function(fmt, d, opt){
             if (utc)
                 return '+0000';
             var off = typeof tz=='number' ? tz : -d.getTimezoneOffset();
-            return (off<0 ? '-' : '+')+pad(Math.abs(off/60), 2)+pad(off%60, 2);
+            return (off<0 ? '-' : '+')+pad(Math.abs(Math.trunc(off/60)), 2)+
+                pad(off%60, 2);
         default: return c;
         }
     }); }
     return replace(fmt);
 };
+
+E.local_tz = E.strftime('%z', E.get(), {utc: false});
 
 // For a string like '11:00-23:30', returns a function that checks whether a
 // given date (moment in time) belongs to the set.

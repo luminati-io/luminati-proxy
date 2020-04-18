@@ -1,14 +1,6 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint node:true, react:true*/
-var define;
-var is_node = typeof module=='object' && module.exports;
-if (is_node)
-    define = require('../../../util/require_node.js').define(module, '..');
-else
-    define = self.define;
-
+'use strict'; /*jslint react:true*/
 define(['react', '/util/etask.js', '/util/setdb.js'], (React, etask, setdb)=>{
-
 const LONG_CB_MS = 100;
 
 // XXX krzysztof: copied from android/who/app/components, removed local
@@ -29,9 +21,9 @@ class Pure_component extends React.PureComponent {
         }
         // XXX michaelg: 'let of' requires shim with babel+react+ie11
         // requires further investigation, leave as is till 01-Feb-2018
-        /*for (let l of Object.values(this.listeners))
+        /* for (let l of Object.values(this.listeners))
             setdb.off(l);*/
-        Object.values(this.listeners).forEach(l=>{setdb.off(l);});
+        Object.values(this.listeners).forEach(l=>{ setdb.off(l); });
         if (this.willUnmount)
             this.willUnmount();
         let t1 = Date.now();
@@ -42,6 +34,9 @@ class Pure_component extends React.PureComponent {
         }
     }
     setdb_on(path, cb, opt){ this.listeners[path] = setdb.on(path, cb, opt); }
+    setdb_off(path){ setdb.off(this.listeners[path]); }
+    setdb_get(path){ return setdb.get(path); }
+    setdb_set(path, curr, opt){ return setdb.set(path, curr, opt); }
     etask(sp){
         if (!this.sp)
             this.sp = etask('Component', function*(){ yield this.wait(); });
@@ -83,6 +78,4 @@ class Pure_component extends React.PureComponent {
     }
 }
 
-return Pure_component;
-
-});
+return Pure_component; }); // eslint-disable-line

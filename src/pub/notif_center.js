@@ -2,12 +2,14 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Tooltip} from './common.js';
 import $ from 'jquery';
-import {ga_event} from './util.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import semver from 'semver';
+import Tooltip from './common/tooltip.js';
+import {Modal} from './common/modals.js';
+import {T} from './common/i18n.js';
+import './css/notif_center.less';
 
 class Notif_center extends Pure_component {
     state = {loaded: false, notifs: []};
@@ -51,15 +53,12 @@ class Notif_center extends Pure_component {
     open(){
         if (this.state.loaded)
         {
-            ga_event('notif-center', 'open');
             this.mark_read();
             $('#notif_modal').modal();
         }
     }
     message_clicked(message){
-        ga_event('notif-center', 'notif-clicked', message.title);
         this.etask(function*(){
-            // XXX krzysztof: switch fetch->ajax
             yield window.fetch('/api/update_notifs', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -75,8 +74,8 @@ class Notif_center extends Pure_component {
     }
     render(){
         const number = this.state.notifs.filter(n=>n.status=='new').length;
-        const tip = 'Notification center: you will receive updates on new'
-        +' features in LPM here';
+        const tip = 'Notification center: you will receive updates on new '
+            +'features in LPM here';
         return <div className="notif">
               <Modal_portal>
                 <div className="notif_modal">
@@ -92,11 +91,11 @@ class Notif_center extends Pure_component {
                   </Modal>
                 </div>
               </Modal_portal>
-              <Tooltip title={tip} placement="bottom">
+              <T>{t=><Tooltip title={t(tip)} placement="bottom">
                 <div onClick={this.open.bind(this)} className="icon">
                   <Circle_icon number={number}/>
                 </div>
-              </Tooltip>
+              </Tooltip>}</T>
             </div>;
     }
 }

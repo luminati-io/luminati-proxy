@@ -4,26 +4,24 @@ import React from 'react';
 import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import classnames from 'classnames';
-import Pure_component from '../../www/util/pub/pure_component.js';
-import {Nav, Modal, Link_icon} from './common.js';
+import Pure_component from '/www/util/pub/pure_component.js';
+import {Nav, Link_icon} from './common.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import filesaver from 'file-saver';
 import $ from 'jquery';
-import {ga_event} from './util.js';
+import {Modal} from './common/modals.js';
+import './css/config.less';
 
 class Config extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {editable: false, changed: false, persisted_config: ''};
-        this.title = 'Manual Configuration';
-        this.subtitle = 'Edit or export your ports configuration as JSON file';
-    }
+    state = {editable: false, changed: false, persisted_config: ''};
+    title = 'Manual configuration';
+    subtitle = 'Edit or export your ports configuration as JSON file';
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea,
             {mode: 'javascript', readOnly: 'nocursor'});
-        this.cm.on('change', this.on_cm_change.bind(this));
+        this.cm.on('change', this.on_cm_change);
         const _this = this;
         this.etask(function*(){
             const config = yield ajax.json({url: '/api/config'});
@@ -32,49 +30,37 @@ class Config extends Pure_component {
         });
         this.setdb_on('head.settings', settings=>this.setState({settings}));
     }
-    on_cm_change(e){
+    on_cm_change = e=>{
         this.setState({changed:
             this.state.persisted_config!=e.doc.getValue()});
-    }
-    set_textarea(el){ this.textarea = el; }
-    set_editable(editable){
+    };
+    set_textarea = el=>{
+        this.textarea = el;
+    };
+    set_editable = editable=>{
         this.setState({editable});
         this.cm.setOption('readOnly', editable ? false : 'nocursor');
-    }
-    check(){
+    };
+    check = ()=>{
         if (!this.state.changed)
             return;
-        ga_event('configuration', 'click save');
+        try {
+            JSON.parse(this.cm.doc.getValue());
+            $('#conf_confirmation_modal').modal();
+        } catch(e){
+            this.setState({warning: e.message});
+        }
+    };
+    check_reload = ()=>{
         const _this = this;
-        this.etask(function*(){
-            const check_url = '/api/config_check';
-            // XXX krzysztof: switch fetch->ajax
-            const raw_check = yield window.fetch(check_url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({config: _this.cm.doc.getValue()}),
-            });
-            const check = yield raw_check.json();
-            if (check.length)
-            {
-                ga_event('configuration', 'wrong format');
-                _this.setState({warning: check[0]});
-            }
-            else
-                $('#conf_confirmation_modal').modal();
-        });
-    }
-    check_reload(){
-        const _this = this;
-        const retry = ()=>{ setTimeout(_this.check_reload.bind(_this), 500); };
+        const retry = ()=>{ setTimeout(_this.check_reload, 500); };
         return etask(function*(){
             this.on('uncaught', retry);
             yield ajax.json({url: 'api/proxies_running'});
             window.location.reload();
         });
-    }
-    save(){
-        ga_event('configuration', 'click save in modal');
+    };
+    save = ()=>{
         this.set_editable(false);
         const _this = this;
         this.etask(function*(){
@@ -89,41 +75,40 @@ class Config extends Pure_component {
             yield etask.sleep(3000);
             yield _this.check_reload();
         });
-    }
-    download(){
-        ga_event('configuration', 'click download');
+    };
+    download = ()=>{
         const blob = new Blob([this.cm.doc.getValue()],
             {type: 'text/plain;charset=utf-8'});
         filesaver.saveAs(blob, `${this.state.settings.customer}_config.json`);
-    }
-    click_edit(){
+    };
+    click_edit = ()=>{
         this.set_editable(true);
-        ga_event('configuration', 'click edit');
-    }
-    click_cancel(){
+    };
+    click_cancel = ()=>{
         this.cm.doc.setValue(this.state.persisted_config);
         this.setState({warning: undefined});
         this.set_editable(false);
-        ga_event('configuration', 'click cancel');
-    }
+    };
     render(){
         const panel_class = classnames('panel code_panel flex_auto vbox', {
             editable: this.state.editable});
+        const read_only = this.state.settings && this.state.settings.read_only;
         return <div className="config vbox">
               <Nav title={this.title} subtitle={this.subtitle}
                 warning={this.state.warning}/>
               <div className={panel_class}>
                 <div className="panel_body flex_auto vbox">
                   <Nav_buttons editable={this.state.editable}
+                    read_only={read_only}
                     changed={this.state.changed}
-                    click_edit={this.click_edit.bind(this)}
-                    click_save={this.check.bind(this)}
-                    click_download={this.download.bind(this)}
-                    click_cancel={this.click_cancel.bind(this)}/>
-                  <textarea ref={this.set_textarea.bind(this)}/>
+                    click_edit={this.click_edit}
+                    click_save={this.check}
+                    click_download={this.download}
+                    click_cancel={this.click_cancel}/>
+                  <textarea ref={this.set_textarea}/>
                 </div>
               </div>
-              <Conf_modal click_ok={this.save.bind(this)}/>
+              <Conf_modal click_ok={this.save}/>
             </div>;
     }
 }
@@ -139,9 +124,11 @@ const Nav_buttons = props=>{
                 classes={save_class} id="ok"/>
             </div>;
     }
+    const tooltip = props.read_only ? 'It is not possible to edit the config '
+    +'in read only mode' : 'Edit config';
     return <div className="nav_buttons">
-          <Link_icon tooltip="Edit config" on_click={props.click_edit}
-            id="pencil"/>
+          <Link_icon tooltip={tooltip} on_click={props.click_edit}
+            id="pencil" disabled={props.read_only}/>
           <Link_icon tooltip="Download as JSON"
             on_click={props.click_download} id="download"/>
         </div>;

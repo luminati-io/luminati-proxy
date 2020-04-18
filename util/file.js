@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
-require('./config.js');
+const zconf = require('./config.js');
 const array = require('./array.js');
 const crypto = require('crypto');
 const rimraf = require('rimraf');
@@ -15,6 +15,9 @@ E.error = null; // an Error() object
 E.read_buf_size = 8192;
 E.is_win = /^win/.test(process.platform);
 E.is_darwin = /^darwin/.test(process.platform);
+E.is_linux = /^linux/.test(process.platform);
+E.is_zlinux = E.is_linux && !/ARCH=ANDROID/.test(zconf.CONFIG_MAKEFLAGS);
+E.is_android = E.is_linux && !E.is_zlinux;
 
 let check_file = (dst, opt)=>{
     opt = opt||{};
@@ -87,8 +90,9 @@ E.read_lines_e = filename=>{
         ret.pop();
     return ret;
 };
-E.fread_e = (fd, start, size)=>{
-    let decoder = new StringDecoder(), rest = size;
+E.fread_e = (fd, start, size, opt)=>{
+    opt = opt||{};
+    let decoder = new StringDecoder(opt.encoding), rest = size;
     let ret = '', append_ret = buf=>ret += decoder.write(buf);
     E.fread_cb_e(fd, start, rest===undefined ? append_ret : buf=>{
         rest -= buf.length;
@@ -178,17 +182,17 @@ E.mkdirp_file_e = (file, mode)=>{
     return file;
 };
 E.rm_rf_e = rimraf.sync;
-E.unlink_e = path=>{
-    fs.unlinkSync(path);
+E.unlink_e = src=>{
+    fs.unlinkSync(src);
     return true;
 };
 E.rmdir_e = dir=>{
     fs.rmdirSync(dir);
     return true;
 };
-E.touch_e = path=>{
+E.touch_e = src=>{
     let tm = Date.now()/1000;
-    let h = fs.openSync(path, 'a');
+    let h = fs.openSync(src, 'a');
     fs.futimesSync(h, tm, tm);
     fs.closeSync(h);
     return true;
@@ -202,7 +206,7 @@ E.readdir_e = (dir, opt)=>{
     return names.filter(n=>E.is_file(dir+'/'+n));
 };
 E.readdir_r_e = (dir, opt)=>{
-    dir = dir.replace(/\/+$/, '');
+    dir = E.normalize(dir).replace(/\/+$/, '');
     return E.find_e(dir, assign({strip: new RegExp('^'+dir+'/')}, opt));
 };
 function get_owner(stat, opt){
@@ -263,6 +267,8 @@ E.copy_r_e = (src, dst, opt)=>{
         return true;
     if (E.is_file(src))
         return copy_file(src, dst, opt);
+    if (E.is_win && E.is_symlink(src))
+        src = E.readlink_e(src);
     return E.readdir_r_e(src, opt).every(f=>
         E.copy_r_e(src+'/'+f, dst+'/'+f, opt));
 };
@@ -372,6 +378,7 @@ function find_cb(dir, cb, opt){
     });
 }
 E.find_e = (dir, opt)=>{
+    dir = E.normalize(dir);
     opt = opt||{};
     if (opt.cb)
         return find_cb(dir, opt.cb, opt);
@@ -379,9 +386,9 @@ E.find_e = (dir, opt)=>{
     find_cb(dir, f=>ret.push(f), opt);
     return ret;
 };
-E.realpath_e = path=>fs.realpathSync(path);
-E.stat_e = path=>fs.statSync(path);
-E.lstat_e = path=>fs.lstatSync(path);
+E.realpath_e = src=>fs.realpathSync(src);
+E.stat_e = src=>fs.statSync(src);
+E.lstat_e = src=>fs.lstatSync(src);
 let err_retval = {
     read: null, read_line: null, read_lines: null, fread: null,
     tail: null, head: null, size: null, mkdirp: null, mkdirp_file: null,
@@ -396,51 +403,52 @@ let err_retval = {
 for (let method in err_retval)
     E[method] = errno_wrapper.bind(null, E[method+'_e'], err_retval[method]);
 
-E.exists = path=>{
-    try { fs.accessSync(path); }
+E.exists = src=>{
+    try { fs.accessSync(src); }
     catch(e){ return false; }
     return true;
 };
-E.is_file = path=>{
+E.is_file = src=>{
     let stat;
-    try { stat = fs.statSync(path); }
+    try { stat = fs.statSync(src); }
     catch(e){ return false; }
     return stat.isFile();
 };
-E.is_dir = path=>{
+E.is_dir = src=>{
     let stat;
-    try { stat = fs.statSync(path); }
+    try { stat = fs.statSync(src); }
     catch(e){ return false; }
     return stat.isDirectory();
 };
-E.is_symlink = path=>{
+E.is_symlink = src=>{
     let stat;
-    try { stat = fs.lstatSync(path); }
+    try { stat = fs.lstatSync(src); }
     catch(e){ return false; }
     return stat.isSymbolicLink();
 };
-E.is_chardev = path=>{
+E.is_chardev = src=>{
     let stat;
-    try { stat = fs.statSync(path); }
+    try { stat = fs.statSync(src); }
     catch(e){ return false; }
     return stat.isCharacterDevice();
 };
-E.is_socket = path=>{
+E.is_socket = src=>{
     let stat;
-    try { stat = fs.statSync(path); }
+    try { stat = fs.statSync(src); }
     catch(e){ return false; }
     return stat.isSocket();
 };
-E.is_exec = path=>{
-    try { fs.accessSync(path, fs.X_OK); }
+E.is_exec = src=>{
+    try { fs.accessSync(src, fs.X_OK); }
     catch(e){ return false; }
     return true;
 };
-E.which = bin=>{
+E.which = (bin, env)=>{
     bin = E.normalize(bin);
     if (E.is_absolute(bin)&&E.is_exec(bin))
         return bin;
-    let paths = process.env.PATH.split(E.is_win ? ';' : ':');
+    const pathvar = env&&env.PATH||process.env.PATH;
+    let paths = pathvar.split(E.is_win ? ';' : ':');
     for (let i=0; i<paths.length; i++)
     {
         let filename = E.normalize(`${paths[i]}/${bin}`);
@@ -467,63 +475,63 @@ if (E.is_win)
     E.cygwin_root = E.is_dir('C:/cygwin') ? 'C:/cygwin' :
         E.is_dir('D:/cygwin') ? 'D:/cygwin' : null;
 }
-E.cyg2unix = path=>{
+E.cyg2unix = src=>{
     if (!E.is_win || !E.cygwin_root)
-        return path;
+        return src;
     // /cygdrive/X/yyy --> X:/yyy
-    path = path.replace(/^\/cygdrive\/(.)(\/(.*))?$/, '$1:/$3');
+    src = src.replace(/^\/cygdrive\/(.)(\/(.*))?$/, '$1:/$3');
     // /usr/lib --> c:/cygwin/lib
-    path = path.replace(/^\/usr\/lib(\/.*)?$/, E.cygwin_root.toLowerCase()+
+    src = src.replace(/^\/usr\/lib(\/.*)?$/, E.cygwin_root.toLowerCase()+
         '/lib$1');
     // /usr/bin --> c:/cygwin/bin
-    path = path.replace(/^\/usr\/bin(\/.*)?$/, E.cygwin_root.toLowerCase()+
+    src = src.replace(/^\/usr\/bin(\/.*)?$/, E.cygwin_root.toLowerCase()+
         '/bin$1');
     // /xxx --> c:/cygwin/xxx
-    path = path.replace(/^\//, E.cygwin_root.toLowerCase()+'/');
-    return path;
+    src = src.replace(/^\//, E.cygwin_root.toLowerCase()+'/');
+    return src;
 };
-E.unix2cyg = path=>{
+E.unix2cyg = src=>{
     if (!E.is_win)
-        return path;
+        return src;
     // c:/cygwin/lib -> /usr/lib
-    path = path.replace(new RegExp('^'+E.cygwin_root.toLowerCase()+'/lib(.*)'),
+    src = src.replace(new RegExp('^'+E.cygwin_root.toLowerCase()+'/lib(.*)'),
         '/usr/lib$1');
     // c:/cygwin/bin -> /usr/bin
-    path = path.replace(new RegExp('^'+E.cygwin_root.toLowerCase()+'/bin(.*)'),
+    src = src.replace(new RegExp('^'+E.cygwin_root.toLowerCase()+'/bin(.*)'),
         '/usr/bin$1');
     // c:/cygwin/xxx -> /xxx
-    path = path.replace(new RegExp('^'+E.cygwin_root.toLowerCase()+'/(.*)'),
+    src = src.replace(new RegExp('^'+E.cygwin_root.toLowerCase()+'/(.*)'),
         '/$1');
-    return path;
+    return src;
 };
-E.unix2win = path=>{
+E.unix2win = src=>{
     if (!E.is_win)
-        return path;
+        return src;
     // c:/xxx -> C:/xxx
-    path = path.replace(/^[c-z]:/, s=>s.toUpperCase());
+    src = src.replace(/^[c-z]:/, s=>s.toUpperCase());
     // C:/xxx/yyy -> C:\xxx\yyy
-    path = path.replace(/\//g, '\\');
-    return path;
+    src = src.replace(/\//g, '\\');
+    return src;
 };
-E.win2unix = (path, force)=>{
+E.win2unix = (src, force)=>{
     if (!force && !E.is_win)
-        return path;
+        return src;
     // C:\xxx\yyy --> C:/xxx/yyy
-    path = path.replace(/\\/g, '/');
+    src = src.replace(/\\/g, '/');
     // C:/ --> c:/
-    path = path.replace(/^[c-z]:/i, s=>s.toLowerCase());
-    return path;
+    src = src.replace(/^[c-z]:/i, s=>s.toLowerCase());
+    return src;
 };
-E.win2cyg = path=>{
+E.win2cyg = src=>{
     if (!E.is_win)
-        return path;
-    path = E.win2unix(path);
-    let escaped_root = E.cygwin_root.replace(/([\?\\\/\[\]+*])/g, '\\$1');
-    path = path.replace(new RegExp('^'+escaped_root+'/?', 'i'), '/');
-    path = path.replace(/^[c-z]:/i, s=>'/cygdrive/'+s[0].toLowerCase());
-    return path;
+        return src;
+    src = E.win2unix(src);
+    let escaped_root = E.cygwin_root.replace(/([?\\/[\]+*])/g, '\\$1');
+    src = src.replace(new RegExp('^'+escaped_root+'/?', 'i'), '/');
+    src = src.replace(/^[c-z]:/i, s=>'/cygdrive/'+s[0].toLowerCase());
+    return src;
 };
-E.is_absolute = path=>/^(\/|([c-z]:))/i.test(path);
+E.is_absolute = src=>/^(\/|([c-z]:))/i.test(src);
 E.absolutize = (p, d1, d2)=>{
     if (!p||E.is_absolute(p))
         return p;

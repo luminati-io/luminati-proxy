@@ -1,55 +1,58 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
 import classnames from 'classnames';
-import {Tooltip} from './common.js';
 import {get_static_country} from './util.js';
+import Tooltip from './common/tooltip.js';
+import {T} from './common/i18n.js';
 
-const tooltips = {
-    crawler: `Your crawler or bot that systematically browses the web. Connect
-        any type of crawler to the Luminati Proxy Manager:
-        <ul>
+const tooltips = t=>({
+    crawler: t('Your crawler or bot that systematically browses the web. '
+        +'Connect any type of crawler to the Luminati Proxy Manager:')
+        +`<ul>
           <li>
-            <div>Browser and extension based crawlers</div>
-            <div class="browser_icon firefox"/>
-            <div class="browser_icon chrome"/>
-            <div class="browser_icon safari"/>
-            <div class="browser_icon explorer"/>
+            <div>${t('Browser and extension based crawlers')}</div>
+            <div class="browser_icon firefox"></div>
+            <div class="browser_icon chrome"></div>
+            <div class="browser_icon safari"></div>
+            <div class="browser_icon explorer"></div>
           </li>
           <li>
-            <div>Dedicated crawling solutions</div>
-            <div class="logo_icon crawlera"/>
-            <div class="logo_icon legs"/>
-            <div class="logo_icon import"/>
+            <div>${t('Dedicated crawling solutions')}</div>
+            <div class="logo_icon crawlera"></div>
+            <div class="logo_icon legs"></div>
+            <div class="logo_icon import"></div>
           </li>
         </ul>`,
-    port_numbers: `Defined proxy ports in Luminati Proxy Manager`,
-    lpm: `Luminati Proxy Manager - open-source proxy service that holds
-        valuable features, such as:
+    port_numbers: t('Defined proxy ports in Luminati Proxy Manager'),
+    lpm: t('Luminati Proxy Manager - open-source proxy service that holds '
+        +'valuable features, such as:')
+        +`<ul>
+          <li>${t('IP rotation control')}</li>
+          <li>${t('auto retry')}</li>
+          <li>${t('speed optimization')}</li>
+          <li>${t('auto blacklist of bad IPs')}</li>
+          <li>${t('powerful debugging options')}</li>
+        </ul>`
+        +t('and more. View full list of features by clicking any proxy port '
+            +'in the')
+        +`<strong> ${t('Proxies')}</strong> ${t('table')}`,
+    super_proxy: t('Load balancing servers that manage the traffic between '
+        +'the Luminati Proxy Manager and the peer'),
+    peer: `${t('Exit node (IP) - This might be:')}
         <ul>
-          <li>IP rotation control</li>
-          <li>auto retry</li>
-          <li>speed optimization</li>
-          <li>auto blacklist of bad IPs</li>
-          <li>powerful debugging options</li>
-        </ul>
-        and more. View full list of features by clicking any proxy port in
-        the <strong>Proxies</strong> table`,
-    super_proxy: `Load balancing servers, that manage the traffic between the
-        Luminati Proxy Manager and the peer`,
-    peer: `Exit node (IP) - This might be:
-        <ul>
-          <li>Residential IP - provided through cable modem, DSL or wireless
-            router</li>
-          <li>Datacenter IP (static)</li>
-          <li>Mobile IP - based on a 3G or 4G cellular network</li>
+          <li>${t('Residential IP - provided through cable modem, DSL or '
+              +'wireless router')}</li>
+          <li>${t('Datacenter IP (static)')}</li>
+          <li>${t('Mobile IP - based on a 3G or 4G cellular network')}</li>
         </ul>`,
-    destination: `The target website that the crawler is collecting data from`,
-};
+    destination: t('The target website that the crawler is collecting data '
+        +'from'),
+});
 
 class Schema extends Pure_component {
-    state = {form: {}, proxies: []};
+    state = {form: {}, proxies: [], spcountry: 'us'};
     componentDidMount(){
         this.setdb_on('head.proxy_edit.form', (form={})=>{
             this.setState({form: {...form}});
@@ -73,6 +76,16 @@ class Schema extends Pure_component {
             if (zones)
                 this.setState({zones});
         });
+        this.setdb_on('head.proxy_edit.form.proxy', proxy=>{
+            const country_prefix = 'servercountry-';
+            if (proxy && proxy.includes(country_prefix))
+            {
+                const start_index = proxy.indexOf(country_prefix)+
+                    country_prefix.length;
+                const spcountry = proxy.substring(start_index, start_index+2);
+                this.setState({spcountry});
+            }
+        });
     }
     render(){
         if (!this.state.zones)
@@ -80,26 +93,26 @@ class Schema extends Pure_component {
         return <span className="schema_component">
               <div className="line"/>
               <Layer id="crawler" no_arr>
-                Crawler
+                <T>Crawler</T>
               </Layer>
               <Proxy_port_layer proxies={this.state.proxies}
                 form={this.state.form}/>
               <Layer id="lpm" class_names="port active">
                 <div className="icon"/>
-                LPM
+                <T>LPM</T>
               </Layer>
-              <Layer no_btn id="port_numbers">Port 22225</Layer>
+              <Layer no_btn id="port_numbers"><T>Port</T> 22225</Layer>
               <Layer id="super_proxy">
-                <span className="flag-icon flag-icon-us"/>
-                Super Proxy
+                <span className={'flag-icon flag-icon-'+this.state.spcountry}/>
+                <T>Super Proxy</T>
               </Layer>
-              <Layer no_btn id="port_numbers">Port 80, 443</Layer>
+              <Layer no_btn id="port_numbers"><T>Port</T> 80, 443</Layer>
               <Layer id="peer">
                 <Peer proxies={this.state.proxies} form={this.state.form}
                   zones={this.state.zones}/>
-                Peer
+                <T>Peer</T>
               </Layer>
-              <Layer id="destination">Destination</Layer>
+              <Layer id="destination"><T>Destination</T></Layer>
             </span>;
     }
 }
@@ -107,28 +120,27 @@ class Schema extends Pure_component {
 const Proxy_port_layer = ({proxies, form})=>{
     let label;
     if (form.port)
-        label = 'Proxy port '+form.port;
+        label = ' '+form.port;
     else if (!proxies.length)
-        label = 'Proxy port';
+        label = '';
     else if (proxies.length==1)
-        label = 'Proxy port '+proxies[0].port;
+        label = ' '+proxies[0].port;
     else
-    {
-        label = 'Proxy port '+proxies[0].port+' - '
-        +proxies[proxies.length-1].port;
-    }
-    return <Layer no_btn id="port_numbers">{label}</Layer>;
+        label = ' '+proxies[0].port+' - '+proxies[proxies.length-1].port;
+    return <Layer no_btn id="port_numbers"><T>Proxy port</T>{label}</Layer>;
 };
 
 const Layer = ({id, no_btn, no_arr, class_names, children})=>{
     return <div className={classnames('layer', id, class_names)}>
-          <Tooltip placement="bottom" title={tooltips[id]}>
-            <span>
-              {!no_btn && !no_arr && <div className="arr"/>}
-              {!no_btn && <div className="layer_btn">{children}</div>}
-              {no_btn && children}
-            </span>
-          </Tooltip>
+          <T>{t=>
+            <Tooltip placement="bottom" title={tooltips(t)[id]}>
+              <span>
+                {!no_btn && !no_arr && <div className="arr"/>}
+                {!no_btn && <div className="layer_btn">{children}</div>}
+                {no_btn && children}
+              </span>
+            </Tooltip>
+          }</T>
         </div>;
 };
 

@@ -2,53 +2,46 @@
 'use strict'; /*jslint react:true, es6:true*/
 import etask from '../../util/etask.js';
 import React from 'react';
-import {Modal, Loader} from './common.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import {Loader} from './common.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
+import {Modal} from './common/modals.js';
+import './css/report_bug.less';
 
 class Index extends Pure_component {
+    success_msg = `Your issue is being handled! We will be in touch as soon as
+        possible.`;
     state = {desc: '', email: '', sending: false};
     componentDidMount(){
         this.setdb_on('head.consts', consts=>{
-            if (consts&&consts.logins&&consts.logins.length==1)
+            if (consts && consts.logins && consts.logins.length==1)
                 this.setState({email: consts.logins[0]});
         });
     }
     desc_changed = e=>this.setState({desc: e.target.value});
     email_changed = e=>this.setState({email: e.target.value});
     click_cancel = ()=>this.setState({desc: ''});
-    detect_browser = ()=>{
-        let browser = 'unknown';
-        if (window.opr && window.opr.addons || window.opera ||
-            navigator.userAgent.indexOf(' OPR/')>=0)
-        {
-            browser = 'opera';
-        }
-        else if (typeof InstallTrigger!=='undefined')
-            browser = 'firefox';
-        else if (document.documentMode)
-            browser = 'IE';
-        else if (window.StyleMedia)
-            browser = 'Edge';
-        else if (window.chrome && window.chrome.webstore)
-            browser = 'chrome';
-        return browser;
-    };
     click_report = ()=>{
         const desc = this.state.desc;
         const _this = this;
         return etask(function*(){
             this.on('uncaught', ()=>{ _this.setState({sending: false}); });
             _this.setState({sending: true});
-            // XXX krzysztof: switch fetch->ajax
-            yield window.fetch('/api/report_bug', {
+            const resp = yield window.fetch('/api/report_bug', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({desc, email: _this.state.email,
-                    browser: _this.detect_browser()}),
+                body: JSON.stringify({desc, email: _this.state.email}),
             });
             _this.setState({sending: false});
-            window.setTimeout(()=>$('#thanks_modal').modal(), 500);
+            if (resp.status==200)
+                _this.setState({modal_msg: _this.success_msg});
+            else
+            {
+                const resp_json = yield resp.json();
+                const modal_msg = `Something went wrong: [${resp_json}]`;
+                _this.setState({modal_msg});
+            }
+            window.setTimeout(()=>$('#finish_modal').modal(), 500);
         });
     };
     render(){
@@ -61,7 +54,7 @@ class Index extends Pure_component {
                 <div className="desc">Briefly describe your issue below and
                   our support engineer will contact you shortly:</div>
                 <textarea placeholder="Describe your issue here"
-                  value={this.state.desc}
+                  style={{width: '100%'}} value={this.state.desc}
                   onChange={this.desc_changed}/>
                 <div className="email_field">
                   <span>Contact in the following address</span>
@@ -69,15 +62,14 @@ class Index extends Pure_component {
                     onChange={this.email_changed}/>
                 </div>
               </Modal>
-              <Thanks_modal/>
+              <Finish_modal msg={this.state.modal_msg}/>
             </div>;
     }
 }
 
-const Thanks_modal = ()=>
-    <Modal title="Report has been sent" id="thanks_modal" no_cancel_btn>
-      <h4>You issue in being handled! We will be in touch as soon
-        as possible.</h4>
+const Finish_modal = props=>
+    <Modal title="Your report has been sent" id="finish_modal" no_cancel_btn>
+      <h4>{props.msg}</h4>
     </Modal>;
 
 export default Index;

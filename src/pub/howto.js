@@ -2,62 +2,59 @@
 'use strict'; /*jslint react:true, es6:true*/
 import 'prismjs/themes/prism.css';
 import React from 'react';
+import classnames from 'classnames';
+import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
-import {Code, Tooltip} from './common.js';
-import {ga_event, swagger_url} from './util.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
-import classnames from 'classnames';
+import {Code} from './common.js';
+import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
+import {T} from './common/i18n.js';
+import {swagger_url} from './util.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 
-class Howto extends Pure_component {
-    state = {option: 'code'};
+const Howto = withRouter(class Howto extends Pure_component {
     choose_click = option=>{
-        this.setState({option});
-        ga_event('How-to-tab', 'select code/browser', option);
+        const pathname = `/howto/${option}`;
+        this.props.history.push({pathname});
     };
     render(){
-        let cur_title;
-        if (this.state.option)
-            cur_title = 'using '+this.state.option;
+        const option = this.props.match.params.option||'code';
+        const cur_title = 'using '+option;
         let Instructions = ()=>null;
-        if (this.state.option=='browser')
+        if (option=='browser')
             Instructions = Browser_instructions;
-        else if (this.state.option=='code')
+        else if (option=='code')
             Instructions = Code_instructions;
-        return <div className="howto">
+        return <T>{t=><div className="howto vbox">
               <div className="nav_header">
-                <h3>How to use the Proxy Manager {cur_title}</h3>
+                <h3>{t('How to use the Proxy Manager')} {t(cur_title)}</h3>
               </div>
               <div className="howto_panel">
                 <div className="panel_inner">
-                  <div className="nav_tabs tabs">
-                    <Tab id="code" title="Code"
-                      tooltip="Examples how to use LPM programatically"
-                      on_click={this.choose_click}
-                      cur_tab={this.state.option}/>
-                    <Tab id="browser" title="Browser"
-                      tooltip="Examples how to inegrate LPM with the browser"
-                      on_click={this.choose_click}
-                      cur_tab={this.state.option}/>
-                  </div>
+                  <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
+                    <Nav_tab id="code" title="Code"
+                      tooltip="Examples how to use LPM programmatically"/>
+                    <Nav_tab id="browser" title="Browser"
+                      tooltip="Examples how to integrate LPM with the
+                      browser"/>
+                  </Nav_tabs>
                   <Instructions>{this.props.children}</Instructions>
                 </div>
+                <Animated_instructions/>
               </div>
-            </div>;
+            </div>}</T>;
     }
-}
+});
 
-const Tab = ({id, on_click, title, cur_tab, tooltip})=>{
-    const active = cur_tab==id;
-    const btn_class = classnames('btn_tab', {active});
-    return <Tooltip title={tooltip}>
-          <div onClick={()=>on_click(id)} className={btn_class}>
-            <div className={classnames('icon', id)}/>
-            <div className="title">{title}</div>
-            <div className="arrow"/>
-          </div>
-        </Tooltip>;
-};
+const Animated_instructions = withRouter(props=>{
+    const option = props.match.params.option||'code';
+    const browser = props.match.params.suboption||'chrome_win';
+    if (option!='browser')
+        return null;
+    return <div className="gifs_inner vbox">
+          <div className={classnames('gif', browser)}/>
+        </div>;
+});
 
 const Lang_btn = props=>{
     const class_names = 'btn btn_lpm btn_lpm_small btn_lang'
@@ -65,21 +62,21 @@ const Lang_btn = props=>{
     return <button className={class_names}>{props.text}</button>;
 };
 
+const Code_instructions = withRouter(
 class Code_instructions extends Pure_component {
-    state = {lang: 'shell'};
     click_lang = lang=>{
-        this.setState({lang});
-        ga_event('How-to-tab', 'select option', lang);
+        const pathname = `/howto/code/${lang}`;
+        this.props.history.push({pathname});
     };
-    click_copy = lang=>ga_event('How-to-tab', 'click copy', lang);
     render(){
+        const lang = this.props.match.params.suboption||'shell';
         const Lang_btn_clickable = props=>
             <span onClick={()=>this.click_lang(props.lang)}>
-              <Lang_btn active={this.state.lang==props.lang} {...props}/>
+              <Lang_btn active={lang==props.lang} {...props}/>
             </span>;
         const tutorial_port = window.localStorage.getItem(
             'quickstart-first-proxy')||24000;
-        const to_copy = instructions.code(tutorial_port)[this.state.lang];
+        const to_copy = instructions.code(tutorial_port)[lang];
         const code = prism.highlight(to_copy, prism.languages.clike);
         return <div className="code_instructions">
               <div className="options">
@@ -96,33 +93,37 @@ class Code_instructions extends Pure_component {
               <div className="well instructions_well">
                 <pre>
                   <code>
-                    <Code on_click={()=>this.click_copy(this.state.lang)}>
+                    <Code>
                       <div dangerouslySetInnerHTML={{__html: code}}/>
                     </Code>
                   </code>
                 </pre>
               </div>
               <div>
-                View available API endpoints
-                <a className="link api_link" href={swagger_url}>here</a>
+                <T>To view available API endpoints</T>
+                <a rel="noopener noreferrer" target="_blank"
+                  className="link api_link" href={swagger_url}>
+                  <T>click here</T>
+                </a>
               </div>
             </div>;
     }
-}
+});
 
+const Browser_instructions = withRouter(
 class Browser_instructions extends Pure_component {
-    state = {browser: 'chrome_win'};
     port = window.localStorage.getItem('quickstart-first-proxy')||24000;
     browser_changed = e=>{
         const browser = e.target.value;
-        this.setState({browser});
-        ga_event('How-to-tab', 'select option', browser);
+        const pathname = `/howto/browser/${browser}`;
+        this.props.history.push({pathname});
     };
     render(){
+        const browser = this.props.match.params.suboption||'chrome_win';
         return <div className="browser_instructions">
               <div className="header_well">
-                <p>Choose browser</p>
-                <select onChange={this.browser_changed}>
+                <p><T>Choose browser</T></p>
+                <select value={browser} onChange={this.browser_changed}>
                   <option value="chrome_win">Chrome Windows</option>
                   <option value="chrome_mac">Chrome Mac</option>
                   <option value="ie">Internet Explorer</option>
@@ -131,12 +132,10 @@ class Browser_instructions extends Pure_component {
                 </select>
               </div>
               <div className="instructions_well">
-                <div className="instructions">
-                  {instructions.browser(this.port)[this.state.browser]}
-                </div>
+                {instructions.browser(this.port)[browser]}
               </div>
             </div>;
     }
-}
+});
 
 export default Howto;

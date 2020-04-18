@@ -3,13 +3,9 @@
 (function(){
 var define, node_util;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
-var is_ff_addon = typeof module=='object' && module.uri
-    && !module.uri.indexOf('resource://');
-if (is_ff_addon)
-    define = require('./require_node.js').define(module, '../');
-else if (is_rn)
+var is_rn = typeof global=='object' && !!global.nativeRequire
+    || typeof navigator=='object' && navigator.product=='ReactNative';
+if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
         require('/util/array.js'));
@@ -35,7 +31,7 @@ E.is_mocha = function(){
 
 E.is_lxc = function(){ return is_node && +process.env.LXC; };
 
-E.f_mset = function(flags, mask, bits){ return (flags &~ mask) | bits; };
+E.f_mset = function(flags, mask, bits){ return flags&~mask | bits; };
 E.f_lset = function(flags, bits, logic){
     return E.f_mset(flags, bits, logic ? bits : 0); };
 E.f_meq = function(flags, mask, bits){ return (flags & mask)==bits; };
@@ -64,7 +60,7 @@ E.revcmp = function(a, b){
     return a>b ? -1 : a<b ? 1 : 0; };
 
 /* Union given objects, using fn to resolve conflicting keys */
-E.union_with = function(fn /*[o1, [o2, [...]]]*/){
+E.union_with = function(fn /* [o1, [o2, [...]]]*/){
     var res = {}, args;
     if (arguments.length==2 && typeof arguments[1]=='object')
         args = arguments[1];
@@ -309,7 +305,7 @@ E.find_prop = function(obj, prop, val){
     return E.find(obj, function(o){ return o[prop]===val; }); };
 E.isspace = function(c){ return /\s/.test(c); };
 E.isdigit = function(c){ return c>='0' && c<='9'; };
-E.isalpha = function(c){ return (c>='a' && c<='z') || (c>='A' && c<='Z'); };
+E.isalpha = function(c){ return c>='a'&&c<='z' || c>='A'&&c<='Z'; };
 E.isalnum = function(c){ return E.isdigit(c)||E.isalpha(c); };
 
 E.obj_pluck = function(obj, prop){
@@ -346,11 +342,8 @@ E.get = function(o, path, def){
     for (var i=0; i<path.length; i++)
     {
         // XXX vladimir/ron: decide on implementation without in operator
-        if (!o || (typeof o!='object' && typeof o!='function') ||
-            !(path[i] in o))
-        {
+        if (!o || typeof o!='object'&&typeof o!='function' || !(path[i] in o))
             return def;
-        }
         o = o[path[i]];
     }
     return o;
@@ -400,7 +393,8 @@ E.clone_inplace = function(dst, src){
     }
     else if (typeof dst=='object')
     {
-        for (var k in src)
+        var k;
+        for (k in src)
             dst[k] = src[k];
         for (k in dst)
         {
@@ -454,6 +448,82 @@ E.omit = function(obj, omit){
             o[i] = obj[i];
     }
     return o;
+};
+
+E.if_set = function(val, o, name){
+    if (val!==undefined)
+        o[name] = val;
+};
+
+E.escape_dotted_keys = function(obj, repl){
+    if (!Array.isArray(obj) && !is_object(obj))
+        return obj;
+    repl = repl||'_';
+    for (var prop in obj)
+    {
+        if (E.own(obj, prop))
+        {
+            var new_prop = prop.replace(/\./g, repl);
+            if (prop != new_prop)
+            {
+                obj[new_prop] = obj[prop];
+                delete obj[prop];
+            }
+            if (Array.isArray(obj[new_prop]))
+            {
+                obj[new_prop].forEach(function(e){
+                    E.escape_dotted_keys(e, repl);
+                });
+            }
+            else if (is_object(obj[new_prop]))
+                E.escape_dotted_keys(obj[new_prop], repl);
+        }
+    }
+};
+
+E.ensure_array = function(v, split){
+    if (v==null || Array.isArray(v))
+        return v||[];
+    if (split && typeof v=='string')
+        return v.split(split==true ? /[ ,]+/ : split).filter(Boolean);
+    return [v];
+};
+
+E.reduce_obj = function(coll, key_cb, val_cb){
+    if (coll==null)
+        return {};
+    if (key_cb==null)
+        key_cb = function(it){ return it; };
+    else if (typeof key_cb=='string')
+    {
+        var kpath = E.path(key_cb);
+        key_cb = function(it){ return E.get(it, kpath); };
+    }
+    if (val_cb==null)
+        val_cb = function(it){ return it; };
+    else if (typeof val_cb=='string')
+    {
+        var vpath = E.path(val_cb);
+        val_cb = function(it){ return E.get(it, vpath); };
+    }
+    var obj = {};
+    if (Array.isArray(coll))
+    {
+        coll.forEach(function(item, i){
+            var k = key_cb(item, i), v = val_cb(item, i);
+            if (k!==undefined && v!==undefined)
+                obj[k] = v;
+        });
+    }
+    else if (typeof coll=='object')
+    {
+        Object.keys(coll).forEach(function(i){
+            var k = key_cb(coll[i], i), v = val_cb(coll[i], i);
+            if (k!==undefined && v!==undefined)
+                obj[k] = v;
+        });
+    }
+    return obj;
 };
 
 return E; }); }());

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.108.399",
+        "version": "1.179.238",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -40,6 +40,11 @@
                             "type": "object",
                             "properties": {
                                 "version": {
+                                    "description": "LPM version",
+                                    "type": "string"
+                                },
+                                "argv": {
+                                    "description": "Command line arguments passed to LPM",
                                     "type": "string"
                                 }
                             }
@@ -50,7 +55,7 @@
         },
         "/last_version": {
             "get": {
-                "description": "Returns the latest public version avaliable\n",
+                "description": "Returns the latest public version available\n",
                 "tags": [
                     "Manager"
                 ],
@@ -61,10 +66,39 @@
                             "type": "object",
                             "properties": {
                                 "version": {
+                                    "description": "Latest LPM version",
                                     "type": "string"
                                 },
                                 "newer": {
+                                    "description": "Whether or not latest version is newer than current LPM version",
                                     "type": "boolean"
+                                },
+                                "versions": {
+                                    "description": "LPM versions changelog",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "ver": {"type": "string"},
+                                            "type": {
+                                                "type": "string",
+                                                "enum": ["stable", "dev"]
+                                            },
+                                            "changes": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "enum": ["star", "sparkles", "bug", "boom"]
+                                                        },
+                                                        "text": {"type": "string"}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -75,9 +109,7 @@
         "/node_version": {
             "get": {
                 "description": "Return the currently running node version\n",
-                "tags": [
-                    "Manager"
-                ],
+                "tags": ["Manager"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -85,13 +117,31 @@
                             "type": "object",
                             "properties": {
                                 "current": {
-                                    "type": "string"
+                                    "type": "object",
+                                    "properties": {
+                                        "raw": {"type": "string"},
+                                        "major": {"type": "number"},
+                                        "minor": {"type": "number"},
+                                        "patch": {"type": "number"},
+                                        "prerelease": {
+                                            "type": "array",
+                                            "items": {"type": "string"}
+                                        },
+                                        "build": {
+                                            "type": "array",
+                                            "items": {"type": "string"}
+                                        },
+                                        "version": {"type": "string"}
+                                    },
+                                    "description": "Current Node information"
                                 },
-                                "recomended": {
-                                    "type": "string"
+                                "recommended": {
+                                    "type": "string",
+                                    "description": "Recommended Node version"
                                 },
                                 "satisfied": {
-                                    "type": "boolean"
+                                    "type": "boolean",
+                                    "description": "Whether or not recommended Node version condition is satisfied"
                                 }
                             }
                         }
@@ -99,20 +149,186 @@
                 }
             }
         },
+        "/gen_token": {
+            "get": {
+                "description": "Generate token for token based authentication",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "token": {"type": "string"}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/add_wip": {
+            "post": {
+                "description": "An alternative to adding IPs to whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "type": "string"
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to whitelist",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "403": {
+                        "description": "Forbidden. No authentication provided"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            }
+        },
+        "/add_whitelist_ip": {
+            "post": {
+                "description": "Grants access to an IP to browse admin UI",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to whitelist",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            }
+        },
         "/proxies_running": {
             "get": {
                 "description": "Return the effective configuration for all running proxies\n",
-                "tags": [
-                    "Proxy",
-                    "Manager"
-                ],
+                "tags": ["Proxy", "Manager"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/proxy"
+                            "items": {"$ref": "#/definitions/proxy"}
+                        }
+                    }
+                }
+            }
+        },
+        "/recent_stats": {
+            "get": {
+                "description": "Return recent stats of all proxies",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "hostname": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/stat"
+                                    },
+                                    "description": "An array containing statistics grouped by host name"
+                                },
+                                "ports": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/definitions/stat"
+                                        }
+                                    },
+                                    "description": "An object containing statistics grouped by proxy port",
+                                    "example": {
+                                        "24001": {
+                                            "key": 24007,
+                                            "in_bw": 1453,
+                                            "out_bw": 579,
+                                            "reqs": 2,
+                                            "success": 2
+                                        },
+                                        "24002": {
+                                            "key": 24257,
+                                            "in_bw": 728,
+                                            "out_bw": 277,
+                                            "reqs": 1,
+                                            "success": 1
+                                        }
+                                    }
+                                },
+                                "protocol": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/stat"
+                                    },
+                                    "description": "An array containing statistics grouped by protocol"
+                                },
+                                "status_code": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/stat"
+                                    },
+                                    "description": "An array containing statistics grouped by status code"
+                                },
+                                "ssl_enable": {
+                                    "type": "boolean",
+                                    "description": "Whether or not SSL Analyzing is enabled on all proxy ports"
+                                },
+                                "success": {
+                                    "type": "number",
+                                    "description": "Total number of successful requests"
+                                },
+                                "total": {
+                                    "type": "number",
+                                    "description": "Total number of requests"
+                                }
                             }
                         }
                     }
@@ -122,27 +338,20 @@
         "/proxies": {
             "get": {
                 "description": "Return the explicit configuration for all running proxies\n",
-                "tags": [
-                    "Proxy",
-                    "Manager"
-                ],
+                "tags": ["Proxy", "Manager"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/proxy"
-                            }
+                            "items": {"$ref": "#/definitions/proxy"}
                         }
                     }
                 }
             },
             "post": {
                 "description": "Add a new proxy",
-                "tags": [
-                    "Proxy"
-                ],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "proxy",
@@ -172,7 +381,123 @@
                         }
                     },
                     "400": {
-                        "description": "Error responce"
+                        "description": "Error response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "errors": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "msg": {"type": "string"},
+                                            "field": {"type": "string"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zones": {
+            "get": {
+                "description": "Return current customer's enabled zones' information",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "zones": {
+                                    "description": "Zones' information",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/zone"
+                                    }
+                                },
+                                "def": {
+                                    "description": "Current default zone",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enable_ssl": {
+            "post": {
+                "description": "Enables SSL Analyzing on all proxy ports",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/shutdown": {
+            "post": {
+                "description": "Shutdown LPM",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/upgrade": {
+            "post": {
+                "description": "Upgrade LPM",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/restart": {
+            "post": {
+                "description": "Restart LPM",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/proxies/delete": {
+            "post": {
+                "description": "Delete existing proxies",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ports"],
+                            "properties": {
+                                "ports": {
+                                    "type": "array",
+                                    "items": {"type": "number"},
+                                    "description": "Existing proxy ports",
+                                    "example": [24000, 24001]
+                                }
+                            }  
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful response"
                     }
                 }
             }
@@ -180,9 +505,7 @@
         "/proxies/{port}": {
             "put": {
                 "description": "Update existing proxy",
-                "tags": [
-                    "Proxy"
-                ],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "port",
@@ -225,28 +548,6 @@
             },
             "delete": {
                 "description": "Delete existing proxy",
-                "tags": [
-                    "Proxy"
-                ],
-                "parameters": [
-                    {
-                        "name": "port",
-                        "in": "path",
-                        "description": "Existing proxy port",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response"
-                    }
-                }
-            }
-        },
-        "/proxies/{port}/link_test.json": {
-            "get": {
-                "description": "Link Tester API. See all the redirections for a given URL",
                 "tags": ["Proxy"],
                 "parameters": [
                     {
@@ -255,89 +556,18 @@
                         "description": "Existing proxy port",
                         "required": true,
                         "type": "integer"
-                    },
-                    {
-                        "name": "url",
-                        "in": "query",
-                        "description": "Target URL that needs to be tested",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "screenshot",
-                        "in": "query",
-                        "description": "Flag determining if to take a screenshot of the final page",
-                        "required": false,
-                        "type": "boolean"
-                    },
-                    {
-                        "name": "html",
-                        "in": "query",
-                        "description": "Flag determining if to include the full html body of the final page",
-                        "required": false,
-                        "type": "boolean"
-                    },
-                    {
-                        "name": "country",
-                        "in": "query",
-                        "description": "Target country in ISO 3166-1 alpha-2 format, e.g 'us' for United States",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "state",
-                        "in": "query",
-                        "description": "Target state, e.g 'ny' for New York",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "city",
-                        "in": "query",
-                        "description": "The city from which IP will be allocated",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "user_agent",
-                        "in": "query",
-                        "description": "Content of the User-Agent header",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "headers",
-                        "in": "query",
-                        "description": "Desription of any other headers that will be sent along with the requests\n\nExample:\nencodueURIComponent(JSON.strinigify({'Accept-Encoding': 'gzip', 'Cache-Control': 'no-cache'}))",
-                        "required": false,
-                        "type": "string"
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "redirects": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "url": {"type": "string"},
-                                            "code": {"type": "integer"}
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    "204": {
+                        "description": "Successful response"
                     }
                 }
             }
         },
-        "/proxies/{port}/ban_ip": {
+        "/proxies/{port}/banip": {
             "post": {
-                "description": "On a specific port ban an IP for a certain amount of time",
+                "description": "Ban an IP on a specific port for a certain amount of time",
                 "tags": ["Proxy"],
                 "parameters": [
                     {
@@ -348,25 +578,248 @@
                         "type": "integer"
                      },
                      {
-                        "name": "banip",
+                        "name": "options",
                         "in": "body",
                         "required": true,
-                        "description": "Specify the ip to ban and for how long in minutes",
-                         "schema": {
-                             "type": "object",
-                             "properties": {
-                                 "ip": {"type": "string"},
-                                 "min": {"type": "integer"}
-                               }
-                           }
+                        "description": "IP ban options",
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "example": "10.0.0.0"
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "example": "facebook.com"
+                                },
+                                "ms": {
+                                    "type": "integer",
+                                    "example": 60000
+                                }
+                            }
+                        }
+                     }
+                ],
+                "responses": {
+                    "204": {"description": "Successful response"}
+                }
+            }
+        },
+        "/proxies/{port}/unbanip": {
+            "post": {
+                "description": "Unban an IP on a specific port ban",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                     },
+                     {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "description": "IP unban options",
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "example": "10.0.0.0"
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "example": "lumtest.com"
+                                }
+                            }
+                        }
+                     }
+                ],
+                "responses": {
+                    "200": {
+                      "description": "Successful response",
+                      "schema": {
+                          "type": "object",
+                          "properties": {
+                              "ips": {
+                                  "type": "array",
+                                  "items": {
+                                      "type": "object",
+                                      "properties": {
+                                          "ip": {
+                                              "type": "string"
+                                          },
+                                          "domain": {
+                                              "type": "string"
+                                          },
+                                          "to": {
+                                              "type": "number",
+                                              "description": "Timestamp of when this IP will be unbanned in millisseconds"
+                                          }
+                                      }
+                                  }
+                              }
+                          }
                       }
+                    }
+                }
+            }
+        },
+        "/proxies/{port}/unbanips": {
+            "post": {
+                "description": "Unban all IPs on a specific port",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                      "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/banlist/{port}": {
+            "get": {
+                "description": "Get the banned IPs of a specific port",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                     }
+                ],
+                "responses": {
+                    "200": {
+                      "description": "Successful response",
+                      "schema": {
+                          "type": "object",
+                          "properties": {
+                              "ips": {
+                                  "type": "array",
+                                  "items": {"type": "string"},
+                                  "example": ["10.0.0.0", "10.0.0.1"]
+                              }
+                          }
+                      }
+                    },
+                    "400": {
+                        "description": "Server with port does not exist"
+                    }
+                }
+            }
+        },
+        "/proxies/{port}/banips": {
+            "post": {
+                "description": "Ban a list of IPs on a specific port for a certain amunt of time",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                     },
+                     {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "description": "Ips ban options",
+                        "schema": {
+                            "type": "object",
+                            "required": ["ips"],
+                            "properties": {
+                                "ips": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "example": ["10.0.0.0", "10.0.0.1"]
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "example": "facebook.com"
+                                },
+                                "ms": {
+                                    "type": "integer",
+                                    "example": 60000
+                                }
+                            }
+                        }
+                     }
                 ],
                 "responses": {
                     "200": {"description": "Successful response"}
                 }
             }
         },
+        "/banip": {
+            "post": {
+                "description": "Ban an IP on all ports for a certain amount of time",
+                "tags": ["Proxy"],
+                "parameters": [
+                     {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "description": "IP ban options",
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "example": "10.0.0.0"
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "example": "facebook.com"
+                                },
+                                "ms": {
+                                    "type": "integer",
+                                    "example": 60000
+                                }
+                            }
+                        }
+                     }
+                ],
+                "responses": {
+                    "204": {"description": "Successful response"}
+                }
+            }
+        },
         "/refresh_sessions/{port}": {
+            "get": {
+                "description": "Switch luminati sessions to new sessions (get new IPs)",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Proxy port",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            },
             "post": {
                 "description": "Switch luminati sessions to new sessions (get new IPs)",
                 "tags": ["Proxy"],
@@ -399,12 +852,6 @@
                         "type": "integer"
                     },
                     {
-                        "name": "with_details",
-                        "in": "query",
-                        "description": "Include status detail messages",
-                        "type": "boolean"
-                    },
-                    {
                         "name": "force",
                         "in": "query",
                         "description": "Force an updated check of the status",
@@ -423,34 +870,450 @@
                     }
                 }
             }
+        },
+        "/settings": {
+            "get": {
+                "description": "Return current LPM general settings",
+                "tags": ["Proxy"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/settings"  
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update LPM general settings",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "settings",
+                        "in": "body",
+                        "description": "New settings",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/updatable_settings"  
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/settings"  
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh_zones": {
+            "post": {
+                "description": "Refresh zones",
+                "tags": ["Proxy"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. User is not currently logged in"
+                    }
+                }
+            }
+        },
+        "/allocated_ips": {
+            "get": {
+                "description": "Return allocated IPs in determined zone",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "zone",
+                        "in": "query",
+                        "description": "Zone",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ips": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "example": ["10.0.0.0", "10.0.0.1"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/allocated_vips": {
+            "get": {
+                "description": "Return allocated gIPs in determined zone",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "zone",
+                        "in": "query",
+                        "description": "Zone",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ips": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "example": ["gip1", "gip2"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh_ips": {
+            "post": {
+                "description": "Refresh allocated IPs or gIPs in determined zone",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "description": "Refresh IP options",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "zone": {
+                                    "description": "Zone",
+                                    "type": "string"
+                                },
+                                "ips": {
+                                    "description": "IPs to be refreshed",
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "example": ["10.0.0.0", "10.0.0.1"]
+                                },
+                                "vips": {
+                                    "description": "gIPs to be refreshed",
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "example": ["gIP_1", "gIP_2"]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ips": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/ip_object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/lpm_users": {
+            "get": {
+                "description": "List of all the available LPM users for the account",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "vips": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/lpm_user_object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/lpm_user": {
+            "post": {
+                "description": "Creates a new LPM user",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/general_logs": {
+            "get": {
+                "description": "Returns the tail from the log file",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of the lines from the log file",
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/logs": {
+            "get": {
+                "description": "Returns e",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of requests to be skipped from the beginning",
+                        "type": "number"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of requests to be fetched",
+                        "type": "number"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Regex search query for the URL",
+                        "type": "string"
+                    },
+                    {
+                        "name": "port_from",
+                        "in": "query",
+                        "description": "Lower bound for port number",
+                        "type": "number"
+                    },
+                    {
+                        "name": "port_to",
+                        "in": "query",
+                        "description": "Upper bound for port number",
+                        "type": "number"
+                    },
+                    {
+                        "name": "status_code",
+                        "in": "query",
+                        "description": "Filter requests by status code",
+                        "type": "number"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Parameter to be sorted by",
+                        "type": "string"
+                    },
+                    {
+                        "name": "sort_desc",
+                        "in": "query",
+                        "description": "Sorting asc or desc",
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "manager": {
+        "ip_object": {
             "type": "object",
             "properties": {
-                "www": {
-                    "type": "integer",
-                    "description": "HTTP port for browser admin UI"
+                "ip": {"type": "string"},
+                "maxmind": {"type": "string"},
+                "ext": {
+                    "type": "object",
+                    "properties": {
+                        "dbip": {"type": "string"},
+                        "ip2location": {"type": "string"},
+                        "google": {"type": "string"},
+                        "def": {"type": "string"}
+                    }
+                }
+            }
+        },
+        "vip_object": {
+            "type": "object",
+            "properties": {
+                "vip": {"type": "string"},
+                "mapping": {"type": "string"},
+                "country": {"type": "string"}
+            }
+        },
+        "lpm_user_object": {
+            "type": "object",
+            "properties": {
+                "email": {"type": "string"},
+                "password": {"type": "string"}
+            }
+        },
+        "stat": {
+            "type": "object",
+            "properties": {
+                "key": {"type": "string"},
+                "in_bw": {"type": "number"},
+                "out_bw": {"type": "number"},
+                "reqs": {"type": "number"},
+                "success": {"type": "number"}
+            }
+        },
+        "zone": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "perm": {"type": "string"},
+                "plan": {"type": "object"},
+                "password": {"type": "string"}
+            }
+        },
+        "settings": {
+            "type": "object",
+            "properties": {
+                "customer": {
+                    "type": "string",
+                    "description": "Default customer"
+                },
+                "zone": {
+                    "type": "string",
+                    "description": "Default zone"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Default password"
                 },
                 "www_whitelist_ips": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "items": {"type": "string"},
                     "description": "Whitelist ip list for granting access to browser admin UI"
                 },
-                "ws": {
-                    "type": "integer",
-                    "description": "websocket port used for request logs"
+                "whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Default for all proxies whitelist ip list for granting access to them"
+                },
+                "fixed_whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Default whitelisted IPs list with granted access for all proxies passed via command line or from www_whitelist_ips"
                 },
                 "config": {
                     "type": "string",
                     "description": "Config file containing proxy definitions"
                 },
-                "database": {
+                "read_only": {
+                    "type": "boolean",
+                    "description": "Avoid saving current config in the config file"
+                },
+                "test_url": {
+                        "type": "string",
+                        "description": "Url for testing proxy"
+                },
+                "api": {
                     "type": "string",
-                    "description": "Database file containing logs and cached values"
+                    "description": "Alternative domain url to luminati API"
+                },
+                "mail_domain": {
+                    "type": "string",
+                    "description": "Luminati support email domain (used in the UI)"
+                },
+                "logs": {
+                    "type": "boolean",
+                    "description": "Enable logs for all proxies"
+                },
+                "request_stats": {
+                        "type": "boolean",
+                        "description": "Enable requests statistics"
+                },
+                "dropin": {
+                    "type": "boolean",
+                    "description": "Create dropin mode proxy port (default: 22225)"
+                },
+                "pending_www_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of IPs not whitelisted that recently tried to access LPM"
+                }
+            }
+        },
+        "updatable_settings": {
+            "type": "object",
+            "properties": {
+                "zone": {
+                    "type": "string",
+                    "description": "Default zone"
+                },
+                "www_whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Whitelist ip list for granting access to browser admin UI"
+                },
+                "whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Default for all proxies whitelist ip list for granting access to them"
+                },
+                "logs": {
+                    "type": "boolean",
+                    "description": "Enable logs for all proxies"
+                },
+                "request_stats": {
+                        "type": "boolean",
+                        "description": "Enable requests statistics"
+                }
+            }
+        },
+        "manager": {
+            "type": "object",
+            "properties": {
+                "whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Default for all proxies whitelist ip list for granting access to them"
+                },
+                "www_whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Whitelist ip list for granting access to browser admin UI"
+                },
+                "www": {
+                    "type": "integer",
+                    "description": "HTTP and WebSocket port used for browser admin UI and request logs"
+                },
+                "config": {
+                    "type": "string",
+                    "description": "Config file containing proxy definitions"
                 },
                 "cookie": {
                     "type": "string",
@@ -473,21 +1336,18 @@
                     "type": "boolean",
                     "description": "Disable collection of usage statistics"
                 },
-                "rules": {
-                    "type": "object",
-                    "description": "Proxy request rules"
-                },
-                "token": {
+                "lpm_token": {
                     "type": "string",
-                    "description": "A Google authorization token for accessing luminati.io"
+                    "description": "An authorization token"
                 },
-                "proxy_creds_check": {
-                    "type": "boolean",
-                    "description": "Validate proxy credentials"
+                "high_perf": {
+                    "type": "boolean"
                 },
-                "use_proxy_cache": {
-                    "type": "boolean",
-                    "description": "Cache resolved ips of superagents"
+                "cloud": {
+                    "type": "boolean"
+                },
+                "cluster": {
+                    "type": "boolean"
                 },
                 "request_stats": {
                     "type": "boolean",
@@ -495,11 +1355,44 @@
                 },
                 "test_url": {
                     "type": "string",
-                    "description": "A url for testing proxy"
+                    "description": "Url for testing proxy"
+                },
+                "log": {
+                    "type": "string",
+                    "pattern": "^(error|warn|notice|info|debug)?$",
+                    "description": "Log level"
                 },
                 "logs": {
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
+                },
+                "har_limit": {
+                    "type": "number",
+                    "description": "Number of bytes to store"
+                },
+                "force": {
+                    "type": "boolean",
+                    "description": "Kill other instances of LPM if there are any"
+                },
+                "session_termination": {
+                    "type": "boolean",
+                    "description": "Stop sending new requests when the peer IP becomes unavailable and redirect to confimration page before new IP is taken"
+                },
+                "api": {
+                    "type": "string",
+                    "description": "Alternative url to luminati API"
+                },
+                "api_domain": {
+                    "type": "string",
+                    "description": "Alternative domain url to luminati API"
+                },
+                "local_login": {
+                    "type": "boolean",
+                    "description": "Requires each browser to authenticate against LPM"
+                },
+                "read_only": {
+                    "type": "boolean",
+                    "description": "Avoid saving current config in the config file"
                 }
             }
         },
@@ -512,20 +1405,23 @@
                 },
                 "proxy_type": {
                      "type": "string",
-                     "description": "Decide if to save proxy into the configuration file. specifing \"persist\" in \"proxy_type\" value will create port and save it in the configuration file."
+                     "description": "Decide if to save proxy into the configuration file. Specifying \"persist\" in \"proxy_type\" value will create port and save it in the configuration file."
                 },
                 "multiply": {
                     "type": "integer",
                     "description": "Multiply the port definition given number of times"
                 },
+                "multiply_users": {
+                    "type": "boolean"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of users. This option has to be used along with \"multiply_users\""
+                },
                 "ssl": {
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
-                },
-                "log": {
-                    "type": "string",
-                    "pattern": "^(none|error|warn|info|verbose|debug)?$",
-                    "description": "Log level"
                 },
                 "iface": {
                     "type": "string",
@@ -551,29 +1447,14 @@
                     "type": "integer",
                     "description": "Super proxy port"
                 },
-                "proxy_count": {
-                    "type": "integer",
-                    "description": "Minimum number of super proxies to use"
-                },
-                "secure_proxy": {
-                    "type": "boolean",
-                    "description": "Use SSL when accessing super proxy"
-                },
-                "short_username": {
-                    "type": "boolean",
-                    "description": "Use Shorthand username for super proxy credentials"
-                },
-                "proxy_switch": {
-                    "type": "integer",
-                    "description": "Automatically switch super proxy on failure"
+                "proxy_connection_type": {
+                    "type": "string",
+                    "pattern": "^(http|https|socks)?$",
+                    "description": "Determines what kind of connection will be used between LPM and Super Proxy"
                 },
                 "proxy_retry": {
                     "type": "integer",
                     "description": "Automatically retry on super proxy failure"
-                },
-                "use_proxy_cache": {
-                    "type": "boolean",
-                    "description": "Cache resolved ips of superagents"
                 },
                 "insecure": {
                     "type": "boolean",
@@ -592,23 +1473,21 @@
                     "description": "City"
                 },
                 "asn": {
-                    "type": "integer",
+                    "type": "string",
                     "description": "ASN"
                 },
                 "ip": {
                     "type": "string",
                     "pattern": "^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$",
-                    "description": "Datacenter IP"
+                    "description": "Data center IP"
                 },
                 "vip": {
                     "type": "integer",
-                    "description": "VIP"
+                    "description": "gIP"
                 },
                 "ext_proxies": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "items": {"type": "string"},
                     "description": "A list of proxies from external vendors. Format: [username:password@]ip[:port]"
                 },
                 "ext_proxy_username": {
@@ -638,15 +1517,8 @@
                 },
                 "reverse_lookup_values": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "items": {"type": "string"},
                     "description": "Process reverse lookup via value"
-                },
-                "debug": {
-                    "type": "string",
-                    "pattern": "^(none|full)?$",
-                    "description": "Luminati request debug info"
                 },
                 "session": {
                     "type": "string",
@@ -661,46 +1533,69 @@
                     "type": "integer",
                     "description": "Session pool size"
                 },
-                "pool_type": {
-                    "type": "string",
-                    "pattern": "^(sequential|round-robin)?$",
-                    "description": "Pool session iteration order"
-                },
-                "keep_alive": {
-                    "type": "integer",
-                    "description": "Generate request to keep session alive after given idle time (seconds)"
-                },
-                "seed": {
-                    "type": "string",
-                    "pattern": "^[^\\.\\-]*$",
-                    "description": "Session ID seed used for identifying sessions from this proxy"
-                },
-                "max_requests": {
-                    "type": "string",
-                    "pattern": "^(\\d+(:\\d+)?)?$",
-                    "description": "Maximum requests per session"
-                },
-                "session_duration": {
-                    "type": "string",
-                    "pattern": "^(\\d+(:\\d+)?)?$",
-                    "description": "Maximum duration of session (seconds)"
+                "rotate_session": {
+                    "type": "boolean",
+                    "description": "Rotate sessions on each request"
                 },
                 "throttle": {
                     "type": "integer",
                     "description": "Throttle requests above given number"
                 },
                 "rules": {
-                    "type": "object",
-                    "description": "Proxy request rules"
-                },
-                "whitelist_ips": {
                     "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Whitelist ip list for granting access to proxy"
+                    "items": {"type": "object"},
+                    "description": "Proxy request rules"
                 },
                 "race_reqs": {
                     "type": "integer",
                     "description": "Race several requests at once and choose fastest"
+                },
+                "route_err": {
+                    "type": "string",
+                    "description": "Block or allow requests to be automatically sent through super proxy on error"
+                },
+                "smtp": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                },
+                "override_headers": {
+                    "type": "boolean"
+                },
+                "os": {
+                    "type": "string",
+                    "description": "Operating System of the Peer IP"
+                },
+                "headers":{
+                    "type":"array",
+                    "items": {"type": "object"},
+                    "description":"Request headers",
+                    "example":[
+                       {
+                        "name": "accept",
+                        "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
+                       },
+                       {
+                        "name": "accept-language",
+                        "value": "en-US,en;q=0.9"
+                       },
+                       {
+                        "name": "alexatoolbar-alx_ns_ph",
+                        "value": "AlexaToolbar/alx-4.0.3"
+                       },
+                       {
+                        "name": "cache-control",
+                        "value": "max-age=0"
+                       },
+                       {
+                        "name": "upgrade-insecure-requests",
+                        "value": "1"
+                       }
+                     ]
+                },
+                "debug": {
+                    "type": "string",
+                    "pattern": "^(full|none)?$",
+                    "description": "Luminati request debug info"
                 }
             }
         }

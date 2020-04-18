@@ -3,15 +3,11 @@
 (function(){
 var define, hash, assert, zerr, vm;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
-var is_ff_addon = typeof module=='object' && module.uri
-    && !module.uri.indexOf('resource://');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (!is_node)
 {
-    if (is_ff_addon)
-        define = require('./require_node.js').define(module, '../');
-    else if (is_rn)
+    if (is_rn)
     {
         define = require('./require_node.js').define(module, '../',
             require('/util/util.js'));
@@ -20,7 +16,7 @@ if (!is_node)
         define = self.define;
     assert = function(){}; // XXX romank: add proper assert
     // XXX romank: use zerr.js
-    if (!is_ff_addon && !is_rn && self.hola && self.hola.zerr)
+    if (!is_rn && self.hola && self.hola.zerr)
         zerr = self.hola.zerr;
     else
     {
@@ -96,12 +92,28 @@ E.inet_ntoa_t = function(ip){
 };
 
 E.inet_addr = function(ip){
-    var parts = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(ip);
-    if (parts===null)
+    var code, res = 0, shift = 24, num = undefined;
+    ip = ''+ip;
+    for (var i = 0, l = ip.length; i < l; ++i)
+    {
+            code = ip.charCodeAt(i);
+        if (code>47&&code<58)
+        {
+            num = (num||0)*10+code-48;
+            continue;
+        }
+        if (code==46)
+        {
+            if (num==undefined||num>255)
+                return null;
+            res += num<<shift;
+            num = undefined;
+            shift -= 8;
+            continue;
+        }
         return null;
-    if (parts[1]>255 || parts[2]>255 || parts[3]>255 || parts[4]>255)
-        return null; // not an IP address
-    return ((parts[1]<<24)+(parts[2]<<16)+(parts[3]<<8)+(parts[4]|0))>>>0;
+    }
+    return shift==0 && num!=undefined && num<256 ? res+(num|0)>>>0 : null;
 };
 
 function flags_to_str_once(flags, conv){
@@ -112,8 +124,8 @@ function flags_to_str_once(flags, conv){
         if (!conv.hasOwnProperty(i))
             continue;
         f += 'if (flags & '+conv[i]+') '
-            +'{ s += '+JSON.stringify(i.toLowerCase())+'+" ";'
-            +' flags &= ~'+conv[i]+'; }\n';
+            +'{ s += '+JSON.stringify(i.toLowerCase())+'+" "; '
+            +'flags &= ~'+conv[i]+'; }\n';
     }
     f += 'if (flags && conv.__conv_to_str.err) '
         +'conv.__conv_to_str.err(flags, conv);\n';
@@ -122,9 +134,9 @@ function flags_to_str_once(flags, conv){
     Object.defineProperty(conv, '__conv_to_str',
         {enumerable: false, writable: true});
     conv.__conv_to_str = func;
-    func.err = function(flags, conv){
-        zerr.perr('flags_str_invalid', 'flags '+flags+' '
-            +JSON.stringify(conv).slice(0, 30));
+    func.err = function(_flags, _conv){
+        zerr.perr('flags_str_invalid', 'flags '+_flags+' '
+            +JSON.stringify(_conv).slice(0, 30));
     };
     return conv.__conv_to_str(flags, conv);
 }
@@ -155,9 +167,9 @@ function flags_from_str_once(s, conv){
     Object.defineProperty(conv, '__conv_from_str',
         {enumerable: false, writable: true});
     conv.__conv_from_str = func;
-    func.err = function(s, conv){
-        zerr.perr('flags_str_invalid', 'flags '+s+' '
-            +JSON.stringify(conv).slice(0, 30));
+    func.err = function(_s, _conv){
+        zerr.perr('flags_str_invalid', 'flags '+_s+' '
+            +JSON.stringify(_conv).slice(0, 30));
     };
     return conv.__conv_from_str(s, conv);
 }
@@ -175,12 +187,13 @@ E.scale_vals = {
         {s: 'G', n: Math.pow(1024, 3)}, {s: 'T', n: Math.pow(1024, 4)},
         {s: 'P', n: Math.pow(1024, 5)}],
 };
+
 E.scaled_number = function(num, opt){
     opt = opt||{};
     var sign = '', per = opt.per, scale = opt.scale;
     var base = opt.base==1024 ? 1024 : 1000, ratio = opt.ratio||1;
     var units = opt.units===undefined||opt.units;
-    function _per(){ return per ? E.format_per(per) : ''; }
+    function _per(){ return per ? E.fmt_per(per) : ''; }
     if (num<0)
     {
         sign = '-';
@@ -215,10 +228,25 @@ E.scaled_number = function(num, opt){
     return sign+str.replace(/((\.\d*[1-9])|\.)0*$/, '$2')
         +(units ? (opt.space ? ' ' : '')+scale.s : '')+_per();
 };
+
 E.scaled_bytes = function(num, opt){
     return E.scaled_number(num, Object.assign({base: 1000}, opt)); };
 
-E.format_per = function(per){
+E.fmt_currency = function(amount, digits, currency_sign){
+    if (amount===undefined)
+        return;
+    if (digits===undefined)
+        digits = 2;
+    if (currency_sign===undefined)
+        currency_sign = '$';
+    var sign = amount<0 ? '-' : '';
+    amount = Math.abs(amount);
+    amount = (+amount).toLocaleString('en-GB', {useGrouping: true,
+        maximumFractionDigits: digits})||amount;
+    return sign+currency_sign+amount;
+};
+
+E.fmt_per = function(per){
     if (!per)
         return '';
     switch (per)
@@ -319,6 +347,43 @@ E.JSON_stringify = function(obj, opt){
         else
             replacer = replace_inf;
     }
+    if (opt.circular)
+    {
+        var ignore_circular = opt.circular=='ignore';
+        var orig_replacer = replacer, keys, objects, stack;
+        replacer = function(k, v){
+            if (!k)
+            {
+                keys = [];
+                stack = [];
+                objects = [{keys: '', value: v}];
+                return orig_replacer ? orig_replacer.call(this, k, v) : v;
+            }
+            while (stack.length && this!==stack[0])
+            {
+                stack.shift();
+                keys.pop();
+            }
+            var found;
+            for (var i = 0; i<objects.length; i++)
+            {
+                if (objects[i].value===v)
+                {
+                    found = objects[i];
+                    break;
+                }
+            }
+            if (!found)
+            {
+                keys.push(k);
+                stack.unshift(v);
+                objects.push({keys: keys.join('.'), value: v});
+                return orig_replacer ? orig_replacer.call(this, k, v) : v;
+            }
+            if (!ignore_circular)
+                return {__Ref__: found.keys};
+        };
+    }
     try { s = JSON.stringify(obj, replacer, opt.spaces); }
     finally {
         if (_date)
@@ -354,6 +419,8 @@ function parse_leaf(v, opt){
     }
     if (v.__Infinity__ && opt.inf)
         return v.__Infinity__ < 0 ? -Infinity : Infinity;
+    if (v.__ObjectId__ && typeof opt.object_id=='function')
+        return opt.object_id(v.__ObjectId__);
     return v;
 }
 
@@ -374,9 +441,34 @@ function parse_obj(v, opt){
     return v;
 }
 
+function traverse_obj(obj, key, parent, cb){
+    cb(obj, key, parent);
+    if (!obj || typeof obj!='object')
+        return;
+    for (var k in obj)
+        traverse_obj(obj[k], k, obj, cb);
+}
+
+function deref_obj(obj){
+    traverse_obj(obj, null, null, function(v, key, parent){
+        if (v && typeof v.__Ref__=='string')
+            parent[key] = zutil.get(obj, v.__Ref__);
+    });
+}
+
 E.JSON_parse = function(s, opt){
-    opt = Object.assign({date: true, re: true, func: true, inf: true}, opt);
-    return JSON.parse(s, function(k, v){ return parse_leaf(v, opt); });
+    opt = Object.assign({date: true, re: true, func: true, inf: true,
+        circular: true}, opt);
+    var has_circular;
+    var ret = JSON.parse(s, function(k, v){
+        v = parse_leaf(v, opt);
+        if (v && typeof v.__Ref__=='string')
+            has_circular = true;
+        return v;
+    });
+    if (has_circular && opt.circular)
+        deref_obj(ret);
+    return ret;
 };
 
 E.JSON_parse_obj = function(v, opt){

@@ -1,70 +1,11 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '../../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Config} from './common.js';
-import {Note} from '../common.js';
-import {withContext} from 'recompose';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
-
-const carriers = [
-    {value: '', key: 'None'},
-    {value: 'a1', key: 'A1 Austria'},
-    {value: 'aircel', key: 'Aircel'},
-    {value: 'airtel', key: 'Airtel'},
-    {value: 'att', key: 'AT&T'},
-    {value: 'vimpelcom', key: 'Beeline Russia'},
-    {value: 'celcom', key: 'Celcom'},
-    {value: 'chinamobile', key: 'China Mobile'},
-    {value: 'claro', key: 'Claro'},
-    {value: 'comcast', key: 'Comcast'},
-    {value: 'cox', key: 'Cox'},
-    {value: 'dt', key: 'Deutsche Telekom'},
-    {value: 'digi', key: 'Digi Malaysia'},
-    {value: 'docomo', key: 'Docomo'},
-    {value: 'dtac', key: 'DTAC Trinet'},
-    {value: 'etisalat', key: 'Etisalat'},
-    {value: 'idea', key: 'Idea India'},
-    {value: 'kyivstar', key: 'Kyivstar'},
-    {value: 'meo', key: 'MEO Portugal'},
-    {value: 'megafont', key: 'Megafon Russia'},
-    {value: 'mtn', key: 'MTN - Mahanager Telephone'},
-    {value: 'mtnza', key: 'MTN South Africa'},
-    {value: 'mts', key: 'MTS Russia'},
-    {value: 'optus', key: 'Optus'},
-    {value: 'orange', key: 'Orange'},
-    {value: 'qwest', key: 'Qwest'},
-    {value: 'reliance_jio', key: 'Reliance Jio'},
-    {value: 'robi', key: 'Robi'},
-    {value: 'sprint', key: 'Sprint'},
-    {value: 'telefonica', key: 'Telefonica'},
-    {value: 'telstra', key: 'Telstra'},
-    {value: 'tmobile', key: 'T-Mobile'},
-    {value: 'tigo', key: 'Tigo'},
-    {value: 'tim', key: 'TIM (Telecom Italia)'},
-    {value: 'vodacomza', key: 'Vodacom South Africa'},
-    {value: 'vodafone', key: 'Vodafone'},
-    {value: 'verizon', key: 'Verizon'},
-    {value: 'vivo', key: 'Vivo'},
-    {value: 'zain', key: 'Zain'},
-    {value: 'umobile', key: 'U-Mobile'},
-    {value: 'proximus', key: 'Proximus'},
-    {value: 'tele2', key: 'Tele2'},
-    {value: 'mobitel', key: 'Mobitel'},
-    {value: 'o2', key: 'O2'},
-    {value: 'bsnl', key: 'BSNL'},
-    {value: 'bouygues', key: 'Bouygues Telecom'},
-    {value: 'free', key: 'Free'},
-    {value: 'sfr', key: 'SFR'},
-    {value: 'mobiltel', key: 'Mobiltel'},
-    {value: 'sunrise', key: 'Sunrise Communications'},
-    {value: 'digicel', key: 'Digicel'},
-    {value: 'h3g', key: 'H3G'},
-    {value: 'three', key: 'Three'},
-];
+import {Note, Ext_tooltip, with_www_api} from '../common.js';
+import {Config, Tab_context} from './common.js';
+import {T} from '../common/i18n.js';
 
 const carriers_note = (()=>{
     const subject = 'Add new carrier option';
@@ -74,33 +15,56 @@ const carriers_note = (()=>{
     +` it in less than 2 business days!`;
     const mail = 'lumext@luminati.io';
     const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
-    return <a className="link" href={mailto}>More carriers</a>;
+    return <a className="link" href={mailto}><T>More carriers</T></a>;
 })();
 
-export default provider({tab_id: 'target'})(
-class Targeting extends Pure_component {
+export default with_www_api(class Targeting extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
+    os_opt = [
+        this.def_value,
+       {key: 'Windows', value: 'win'},
+       {key: 'MacOS', value: 'mac'},
+       {key: 'Android', value: 'android'},
+   ];
     set_field = setdb.get('head.proxy_edit.set_field');
+    get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
         this.setdb_on('head.locations', locations=>{
             if (!locations)
                 return;
-            const asns = Object.keys(locations.asns)
-                .map(a=>({id: a, label: a}));
-            this.setState({locations, asns});
+            this.setState({locations});
+        });
+        this.setdb_on('head.defaults', defaults=>{
+            if (!defaults)
+                return;
+            this.setState({defaults});
+        });
+        this.setdb_on('head.carriers', carriers=>{
+            if (!carriers)
+                return;
+            carriers = carriers.map(c=>({value: c.value, key: c.label}));
+            this.setState({carriers});
+        });
+        this.setdb_on('head.proxy_edit.form', form=>{
+            form && this.setState({form});
         });
     }
     allowed_countries = ()=>{
         let res = this.state.locations.countries.map(c=>({
             key: c.country_name, value: c.country_id, mob: c.mob}));
-        const curr_plan = this.props.get_curr_plan();
-        if (curr_plan&&curr_plan.ip_alloc_preset=='shared_block')
+        const curr_plan = this.get_curr_plan();
+        if (curr_plan && curr_plan.country)
+        {
+            res = res.filter(r=>
+                curr_plan.country.split(' ').includes(r.value));
+        }
+        else if (curr_plan && curr_plan.ip_alloc_preset=='shared_block')
         {
             res = res.filter(r=>
                 this.state.locations.shared_countries.includes(r.value));
         }
-        if (curr_plan&&curr_plan.mobile)
+        if (curr_plan && curr_plan.mobile)
             res = res.filter(r=>r.mob);
         return [this.def_value, ...res];
     };
@@ -109,10 +73,10 @@ class Targeting extends Pure_component {
         this.set_field('state', '');
     };
     states = ()=>{
-        const country = this.props.form.country;
+        const country = this.state.form.country;
         if (!country||country=='*')
             return [];
-        const curr_plan = this.props.get_curr_plan();
+        const curr_plan = this.get_curr_plan();
         const res = (this.state.locations.regions[country]||[])
         .filter(r=>!curr_plan||!curr_plan.mobile||r.mob)
         .map(r=>({key: r.region_name, value: r.region_id}));
@@ -120,11 +84,11 @@ class Targeting extends Pure_component {
     };
     state_changed = ()=>this.set_field('city', []);
     cities = ()=>{
-        const {country, state} = this.props.form;
+        const {country, state} = this.state.form;
         let res;
         if (!country)
             return [];
-        const curr_plan = this.props.get_curr_plan();
+        const curr_plan = this.get_curr_plan();
         res = this.state.locations.cities
         .filter(c=>c.country_id==country)
         .filter(c=>!curr_plan||!curr_plan.mobile||c.mob);
@@ -138,42 +102,110 @@ class Targeting extends Pure_component {
         });
         return res;
     };
+    asns = ()=>{
+        const {country} = this.state.form;
+        const {locations} = this.state;
+        let asns;
+        if (!country)
+        {
+            asns = Object.values(locations.asns)
+                .reduce((acc, el)=>Object.assign(acc, el), {});
+        }
+        else
+            asns = locations.asns[country]||{};
+        return Object.keys(asns).map(a=>({id: a, label: a}));
+    };
+    carriers = ()=>{
+        const {country} = this.state.form;
+        const {locations, carriers} = this.state;
+        let res;
+        if (!country)
+        {
+            res = Object.values(locations.carriers).reduce(
+                (acc, el)=>[...acc, ...el], []);
+        }
+        else
+            res = locations.carriers[country];
+        return [
+            {value: '', key: 'None'},
+            ...carriers.filter(c=>(res||[]).includes(c.value)),
+        ];
+    };
     city_changed = e=>{
-        if (e&&e.length)
+        if (e && e.length)
             this.set_field('state', e[0].region);
     };
     render(){
-        if (!this.state.locations)
+        if (!this.state.locations || !this.state.carriers || !this.state.form)
             return null;
-        const curr_plan = this.props.get_curr_plan();
-        const show_dc_note = curr_plan&&curr_plan.type=='static';
-        const show_vips_note = curr_plan&&
+        if (this.state.form.ext_proxies)
+            return <Note><Ext_tooltip/></Note>;
+        const curr_plan = this.get_curr_plan();
+        const is_static = curr_plan && curr_plan.type=='static';
+        const show_vips_note = curr_plan &&
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
-        const carrier_disabled = !!this.props.form.asn&&
-            !!this.props.form.asn.length;
-        return <div>
-              {(show_dc_note || show_vips_note) &&
-                <Note>
-                  {show_dc_note &&
-                    <span>To change Data Center country visit your </span>}
-                  {show_vips_note &&
-                    <span>To change Exclusive gIP country visit your </span>}
-                  <a className="link" target="_blank" rel="noopener noreferrer"
-                    href="https://luminati.io/cp/zones">zone page</a>
-                  <span> and change your zone plan.</span>
-                </Note>
-              }
-              <Config type="select" id="country"
-                data={this.allowed_countries()}
-                on_change={this.country_changed}/>
-              <Config type="select" id="state" data={this.states()}
-                on_change={this.state_changed}/>
-              <Config type="typeahead" id="city" data={this.cities()}
-                on_change={this.city_changed}/>
-              <Config type="typeahead" id="asn" data={this.state.asns}
-                disabled={!!this.props.form.carrier} update_on_input/>
-              <Config type="select" id="carrier" data={carriers}
-                note={carriers_note} disabled={carrier_disabled}/>
+        const carrier_disabled = !!this.state.form.asn &&
+            !!this.state.form.asn.length;
+        const filter_by_asns = (option, props)=>{
+            let low_text = props.text.toLowerCase();
+            if (low_text=='a'||low_text=='as')
+                return false;
+            if (low_text.startsWith('as'))
+                low_text = low_text.substr(2);
+            if (option.label.startsWith(low_text))
+                return true;
+            return false;
+        };
+        return <div className="target">
+              <Tab_context.Provider value="target">
+                {(is_static || show_vips_note) &&
+                  <Note>
+                    {is_static &&
+                      <span>
+                      <div>
+                        <T>This port is configured to use Data center IPs.</T>
+                      </div>
+                      <span>
+                        <T>To change Data center country visit your</T>{' '}
+                      </span>
+                      </span>
+                    }
+                    {show_vips_note &&
+                      <span>
+                      <div>
+                        This port is configured to use exclusive Residential
+                        IPs.
+                      </div>
+                      <span> To change Exclusive gIP country visit your </span>
+                      </span>
+                    }
+                    <a className="link" target="_blank"
+                      rel="noopener noreferrer"
+                      href={`${this.props.www_api}/cp/zones`}>
+                      <T>zone page</T>
+                    </a>
+                    <span>{' '}<T>and change your zone plan.</T></span>
+                  </Note>
+                }
+                <Config type="select" id="country"
+                  data={this.allowed_countries()}
+                  on_change={this.country_changed}/>
+                <Config type="select" id="state" data={this.states()}
+                  on_change={this.state_changed}/>
+                <Config type="typeahead" id="city" data={this.cities()}
+                  on_change={this.city_changed}/>
+                {!this.state.form.asn || !this.state.form.asn[1] &&
+                  <Config type="typeahead" id="asn" data={this.asns()}
+                    disabled={!!this.state.form.carrier} update_on_input
+                    depend_a={this.state.form.zone}
+                    filter_by={filter_by_asns}/>
+                }
+                <Config type="select" id="carrier" data={this.carriers()}
+                  note={carriers_note} disabled={carrier_disabled}
+                  depend_a={this.state.form.zone}/>
+                <Config type="select" id="os" data={this.os_opt}
+                  disabled={is_static}/>
+              </Tab_context.Provider>
             </div>;
     }
 });

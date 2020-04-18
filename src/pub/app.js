@@ -1,7 +1,16 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
+import Pure_component from '/www/util/pub/pure_component.js';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'flag-icon-css/css/flag-icon.css';
+import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import './css/app.less';
 import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
@@ -10,31 +19,33 @@ import Login from './login.js';
 import Overview from './overview.js';
 import Config from './config.js';
 import Settings from './settings.js';
-import Tracer from './tracer.js';
+import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
-import {Enable_ssl_modal} from './common.js';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
-import 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.css';
-import './app.less';
-import 'es6-shim';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Enable_ssl_modal from './common/ssl_modal.js';
+import Api_url_modal from './common/api_url_modal.js';
+import Error_boundry from './common/error_boundry.js';
+import {Modal} from './common/modals.js';
+import {report_exception} from './util.js';
 
 window.setdb = setdb;
-setdb.setMaxListeners(30);
+setdb.setMaxListeners(50);
 
 const App = withRouter(class App extends Pure_component {
     componentDidMount(){
+        setdb.set('head.save_settings', this.save_settings);
         const _this = this;
         this.etask(function*(){
             const version = yield ajax.json({url: '/api/version'});
             setdb.set('head.version', version.version);
+            setdb.set('head.is_upgraded', version.is_upgraded);
+            setdb.set('head.backup_exist', version.backup_exist);
+            setdb.set('head.argv', version.argv);
         });
         this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e, 'app.App.componentDidMount');
+            }));
             const mode = yield window.fetch('/api/mode');
             let block_ip;
             if (block_ip = mode.headers.get('x-lpm-block-ip'))
@@ -43,6 +54,8 @@ const App = withRouter(class App extends Pure_component {
                 return _this.props.history.replace('/whitelist_ips');
             }
             _this.load_data();
+            if (mode.headers.get('x-lpm-local-login'))
+                return _this.props.history.replace('/login');
             const data = yield mode.json();
             if (data.logged_in)
             {
@@ -69,9 +82,16 @@ const App = withRouter(class App extends Pure_component {
             setdb.set('head.locations', locations);
         });
         this.etask(function*(){
+            const carriers = yield ajax.json({url: '/api/all_carriers'});
+            setdb.set('head.carriers', carriers);
+        });
+        this.etask(function*(){
             const settings = yield ajax.json({url: '/api/settings'});
             setdb.set('head.settings', settings);
-            window.ga('set', 'dimension1', settings.customer);
+        });
+        this.etask(function*(){
+            const conn = yield ajax.json({url: '/api/conn'});
+            setdb.set('head.conn', conn);
         });
         this.etask(function*(){
             const version = yield ajax.json({url: '/api/last_version'});
@@ -80,9 +100,6 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const defaults = yield ajax.json({url: '/api/defaults'});
             setdb.set('head.defaults', defaults);
-            const socket = new WebSocket(
-                `ws://${window.location.hostname}:${defaults.ws}`);
-            setdb.set('head.ws', socket);
         });
         this.etask(function*(){
             const node = yield ajax.json({url: '/api/node_version'});
@@ -101,13 +118,26 @@ const App = withRouter(class App extends Pure_component {
             setdb.set('head.zones', zones);
         });
         this.etask(function*(){
-            const warnings = yield ajax.json({url: '/api/warnings'});
-            setdb.set('head.warnings', warnings.warnings);
+            const w = yield ajax.json({url: '/api/tls_warning'});
+            setdb.set('ws.tls_warning', w);
         });
+    };
+    save_settings = settings=>{
+      return this.etask(function*(){
+          const raw = yield window.fetch('/api/settings', {
+              method: 'PUT',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(settings),
+          });
+          const new_settings = yield raw.json();
+          setdb.set('head.settings', new_settings);
+      });
     };
     render(){
         return <div className="page_wrapper">
               <Enable_ssl_modal/>
+              <Api_url_modal/>
+              <Old_modals/>
               <Switch>
                 <Route path="/login" exact component={Login}/>
                 <Route path="/whitelist_ips" exact component={Whitelist_ips}/>
@@ -118,28 +148,95 @@ const App = withRouter(class App extends Pure_component {
     }
 });
 
+const Old_modals = ()=>
+    <div className="old_modals">
+      <div id="restarting" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Restarting...</h4>
+            </div>
+            <div className="modal-body">
+              Please wait. The page will be reloaded automatically
+              once the application has restarted.
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+      <div id="upgrading" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">
+                Luminati Proxy Manager is upgrading</h4>
+            </div>
+            <div className="modal-body">
+              Please wait...
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+      <div id="downgrading" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">
+                Luminati Proxy Manager is downgrading</h4>
+            </div>
+            <div className="modal-body">
+              Please wait...
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+      <div id="shutdown" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Shutdown</h4>
+            </div>
+            <div className="modal-body">
+              The application has been shut down. To restart,
+              please run it manually and reload this page.
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+      <Modal id="fetching_chrome_modal"
+        title="Downloading Chromium. Please wait..." no_cancel_btn>
+      </Modal>
+    </div>;
+
 const Page = ()=>
     <div>
       <Nav/>
-      <div className="page_body">
-        <Switch>
-          <Route path="/overview" exact component={Overview}/>
-          <Route path="/overview/:master_port" exact component={Overview}/>
-          <Route path="/proxy/:port/:tab?" exact component={Proxy_edit}/>
-          <Route path="/howto" exact component={Howto}/>
-          <Route path="/logs" exact component={Logs}/>
-          <Route path="/proxy_tester" exact component={Proxy_tester}/>
-          <Route path="/tracer" exact component={Tracer}/>
-          <Route path="/config" exact component={Config}/>
-          <Route path="/settings" exact component={Settings}/>
-          <Route path="/" component={Overview}/>
-        </Switch>
+      <Proxy_add/>
+      <div className="page_body vbox">
+        <Error_boundry>
+          <Switch>
+            <Route path="/overview" exact component={Overview}/>
+            <Route path="/overview/:master_port" exact component={Overview}/>
+            <Route path="/proxy/:port" component={Proxy_edit}/>
+            <Route path="/howto/:option?/:suboption?" exact component={Howto}/>
+            <Route path="/logs" exact component={Logs}/>
+            <Route path="/proxy_tester" exact component={Proxy_tester}/>
+            <Route path="/config" exact component={Config}/>
+            <Route path="/settings" exact component={Settings}/>
+            <Route path="/" component={Overview}/>
+          </Switch>
+        </Error_boundry>
       </div>
     </div>;
 
 const Root = ()=>
     <BrowserRouter>
-      <App/>
+      <Switch>
+        <Route path="/" component={App}/>
+      </Switch>
     </BrowserRouter>;
 
 ReactDOM.render(<Root/>, document.getElementById('react_root'));

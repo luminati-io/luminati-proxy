@@ -1,0 +1,34 @@
+@import 'common.less';
+html,
+body {
+    line-height: 23px;
+    font-family: "Lato";
+    color: @first_color;
+}
+.old_modals { height: auto !important; }
+html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
+    height: 100%;
+}
+.page_body {
+    padding-left: 50px;
+    padding-top: 60px;
+    position: initial !important;
+}
+.api_app {
+    margin-top: 50px;
+    text-align: center;
+    button { margin: 10px; }
+}
+.no_nav {
+    .page-body { margin-left: 0; }
+    .logo_wrapper { background-color: white !important; }
+    .version_filler { background-color: white !important; }
+    .notif { display: none; }
+    .nav_top {
+        background-color: white;
+        .schema {
+            margin-right: 50px;
+            .schema_component { margin-right: 0; }
+        }
+    }
+}

@@ -3,15 +3,11 @@
 (function(){
 var define, process, zerr, assert;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
-var is_ff_addon = typeof module=='object' && module.uri
-    && !module.uri.indexOf('resource://');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (!is_node)
 {
-    if (is_ff_addon)
-        define = require('./require_node.js').define(module, '../');
-    else if (is_rn)
+    if (is_rn)
     {
         define = require('./require_node.js').define(module, '../',
             require('/util/events.js'), require('/util/array.js'),
@@ -25,7 +21,7 @@ if (!is_node)
     };
     // XXX romank: use zerr.js
     // XXX bahaa: require bext/pub/zerr.js for extensions
-    if (!is_ff_addon && !is_rn && self.hola && self.hola.zerr)
+    if (!is_rn && self.hola && self.hola.zerr)
         zerr = self.hola.zerr;
     else
     {
@@ -135,7 +131,7 @@ function Etask(opt, states){
         states = opt;
         opt = undefined;
     }
-    opt = (typeof opt=='string' && {name: opt})||opt||{};
+    opt = typeof opt=='string' && {name: opt} || opt || {};
     if (typeof states=='function')
     {
         if (states.constructor.name=='GeneratorFunction')
@@ -538,11 +534,12 @@ E.prototype.spawn = function(child, replace){
     if (!(child instanceof Etask)) // promise already completed?
     {
         this.emit('child', child);
-        return;
+        return child;
     }
     if (!replace && child.parent)
         assert(0, 'child already has a parent\n'+child.parent.ps());
     child.spawn_parent(this);
+    return child;
 };
 
 E.prototype._spawn_parent_guess = function(parent){
@@ -882,7 +879,7 @@ function Etask_err(err){ this.error = err || new Error(); }
 E.Etask_err = Etask_err;
 E.err = function(err){ return new Etask_err(err); };
 E.is_err = function(v){
-    return (v instanceof Etask && v.error!==undefined) ||
+    return v instanceof Etask && v.error!==undefined ||
         v instanceof Etask_err;
 };
 E.err_res = function(err, res){ return err ? E.err(err) : res; };
@@ -892,7 +889,7 @@ E._res2rv = function(res){
 };
 E.is_final = function(v){
     return !v || typeof v.then!='function' || v instanceof Etask_err ||
-        (v instanceof Etask && !!v.tm_completed);
+        v instanceof Etask && !!v.tm_completed;
 };
 
 // promise compliant .then() implementation for Etask and Etask_err.
@@ -1265,8 +1262,7 @@ E.all = function(a_or_o, ao2){
             return this.goto('loop');
         }]);
     }
-    else
-        assert(0, 'invalid type');
+    assert(0, 'invalid type');
 };
 
 E.all_limit = function(limit, arr_iter, cb){
@@ -1352,7 +1348,7 @@ E._apply = function(opt, func, _this, args){
 // nfn_apply([opt, ]object, method, args)
 // nfn_apply([opt, ]func, this, args)
 E.nfn_apply = function(opt, func, _this, args){
-    var _opt = {nfn: 1};
+    var _opt = {nfn: 1, cancel: 1};
     if (typeof opt=='function' || typeof func=='string')
     {
         args = _this;
@@ -1447,7 +1443,7 @@ E.fn = function(opt, states){ return etask_fn(opt, states, false); };
 E._fn = function(opt, states){ return etask_fn(opt, states, true); };
 E._generator = function(gen, ctor, opt){
     opt = opt||{};
-    opt.name = opt.name||(ctor && ctor.name)||'generator';
+    opt.name = opt.name || ctor && ctor.name || 'generator';
     if (opt.cancel===undefined)
         opt.cancel = true;
     var done;
@@ -1471,7 +1467,7 @@ E._generator = function(gen, ctor, opt){
     }, function finally$(){
         // https://kangax.github.io/compat-table/es6/#test-generators_%GeneratorPrototype%.return
         // .return() supported only in node>=6.x.x
-        if (!done && gen.return)
+        if (!done && gen && gen.return)
             try { gen.return(); } catch(e){}
     }]);
 };
@@ -1527,6 +1523,35 @@ E.interval = function(opt, states){
         }]);
     }
     throw new Error('unexpected mode '+opt.mode);
+};
+E._class = function(cls){
+    var proto = cls.prototype, keys = Object.getOwnPropertyNames(proto);
+    for (var i=0; i<keys.length; i++)
+    {
+        var key = keys[i];
+        var descr = Object.getOwnPropertyDescriptor(proto, key);
+        if (descr.get||descr.set)
+            continue;
+        var p = proto[key];
+        if (p && p.constructor && p.constructor.name=='GeneratorFunction')
+            proto[key] = E._fn(p);
+    }
+    return cls;
+};
+E.shutdown = function(){
+    var prev;
+    while (E.root.length)
+    {
+        var e = E.root[0];
+        if (e==prev)
+        {
+            assert(e.tm_completed);
+            zerr.zexit('etask root not removed after return - '+
+                'fix non-cancelable child etask');
+        }
+        prev = e;
+        e.return();
+    }
 };
 
 return Etask; }); }());

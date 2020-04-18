@@ -11,7 +11,7 @@ var qs;
 
 if (is_rn)
     define = require('./require_node.js').define(module, '../');
-else if (!is_node && !is_ff_addon)
+else if (!is_node)
     define = self.define;
 else
 {
@@ -20,11 +20,13 @@ else
     // even thoguh it never reaches this if (it is done in pre-processing)
     // so we fool him
     var _require = require;
-    qs = _require(is_ff_addon ? 'sdk/querystring' : 'querystring');
+    qs = _require('querystring');
 }
 define([], function(){
 var assign = Object.assign;
 var E = {};
+
+function replace_slashes(url){ return url.replace(/\\/g, '/'); }
 
 E.add_proto = function(url){
     if (!url.match(/^([a-z0-9]+:)?\/\//i))
@@ -43,7 +45,7 @@ E.get_top_level_domain = function(host){
 };
 
 E.get_host = function(url){
-    var n = url.match(/^(https?:)?\/\/([^\/]+)\/.*$/);
+    var n = replace_slashes(url).match(/^(https?:)?\/\/([^\/]+)\/.*$/);
     return n ? n[2] : '';
 };
 
@@ -77,7 +79,7 @@ E.get_root_domain = function(domain){
 
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
-    var match = email.toLowerCase().match(/^[a-z0-9_\.\-\+]+@(.*)$/);
+    var match = email.toLowerCase().match(/^[a-z0-9_.\-+]+@(.*)$/);
     return match && match[1];
 };
 
@@ -99,7 +101,7 @@ E.get_proto = function(url){
 };
 
 E.get_host_gently = function(url){
-    var n = url.match(/^(?:(?:[a-z0-9]+?:)?\/\/)?([^\/]+)/);
+    var n = replace_slashes(url).match(/^(?:(?:[a-z0-9]+?:)?\/\/)?([^\/]+)/);
     return n ? n[1] : '';
 };
 
@@ -123,13 +125,13 @@ E.is_ip_mask = function(host){
         return false;
     var final = false;
     var check_num_mask = function(num){
-        var arr = (num >>> 0).toString(2).split(''), final = false;
+        var arr = (num >>> 0).toString(2).split(''), _final = false;
         for (var i=0; i<arr.length; i++)
         {
-            if (final && arr[i]=='1')
+            if (_final && arr[i]=='1')
                 return false;
-            if (!final && arr[i]=='0')
-                final = true;
+            if (!_final && arr[i]=='0')
+                _final = true;
         }
         return true;
     };
@@ -194,13 +196,53 @@ E.is_valid_domain = function(domain){
     return /^([a-z0-9]([a-z0-9-_]*[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain); };
 
 E.is_hola_domain = function(domain){
-    return domain.search(/^(.*\.)?(hola\.org|holacdn\.com|h-cdn\.com)$/)!=-1;
+    return E.is_valid_domain(domain) &&
+        domain.search(/^(.*\.)?(hola\.org|holacdn\.com|h-cdn\.com)$/)!=-1;
 };
 
 // XXX josh: move to email.js:is_valid
-E.is_valid_email = function(email){
-    var n = email.toLowerCase().match(/^[a-z0-9_\.\-\+]+@(.*)$/);
+E.is_valid_email = function(email, is_signup){
+    var re = /^[a-z0-9_\-+]+(?:\.[a-z0-9_\-+]+)*@(.*)$/;
+    var n = email.toLowerCase().match(re);
+    if ((n&&is_signup&&email.split('@')[0].match(/\+/g)||[]).length>1)
+        return false;
     return !!(n && E.is_valid_domain(n[1]));
+};
+
+// XXX dmitriie: move to email.js:is_alias
+E.is_alias_email = function(email){
+    if (!E.is_valid_email(email))
+        return false;
+    var n = email.toLowerCase().match(/^([a-z0-9_.\-+]+)@.*$/);
+    return !!(n && /.+\+.+/.test(n[1]));
+};
+
+// XXX vadimr: move to email.js:is_need_sanitize
+E.is_email_need_sanitize = function(email){
+    var valid_domains = ['gmail.com', 'googlemail.com', 'yahoo.com',
+        'yahoo.fr', 'yahoo.co.uk', 'yahoo.com.br', 'yahoo.co.in', 'yahoo.es',
+        'yahoo.it', 'yahoo.de', 'yahoo.in', 'yahoo.ca', 'yahoo.com.au',
+        'yahoo.co.jp', 'yahoo.com.ar', 'yahoo.com.mx', 'yahoo.co.id',
+        'yahoo.com.sg', 'protonmail.ch'];
+    return valid_domains.indexOf(E.get_domain_email(email)) !== -1;
+};
+
+// XXX vadimr: move to email.js:sanitize
+E.sanitize_email = function(email){
+    var main = E.get_main_email(email);
+    if(!main)
+        return;
+    var sp = main.split('@');
+    return sp[0].replace(/\.*/g, '')+'@'+sp[1];
+};
+
+// XXX dmitriie: move to email.js:get_main
+E.get_main_email = function(email){
+    if (!E.is_valid_email(email))
+        return;
+    if (E.is_alias_email(email))
+        return email.replace(/\+.+@/, '@');
+    return email;
 };
 
 E.is_ip_in_range = function(ips_range, ip){
@@ -210,6 +252,13 @@ E.is_ip_in_range = function(ips_range, ip){
     var min_ip = E.ip2num(ips[0]), max_ip = E.ip2num(ips[1]);
     var num_ip = E.ip2num(ip);
     return num_ip>=min_ip && num_ip<=max_ip;
+};
+
+E.is_ip_local = function(ip){
+    return E.is_ip_in_range('10.0.0.0-10.255.255.255', ip) ||
+        E.is_ip_in_range('172.16.0.0-172.31.255.255', ip) ||
+        E.is_ip_in_range('192.168.0.0-192.168.255.255', ip) ||
+        E.is_ip_in_range('169.254.0.0-169.254.255.255', ip);
 };
 
 E.host_lookup = function(lookup, host){
@@ -234,7 +283,7 @@ E.uri_obj_href = function(uri){
 
 var protocol_re = /^((?:about|http|https|file|ftp|ws|wss):)?(\/\/)?/i;
 var host_section_re = /^(.*?)(?:[\/?#]|$)/;
-var host_re = /^(?:(([^:@]*):?([^:@]*))?@)?([^:]*)(?::(\d*))?/;
+var host_re = /^(?:(([^:@]*):?([^:@]*))?@)?([a-zA-Z0-9._+-]*)(?::(\d*))?/;
 var path_section_re = /^([^?#]*)(\?[^#]*)?(#.*)?$/;
 var path_re_loose = /^(\/(?:.(?![^\/]*\.[^\/.]+$))*\/?)?([^\/]*?(?:\.([^.]+))?)$/;
 var path_re_strict = /^(\/(?:.(?![^\/]*(?:\.[^\/.]+)?$))*\/?)?([^\/]*?(?:\.([^.]+))?)$/;
@@ -250,7 +299,9 @@ E.parse = function(url, strict){
         return m;
     }
     url = url||location.href;
-    var m, uri = {orig: url}, remaining = url;
+    var uri = {orig: url};
+    url = replace_slashes(url);
+    var m, remaining = url;
     // protocol
     if (!(m = re(protocol_re, remaining)))
         return {};
@@ -416,7 +467,7 @@ E.root_url_cmp = function(a, b){
 E.qs_strip = function(url){ return /^[^?#]*/.exec(url)[0]; };
 
 // mini-implementation of zescape.qs to avoid dependency of escape.js
-function qs_str(qs){
+E.qs_str = function(qs){
     var q = [];
     for (var k in qs)
     {
@@ -424,16 +475,16 @@ function qs_str(qs){
             q.push(encodeURIComponent(k)+'='+encodeURIComponent(v)); });
     }
     return q.join('&');
-}
+};
 
 E.qs_add = function(url, qs){
     var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {}, qs);
-    u.path = u.pathname+'?'+qs_str(q);
+    u.path = u.pathname+'?'+E.qs_str(q);
     return E.uri_obj_href(u);
 };
 
 E.qs_parse_url = function(url){
-    return E.qs_parse(url.replace(/(^.*\?)|(^[^\?]*$)/, ''));
+    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, ''));
 };
 
 return E; }); }());

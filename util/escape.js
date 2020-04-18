@@ -135,11 +135,13 @@ var http_escape_chars = [];
 }());
 E.encodeURIComponent_bin = function(s_or_b){
     // Browser does not have Buffer Object
-    var s = Buffer && s_or_b instanceof Buffer ? s_or_b.toString('binary')
-        : ''+s_or_b;
+    var s = typeof Buffer!='undefined' && s_or_b instanceof Buffer ?
+        s_or_b.toString('binary') : ''+s_or_b;
     var esc = '';
+    // critical perf only for 0<=code<256: encodeURIComponent() will not be
+    // called in these cases
     for (var i = 0; i < s.length; i++)
-        esc += http_escape_chars[s.charCodeAt(i)];
+        esc += http_escape_chars[s.charCodeAt(i)] || encodeURIComponent(s[i]);
     return esc;
 };
 

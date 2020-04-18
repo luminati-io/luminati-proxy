@@ -1,61 +1,131 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
-import {Config} from './common.js';
-import {normalizers} from '../util.js';
-import {withContext} from 'recompose';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
+import {Config, Tab_context} from './common.js';
+import {T} from '../common/i18n.js';
+import Users_modal from './users_modal.js';
 
-export default provider({tab_id: 'general'})(props=>{
-    const set_field = setdb.get('head.proxy_edit.set_field');
-    const open_modal = ()=>{ $('#allocated_ips').modal('show'); };
-    const multiply_changed = val=>{
-        const size = Math.max(props.form.ips.length, props.form.vips.length);
+const route_err_opt = [
+    {key: 'pass_dyn (default)', value: 'pass_dyn'},
+    {key: 'block', value: 'block'}
+];
+
+const debug_opt = [
+    {key: 'Yes (default)', value: 'full'},
+    {key: 'No', value: 'none'},
+];
+
+export default class General extends Pure_component {
+    state = {defaults: {}};
+    get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
+    set_field = setdb.get('head.proxy_edit.set_field');
+    proxy_connection_type_opt(t){
+        return this.state.defaults.proxy_connection_type=='https' ? [
+            {key: t('HTTPS (default)'), value: 'https'},
+            {key: 'HTTP', value: 'http'}
+        ] : [
+            {key: t('HTTP (default)'), value: 'http'},
+            {key: 'HTTPS', value: 'https'}
+        ];
+    }
+    componentDidMount(){
+        this.setdb_on('head.defaults',
+            defaults=>this.setState({defaults: defaults||{}}));
+        this.setdb_on('head.proxy_edit.form', form=>{
+            form && this.setState({form});
+        });
+        this.setdb_on('head.consts', consts=>{
+            consts && consts.proxy && this.setState({proxy: consts.proxy});
+        });
+        this.setdb_on('head.settings', settings=>{
+            settings && this.setState({settings});
+        });
+    }
+    multiply_users_changed = val=>{
+        console.log('mult users changed');
+        if (val)
+            this.open_users_modal();
+    };
+    multiply_static_changed = val=>{
+        const {form} = this.state;
+        const size = Math.max(form.ips.length, form.vips.length);
         if (val)
         {
-            set_field('pool_size', 1);
-            set_field('multiply', size);
-            open_modal();
+            this.set_field('pool_size', 1);
+            this.set_field('multiply', size);
+            this.open_static_modal();
             return;
         }
-        set_field('pool_size', size);
-        set_field('multiply', 1);
+        this.set_field('pool_size', size);
+        this.set_field('multiply', 1);
     };
-    // XXX krzysztof: cleanup type
-    const curr_plan = props.get_curr_plan();
-    let type;
-    if (curr_plan&&curr_plan.type=='static')
-        type = 'ips';
-    else if (curr_plan&&!!curr_plan.vip)
-        type = 'vips';
-    const note_ips = props.form.multiply_ips ?
-        <a className="link" onClick={open_modal}>Select IPs</a> : null;
-    const note_vips = props.form.multiply_vips ?
-        <a className="link" onClick={open_modal}>Select gIPs</a> : null;
-    const mul_disabled = props.form.multiply_ips||props.form.multiply_vips;
-    return <div>
-          <Config type="text" id="internal_name"/>
-          <Config type="number" id="port"/>
-          <Config type="number" id="socks" disabled={true} val_id="port"/>
-          <Config type="text" id="password"/>
-          <Config type="text" id="whitelist_ips" save_on_blur
-            validator={normalizers.ips_list}/>
-          <Config type="yes_no" id="ssl"/>
-          <Config type="select_number" id="multiply" disabled={mul_disabled}
-            range="medium"/>
-          {type=='ips' &&
-            <Config type="yes_no" id="multiply_ips"
-              on_change={multiply_changed} note={note_ips}/>
-          }
-          {type=='vips' &&
-            <Config type="yes_no" id="multiply_vips"
-              on_change={multiply_changed} note={note_vips}/>
-          }
-          <Config type="yes_no" id="secure_proxy"/>
-          <Config type="select" id="iface" data={props.proxy.iface.values}/>
-        </div>;
-});
+    on_change_ssl = ssl=>{
+        if (!ssl && this.state.form.insecure)
+            this.set_field('insecure', false);
+    };
+    open_static_modal = ()=>$('#allocated_ips').modal('show');
+    open_users_modal = ()=>$('#users_modal').modal('show');
+    render(){
+        if (!this.state.form || !this.state.proxy || !this.state.settings)
+            return null;
+        // XXX krzysztof: cleanup type (index.js rotation.js general.js)
+        const curr_plan = this.get_curr_plan();
+        let type;
+        if (curr_plan && (curr_plan.type||'').startsWith('static'))
+            type = 'ips';
+        else if (curr_plan && !!curr_plan.vip)
+            type = 'vips';
+        const form = this.state.form;
+        const note_ips = form.multiply_ips ?
+            <a className="link" onClick={this.open_static_modal}>
+              Select IPs
+            </a> : null;
+        const note_vips = form.multiply_vips ?
+            <a className="link" onClick={this.open_static_modal}>
+              Select gIPs
+            </a> : null;
+        const disabled_wl = (this.state.settings.fixed_whitelist_ips||[])
+            .concat(this.state.settings.whitelist_ips);
+        const note_users = form.multiply_users ?
+            <a className="link" onClick={this.open_users_modal}>
+              <T>Select users</T>
+            </a> : null;
+        let {ssl} = form, def_ssl = this.state.defaults.ssl;
+        let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
+        return <div className="general">
+              <Tab_context.Provider value="general">
+                <Users_modal form={this.state.form}/>
+                <Config type="text" id="internal_name"/>
+                <Config type="number" id="port"/>
+                <Config type="pins" id="whitelist_ips"
+                  disabled_ips={disabled_wl}/>
+                <T>{t=><Config type="select"
+                  data={this.proxy_connection_type_opt(t)}
+                  id="proxy_connection_type"/>}</T>
+                <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
+                <Config type="yes_no" id="insecure"
+                  disabled={!ssl_analyzing_enabled}/>
+                <Config type="select" data={route_err_opt} id="route_err"/>
+                <Config type="select_number" id="multiply"
+                  data={[0, 5, 20, 100, 500]}/>
+                {type=='ips' &&
+                  <Config type="yes_no" id="multiply_ips"
+                    on_change={this.multiply_static_changed} note={note_ips}/>
+                }
+                {type=='vips' &&
+                  <Config type="yes_no" id="multiply_vips"
+                    on_change={this.multiply_static_changed} note={note_vips}/>
+                }
+                <Config type="yes_no" id="multiply_users"
+                  on_change={this.multiply_users_changed} note={note_users}/>
+                <Config type="select" id="iface"
+                  data={this.state.proxy.iface.values}/>
+                <Config type="pins" id="smtp" exact no_any/>
+                <Config type="select" id="debug" data={debug_opt}/>
+              </Tab_context.Provider>
+            </div>;
+    }
+}

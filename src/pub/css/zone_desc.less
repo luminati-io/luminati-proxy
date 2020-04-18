@@ -1,0 +1,44 @@
+@import (reference) 'common.less';
+.zone_settings {
+    cursor: default !important;
+    .pair {
+        display: flex;
+        .title {
+            margin-right: 5px;
+            font-weight: 600;
+        }
+        .val {
+            display: flex;
+            align-items: center;
+            .lit {
+                line-height: 1.9;
+                padding: 0 6px;
+                margin-right: 3px;
+                background-color: #e1e9ed;
+                color: inherit;
+                font-size: 11px;
+                border-radius: 3px;
+            }
+        }
+    }
+    .perm_icon {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin: 2px 4px 0;
+        background-repeat: no-repeat;
+        background-size: contain;
+        &.country { background-image: url(/img/country.svg); }
+        &.state { background-image: url(/img/state.svg); }
+        &.data_center { background-image: url(/img/data_center.svg); }
+        &.asn { background-image: url(/img/asn.svg); }
+        &.city { background-image: url(/img/city.svg); }
+        &.vip { background-image: url(/img/g_ip.svg); }
+        &.residential { background-image: url(/img/residential.svg); }
+        &.static_res { background-image: url(/img/static_res.svg); }
+        &.mobile {
+            width: 14px;
+            background-image: url(/img/mobile.svg);
+        }
+    }
+}

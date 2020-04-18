@@ -4,6 +4,7 @@
 const _ = require('lodash');
 const yargs = require('yargs');
 const pkg = require('../package.json');
+const perr = require('../lib/perr.js');
 const lpm_config = require('./lpm_config.js');
 const zerr = require('../util/zerr.js');
 const E = module.exports;
@@ -46,15 +47,7 @@ const parse_env_params = (env, fields)=>{
 E.t = {parse_env_params};
 
 E.init_args = args=>{
-    const added_descriptions = {
-        'no-www': 'Disable local web',
-        'no-config': 'Working without a config file',
-        'no-cookie': 'Working without a cookie file',
-        daemon: 'Start as a daemon',
-        'stop-daemon': 'Stop running daemon',
-        upgrade: 'Upgrade proxy manager',
-    };
-    let usage = ['Usage:\n  $0 [options] config1 config2 ...'];
+    const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
     if (process.env.DOCKER)
     {
         usage.unshift('  docker run luminati/luminati-proxy '
@@ -63,17 +56,18 @@ E.init_args = args=>{
     const defaults = Object.assign({}, lpm_config.manager_default,
         parse_env_params(process.env, lpm_config.proxy_fields));
     args = (args||process.argv.slice(2)).map(String);
-    const argv = yargs(args).usage(usage.join(' \n'))
+    const argv = yargs(args)
+    .usage(usage.join(' \n'))
     .options(lpm_config.proxy_fields)
-    .describe(added_descriptions)
+    .describe(lpm_config.args.added_descriptions)
     .number(lpm_config.numeric_fields)
     .default(defaults)
-    .help('h')
-    .alias({'help': ['h', '?'], port: 'p', daemon: 'd', 'version': 'v'})
-    .version(()=>`luminati-proxy version: ${pkg.version}`).argv;
+    .help()
+    .strict()
+    .version(pkg.version)
+    .alias(lpm_config.args.alias)
+    .parse();
     argv.native_args = args;
-    if (argv.log instanceof Array)
-        argv.log = argv.log.pop();
     argv.log = argv.log.toLowerCase();
     if (argv.session=='true')
         argv.session = true;
@@ -81,7 +75,6 @@ E.init_args = args=>{
         .filter(p=>args.includes(`--${p}`)));
     if (args.includes('-p'))
         argv.explicit_opt.port = argv.port;
-    argv.overlay_opt = _.omit(argv.explicit_opt, 'port');
     argv.daemon_opt = args.filter(arg=>arg.includes('daemon')||arg=='-d')
     .map(arg=>{
         let match;
@@ -100,5 +93,6 @@ E.init_args = args=>{
             acc[curr.name] = curr.value||true;
         return acc;
     }, {});
+    perr.enabled = !argv.no_usage_stats;
     return argv;
 };

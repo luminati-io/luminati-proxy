@@ -2,40 +2,33 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const electron = require('electron');
-const lpm_config = require('../util/lpm_config.js');
 const child_process = require('child_process');
-const app = electron.app, dialog = electron.dialog;
-const opn = require('opn');
+const semver = require('semver');
+const app = electron.app;
+const dialog = electron.dialog;
+const open = require('open');
 let _info_bkp = console.info;
 console.info = function(){};
 const auto_updater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
+const config = require('../util/lpm_config.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
+require('../lib/perr.js').run({});
 const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
-const analytics = require('universal-analytics');
-const ua = analytics('UA-60520689-2');
-const assign = Object.assign;
+const pkg = require('../package.json');
+const logger = require('../lib/logger.js');
 const E = module.exports;
 
-ua.set('an', 'LPM-electron');
-ua.set('av', `v${lpm_config.version}`);
-
-let manager, upgrade_available, can_upgrade;
+let manager, upgrade_available, can_upgrade, is_upgrading, upgrade_cb;
 
 const show_message = opt=>etask(function*(){
     let [res] = yield etask.cb_apply({ret_a: true}, dialog, '.showMessageBox',
         [opt]);
     return res;
 });
-const mgr_err = msg=>{
-    if (manager&&manager._log)
-        manager._log.error(msg);
-    else
-        console.log(msg);
-};
 
 // XXX vladislavl: need refactor restart themself - electron does not support
 // fork child other path js process run
@@ -59,70 +52,87 @@ let upgrade = ver=>etask(function*(){
             +' will be installed on exit',
             buttons: ['Install on exit', 'Install now']});
         if (!res)
-            return void console.log('Update postponed until exit');
+            return void logger.notice('Update postponed until exit');
     }
-    console.log('Starting upgrade');
+    logger.notice('Starting upgrade');
+    is_upgrading = true;
+    zerr.perr('upgrade_start');
     auto_updater.quitAndInstall();
 });
 
 auto_updater.allowDowngrade = true;
 auto_updater.autoDownload = false;
-auto_updater.on('error', ()=>{});
+auto_updater.on('error', e=>zerr.perr('upgrade_error', {error: e}));
+auto_updater.on('before-quit', ()=>{
+    if (is_upgrading)
+        zerr.perr('upgrade_finish');
+});
 
 auto_updater.on('update-available', e=>etask(function*(){
+    if (semver.lt(e.version, pkg.version))
+    {
+        if (!config.is_lum)
+        {
+            zerr.perr('upgrade_invalid_version',
+                {upgrade_v: e.version, current_v: pkg.version});
+        }
+        return;
+    }
     const changelog_url = 'https://github.com/luminati-io/luminati-proxy/blob/'
     +'master/CHANGELOG.md';
     const update_msg = `Update version ${e.version} is available. Full list of`
     +` changes is available here: ${changelog_url}`;
-    console.log(update_msg);
+    logger.notice(update_msg);
     if (!can_upgrade)
     {
         let res = yield show_message({type: 'info',
             title: `Luminati update ${e.version} is available`,
             message: 'Luminati version '+e.version
-            +' is available, would you like to download it?',
+            +' is available. Would you like to download it?',
             buttons: ['No', 'Yes']});
         if (!res)
-            return void console.log('Will not download update');
+            return void logger.notice('Will not download update');
     }
-    console.log(`Downloading version ${e.version}`);
+    logger.notice(`Downloading version ${e.version}`);
     auto_updater.downloadUpdate();
 }));
 
 auto_updater.on('update-downloaded', e=>{
-    console.log('Update downloaded');
-    if (manager && manager.argv && !manager.argv.no_usage_stats)
-        ua.event('app', 'update-downloaded');
+    logger.notice('Update downloaded');
     upgrade_available = true;
     upgrade(e.version);
 });
 
-let _show_port_conflict = (addr, port)=>etask(function*(){
+auto_updater.on('update-not-available', ()=>{
+    if (upgrade_cb)
+        upgrade_cb('Update not available');
+    upgrade_cb = null;
+});
+
+const check_conflicts = ()=>etask(function*(){
     let tasks;
     try { tasks = yield tasklist(); }
     catch(e){ process.exit(); }
     tasks = tasks.filter(t=>t.imageName.includes('Luminati Proxy Manager') &&
         t.pid!=process.pid);
-    let res = dialog.showMessageBox({
+    if (tasks.length<=2)
+        return;
+    const res = dialog.showMessageBox({
         type: 'warning',
         title: 'Address in use',
-        message: `There is already an application running on ${addr}:${port}\n`
-            +(tasks.length ? 'Click OK button to try stopping the '
-            +'offending processes or Cancel to close Luminati Proxy '
-            +'Manager and stop other instances manually.\n\n'
+        message: `LPM is already running (${tasks[0].pid})\n`
+            +'Click OK to stop the '
+            +'offending processes or Cancel to close LPM.\n\n'
             +'Suspected processes:\n'
             +'PID\t Image Name\t Session Name\t Mem Usage\n'
             +tasks.map(t=>`${t.pid}\t ${t.imageName}\t ${t.sessionName}\t `
-                +`${t.memUsage}`).join('\n') :
-            'Stop other running instances manually then click OK button '
-            +'to restart Luminati Proxy Manager.'),
+                +`${t.memUsage}`).join('\n'),
         buttons: ['Ok', 'Cancel'],
     });
     if (res)
         return app.exit();
     try {
-        if (tasks.length)
-            yield taskkill(tasks.map(t=>t.pid), {tree: true, force: true});
+        yield taskkill(tasks.map(t=>t.pid), {tree: true, force: true});
     } catch(e){
         dialog.showMessageBox({
             type: 'warning',
@@ -137,28 +147,22 @@ let _show_port_conflict = (addr, port)=>etask(function*(){
     restart();
 });
 
-let conflict_shown;
-let show_port_conflict = (addr, port)=>{
-    if (conflict_shown)
-        return;
-    conflict_shown = true;
-    _show_port_conflict(addr, port);
-};
-
-const _run = (argv, run_config)=>{
+const _run = argv=>etask(function*(){
     if (process.send)
+    {
         process.send({cmd: 'lpm_restart_init'});
-    manager = new Manager(argv, assign({ua}, run_config));
-    if (!manager.argv.no_usage_stats)
-        ua.event('app', 'run');
-    auto_updater.logger = manager._log;
+        // give some time to parent process to exit before checking conflicts
+        yield etask.sleep(2000);
+    }
+    yield check_conflicts();
+    manager = new Manager(argv);
+    auto_updater.logger = manager.log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
-        if (!manager.argv.no_usage_stats)
-            ua.event('manager', 'www_ready', url).send();
-        opn(url);
+        open(url, {url: true});
     })
     .on('upgrade', cb=>{
+        upgrade_cb = cb;
         can_upgrade = true;
         if (upgrade_available)
             upgrade();
@@ -166,58 +170,34 @@ const _run = (argv, run_config)=>{
             auto_updater.checkForUpdates();
     })
     .on('stop', ()=>{
-        if (manager.argv.no_usage_stats)
-            process.exit();
-        else
-            ua.event('manager', 'stop', ()=>process.exit());
+        process.exit();
     })
     .on('error', (e, fatal)=>{
         let e_msg = e.raw ? e.message : 'Unhandled error: '+e;
         let handle_fatal = ()=>{
-            let err;
-            if (err = (e.message||'').match(/((?:\d{1,3}\.?){4}):(\d+)$/))
-                return show_port_conflict(err[1], err[2]);
             if (fatal)
             {
-                mgr_err(e_msg);
+                logger.error(e_msg);
                 process.exit();
             }
         };
-        if (manager.argv.no_usage_stats)
-            handle_fatal();
-        else
-        {
-            if (e.raw)
-                e = assign({message: e.message}, e);
-            ua.event('manager', 'error', JSON.stringify(e), handle_fatal);
-        }
+        handle_fatal();
     })
-    .on('config_changed', etask.fn(function*(zone_autoupdate){
-        if (!manager.argv.no_usage_stats)
-        {
-            ua.event('manager', 'config_changed',
-                JSON.stringify(zone_autoupdate));
-        }
+    .on('config_changed', etask.fn(function*(){
         yield manager.stop('config change', true, true);
-        setTimeout(()=>_run(argv, zone_autoupdate && zone_autoupdate.prev ? {
-            warnings: [`Your default zone has been automatically changed from `
-                +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],
-        } : {}), 0);
+        setTimeout(()=>_run(argv));
     }));
     manager.start();
-};
+});
 
 let quit = err=>{
     if (err)
     {
-        if (!manager||!manager.argv.no_usage_stats)
+        if (!manager)
             zerr.perr(err);
-        mgr_err('uncaught exception '+zerr.e2s(err));
+        logger.error('uncaught exception '+zerr.e2s(err));
     }
-    if (manager&&manager.argv.no_usage_stats)
-        app.quit();
-    else
-        ua.event('app', 'quit', ()=>app.quit());
+    app.quit();
 };
 
 E.run = argv=>{

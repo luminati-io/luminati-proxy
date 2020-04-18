@@ -1,0 +1,94 @@
+@import (reference) 'common.less';
+.buttons_upgrade { flex: 1; }
+.btn_upgrade {
+    width: 100px;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 300;
+    float: right;
+    margin-right: 10px;
+}
+.overview_page {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    .warning {
+        position: relative;
+        margin: 15px;
+    }
+    .panels {
+        display: flex;
+        flex: 3;
+        height: 100%;
+        min-height: 400px;
+        position: relative;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .proxies_wrapper {
+        flex: 1;
+        overflow: auto;
+    }
+    .stats_wrapper {
+        width: 305px;
+        min-width: 305px;
+        max-width: 305px;
+        margin-left: 15px;
+        .stats_panel {
+            height: 100%;
+            .main_panel {
+                display: flex;
+                flex-direction: column;
+            }
+            .tables_container {
+                .data_container {
+                    position: initial;
+                    flex: 1;
+                }
+            }
+            h4 { font-size: 16px; margin-bottom: 10px; }
+            .stats_btn {
+                font-size: 12px;
+                width: 100px;
+                max-width: 100px;
+                white-space: normal;
+                height: auto;
+                padding: 0;
+            }
+            table {
+                .empty_row td { cursor: default; }
+                .enable_ssl { margin-left: 2px; }
+            }
+        }
+        .title_wrapper {
+            .success_title {
+                font-weight: bold;
+            }
+            .success_value { margin-left: 5px; }
+        }
+    }
+    .enable_btn {
+        padding: 0;
+        background-color: #f3f3f3;
+        border: 1px solid #d0d0d0;
+        &_stats { margin-left: 15px; }
+        &_logs {
+            min-height: 18px;
+            line-height: initial;
+            margin: 10px 15px;
+        }
+    }
+    .logs_wrapper {
+        display: flex;
+        flex: 2;
+        min-height: 230px;
+        .har_viewer {
+            height: auto;
+            padding: 15px;
+            min-height: initial;
+        }
+    }
+    .main_panel { justify-content: center; }
+    .loader_small { justify-content: center; }
+    >.loader_small { margin-bottom: 10px; }
+}

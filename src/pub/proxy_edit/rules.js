@@ -1,118 +1,143 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '../../../www/util/pub/pure_component.js';
-import ajax from '../../../util/ajax.js';
-import setdb from '../../../util/setdb.js';
-import {getContext, withContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
-import {Labeled_controller, Note, with_proxy_ports} from '../common.js';
-import {validators} from './common.js';
+import Pure_component from '/www/util/pub/pure_component.js';
+import classnames from 'classnames';
+import setdb from '../../../util/setdb.js';
+import ajax from '../../../util/ajax.js';
+import conv from '../../../util/conv.js';
+import {migrate_trigger, no_ssl_trigger_types, trigger_types,
+    action_types, default_action, WWW_API} from '../../../util/rules_util.js';
+import {ms} from '../../../util/date.js';
+import zutil from '../../../util/util.js';
+import {Labeled_controller, with_proxy_ports, Cm_wrapper,
+    Field_row_raw, Warning} from '../common.js';
 import {tabs} from './fields.js';
-import PropTypes from 'prop-types';
-import filesaver from 'file-saver';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
+import {Tester} from '../proxy_tester.js';
+import Tooltip from '../common/tooltip.js';
+import {T} from '../common/i18n.js';
 
-const trigger_types = [
-    {key: 'i.e. Status code', value: '', tooltip: `Choose a trigger type.
-        For each request the system will check if the trigger is matching
-        the response`},
-    {key: 'URL', value: 'url', tooltip: `Trigger will be pulled for all
-        requests to the selected URL`},
-    {key: 'Status code', value: 'status', tooltip: `Trigger will be pulled
-        for all the requests that returns the matching status code`},
-    {key: 'HTML body element', value: 'body', tooltip: `Trigger will be
-        pulled when the response <body> contain the selected string`},
-    {key: 'Request time more than', value: 'min_req_time',
-        tooltip: `Triggers when the request time is above the selected value`,
-        type: 'pre'},
-    {key: 'Request time less than', value: 'max_req_time',
-        tooltip: `Triggers when the request time is below the selected value`},
-];
+const rule_prepare = rule=>{
+    const action = {};
+    if (['retry', 'refresh_ip'].includes(rule.action))
+        action.retry = true;
+    if (rule.action=='retry' && rule.retry_number)
+        action.retry = rule.retry_number;
+    else if (rule.action=='retry_port')
+        action.retry_port = Number(rule.retry_port);
+    else if (rule.action=='ban_ip')
+        action.ban_ip = (rule.ban_ip_duration||0)*ms.MIN;
+    else if (rule.action=='ban_ip_global')
+        action.ban_ip_global = (rule.ban_ip_duration||0)*ms.MIN;
+    else if (rule.action=='ban_ip_domain')
+        action.ban_ip_domain = (rule.ban_ip_duration||0)*ms.MIN;
+    else if (rule.action=='refresh_ip')
+        action.refresh_ip = true;
+    else if (rule.action=='save_to_pool')
+        action.reserve_session = true;
+    else if (rule.action=='process')
+        action.process = rule.process && JSON.parse(rule.process);
+    else if (rule.action=='request_url')
+    {
+        action.request_url = {
+            url: /^https?:\/\//.test(rule.request_url) ?
+                rule.request_url : 'http://'+rule.request_url,
+            method: rule.request_method,
+            payload: rule.request_payload && JSON.parse(rule.request_payload),
+        };
+    }
+    else if (rule.action=='null_response')
+        action.null_response = true;
+    else if (rule.action=='bypass_proxy')
+        action.bypass_proxy = true;
+    else if (rule.action=='direct')
+        action.direct = true;
+    if (rule.email)
+        action.email = rule.email;
+    let result = null;
+    if (rule.trigger_type)
+    {
+        result = {
+            action,
+            action_type: rule.action,
+            trigger_type: rule.trigger_type,
+            url: rule.trigger_url_regex,
+        };
+    }
+    if (rule.trigger_type=='status')
+        result.status = rule.status||'';
+    else if (rule.trigger_type=='body' && rule.body_regex)
+        result.body = rule.body_regex;
+    else if (rule.trigger_type=='min_req_time' && rule.min_req_time)
+        result.min_req_time = rule.min_req_time;
+    else if (rule.trigger_type=='max_req_time' && rule.max_req_time)
+        result.max_req_time = rule.max_req_time;
+    if (result && (rule.type || rule.trigger_code))
+    {
+        const {type, trigger_code} = migrate_trigger(result);
+        if (rule.type!=type || rule.trigger_code!=trigger_code)
+        {
+            result.type = rule.type||type;
+            result.trigger_code = rule.trigger_code||trigger_code;
+        }
+    }
+    return result;
+};
+export const map_rule_to_form = rule=>{
+    const result = {};
+    result.status = rule.status;
+    result.trigger_url_regex = rule.url;
+    result.trigger_type = rule.trigger_type;
+    result.body_regex = rule.body;
+    result.min_req_time = rule.min_req_time;
+    result.max_req_time = rule.max_req_time;
+    result.action = rule.action_type;
+    result.retry_port = rule.action.retry_port;
+    result.retry_number = rule.action.retry;
+    if (rule.action.request_url)
+    {
+        result.request_url = rule.action.request_url.url;
+        result.request_method = rule.action.request_url.method;
+        result.request_payload =
+            JSON.stringify(rule.action.request_url.payload, null, '  ');
+    }
+    if (rule.action.ban_ip)
+        result.ban_ip_duration = rule.action.ban_ip/ms.MIN;
+    if (rule.action.ban_ip_global)
+        result.ban_ip_duration = rule.action.ban_ip_global/ms.MIN;
+    if (rule.action.ban_ip_domain)
+        result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
+    if (rule.action.process)
+        result.process = JSON.stringify(rule.action.process, null, '  ');
+    if (rule.action.email)
+    {
+        result.send_email = true;
+        result.email = rule.action.email;
+    }
+    result.trigger_code = rule.trigger_code;
+    result.type = rule.type;
+    return result;
+};
 
-const default_action = {key: 'Choose an action type', value: '',
-    tooltip: `Select an action.  Once the trigger rule is met the selected
-    action is executed automatically.`};
-const action_types = [
-    {key: 'Retry with new IP', value: 'retry', tooltip: `System will send the
-        exact same request again with newly refreshed IP`,
-        min_req_time: true},
-    {key: 'Retry with new proxy port (Waterfall)', value: 'retry_port',
-        tooltip: `System will send another request using different port
-        from your port list. This can allow cost optimization by escalating the
-        request between different types of networks according to the port
-        configuration.`, min_req_time: true},
-    {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
-        amount of time. usually used for failed request.`, min_req_time: true,
-        type: 'post'},
-    {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
-        Data Center IP with new allocated IP. This action contain
-        additional charges. View the cost of IP refreshing in your zones
-        page http://luminati.io/cp/zones`},
-    {key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: `Save
-        the current IP to a pool of reserved IPs.  you can then download all
-        the IPs at a later time.`},
-    {key: 'Save IP to fast pool', value: 'save_to_fast_pool', tooltip: `Save
-        the current IP to fast IP pool to increase the speed of your requests.
-        You will need to specify the size of this pool.`},
-    {key: 'Null response', value: 'null_response', tooltip: `LPM will return a
-        "null response" without proxying. It is useful when users do not want
-        to make a request, but a browser expects 200 response.`, type: 'pre',
-        only_url: true},
-    {key: 'Bypass proxy', value: 'bypass_proxy', tooltip: `Requests will be
-        passed directly to target site without any proxy (super proxy or
-        peer).`, type: 'pre', only_url: true},
-    {key: 'Direct super proxy', value: 'direct', tooltip: `Requests will be
-        passed through super proxy (not through peers)`, type: 'pre',
-        only_url: true},
-    {key: 'Process data', value: 'process', only_url: true},
-    {key: 'Switch port', value: 'switch_port', only_url: true, type: 'pre'},
-];
-
-const pre_actions = action_types.filter(a=>a.type=='pre').map(a=>a.value);
-const post_actions = action_types.filter(a=>a.type=='post').map(a=>a.value);
-const pre_trigger_types = trigger_types.filter(tt=>tt.type=='pre')
-.map(tt=>tt.value);
-const is_pre_rule = rule=>pre_actions.includes(rule.action)||
-    pre_trigger_types.includes(rule.trigger_type)&&
-    !post_actions.includes(rule.action);
-const is_post_rule = rule=>!is_pre_rule(rule);
-
-const status_types = [
-    'i.e. 200 - Succeeded requests',
-    '200 - Succeeded requests',
-    '403 - Forbidden',
-    '404 - Not found',
-    '500 - Internal server error',
-    '502 - Bad gateway',
-    '503 - Service unavailable',
-    '504 - Gateway timeout',
-    'Custom',
-].map(s=>({key: s, value: s}));
-
-const ban_options = [
-    {key: '10 minutes', value: '10min'},
-    {key: '20 minutes', value: '20min'},
-    {key: '30 minutes', value: '30min'},
-    {key: '40 minutes', value: '40min'},
-    {key: '50 minutes', value: '50min'},
-    {key: 'Custom', value: 'custom'},
-];
-
-export default provider({tab_id: 'rules'})(
-class Rules extends Pure_component {
-    state = {rules: [{id: 0}], max_id: 0};
+export default class Rules extends Pure_component {
+    state = {rules: [{id: 0}], max_id: 0, disabled_fields: {}, defaults: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
     goto_field = setdb.get('head.proxy_edit.goto_field');
     componentDidMount(){
-        this.setdb_on('head.proxy_edit.form', form=>this.setState({form}));
+        this.setdb_on('head.proxy_edit.form', form=>{
+            form && this.setState({form});
+        });
         this.setdb_on('head.proxy_edit.rules', rules=>{
             if (!rules||!rules.length)
                 return;
             this.setState({rules, max_id: Math.max(...rules.map(r=>r.id))});
         });
         this.setdb_on('head.proxy_edit.update_rule', this.update_rule);
+        this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
+            disabled_fields&&this.setState({disabled_fields}));
+        this.setdb_on('head.defaults',
+            defaults=>this.setState({defaults: defaults||{}}));
     }
     update_rule = rule=>{
         if (!rule)
@@ -127,145 +152,80 @@ class Rules extends Pure_component {
     };
     rule_add = ()=>{
         this.setState(prev=>({
-            rules: [...prev.rules, {id: prev.max_id+1}],
+            rules: [{id: prev.max_id+1}, ...prev.rules],
             max_id: prev.max_id+1,
         }));
     };
     rule_del = id=>{
-        if (this.state.rules.length==1)
-            this.setState({rules: [{id: 0}], max_id: 0}, this.rules_update);
-        else
-        {
-            this.setState(prev=>({rules: prev.rules.filter(r=>r.id!=id)}),
-                this.rules_update);
-        }
-    };
-    post_rule_prepare = rule=>{
-        const action_raw = {};
-        if (['retry', 'retry_port', 'ban_ip', 'refresh_ip'].includes(
-            rule.action))
-        {
-            action_raw.retry = true;
-        }
-        if (rule.action=='retry' && rule.retry_number)
-            action_raw.retry = rule.retry_number;
-        else if (rule.action=='retry_port')
-            action_raw.retry_port = Number(rule.retry_port);
-        else if (rule.action=='ban_ip')
-        {
-            if (rule.ban_ip_duration!='custom')
-                action_raw.ban_ip = rule.ban_ip_duration||'10min';
-            else
-                action_raw.ban_ip = rule.ban_ip_custom+'min';
-        }
-        else if (rule.action=='refresh_ip')
-            action_raw.refresh_ip = true;
-        else if (rule.action=='save_to_pool')
-            action_raw.reserve_session = true;
-        else if (rule.action=='save_to_fast_pool')
-        {
-            action_raw.fast_pool_session = true;
-            action_raw.fast_pool_size = rule.fast_pool_size;
-        }
-        else if (rule.action=='process')
-        {
-            try { action_raw.process = JSON.parse(rule.process); }
-            catch(e){ console.log('wrong json'); }
-        }
-        if (rule.email)
-            action_raw.email = rule.email;
-        let result = null;
-        if (rule.trigger_type)
-        {
-            result = {
-                res: [{
-                    head: true,
-                    action: action_raw,
-                    action_type: rule.action,
-                    trigger_type: rule.trigger_type,
-                }],
-                url: rule.trigger_url_regex||'**',
-            };
-        }
-        if (rule.trigger_type=='status')
-        {
-            let is_custom = rule.status_code=='Custom';
-            let rule_status = is_custom ? rule.status_custom :
-                rule.status_code;
-            rule_status = rule_status||'';
-            result.res[0].status =
-                {type: is_custom ? '=~' : 'in', arg: rule_status};
-            result.res[0].status_custom = is_custom;
-        }
-        else if (rule.trigger_type=='body'&&rule.body_regex)
-            result.res[0].body = {type: '=~', arg: rule.body_regex};
-        else if (rule.trigger_type=='min_req_time'&&rule.min_req_time)
-            result.res[0].min_req_time = rule.min_req_time+'ms';
-        else if (rule.trigger_type=='max_req_time'&&rule.max_req_time)
-            result.res[0].max_req_time = rule.max_req_time+'ms';
-        return result;
-    };
-    pre_rule_prepare = rule=>{
-        const res = {
-            url: rule.trigger_url_regex||'**',
-            action: rule.action,
-            trigger_type: rule.trigger_type,
-        };
-        if (rule.email)
-            res.email = rule.email;
-        if (rule.action=='retry_port')
-            res.retry_port = rule.retry_port;
-        if (rule.min_req_time)
-            res.min_req_time = rule.min_req_time;
-        if (rule.switch_port)
-            res.port = +rule.switch_port;
-        return res;
+        this.setState(prev=>{
+            const new_state = {rules: prev.rules.filter(r=>r.id!=id)};
+            if (!new_state.rules.length)
+            {
+                new_state.rules.push({id: prev.max_id+1});
+                new_state.max_id = prev.max_id+1;
+            }
+            return new_state;
+        }, this.rules_update);
     };
     rules_update = ()=>{
         setdb.set('head.proxy_edit.rules', this.state.rules);
-        const post = this.state.rules.filter(is_post_rule)
-            .map(this.post_rule_prepare).filter(Boolean);
-        const pre = this.state.rules.filter(is_pre_rule)
-            .map(this.pre_rule_prepare).filter(Boolean);
-        let rules = this.state.form.rules||{};
-        if (post.length)
-            rules.post = post;
-        else
-            delete rules.post;
-        if (pre.length)
-            rules.pre = pre;
-        else
-            delete rules.pre;
-        if (!rules.post&&!rules.pre)
-            rules = null;
+        const rules = this.state.rules.map(rule_prepare).filter(Boolean);
         this.set_field('rules', rules);
     };
     goto_ssl = ()=>this.goto_field('ssl');
     render(){
-        return <div>
-              {!this.props.form.ssl &&
-                <Note>
-                  <span><strong>Warning: </strong></span>
-                  <span>we can't apply rules to HTTPS requests unless </span>
-                  <a onClick={this.goto_ssl} className="link">SSL proxy</a>
-                  <span> is turned on</span>
-                </Note>
+        const {form, rules, disabled_fields, www} = this.state;
+        if (!form)
+            return null;
+        let {ssl} = form, def_ssl = this.state.defaults.ssl;
+        let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
+        return <div className="rules">
+              {!ssl_analyzing_enabled &&
+                <Warning text={
+                  <React.Fragment>
+                    <span>
+                      <T>
+                        Most of the options here are available only when using
+                      </T>
+                      {' '}
+                      <a className="link" onClick={this.goto_ssl}>
+                      <T>SSL analyzing</T></a>
+                    </span>
+                  </React.Fragment>
+                }/>
               }
-              {this.state.rules.map(r=>
-                <Rule key={r.id} rule={r} rule_del={this.rule_del}
-                   www={this.state.www}/>
-              )}
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
-                onClick={this.rule_add}>
-                New rule
+                onClick={this.rule_add} disabled={disabled_fields.rules}>
+                <T>New rule</T>
                 <i className="glyphicon glyphicon-plus"/>
               </button>
+              {rules.map(r=>
+                <Rule key={r.id} rule={r} rule_del={this.rule_del}
+                  www={www} ssl={ssl_analyzing_enabled}
+                  disabled={disabled_fields.rules}/>
+              )}
+              <Tester_wrapper/>
+            </div>;
+    }
+}
+
+const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
+    render(){
+        return <div className="tester_wrapper">
+              <div className="nav_header" style={{marginBottom: 5}}>
+                <h3><T>Test rules</T></h3>
+              </div>
+              <Tester port={this.props.match.params.port} no_labels/>
             </div>;
     }
 });
 
-const Rule_config = getContext({provide: PropTypes.object})(
 class Rule_config extends Pure_component {
+    state = {disabled_fields: {}};
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
+            disabled_fields&&this.setState({disabled_fields}));
+    }
     value_change = value=>{
         if (this.props.on_change)
             this.props.on_change(value);
@@ -274,223 +234,376 @@ class Rule_config extends Pure_component {
     };
     render(){
         const id = this.props.id;
-        const tab_id = this.props.provide.tab_id;
+        const tab_id = 'rules';
+        const disabled = this.props.disabled||this.state.disabled_fields[id];
         return <Labeled_controller
               id={id}
+              style={this.props.style}
+              desc_style={this.props.desc_style}
+              field_row_inner_style={this.props.field_row_inner_style}
               sufix={this.props.sufix}
               data={this.props.data}
               type={this.props.type}
+              range={this.props.range}
               on_change_wrapper={this.value_change}
-              val={this.props.rule[id]||''}
-              disabled={this.props.disabled}
-              min={this.props.min}
-              max={this.props.max}
+              val={this.props.val||this.props.rule[id]||''}
+              disabled={disabled}
               note={this.props.note}
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}
               label={tabs[tab_id].fields[id].label}
               tooltip={tabs[tab_id].fields[id].tooltip}/>;
     }
-});
-
-class Ips_lists extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('head.proxy_edit.form.port', port=>
-            port&&this.setState({port}));
-    }
-    banned_ips = ()=>this.download_data('banlist');
-    reserved_ips = ()=>this.download_data('reserved');
-    download_data = type=>{
-        const _this = this;
-        this.etask(function*(){
-            const data = yield ajax.json({
-                url: `/api/${type}/${_this.state.port}`});
-            const blob = new Blob([data.ips],
-                {type: 'text/plain;charset=utf-8'});
-            filesaver.saveAs(blob, `${type}_${_this.state.port}.json`);
-        });
-    };
-    render(){
-        return <div>
-              <div><a onClick={this.banned_ips} className="link">
-                Download banned IPs</a></div>
-              <div><a onClick={this.reserved_ips} className="link">
-                Download reserved IPs</a></div>
-            </div>;
-    }
 }
 
-const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
-    state = {ports: []};
+const Ban_ips_note = withRouter(({match, history})=>{
+    const goto_banlist = ()=>{
+        const port = match.params.port;
+        history.push({pathname: `/proxy/${port}/logs/banned_ips`});
+    };
+    return <span>
+          <a className="link" onClick={goto_banlist}>
+            <T>Currently banned IPs</T>
+          </a>
+        </span>;
+});
+
+class Rule extends Pure_component {
+    state = {};
     componentDidMount(){
-        this.setdb_on('head.consts', consts=>{
-            if (consts&&consts.logins)
-                this.setState({logins: consts.logins});
-        });
-        this.setdb_on('head.defaults', defaults=>{
-            if (defaults&&defaults.www_api)
-                this.setState({www: defaults.www_api});
-        });
+        const rule = this.props.rule;
+        if (rule && (rule.trigger_code || rule.type))
+            this.setState({ui_blocked: true});
     }
     set_rule_field = (field, value)=>{
         setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
             field, value});
     };
-    trigger_change = val=>{
-        if (this.props.rule.trigger_type=='url'&&val!='url'||
-            this.props.rule.trigger_type!='url'&&val=='url')
+    change_ui_block = blocked=>{
+        if (blocked)
+            this.setState({ui_blocked: true});
+        else
         {
-            this.set_rule_field('action', '');
+            this.set_rule_field('trigger_code', undefined);
+            this.set_rule_field('type', undefined);
+            this.setState({ui_blocked: false});
         }
-        if (val!='status')
-        {
-            this.set_rule_field('status_code', '');
-            this.set_rule_field('status_custom', '');
-        }
-        if (val!='body')
-            this.set_rule_field('body_regex', '');
-        if (val!='min_req_time')
-            this.set_rule_field('min_req_time', '');
-        if (val!='max_req_time')
-        {
-            this.set_rule_field('max_req_time', '');
-            if (this.props.rule.action=='save_to_fast_pool')
-            {
-                this.set_rule_field('action', '');
-                this.set_rule_field('fast_pool_size', '');
-            }
-        }
-        if (!val)
-            this.set_rule_field('trigger_url_regex', '');
+    };
+    render(){
+        const {rule_del, rule, ssl, disabled} = this.props;
+        const {ui_blocked} = this.state;
+        return <div>
+          <div className="rule_wrapper">
+            <Trigger rule={rule} ui_blocked={ui_blocked} ssl={ssl}
+              set_rule_field={this.set_rule_field} disabled={disabled}
+              change_ui_block={this.change_ui_block}/>
+            <Action rule={rule} set_rule_field={this.set_rule_field}
+              change_ui_block={this.change_ui_block}/>
+            <Btn_rule_del on_click={()=>rule_del(rule.id)}/>
+          </div>
+        </div>;
+    }
+}
+
+const Action = with_proxy_ports(withRouter(
+class Action extends Pure_component {
+    state = {ports: []};
+    componentDidMount(){
+        this.setdb_on('head.consts', consts=>{
+            if (consts && consts.logins)
+                this.setState({logins: consts.logins});
+        });
+        this.setdb_on('head.defaults', defaults=>{
+            if (defaults)
+                this.setState({defaults});
+        });
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({settings});
+        });
+        this.setdb_on('head.zones', zones=>{
+            if (zones)
+                this.setState({zones});
+        });
+        this.setdb_on('head.proxy_edit.zone_name', curr_zone=>{
+            if (curr_zone)
+                this.setState({curr_zone}, this.load_refresh_cost);
+        });
+    }
+    load_refresh_cost = ()=>{
+        if (!this.should_show_refresh())
+            return;
+        const _this = this;
+        this.etask(function*(){
+            const response = yield ajax.json({url: '/api/refresh_cost',
+                qs: {zone: _this.state.curr_zone}});
+            _this.setState({refresh_cost: response.cost});
+        });
     };
     action_changed = val=>{
+        const {ports_opt, match, rule, set_rule_field,
+            change_ui_block} = this.props;
         if (val=='retry_port'||val=='switch_port')
         {
-            const def_port = this.props.ports_opt.filter(p=>
-                p.value!=this.props.match.params.port)[0];
-            this.set_rule_field(val, def_port&&def_port.value||'');
+            const def_port = ports_opt.find(p=>p.value!=match.params.port);
+            set_rule_field(val, def_port && def_port.value || '');
         }
-        if (val!='ban_ip')
+        if (val=='ban_ip' || val=='ban_ip_domain' || val=='ban_ip_global')
         {
-            this.set_rule_field('ban_ip_duration', '');
-            this.set_rule_field('ban_ip_custom', '');
+            if (rule.trigger_type=='url' && !rule.type)
+            {
+                set_rule_field('type', 'after_hdr');
+                change_ui_block(true);
+            }
         }
-    };
-    status_changed = val=>{
-        if (val!='Custom')
-            this.set_rule_field('status_custom', '');
+        else
+            set_rule_field('ban_ip_duration', '');
+        if (!val)
+        {
+            set_rule_field('email', '');
+            set_rule_field('send_email', false);
+        }
     };
     send_email_changed = val=>{
         if (!val)
-            return this.set_rule_field('email', '');
+            return this.props.set_rule_field('email', '');
         if (!this.state.logins)
             return;
-        return this.set_rule_field('email', this.state.logins[0]);
+        return this.props.set_rule_field('email', this.state.logins[0]);
+    };
+    request_method_changed = val=>{
+        if (val=='GET')
+            delete this.props.rule.request_payload;
     };
     goto_tester = ()=>{
         this.props.history.push({pathname: `/proxy_tester`, state: {
-            url: 'https://luminati.io/lpm/templates/product',
+            url: `${this.state.defaults.www_api}/lpm/templates/product`,
             port: this.props.match.params.port,
         }});
     };
+    should_show_refresh = ()=>{
+        const {zones, curr_zone} = this.state;
+        const zone = (zones.zones||[]).find(z=>z.name==curr_zone);
+        const plan = zone && zone.plan || {};
+        return ['static', 'static_res'].includes(plan.type) && plan.ips;
+    };
+    request_methods = ()=>
+        ['GET', 'POST', 'PUT', 'DELETE'].map(m=>({key: m, value: m}));
+    action_types_with_updated_domain = ()=>{
+        const _action_types = zutil.clone_deep(action_types);
+        _action_types.forEach(at=>at.tooltip = (at.tooltip||'')
+            .replace(WWW_API, this.state.defaults.www_api));
+        return _action_types;
+    };
     render(){
-        const rule = this.props.rule;
-        const _action_types = [default_action].concat(action_types
-        .filter(at=>at.value!='save_to_fast_pool'||
-            rule.trigger_type=='max_req_time')
-        .filter(at=>rule.trigger_type=='url'&&at.only_url||
-            rule.trigger_type!='url'&&!at.only_url)
-        .filter(at=>rule.trigger_type!='min_req_time'||
-            at.min_req_time));
-        const ports = this.props.ports_opt.filter(p=>
-            p.value!=this.props.match.params.port);
-        return <div className="rule_wrapper">
-              <Btn_rule_del on_click={()=>this.props.rule_del(rule.id)}/>
-              <Rule_config id="trigger_type" type="select"
-                data={trigger_types} on_change={this.trigger_change}
-                rule={rule}/>
-              {rule.trigger_type=='body' &&
-                <Rule_config id="body_regex" type="text" rule={rule}/>}
-              {rule.trigger_type=='min_req_time' &&
-                <Rule_config id="min_req_time" type="number"
-                  sufix="milliseconds" rule={rule}/>
-              }
-              {rule.trigger_type=='max_req_time' &&
-                <Rule_config id="max_req_time" type="number"
-                  sufix="milliseconds" rule={rule}/>
-              }
-              {rule.trigger_type=='status' &&
-                <Rule_config id="status_code" type="select"
-                  data={status_types} on_change={this.status_changed}
-                  rule={rule}/>
-              }
-              {rule.status_code=='Custom' &&
-                <Rule_config id="status_custom" type="text" rule={rule}/>}
-              {rule.trigger_type &&
-                <Rule_config id="trigger_url_regex" type="regex" rule={rule}/>}
-              {rule.trigger_type &&
-                <Rule_config id="action" type="select" data={_action_types}
-                  on_change={this.action_changed} rule={rule}/>
-              }
-              {rule.action=='retry' &&
-                <Rule_config id="retry_number" type="number" min="0" max="20"
-                  validator={validators.number(0, 20)} rule={rule}/>
-              }
-              {rule.action=='retry_port' &&
-                <Rule_config id="retry_port" type="select" data={ports}
-                  rule={rule}/>
-              }
-              {rule.action=='switch_port' &&
-                <Rule_config id="switch_port" type="select" data={ports}
-                  rule={rule}/>
-              }
-              {rule.action=='ban_ip' &&
-                <Rule_config id="ban_ip_duration" type="select"
-                  data={ban_options} rule={rule}/>
-              }
-              {rule.action=='save_to_fast_pool' &&
-                <Rule_config id="fast_pool_size" type="number" min="1"
-                  max="50" validator={validators.number(1, 50)} rule={rule}/>
-              }
-              {rule.ban_ip_duration=='custom' &&
-                <Rule_config id="ban_ip_custom" type="number" sufix="minutes"
-                  rule={rule}/>
-              }
-              {rule.action=='process' &&
-                <div>
-                  <Rule_config id="process" type="json" rule={rule}/>
-                  <div className="field_row">
-                    Test data processing in
-                    <a onClick={this.goto_tester} className="link api_link">
-                      proxy tester</a>
+        const {rule, match, ports_opt} = this.props;
+        const {logins, defaults, settings, zones, curr_zone,
+            refresh_cost} = this.state;
+        if (!rule.trigger_type || !settings || !defaults)
+            return null;
+        if (!zones || !curr_zone)
+            return null;
+        let _action_types = this.action_types_with_updated_domain()
+            .filter(at=>rule.trigger_type=='url' && at.url ||
+                rule.trigger_type!='url' && !at.only_url)
+            .filter(at=>rule.trigger_type!='min_req_time' ||
+                at.min_req_time);
+        if (this.should_show_refresh())
+        {
+            const refresh_ip_at = _action_types.find(
+                at=>at.value=='refresh_ip');
+            if (refresh_ip_at)
+            {
+                refresh_ip_at.key += refresh_cost ?
+                    ` (${conv.fmt_currency(refresh_cost)})` : '';
+            }
+        }
+        else
+            _action_types = _action_types.filter(at=>at.value!='refresh_ip');
+        _action_types = [default_action].concat(_action_types);
+        const current_port = match.params.port;
+        const ports = ports_opt.filter(p=>p.value!=current_port);
+        ports.unshift({key: '--Select--', value: ''});
+        const ban_action = ['ban_ip', 'ban_ip_domain', 'ban_ip_global']
+            .includes(rule.action);
+        return <React.Fragment>
+              <div className="action ui">
+                {rule.trigger_type &&
+                  <Rule_config id="action" type="select" data={_action_types}
+                    on_change={this.action_changed} rule={rule}/>
+                }
+                {rule.action=='retry' &&
+                  <Rule_config id="retry_number" type="select_number"
+                    rule={rule}/>
+                }
+                {rule.action=='retry_port' &&
+                  <Rule_config id="retry_port" type="select" data={ports}
+                    rule={rule}/>
+                }
+                {rule.action=='switch_port' &&
+                  <Rule_config id="switch_port" type="select" data={ports}
+                    rule={rule}/>
+                }
+                {ban_action &&
+                  <Rule_config id="ban_ip_duration" type="select_number"
+                    data={[0, 1, 5, 10, 30, 60]} sufix="minutes" rule={rule}
+                    note={<Ban_ips_note/>}/>
+                }
+                {rule.action=='process' &&
+                  <div>
+                    <Rule_config id="process" type="json" rule={rule}/>
+                    <Field_row_raw>
+                      Test data processing in
+                      <a onClick={this.goto_tester} className="link api_link">
+                        proxy tester</a>
+                    </Field_row_raw>
                   </div>
-                </div>
-              }
-              {rule.action &&
-                <Rule_config id="send_email" type="yes_no" rule={rule}
-                  on_change={this.send_email_changed}/>
-              }
-              {rule.send_email && this.state.logins &&
-                this.state.logins.length==1 &&
-                <Rule_config id="email" type="text" rule={rule} disabled/>
-              }
-              {rule.send_email && this.state.logins &&
-                this.state.logins.length>1 &&
-                <Rule_config id="email" type="select" rule={rule}
-                  data={this.state.logins.map(l=>({key: l, value: l}))}
-                  note={<Email_note www={this.state.www}/>}/>
-              }
-            </div>;
+                }
+                {rule.action=='request_url' &&
+                  <div>
+                    <Rule_config id="request_url" type="url" rule={rule}/>
+                    <Rule_config id="request_method" type="select" rule={rule}
+                        data={this.request_methods()}
+                        on_change={this.request_method_changed}/>
+                    {rule.request_method && rule.request_method!='GET' &&
+                      <Rule_config id="request_payload" type="json"
+                        rule={rule}/>
+                    }
+                  </div>
+                }
+                {rule.action &&
+                  <Rule_config id="send_email" type="yes_no" rule={rule}
+                    on_change={this.send_email_changed}/>
+                }
+                {rule.send_email && logins &&
+                  logins.length==1 &&
+                  <Rule_config id="email" type="text" rule={rule} disabled/>
+                }
+                {rule.send_email && logins && logins.length>1 &&
+                  <Rule_config id="email" type="select" rule={rule}
+                    data={logins.map(l=>({key: l, value: l}))}
+                    note={<Email_note www={defaults.www_api}/>}/>
+                }
+              </div>
+            </React.Fragment>;
     }
 }));
 
-const Email_note = ({www})=><div>
+class Trigger extends Pure_component {
+    trigger_changed = val=>{
+        const {rule, set_rule_field} = this.props;
+        if (rule.trigger_type=='url' && val!='url' ||
+            rule.trigger_type!='url' && val=='url' || !val)
+        {
+            set_rule_field('action', '');
+        }
+        if (val!='status')
+            set_rule_field('status', '');
+        if (val!='body')
+            set_rule_field('body_regex', '');
+        if (val!='min_req_time')
+            set_rule_field('min_req_time', '');
+        if (val!='max_req_time')
+            set_rule_field('max_req_time', '');
+        if (!val)
+            set_rule_field('trigger_url_regex', '');
+    };
+    trigger_code_changed = val=>{
+        this.props.change_ui_block(true);
+        this.props.set_rule_field('trigger_code', val);
+    };
+    render(){
+        const {rule, ui_blocked, change_ui_block, ssl, disabled} = this.props;
+        let tip = ' ';
+        if (ui_blocked)
+        {
+            tip = `Trigger function was modified. Click 'restore' to generate
+                it based on your selections.`;
+        }
+        return <React.Fragment>
+              <div className="trigger ui">
+                <Tooltip title={tip}>
+                <div className={classnames('mask', {active: ui_blocked})}>
+                  <button className="btn btn_lpm btn_lpm_small reset_btn"
+                    onClick={()=>change_ui_block(false)}>
+                    Restore
+                  </button>
+                </div>
+                </Tooltip>
+                <Rule_config id="trigger_type" type="select"
+                  data={ssl ? trigger_types : no_ssl_trigger_types}
+                  on_change={this.trigger_changed} rule={rule}/>
+                {rule.trigger_type=='body' &&
+                  <Rule_config id="body_regex" type="regex_text" rule={rule}
+                    field_row_inner_style={{paddingBottom: '1em'}}
+                    style={{borderRadius: '4px'}}
+                    />}
+                {rule.trigger_type=='min_req_time' &&
+                  <Rule_config id="min_req_time" type="select_number"
+                    range="ms" sufix="milliseconds" rule={rule}/>
+                }
+                {rule.trigger_type=='max_req_time' &&
+                  <Rule_config id="max_req_time" type="select_number"
+                    range="ms" sufix="milliseconds" rule={rule}/>
+                }
+                {rule.trigger_type=='status' &&
+                  <Rule_config id="status" type="select_status" rule={rule}/>
+                }
+                {rule.trigger_type &&
+                  <Rule_config id="trigger_url_regex" type="regex"
+                    rule={rule} style={{width: '100%'}}
+                    field_row_inner_style={{paddingBottom: '1em'}}/>}
+              </div>
+              <Trigger_code rule={rule} disabled={disabled}
+                type_changed={()=>change_ui_block(true)}
+                trigger_code_changed={this.trigger_code_changed}/>
+            </React.Fragment>;
+    }
+}
+
+class Trigger_code extends Pure_component {
+    type_opt = [
+        {key: 'Before send', value: 'before_send'},
+        {key: 'After headers', value: 'after_hdr'},
+        {key: 'After body', value: 'after_body'},
+        {key: 'Timeout', value: 'timeout'},
+    ];
+    state = {};
+    static getDerivedStateFromProps(props, state){
+        const rule = props.rule;
+        let prepared = rule_prepare(rule);
+        if (!prepared)
+            return {trigger_code: null};
+        let {trigger_code, type} = migrate_trigger(prepared);
+        if (rule && rule.type)
+            type = rule.type;
+        if (rule && rule.trigger_code)
+            trigger_code = rule.trigger_code;
+        return {trigger_code, type};
+    }
+    render(){
+        const {rule, type_changed, trigger_code_changed,
+            disabled} = this.props;
+        if (!this.state.trigger_code)
+            return null;
+        return <div className="trigger code">
+              <Rule_config id="type" type="select" data={this.type_opt}
+                rule={rule} val={this.state.type}
+                desc_style={{width: 'auto', minWidth: 'initial'}}
+                field_row_inner_style={{paddingBottom: 6}}
+                on_change={type_changed}/>
+              <Cm_wrapper on_change={trigger_code_changed}
+                val={this.state.trigger_code} readonly={disabled}/>
+            </div>;
+    }
+}
+
+const Email_note = ({www})=>
+    <div>
       <span>You can manage the list of available emails </span>
       <a target="_blank" rel="noopener noreferrer" href={`${www}/cp/settings`}>
         here</a>
     </div>;
 
-const Btn_rule_del = ({on_click})=><Note>
-      <div className="btn_rule_del" onClick={on_click}/>
-    </Note>;
+const Btn_rule_del = ({on_click})=>
+    <button className="btn_rule_del" onClick={on_click}/>;
