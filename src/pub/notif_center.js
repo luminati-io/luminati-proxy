@@ -37,35 +37,11 @@ class Notif_center extends Pure_component {
         });
         this.setState({notifs: all_read});
     }
-    mark_read(){
-        const _this = this;
-        this.etask(function*(){
-            const updated = _this.state.notifs.filter(n=>n.status=='new')
-            .map(u=>({id: u._id, status: 'read'}));
-            // XXX krzysztof: switch fetch->ajax
-            yield window.fetch('/api/update_notifs', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({notifs: updated}),
-            });
-        });
-    }
     open(){
         if (this.state.loaded)
-        {
-            this.mark_read();
             $('#notif_modal').modal();
-        }
     }
     message_clicked(message){
-        this.etask(function*(){
-            yield window.fetch('/api/update_notifs', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(
-                    {notifs: [{id: message._id, status: 'clicked'}]}),
-            });
-        });
         if (message.code)
         {
             $('#notif_modal').modal('hide');

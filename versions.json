@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.179.735",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Crash fix during the startup process"
+            },
+            {
+                "type": "sparkles",
+                "text": "Configuration synchronization across instances"
+            }
+        ]
+    },
+    {
         "ver": "1.179.238",
         "type": "stable",
         "changes": [

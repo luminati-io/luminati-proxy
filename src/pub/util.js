@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true, es6:true*/
-
+'use strict'; /*jslint react:true, es6:true*/
+import React from 'react';
 import user_agent_gen from '/www/util/pub/user_agent_gen.js';
 import etask from '../../util/etask.js';
 
@@ -95,3 +95,26 @@ export const perr = (type, message, stack, context)=>etask(function*(){
         body: JSON.stringify({type, message, stack, context}),
     });
 });
+
+export const get_troubleshoot = (body, status_code, headers)=>{
+    let title;
+    let info;
+    if (/([123]..|404)/.test(status_code))
+        return {title, info};
+    if (status_code=='canceled')
+    {
+        return {title: 'canceled by the sender', info: 'This request has been'
+            +' canceled by the sender (your browser or scraper).'};
+    }
+    title = (headers && headers.find(h=>
+        h.name=='x-luminati-error'||h.name=='x-lpm-error')||{}).value||'';
+    if (/not matching any of allocated gIPs/.test(title))
+    {
+        info = <span>This error means that the chosen targeting could not be
+              applied on any of the allocated gIPs. Go to the <b>Targeting </b>
+              tab and remove the selected criteria and try again
+            </span>;
+    }
+    return {title, info};
+};
+

@@ -5,10 +5,11 @@ const presets = {
     session_long: {
         title: 'Long single session (IP)',
         new_title: 'Browser (Puppeteer/Selenium)',
-        subtitle: `Use this preset if you want to connect from the browser
-            manually (for example Chrome/Firefox) or programatically
-            (for example Puppeteer/Selenium). All requests share the same
-            IP. You can control when you refresh the IP from the UI or API.`,
+        subtitle: `Use this preset if you need full page loads. Connect from
+            the browser manually (for example Chrome/Firefox) or
+            programatically (for example Puppeteer/Selenium). All requests
+            share the same IP. You can control when you refresh the IP from the
+            UI or API.`,
         set: opt=>null,
         clean: opt=>null,
         disabled: {
@@ -19,7 +20,7 @@ const presets = {
     },
     rotating: {
         title: 'Rotating (IPs)',
-        new_title: 'Rotating IPs (fetching API)',
+        new_title: 'Scraper (Code/Fetching single resources)',
         subtitle: `Use this preset if you want to get a fresh new IP on each
             single request. This preset also rotates the User-Agent header
             automatically. It's the best for scraping API when you don't load

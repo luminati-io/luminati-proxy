@@ -12,7 +12,8 @@ import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import zescape from '../../util/escape.js';
-import {status_codes, bytes_format, report_exception} from './util.js';
+import {status_codes, bytes_format, report_exception,
+    get_troubleshoot} from './util.js';
 import {Waypoint} from 'react-waypoint';
 import {Toolbar_button, Devider, Sort_icon, with_resizable_cols,
     Toolbar_container, Toolbar_row, Search_box} from './chrome_widgets.js';
@@ -411,6 +412,7 @@ const table_cols = [
     {title: 'Time', sort_by: 'elapsed', data: 'time'},
     {title: 'Peer proxy', sort_by: 'proxy_peer',
         data: 'details.proxy_peer'},
+    {title: 'Troubleshooting', data: 'details.troubleshoot'},
     {title: 'Date', sort_by: 'timestamp', data: 'details.timestamp'},
 ];
 const Tables_container = withRouter(with_resizable_cols(table_cols,
@@ -937,7 +939,13 @@ class Cell_value extends React.Component {
             const ip = req.details.proxy_peer;
             const ext_proxy = (setdb.get('head.proxies_running')||[])
                 .some(p=>p.port==req.details.port && p.ext_proxies);
-            const val = ip && ip.length > 15 ? `...${ip.slice(-5)}` : ip;
+            let val;
+            if (ip && (ip=='superproxy bypass' || ip.length < 16))
+                val = ip;
+            else if (ip)
+                val = `...${ip.slice(-5)}`;
+            else
+                val = '';
             const tip = ext_proxy ? 'This feature is only available when '
                 +'using proxies by Luminati network' : ip;
             return <Tooltip_and_value val={val} tip={tip}
@@ -948,6 +956,12 @@ class Cell_value extends React.Component {
             const local = moment(new Date(req.startedDateTime||
                 req.details.timestamp)).format('YYYY-MM-DD HH:mm:ss');
             return <Tooltip_and_value val={local}/>;
+        }
+        else if (col=='Troubleshooting')
+        {
+            const troubleshoot = get_troubleshoot(req.response.content.text,
+                req.response.status, req.response.headers);
+            return <Tooltip_and_value val={troubleshoot.title}/>;
         }
         return col;
     }

@@ -20,16 +20,19 @@ import {Textarea, Select_zone} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
+import {Instructions, Li} from './common/bullets.js';
 import './css/proxy_add.less';
 
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
-    state = {
+    init_state = {
         zone: '',
         preset: 'session_long',
         show_loader: false,
         cur_tab: 'proxy_lum',
         error_list: [],
+        step: 0,
     };
+    state = Object.assign({}, this.init_state);
     static getDerivedStateFromProps(props, state){
         const is_unblocker = ()=>{
             if (!state.zones)
@@ -107,67 +110,93 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             }
             if (resp.port)
                 _this.setState({show_loader: false});
-            if (resp.port&&!_this.state.proxies_running.length)
+            if (resp.port)
                 _this.setState({created_port: resp.port});
-            else
-                $('#add_new_proxy_modal').modal('hide');
             if (!resp.errors)
             {
                 const proxies = yield ajax.json({url: '/api/proxies_running'});
                 setdb.set('head.proxies_running', proxies);
                 window.localStorage.setItem('quickstart-first-proxy',
                     resp.port);
-                if (opt.redirect)
-                {
-                    yield etask.sleep(500);
-                    $('#add_new_proxy_modal').modal('hide');
-                    const state_opt = {};
-                    if (opt.field)
-                        state_opt.field = opt.field;
-                    _this.props.history.push({pathname: `/proxy/${resp.port}`,
-                        state: state_opt});
-                }
+                _this.next_step();
             }
         });
     };
     field_changed = id=>value=>this.setState({[id]: value});
     set_tab = id=>this.setState({cur_tab: id});
-    on_hidden = ()=>this.setState({created_port: null});
+    on_hidden = ()=>this.setState(this.init_state);
+    next_step = ()=>this.setState(prev=>({step: prev.step+1}));
     render(){
         const disabled = this.state.cur_tab=='proxy_ext'&&
             !this.state.valid_json;
-        const Footer_wrapper = <Footer save_clicked={this.save}
-            disabled={disabled} created_port={this.state.created_port}/>;
+        const Footer_wrapper = <Footer
+            save_clicked={this.save}
+            disabled={disabled}
+            step={this.state.step}
+            next_step={this.next_step}
+            created_port={this.state.created_port}/>;
         if (!this.state.proxies_running || !this.state.zones)
             return null;
-        const anim_classes = classnames('proxy_form', 'animated', {
-            proxy_created: this.state.created_port,
-            fadeOutUp: this.state.created_port,
-        });
         return <div className="lpm">
               <Loader show={this.state.show_loader}/>
               <Modal id="add_new_proxy_modal" no_header no_close
                 on_hidden={this.on_hidden} footer={Footer_wrapper}
                 className="add_proxy_modal">
-                <div className={anim_classes}>
-                  <Nav_tabs_wrapper set_tab={this.set_tab}
-                    cur_tab={this.state.cur_tab}/>
-                  {this.state.cur_tab=='proxy_lum' &&
-                    <Lum_proxy
-                      def_zone={this.state.zones.def}
-                      created_port={this.state.created_port}
-                      zone={this.state.zone}
-                      on_field_change={this.field_changed}
-                      preset={this.state.preset}/>
-                  }
-                  {this.state.cur_tab=='proxy_ext' &&
-                    <Ext_proxy
-                      parse_error={this.state.parse_error}
-                      ips_list={this.state.ips_list}
-                      on_field_change={this.field_changed}/>
-                  }
+                <div className="proxy_form">
+                  <Instructions>
+                    <Li>
+                      <Step curr_step={this.state.step} step={0}
+                        title="Network">
+                        <Note>
+                          Choose the network type first. You can configure your
+                          proxy port to work with the Luminati network or you
+                          can use any external vendor
+                        </Note>
+                        <Nav_tabs_wrapper set_tab={this.set_tab}
+                          cur_tab={this.state.cur_tab}/>
+                        {this.state.cur_tab=='proxy_lum' &&
+                          <Lum_proxy
+                            def_zone={this.state.zones.def}
+                            created_port={this.state.created_port}
+                            zone={this.state.zone}
+                            on_field_change={this.field_changed}/>
+                        }
+                        {this.state.cur_tab=='proxy_ext' &&
+                          <Ext_proxy
+                            parse_error={this.state.parse_error}
+                            ips_list={this.state.ips_list}
+                            on_field_change={this.field_changed}/>
+                        }
+                      </Step>
+                    </Li>
+                    <Li>
+                      <Step curr_step={this.state.step} step={1}
+                        title="Configuration">
+                        <Note>
+                          How do you want to use this proxy? Choose between
+                          connecting from the browser or the scraper. The main
+                          difference is in the IP rotation.
+                        </Note>
+                        <Nav_tabs set_tab={this.field_changed('preset')}
+                          cur_tab={this.state.preset}>
+                          <Preset_nav_tab id="session_long"/>
+                          <Preset_nav_tab id="rotating"/>
+                        </Nav_tabs>
+                        <Preview
+                          title={presets.get(this.state.preset).new_title}>
+                          <Preset_description preset={this.state.preset}/>
+                        </Preview>
+                      </Step>
+                    </Li>
+                    <Li>
+                      <Step curr_step={this.state.step} step={2}
+                        title="Example">
+                        <Created_port port={this.state.created_port}
+                          preset={this.state.preset}/>
+                      </Step>
+                    </Li>
+                  </Instructions>
                 </div>
-                <Created_port port={this.state.created_port}/>
               </Modal>
               <Modal className="warnings_modal" id="add_proxy_errors"
                 title="Errors:" no_cancel_btn>
@@ -177,27 +206,54 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     }
 });
 
-const Created_port = ({port})=>{
-    if (!port)
-        return null;
+const Note = ({children})=><div className="note">{children}</div>;
+
+const Step = ({title, step, curr_step, children})=>{
+    const classes = classnames('step_content', 'animated', {
+        shown: step==curr_step,
+        fadeIn: step==curr_step,
+    });
+    return <div>
+          <div className="step_title">{title}</div>
+          <div className={classes}>{children}</div>
+        </div>;
+};
+
+const Created_port = ({port, preset})=>{
     const to_copy = instructions.code(port).shell;
     const code = prism.highlight(to_copy, prism.languages.clike);
-    return <div className="howto animated fadeInUp">
-          <h3 style={{marginBottom: 15, marginTop: -20}}>
-            <T>Congratulation! You just created a port</T> {port}
-          </h3>
-          <span>
-            <T>
-              You can start using the port by running the following command:
-            </T>
-          </span>
-          <div className="well instructions_well">
-            <pre>
-              <Code>
-                <div dangerouslySetInnerHTML={{__html: code}}/>
-              </Code>
-            </pre>
-          </div>
+    const open_browser = ()=>etask(function*(){
+        const url = `/api/browser/${port}`;
+        const res = yield window.fetch(url);
+        if (res.status==206)
+            $('#fetching_chrome_modal').modal();
+    });
+    return <div className="howto">
+          <Note>
+            Congratulation! You just created a port {port}.
+          </Note>
+          {preset=='session_long' &&
+            <div>
+              <Note>
+                <span>You can start using the port by clicking </span>
+                <a onClick={open_browser} className="link">open a browser</a>
+              </Note>
+            </div>
+          }
+          {preset!='session_long' &&
+            <div>
+              <Note>
+                You can start using the port by running the following command:
+              </Note>
+              <div className="well instructions_well">
+                <pre>
+                  <Code>
+                    <div dangerouslySetInnerHTML={{__html: code}}/>
+                  </Code>
+                </pre>
+              </div>
+            </div>
+          }
         </div>;
 };
 
@@ -240,31 +296,18 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
 };
 
 const Lum_proxy = with_www_api(props=>{
-    const {zone, def_zone, on_field_change, preset} = props;
+    const {zone, def_zone, on_field_change} = props;
     const zone_tip = `Zone that will be used by this proxy port`;
     return <div className="lum_proxy">
-          <div className="group">
-            <Field icon_class="zone_icon" title="Zone">
-              <Select_zone val={zone} tooltip={zone_tip}
-                on_change_wrapper={on_field_change('zone')}/>
-            </Field>
-            <Preview title={zone||def_zone}>
-              <Zone_description zone_name={zone}/>
-              <a className="link" href={`${props.www_api}/cp/zones`}
-                target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
-            </Preview>
-          </div>
-          {preset!='unblocker' &&
-            <div className="group">
-              <Nav_tabs set_tab={on_field_change('preset')} cur_tab={preset}>
-                <Preset_nav_tab id="session_long"/>
-                <Preset_nav_tab id="rotating"/>
-              </Nav_tabs>
-              <Preview title={presets.get(preset).new_title}>
-                <Preset_description preset={preset}/>
-              </Preview>
-            </div>
-          }
+          <Field icon_class="zone_icon" title="Zone">
+            <Select_zone val={zone} tooltip={zone_tip}
+              on_change_wrapper={on_field_change('zone')}/>
+          </Field>
+          <Preview title={zone||def_zone}>
+            <Zone_description zone_name={zone}/>
+            <a className="link" href={`${props.www_api}/cp/zones`}
+              target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
+          </Preview>
         </div>;
 });
 
@@ -311,23 +354,22 @@ const Field = props=>
     }</T>;
 
 const Footer = props=>{
-    const save_clicked = ()=>{
+    const btn_labels = ['Next', 'Create proxy port', 'Close'];
+    const btn_clicked = ()=>{
         if (props.disabled)
             return;
-        props.save_clicked();
+        if (props.step==1)
+            return props.save_clicked();
+        if (props.step==2)
+            return $('#add_new_proxy_modal').modal('hide');
+        props.next_step();
     };
-    const ok_clicked = ()=>$('#add_new_proxy_modal').modal('hide');
     const classes = classnames('btn', 'btn_lpm', 'btn_lpm_primary',
         {disabled: props.disabled});
     return <div className="footer">
-          {!props.created_port &&
-            <button onClick={save_clicked} className={classes}>
-              <T>Save</T>
-            </button>
-          }
-          {!!props.created_port &&
-            <button onClick={ok_clicked} className={classes}><T>OK</T></button>
-          }
+          <button onClick={btn_clicked} className={classes}>
+            {btn_labels[props.step]}
+          </button>
         </div>;
 };
 

@@ -12,6 +12,7 @@ import classnames from 'classnames';
 import moment from 'moment';
 import {trigger_types, action_types} from '../../util/rules_util.js';
 import {Copy_btn} from './common.js';
+import {get_troubleshoot} from './util.js';
 import './css/har_preview.less';
 import {T} from './common/i18n.js';
 
@@ -22,6 +23,7 @@ class Preview extends Pure_component {
         {id: 'response', width: 72, comp: Pane_response},
         {id: 'timing', width: 57, comp: Pane_timing},
         {id: 'rules', width: 50, comp: Pane_rules},
+        {id: 'troubleshooting', width: 110, comp: Pane_troubleshoot},
     ];
     state = {cur_pane: 0};
     select_pane = id=>{ this.setState({cur_pane: id}); };
@@ -338,6 +340,29 @@ const Action = ({action, value})=>{
           {key} {val ? `: ${val}` : ''}
         </div>;
 };
+
+class Pane_troubleshoot extends Pure_component {
+    render(){
+        const response = this.props.req.response;
+        const troubleshoot = get_troubleshoot(response.content.text,
+            response.status, response.headers);
+        if (troubleshoot.title)
+        {
+            return <div className="timing_view_wrapper">
+                  <ol className="tree_outline">
+                    <li key="li" onClick={this.toggle}
+                      className="parent_title expandable open">
+                      {troubleshoot.title}
+                    </li>
+                    <ol>{troubleshoot.info}</ol>
+                  </ol>
+                </div>;
+        }
+        return <Pane_info>
+              <div>There's not troubleshooting for this request.</div>
+            </Pane_info>;
+    }
+}
 
 class Pane_timing extends Pure_component {
     state = {};

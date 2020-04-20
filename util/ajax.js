@@ -107,6 +107,8 @@ function ajax(opt){
             perr({id: 'be_ajax_slow', info: t+'ms '+url});
         if (E.do_op)
             E.do_op(_data&&_data.do_op);
+        if (opt.restore_dates)
+            restore_dates(_data);
         return this.return(_data);
     }, function abort(){
         // reachable only via E.abort
@@ -139,6 +141,22 @@ function get_res_data(xhr){
         catch(e){ }
     }
     return xhr.responseText||'';
+}
+
+var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;
+function restore_dates(data){
+    if (!data || typeof data!='object')
+        return;
+    for (var key in data)
+    {
+        if (!data.hasOwnProperty(key))
+            continue;
+        var val = data[key];
+        if (typeof val=='string' && date_rx.test(val))
+            data[key] = new Date(val);
+        else if (val && typeof val=='object')
+            restore_dates(val);
+    }
 }
 
 return E; }); }());
