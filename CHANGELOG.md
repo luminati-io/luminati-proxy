@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.179.847 Stable
+- :sparkles: Backup local configuration on config synchronization
+
 ## 1.179.735 Stable
 - :bug: Crash fix during the startup process
 - :sparkles: Configuration synchronization across instances

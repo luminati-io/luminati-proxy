@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.179.847",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Backup local configuration on config synchronization"
+            }
+        ]
+    },
+    {
         "ver": "1.179.735",
         "type": "stable",
         "changes": [
