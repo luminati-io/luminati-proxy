@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.179.924 Stable
+- :sparkles: Serving UI on HTTPS when LPM in the cloud
+
 ## 1.179.847 Stable
 - :sparkles: Backup local configuration on config synchronization
 

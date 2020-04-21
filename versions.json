@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.179.924",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Serving UI on HTTPS when LPM in the cloud"
+            }
+        ]
+    },
+    {
         "ver": "1.179.847",
         "type": "stable",
         "changes": [

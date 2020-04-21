@@ -99,6 +99,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     cluster: true,
     read_only: false,
     cloud: true,
+    zagent: false,
 });
 conf.log_levels = {
     error: 0,
