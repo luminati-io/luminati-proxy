@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.180.34",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed styling in Firefox"
+            }
+        ]
+    },
+    {
         "ver": "1.179.924",
         "type": "stable",
         "changes": [

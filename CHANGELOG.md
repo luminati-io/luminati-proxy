@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.180.34 Stable
+- :bug: Fixed styling in Firefox
+
 ## 1.179.924 Stable
 - :sparkles: Serving UI on HTTPS when LPM in the cloud
 

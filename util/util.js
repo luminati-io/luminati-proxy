@@ -349,6 +349,7 @@ E.get = function(o, path, def){
     return o;
 };
 E.set = function(o, path, value){
+    var orig = o;
     path = E.path(path);
     for (var i=0; i<path.length-1; i++)
     {
@@ -356,6 +357,7 @@ E.set = function(o, path, value){
         o = o[p] || (o[p] = {});
     }
     o[path[path.length-1]] = value;
+    return orig;
 };
 E.unset = function(o, path){
     path = E.path(path);
