@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.180.240 Stable
+- :bug: Fixed error message for authentication
+
 ## 1.180.34 Stable
 - :bug: Fixed styling in Firefox
 

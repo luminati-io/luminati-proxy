@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.180.240",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed error message for authentication"
+            }
+        ]
+    },
+    {
         "ver": "1.180.34",
         "type": "stable",
         "changes": [

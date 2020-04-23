@@ -96121,7 +96121,7 @@ var propTypes = {
    * A ModalManager instance used to track and manage the state of open
    * Modals. Useful when customizing how modals interact within a container
    */
-  manager: __WEBPACK_IMPORTED_MODULE_6_prop_types___default.a.object
+  manager: __WEBPACK_IMPORTED_MODULE_6_prop_types___default.a.instanceOf(__WEBPACK_IMPORTED_MODULE_13__ModalManager__["a" /* default */])
 };
 Modal.displayName = 'Modal';
 Modal.propTypes = propTypes;
