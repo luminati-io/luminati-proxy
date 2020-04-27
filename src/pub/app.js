@@ -10,6 +10,7 @@ import 'flag-icon-css/css/flag-icon.css';
 import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import zurl from '../../util/url.js';
 import './css/app.less';
 import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
@@ -46,6 +47,16 @@ const App = withRouter(class App extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'app.App.componentDidMount');
             }));
+            const url_o = zurl.parse(document.location.href);
+            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+            if (qs_o.lpm_token)
+            {
+                yield window.fetch('/api/add_lpm_wip', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({lpm_token: qs_o.lpm_token}),
+                });
+            }
             const mode = yield window.fetch('/api/mode');
             let block_ip;
             if (block_ip = mode.headers.get('x-lpm-block-ip'))
