@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.180.685 Stable
+## 1.180.690 Stable
 - :sparkles: Adjustemnts for LPM in the Cloud
 
 ## 1.180.664 Stable
