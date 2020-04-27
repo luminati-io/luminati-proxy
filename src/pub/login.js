@@ -19,9 +19,15 @@ const token_err_msg = {
 };
 
 const Login = withRouter(class Login extends Pure_component {
-    state = {password: '', username: '', loading: false, two_step: false,
-        two_step_verified: false, customer_selected: false,
-        sending_email: false};
+    state = {
+        password: '',
+        username: '',
+        loading: false,
+        two_step: false,
+        two_step_verified: false,
+        customer_selected: false,
+        sending_email: false,
+    };
     componentDidMount(){
         this.setdb_on('head.argv', argv=>{
             if (argv)
@@ -35,6 +41,8 @@ const Login = withRouter(class Login extends Pure_component {
             this.token = qs_o.t.replace(/\s+/g, '+');
             this.save_user();
         }
+        if (qs_o.lpm_token)
+            this.lpm_token = qs_o.lpm_token;
     }
     update_password = ({target: {value}})=>this.setState({password: value});
     update_username = ({target: {value}})=>this.setState({username: value});
@@ -160,28 +168,65 @@ const Login = withRouter(class Login extends Pure_component {
     render(){
         return <div className="lum_login">
               <Logo/>
-              <Messages error_message={this.state.error_message}
-                argv={this.state.argv}
-                ver_node={this.state.ver_node}/>
-              <Loader show={this.state.loading}/>
-              <Header/>
-              <Form save_user={this.save_user}
-                user_customers={this.state.user_customers}
-                customer_selected={this.state.customer_selected}
-                two_step={this.state.two_step}
-                password={this.state.password}
-                username={this.state.username}
-                loading={this.state.loading}
-                sending_email={this.state.sending_email}
-                update_password={this.update_password}
-                update_username={this.update_username}
-                select_customer={this.select_customer}
-                select_final_customer={this.select_final_customer}
-                send_two_step_email={this.send_two_step_email}
-                verify_two_step={this.verify_two_step}/>
+              {!!this.lpm_token &&
+                <Autologin lpm_token={this.lpm_token} get_in={this.get_in}/>
+              }
+              {!this.lpm_token &&
+                <React.Fragment>
+                  <Loader show={this.state.loading}/>
+                  <Messages error_message={this.state.error_message}
+                    argv={this.state.argv}
+                    ver_node={this.state.ver_node}/>
+                  <Header/>
+                  <Form save_user={this.save_user}
+                    user_customers={this.state.user_customers}
+                    customer_selected={this.state.customer_selected}
+                    two_step={this.state.two_step}
+                    password={this.state.password}
+                    username={this.state.username}
+                    loading={this.state.loading}
+                    sending_email={this.state.sending_email}
+                    update_password={this.update_password}
+                    update_username={this.update_username}
+                    select_customer={this.select_customer}
+                    select_final_customer={this.select_final_customer}
+                    send_two_step_email={this.send_two_step_email}
+                    verify_two_step={this.verify_two_step}/>
+                </React.Fragment>
+              }
             </div>;
     }
 });
+
+class Autologin extends Pure_component {
+    componentDidMount(){
+        this.autologin();
+    }
+    autologin = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            const res = yield ajax.json({
+                url: '/api/creds_user',
+                data: {lpm_token: _this.props.lpm_token},
+                method: 'POST',
+                timeout: 60000,
+            });
+            if (res.result=='ok')
+                yield _this.props.get_in();
+        });
+    };
+    render(){
+        const style = {
+            textAlign: 'center',
+            fontSize: 40,
+            marginTop: 30,
+        };
+        return <div style={style}>
+              <Loader show/>
+              Your LPM is getting ready
+            </div>;
+    }
+}
 
 const parse_arguments = argv=>
     argv.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3').split('|||');

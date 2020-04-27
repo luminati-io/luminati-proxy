@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.180.664",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Changed port for WS connection with Luminati servers"
+            },
+            {
+                "type": "sparkles",
+                "text": "Adjustemnts for LPM in the Cloud"
+            }
+        ]
+    },
+    {
         "ver": "1.180.240",
         "type": "stable",
         "changes": [

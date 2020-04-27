@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.180.664 Stable
+- :sparkles: Changed port for WS connection with Luminati servers
+- :sparkles: Adjustemnts for LPM in the Cloud
+
 ## 1.180.240 Stable
 - :bug: Fixed error message for authentication
 

@@ -10,7 +10,6 @@ import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import {swagger_url} from './util.js';
 import Schema from './schema.js';
-import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
 import Cpu_warning from './cpu_warning.js';
 import Tooltip from './common/tooltip.js';
@@ -113,7 +112,6 @@ const Nav_right = ()=>
     <div className="nav_top_right">
       <div className="schema"><Schema/></div>
       <Cpu_warning/>
-      <div className="notif_icon"><Notif/></div>
       <Patent/>
       <Language/>
       <Account/>
@@ -228,12 +226,15 @@ const Account = withRouter(class Account extends Pure_component {
     render(){
         if (!this.state.settings)
             return null;
-        const is_upgradable = this.state.ver_last && this.state.ver_last.newer;
+        const zagent = this.state.settings.zagent;
+        const is_upgradable = !zagent && this.state.ver_last &&
+            this.state.ver_last.newer;
+        const is_downgradable = !zagent && this.state.backup_exist;
         const customer = this.state.settings.customer;
         return <T>{t=><div className="dropdown">
               <a className="link dropdown-toggle" data-toggle="dropdown">
                 <Tooltip placement="bottom"
-                  title={t('You are currently logged in as')+' '+customer}>
+                  title={t('You are logged in as')+' '+customer}>
                   <span>
                     {customer}
                     <span style={{marginLeft: 5}} className="caret"/>
@@ -244,14 +245,18 @@ const Account = withRouter(class Account extends Pure_component {
                 {is_upgradable &&
                   <li><a onClick={this.upgrade}>{t('Upgrade')}</a></li>
                 }
-                {this.state.backup_exist &&
-                    <li><a onClick={this.downgrade}>{t('Downgrade')}</a></li>
+                {is_downgradable &&
+                  <li><a onClick={this.downgrade}>{t('Downgrade')}</a></li>
                 }
                 <li>
                   <a onClick={this.open_report_bug}>{t('Report a bug')}</a>
                 </li>
-                <li><a onClick={this.logout}>{t('Log out')}</a></li>
-                <li><a onClick={this.shutdown}>{t('Shut down')}</a></li>
+                {!zagent &&
+                  <React.Fragment>
+                    <li><a onClick={this.logout}>{t('Log out')}</a></li>
+                    <li><a onClick={this.shutdown}>{t('Shut down')}</a></li>
+                  </React.Fragment>
+                }
               </ul>
             </div>}</T>;
     }
