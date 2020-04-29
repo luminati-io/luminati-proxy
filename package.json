@@ -113,7 +113,7 @@
     "codemirror": "5.49.2",
     "es6-shim": "0.35.5",
     "event-target-shim": "5.0.1",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "moment": "2.24.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
