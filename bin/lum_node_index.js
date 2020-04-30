@@ -7,6 +7,8 @@ require('../lib/perr.js').run({});
 const logger = require('../lib/logger.js').child({category: 'lum_node_index'});
 const ssl = require('../lib/ssl.js');
 const lpm_config = require('../util/lpm_config.js');
+const lpm_file = require('../util/lpm_file.js');
+const file = require('../util/file.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
@@ -137,23 +139,25 @@ class Lum_node_index {
         logger.notice('Generating cert');
         ssl.gen_cert();
     }
-    restart_on_child_exit(is_upgraded){
+    restart_on_child_exit(opt){
         if (!this.child)
             return;
         this.child.removeListener('exit', this.restart_on_child_exit);
-        setTimeout(()=>this.create_child(is_upgraded), 5000);
+        if (opt.cleanup)
+            file.rm_rf_e(lpm_file.work_dir);
+        setTimeout(()=>this.create_child(opt), 5000);
     }
     shutdown_on_child_exit(){
         process.exit();
     }
-    create_child(is_upgraded){
+    create_child(opt={}){
         process.env.LUM_MAIN_CHILD = true;
         this.child = child_process.fork(
             path.resolve(__dirname, 'lum_node.js'),
             process.argv.slice(2), {stdio: 'inherit', env: process.env});
         this.child.on('message', this.msg_handler.bind(this));
         this.child.on('exit', this.shutdown_on_child_exit);
-        this.child.send({command: 'run', argv: this.argv, is_upgraded});
+        this.child.send(Object.assign(opt, {command: 'run', argv: this.argv}));
     }
     msg_handler(msg){
         switch (msg.command)
@@ -162,8 +166,7 @@ class Lum_node_index {
             return process.exit();
         case 'restart':
             this.child.removeListener('exit', this.shutdown_on_child_exit);
-            this.child.on('exit', this.restart_on_child_exit.bind(this,
-                msg.is_upgraded));
+            this.child.on('exit', this.restart_on_child_exit.bind(this, msg));
             this.child.kill();
             break;
         case 'upgrade':

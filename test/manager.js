@@ -29,6 +29,7 @@ const api_base = 'https://'+pkg.api_domain;
 
 describe('manager', ()=>{
     let app, temp_files, logger_stub, sandbox;
+    // XXX krzysztof: make it configurable to show logs in tests
     const stub_logger = ()=>{
         logger.transports.forEach(t=>{ t.silent = true; });
         logger_stub = sinon.stub(logger, 'notice');
@@ -205,6 +206,7 @@ describe('manager', ()=>{
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
         function*(_this){
+            _this.timeout(6000);
             app = yield app_with_config(config);
             const proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');

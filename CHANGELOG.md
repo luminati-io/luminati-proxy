@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.145 Stable
+- :sparkles: Enabled option for serving UI on HTTPS
+
 ## 1.181.51 Stable
 - :sparkles: Remove 'sending emails as a rule action' logic
 - :sparkles: Improve troubleshooting section

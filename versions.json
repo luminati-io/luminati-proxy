@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.181.145",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Enabled option for serving UI on HTTPS"
+            }
+        ]
+    },
+    {
         "ver": "1.181.51",
         "type": "stable",
         "changes": [

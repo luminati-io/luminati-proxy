@@ -113,8 +113,9 @@ E.run = (argv, run_config)=>{
             return;
         process.send({command: 'downgrade'});
         E.on_downgrade_finished = cb;
-    }).on('restart', is_upgraded=>
-        process.send({command: 'restart', is_upgraded}));
+    }).on('restart', opt=>{
+        process.send(Object.assign(opt, {command: 'restart'}));
+    });
     E.manager.start();
 };
 
