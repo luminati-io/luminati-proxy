@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import _ from 'lodash';
 import user_agent_gen from '/www/util/pub/user_agent_gen.js';
 import etask from '../../util/etask.js';
 
@@ -63,6 +64,109 @@ export const status_codes = {
     505: 'HTTP Version Not Supported',
 };
 
+const error_desc = [
+    // proxy.js err_messages
+    {
+        regex: /Bad Port. Ports we support/,
+        description: <span/>,
+    },
+    {
+        regex: /We do not have IPs in the city you requested/,
+        description: <span/>,
+    },
+    {
+        regex: /Request is not allowed from peers and sent from super proxy/,
+        description: <span/>,
+    },
+    // proxy.js check_blocked_target
+    {
+        regex: /You tried to target .* but got blocked/,
+        description: <span/>,
+    },
+    {
+        regex: /request needs to be made using residential network/,
+        description: <span/>,
+    },
+    {
+        regex: /target site requires special permission/,
+        description: <span/>,
+    },
+    // agent_conn.js find_reasons
+    {
+        regex: /No peers available/,
+        description: <span/>,
+    },
+    {
+        regex: /not matching any of allocated gIPs/,
+        description: <span>This error means that the chosen targeting could
+            not be applied on any of the allocated gIPs. Go to the
+            <b>Targeting</b> tab and remove the selected criteria and try
+            again
+        </span>,
+    },
+    {
+        regex: /Zone wrong status/,
+        description: <span/>,
+    },
+    {
+        regex: /Internal server error/,
+        description: <span/>,
+    },
+    {
+        regex: /Wrong city/,
+        description: <span/>,
+    },
+    {
+        regex: /No matching fallback IP/,
+        description: <span/>,
+    },
+    // zone_util.js disabled_reasons_names
+    {
+        regex: /Wrong customer name/,
+        description: <span/>,
+    },
+    {
+        regex: /Customer suspended/,
+        description: <span/>,
+    },
+    {
+        regex: /Customer disabled/,
+        description: <span/>,
+    },
+    {
+        regex: /IP forbidden/,
+        description: <span/>,
+    },
+    {
+        regex: /Wrong password/,
+        description: <span/>,
+    },
+    {
+        regex: /Zone not found/,
+        description: <span/>,
+    },
+    {
+        regex: /No passwords/,
+        description: <span/>,
+    },
+    {
+        regex: /No IPs/,
+        description: <span/>,
+    },
+    {
+        regex: /Usage limit reached/,
+        description: <span/>,
+    },
+    {
+        regex: /No plan/,
+        description: <span/>,
+    },
+    {
+        regex: /Plan disabled/,
+        description: <span/>,
+    },
+];
+
 export const get_static_country = (proxy, zones)=>{
     if (!proxy||!proxy.zone||!zones||!zones.zones)
         return false;
@@ -96,6 +200,10 @@ export const perr = (type, message, stack, context)=>etask(function*(){
     });
 });
 
+const undescribed_error = _.once(title=>{
+    perr('undescribed_error', title);
+});
+
 export const get_troubleshoot = (body, status_code, headers)=>{
     let title;
     let info;
@@ -108,13 +216,11 @@ export const get_troubleshoot = (body, status_code, headers)=>{
     }
     title = (headers && headers.find(h=>
         h.name=='x-luminati-error'||h.name=='x-lpm-error')||{}).value||'';
-    if (/not matching any of allocated gIPs/.test(title))
+    for (let {regex, description} of error_desc)
     {
-        info = <span>This error means that the chosen targeting could not be
-              applied on any of the allocated gIPs. Go to the <b>Targeting </b>
-              tab and remove the selected criteria and try again
-            </span>;
+        if (regex.test(title))
+            return {title, info: description};
     }
-    return {title, info};
+    undescribed_error(title);
+    return {title, info: ''};
 };
-

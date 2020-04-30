@@ -1124,7 +1124,7 @@ class Mux {
             stream.send_fin();
             if (wait_rmt)
             {
-                try { yield zfin_pending = this.wait(opt.fin_timeout); }
+                try { yield zfin_pending = this.wait(2*opt.fin_timeout); }
                 catch(e){ w_log(e, 'zfin_pending'); }
             }
             // XXX vladislavl: remove condition once no need support node 6.X

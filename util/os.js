@@ -323,7 +323,7 @@ E.iface_list = ()=>{
 };
 
 E.eth_dev = ()=>{
-    let is_ether = ifname=>/^(en|wl|eth)/.test(ifname);
+    let is_ether = ifname=>/^(bond|en|wl|eth)/.test(ifname);
     let ifaces = E.iface_list().filter(is_ether);
     if (E.is_release(['c:trusty']))
         return {eth_dev: 'eth0', udptunnel_dev: 'eth1', ifaces};

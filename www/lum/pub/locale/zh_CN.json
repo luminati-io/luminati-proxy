@@ -4476,5 +4476,15 @@
   "Other:": "其它：",
   "Skip": "跳过",
   "Sending request": "正在发送请求",
-  "For security purposes only, a non-refundable $1 charge will apply, this is one of our verification methods to ensure the safety and integrity of our networks.": "出于安全原因，您将被收取1$(不可申请退款)用作确保网络安全性和完整性的验证。感谢您的理解与支持！"
+  "For security purposes only, a non-refundable $1 charge will apply, this is one of our verification methods to ensure the safety and integrity of our networks.": "出于安全原因，您将被收取1$(不可申请退款)用作确保网络安全性和完整性的验证。感谢您的理解与支持！",
+  "API tokens": "API令牌",
+  "Ask your account owner to create token for you" : "请求您的帐户所有者为您创建令牌",
+  "Change expiration date" : "更改到期日期",
+  "Refresh token" : "刷新令牌",
+  "Revoke token" : "撤销令牌",
+  "Add token" : "添加令牌",
+  "Token" : "Token",
+  "Expiration date" : "到期日期",
+  "Add API token" : "添加API令牌",
+  "Edit API token" : "编辑API令牌"
 }

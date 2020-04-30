@@ -3656,5 +3656,15 @@
   "Your registration has been denied.": "O seu registo foi negado.",
   "The IP you tried to sign-up with has been blocked.": "O IP que tentou inscrever-se foi bloqueado.",
   "This may happen because our system has identified that this IP address has been abused": "Isso pode acontecer porque nosso sistema identificou que este endereço IP foi abusado",
-  "We detected too many signups from your IP.": "Detectámos demasiadas inscrições do seu IP."
+  "We detected too many signups from your IP.": "Detectámos demasiadas inscrições do seu IP.",
+  "Ask your account owner to create token for you" : "Peça ao dono da sua conta para criar um token para si",
+  "API tokens": "Tokens de API",
+  "Change expiration date" : "Mudar a data de expiração",
+  "Refresh token" : "Ficha de actualização",
+  "Revoke token" : "Revogar token",
+  "Add token" : "Adicionar elemento",
+  "Token" : "Token",
+  "Expiration date" : "Data de validade",
+  "Add API token" : "Adicionar um token API",
+  "Edit API token" : "Editar o token da API"
 }

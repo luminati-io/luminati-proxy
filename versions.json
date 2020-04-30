@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.181.51",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Remove 'sending emails as a rule action' logic"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improve troubleshooting section"
+            },
+            {
+                "type": "bug",
+                "text": "Start LPM even if some ports failed to start"
+            }
+        ]
+    },
+    {
         "ver": "1.180.690",
         "type": "stable",
         "changes": [

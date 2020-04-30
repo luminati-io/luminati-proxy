@@ -3402,5 +3402,15 @@
   "Your registration has been denied.": "В вашей регистрации было отказано.",
   "The IP you tried to sign-up with has been blocked.": "IP-адрес, с которого вы пытаетесь зарегистрироваться, заблокирован.",
   "This may happen because our system has identified that this IP address has been abused": "Это могло произойти потому, что наша система определила, что этот IP-адрес небезопасен",
-  "We detected too many signups from your IP.": "Мы обнаружили слишком много попыток регистрации с вашего IP-адреса."
+  "We detected too many signups from your IP.": "Мы обнаружили слишком много попыток регистрации с вашего IP-адреса.",
+  "API tokens": "API токены",
+  "Ask your account owner to create token for you" : "Попросите владельца вашей учетной записи создать токен для вас",
+  "Change expiration date" : "Изменить срок годности",
+  "Refresh token" : "Маркер",
+  "Revoke token" : "Отозвать токен",
+  "Add token" : "Добавить токен",
+  "Token" : "Токен",
+  "Expiration date" : "Срок годности",
+  "Add API token" : "Добавить маркер API",
+  "Edit API token" : "Редактирование токен API"
 }

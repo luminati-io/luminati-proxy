@@ -168,18 +168,6 @@ export const tabs = {
             request_payload: {label: 'Payload', tooltip: `Payload sent in the
                 request. The IP used for the request will be sent in a field
                 if its value equals "$IP"`},
-            send_email: {
-                label: 'Send email',
-                tooltip: `Every time the rule is triggered and executed, the
-                        email notification will be sent to the provided
-                        address`,
-            },
-            email: {
-                label: 'Email address',
-                tooltip: `Notifications will be sent to this email address.
-                        If you want to use another email you can add it to the
-                        list in control panel by going to the link below`,
-            },
         },
     },
     rotation: {

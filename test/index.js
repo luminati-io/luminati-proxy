@@ -1316,13 +1316,7 @@ describe('proxy', ()=>{
         });
         describe('pre', ()=>{
             it('action null_response', ()=>etask(function*(){
-                l = yield lum({rules: [{action: {null_response: true,
-                    email: 'test@mail'}}]});
-                l.on('send_rule_mail', data=>{
-                    assert.equal(data.port, 24000);
-                    assert.equal(data.email, 'test@mail');
-                    assert.equal(data.url, 'lumtest.com');
-                });
+                l = yield lum({rules: [{action: {null_response: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
                     log: l.log, timeline: new Timeline(1)}};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
@@ -1331,13 +1325,7 @@ describe('proxy', ()=>{
                 assert.equal(r.status_message, 'NULL');
             }));
             it('action direct', ()=>etask(function*(){
-                l = yield lum({rules: [{url: '', action: {direct: true,
-                    email: 'test@mail'}}]});
-                l.on('send_rule_mail', data=>{
-                    assert.equal(data.port, 24000);
-                    assert.equal(data.email, 'test@mail');
-                    assert.equal(data.url, 'lumtest.com');
-                });
+                l = yield lum({rules: [{url: '', action: {direct: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
                     log: l.log, timeline: new Timeline(1)}};
                 const _res = {end: sinon.stub(), write: sinon.stub()};

@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.51 Stable
+- :sparkles: Remove 'sending emails as a rule action' logic
+- :sparkles: Improve troubleshooting section
+- :bug: Start LPM even if some ports failed to start
+
 ## 1.180.690 Stable
 - :sparkles: Adjustemnts for LPM in the Cloud
 

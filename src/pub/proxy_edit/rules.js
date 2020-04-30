@@ -53,8 +53,6 @@ const rule_prepare = rule=>{
         action.bypass_proxy = true;
     else if (rule.action=='direct')
         action.direct = true;
-    if (rule.email)
-        action.email = rule.email;
     let result = null;
     if (rule.trigger_type)
     {
@@ -110,11 +108,6 @@ export const map_rule_to_form = rule=>{
         result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
     if (rule.action.process)
         result.process = JSON.stringify(rule.action.process, null, '  ');
-    if (rule.action.email)
-    {
-        result.send_email = true;
-        result.email = rule.action.email;
-    }
     result.trigger_code = rule.trigger_code;
     result.type = rule.type;
     return result;
@@ -309,10 +302,6 @@ const Action = with_proxy_ports(withRouter(
 class Action extends Pure_component {
     state = {ports: []};
     componentDidMount(){
-        this.setdb_on('head.consts', consts=>{
-            if (consts && consts.logins)
-                this.setState({logins: consts.logins});
-        });
         this.setdb_on('head.defaults', defaults=>{
             if (defaults)
                 this.setState({defaults});
@@ -358,18 +347,6 @@ class Action extends Pure_component {
         }
         else
             set_rule_field('ban_ip_duration', '');
-        if (!val)
-        {
-            set_rule_field('email', '');
-            set_rule_field('send_email', false);
-        }
-    };
-    send_email_changed = val=>{
-        if (!val)
-            return this.props.set_rule_field('email', '');
-        if (!this.state.logins)
-            return;
-        return this.props.set_rule_field('email', this.state.logins[0]);
     };
     request_method_changed = val=>{
         if (val=='GET')
@@ -397,7 +374,7 @@ class Action extends Pure_component {
     };
     render(){
         const {rule, match, ports_opt} = this.props;
-        const {logins, defaults, settings, zones, curr_zone,
+        const {defaults, settings, zones, curr_zone,
             refresh_cost} = this.state;
         if (!rule.trigger_type || !settings || !defaults)
             return null;
@@ -470,19 +447,6 @@ class Action extends Pure_component {
                         rule={rule}/>
                     }
                   </div>
-                }
-                {rule.action &&
-                  <Rule_config id="send_email" type="yes_no" rule={rule}
-                    on_change={this.send_email_changed}/>
-                }
-                {rule.send_email && logins &&
-                  logins.length==1 &&
-                  <Rule_config id="email" type="text" rule={rule} disabled/>
-                }
-                {rule.send_email && logins && logins.length>1 &&
-                  <Rule_config id="email" type="select" rule={rule}
-                    data={logins.map(l=>({key: l, value: l}))}
-                    note={<Email_note www={defaults.www_api}/>}/>
                 }
               </div>
             </React.Fragment>;
@@ -597,13 +561,6 @@ class Trigger_code extends Pure_component {
             </div>;
     }
 }
-
-const Email_note = ({www})=>
-    <div>
-      <span>You can manage the list of available emails </span>
-      <a target="_blank" rel="noopener noreferrer" href={`${www}/cp/settings`}>
-        here</a>
-    </div>;
 
 const Btn_rule_del = ({on_click})=>
     <button className="btn_rule_del" onClick={on_click}/>;
