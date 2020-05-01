@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.199 Stable
+- :sparkles: Fix default country in new port popup and improve country dropdown at targeting section
+
 ## 1.181.145 Stable
 - :sparkles: Enabled option for serving UI on HTTPS
 

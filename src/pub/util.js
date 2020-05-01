@@ -200,8 +200,8 @@ export const perr = (type, message, stack, context)=>etask(function*(){
     });
 });
 
-const undescribed_error = _.once(title=>{
-    perr('undescribed_error', title);
+const undescribed_error = _.once((status_code, title)=>{
+    perr('undescribed_error', {status_code, title});
 });
 
 export const get_troubleshoot = (body, status_code, headers)=>{
@@ -221,6 +221,7 @@ export const get_troubleshoot = (body, status_code, headers)=>{
         if (regex.test(title))
             return {title, info: description};
     }
-    undescribed_error(title);
+    if (title)
+        undescribed_error(status_code, title);
     return {title, info: ''};
 };

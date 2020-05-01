@@ -53,8 +53,8 @@ export default class Zone_description extends Pure_component {
         const zones = this.state.zones || this.props.zones;
         if (!zones)
             return null;
-        const {zone_name} = this.props;
-        const zone = zones.zones.find(z=>z.name==(zone_name||zones.def));
+        const zone_name = this.props.zone_name||zones.def;
+        const zone = zones.zones.find(z=>z.name==zone_name);
         if (!zone)
             return <span>This zone is disabled</span>;
         const plan = zone.plan;

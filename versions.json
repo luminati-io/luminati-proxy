@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.181.199",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Fix default country in new port popup and improve country dropdown at targeting section"
+            }
+        ]
+    },
+    {
         "ver": "1.181.145",
         "type": "stable",
         "changes": [

@@ -23,10 +23,10 @@ export default with_www_api(class Targeting extends Pure_component {
     def_value = {key: 'Any (default)', value: ''};
     os_opt = [
         this.def_value,
-       {key: 'Windows', value: 'win'},
-       {key: 'MacOS', value: 'mac'},
-       {key: 'Android', value: 'android'},
-   ];
+        {key: 'Windows', value: 'win'},
+        {key: 'MacOS', value: 'mac'},
+        {key: 'Android', value: 'android'},
+    ];
     set_field = setdb.get('head.proxy_edit.set_field');
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
@@ -50,14 +50,22 @@ export default with_www_api(class Targeting extends Pure_component {
             form && this.setState({form});
         });
     }
-    allowed_countries = ()=>{
+    allowed_countries = t=>{
         let res = this.state.locations.countries.map(c=>({
             key: c.country_name, value: c.country_id, mob: c.mob}));
         const curr_plan = this.get_curr_plan();
+        let list = [this.def_value];
         if (curr_plan && curr_plan.country)
         {
-            res = res.filter(r=>
-                curr_plan.country.split(' ').includes(r.value));
+            let countries = curr_plan.country.split(' ');
+            res = res.filter(r=>countries.includes(r.value));
+            if (res.length==1)
+                list[0] = {key: `${res[0].key} (default)`, value: ''};
+            else if (res.length>1)
+            {
+                let key = `${res[0].key} + ${res.length-1} `+t('countries');
+                list[0] = {key, value: ''};
+            }
         }
         else if (curr_plan && curr_plan.ip_alloc_preset=='shared_block')
         {
@@ -66,7 +74,7 @@ export default with_www_api(class Targeting extends Pure_component {
         }
         if (curr_plan && curr_plan.mobile)
             res = res.filter(r=>r.mob);
-        return [this.def_value, ...res];
+        return list.concat(res);
     };
     country_changed = ()=>{
         this.set_field('city', []);
@@ -187,9 +195,9 @@ export default with_www_api(class Targeting extends Pure_component {
                     <span>{' '}<T>and change your zone plan.</T></span>
                   </Note>
                 }
-                <Config type="select" id="country"
-                  data={this.allowed_countries()}
-                  on_change={this.country_changed}/>
+                <T>{t=><Config type="select" id="country"
+                  data={this.allowed_countries(t)}
+                  on_change={this.country_changed}/>}</T>
                 <Config type="select" id="state" data={this.states()}
                   on_change={this.state_changed}/>
                 <Config type="typeahead" id="city" data={this.cities()}
