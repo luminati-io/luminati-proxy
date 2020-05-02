@@ -93,6 +93,8 @@ export class Language extends Pure_component {
     render(){
         if (!this.state.lang)
             return null;
+        if (this.props.hidden)
+            return null;
         return <div className="dropdown">
               <a className="link dropdown-toggle" data-toggle="dropdown">
                 <Lang_cell lang={this.state.lang}/>

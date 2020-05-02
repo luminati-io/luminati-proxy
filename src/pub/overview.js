@@ -11,11 +11,21 @@ import {T} from './common/i18n.js';
 import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
 import {perr} from './util.js';
 import Tooltip from './common/tooltip.js';
+import zurl from '../../util/url.js';
 import setdb from '../../util/setdb.js';
 import './css/overview.less';
 
 class Overview extends Pure_component {
-    state = {show_logs: null, tls_warning: false};
+    constructor(props){
+        super(props);
+        const url_o = zurl.parse(document.location.href);
+        const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+        this.state = {
+            show_logs: null,
+            tls_warning: false,
+            embedded: qs_o.embedded=='true',
+        };
+    }
     componentDidMount(){
         this.setdb_on('head.settings', settings=>settings &&
             this.setState({show_logs: settings.logs>0}));
@@ -43,8 +53,12 @@ class Overview extends Pure_component {
             </span> : <T>Overview</T>;
         return <div className="overview_page">
               <div className="warnings">
-                <Upgrade/>
-                <Upgrade_warning/>
+                {!this.state.embedded &&
+                  <React.Fragment>
+                    <Upgrade/>
+                    <Upgrade_warning/>
+                  </React.Fragment>
+                }
                 <Tls_warning show={this.state.tls_warning}/>
                 <Warnings warnings={this.state.warnings}/>
               </div>

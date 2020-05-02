@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.265 Stable
+- :star: UI Improvements in the embedded Cloud LPM
+
 ## 1.181.199 Stable
 - :sparkles: Fix default country in new port popup and improve country dropdown at targeting section
 

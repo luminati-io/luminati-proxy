@@ -8,6 +8,7 @@ import classnames from 'classnames';
 import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
+import zurl from '../../util/url.js';
 import {swagger_url} from './util.js';
 import Schema from './schema.js';
 import Report_bug_modal from './report_bug.js';
@@ -70,51 +71,78 @@ const Nav_link_inner = ({label, to, name, match})=>
     </Link>;
 
 class Nav_top extends Pure_component {
-    state = {ver: '', lock: false};
+    constructor(props){
+        super(props);
+        const url_o = zurl.parse(document.location.href);
+        const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+        this.state = {ver: '', lock: false, embedded: qs_o.embedded=='true'};
+    }
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>
             lock!==undefined && this.setState({lock}));
         this.setdb_on('head.version', ver=>this.setState({ver}));
+        this.setdb_on('head.settings', settings=>this.setState({settings}));
     }
     render(){
+        if (!this.state.settings)
+            return null;
         const {ver} = this.state;
         const tooltip = `Luminati Proxy Manager v.${ver}`;
         return <div className="nav_top">
               <Tooltip title={tooltip} placement="right">
                 <div><Logo lock={this.state.lock}/></div>
               </Tooltip>
-              <Nav_right/>
+              <Nav_right settings={this.state.settings}
+                embedded={this.state.embedded}/>
             </div>;
     }
 }
 
-const Footer = with_www_api(props=>
-    <div className="footer">
-      <div>
-        <a href={`${props.www_api}/faq#proxy`} rel="noopener noreferrer"
-          target="_blank" className="link"><T>FAQ</T></a>
-      </div>
-      <div>
-        <a href="mailto:lpm@luminati.io" className="link">
-          <T>Contact</T></a>
-      </div>
-      <div>
-        <a rel="noopener noreferrer" target="_blank" href={swagger_url}
-          className="link"><T>API</T></a>
-      </div>
-    </div>
-);
+const Footer = with_www_api(class Footer extends Pure_component {
+    constructor(props){
+        super(props);
+        const url_o = zurl.parse(document.location.href);
+        const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+        this.state = {embedded: qs_o.embedded=='true'};
+    }
+    render(){
+        return <div className="footer">
+            {!this.state.embedded &&
+              <React.Fragment>
+                <div>
+                  <a href={`${this.props.www_api}/faq#proxy`}
+                    rel="noopener noreferrer"
+                    target="_blank" className="link"><T>FAQ</T></a>
+                </div>
+                <div>
+                  <a href="mailto:lpm@luminati.io" className="link">
+                    <T>Contact</T></a>
+                </div>
+              </React.Fragment>
+            }
+            <div>
+              <a rel="noopener noreferrer" target="_blank" href={swagger_url}
+                className="link"><T>API</T></a>
+            </div>
+          </div>;
+    }
+});
 
 const Logo = withRouter(({lock})=>
     <Link to="/overview" className={classnames('logo', {lock})}/>);
 
-const Nav_right = ()=>
+const Nav_right = props=>
     <div className="nav_top_right">
       <div className="schema"><Schema/></div>
-      <Cpu_warning/>
-      <Patent/>
-      <Language/>
-      <Account/>
+      {props.embedded && <Language hidden/>}
+      {!props.embedded &&
+        <React.Fragment>
+          <Cpu_warning/>
+          <Patent/>
+          <Language/>
+          <Account settings={props.settings}/>
+        </React.Fragment>
+      }
     </div>;
 
 const Patent = with_www_api(props=>
@@ -207,7 +235,6 @@ class Shutdown_modal extends Pure_component {
 const Account = withRouter(class Account extends Pure_component {
     state = {};
     componentDidMount(){
-        this.setdb_on('head.settings', settings=>this.setState({settings}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
         this.setdb_on('head.backup_exist', backup_exist=>
             this.setState({backup_exist}));
@@ -224,22 +251,17 @@ const Account = withRouter(class Account extends Pure_component {
         });
     };
     render(){
-        if (!this.state.settings)
-            return null;
-        const zagent = this.state.settings.zagent;
+        const zagent = this.props.settings.zagent;
         const is_upgradable = !zagent && this.state.ver_last &&
             this.state.ver_last.newer;
         const is_downgradable = !zagent && this.state.backup_exist;
-        const customer = this.state.settings.customer;
+        const customer = this.props.settings.customer;
         return <T>{t=><div className="dropdown">
               <a className="link dropdown-toggle" data-toggle="dropdown">
-                <Tooltip placement="bottom"
-                  title={t('You are logged in as')+' '+customer}>
-                  <span>
-                    {customer}
-                    <span style={{marginLeft: 5}} className="caret"/>
-                  </span>
-                </Tooltip>
+                <span>
+                  {customer}
+                  <span style={{marginLeft: 5}} className="caret"/>
+                </span>
               </a>
               <ul className="dropdown-menu dropdown-menu-right">
                 {is_upgradable &&
