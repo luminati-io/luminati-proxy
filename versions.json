@@ -1,5 +1,20 @@
 [
     {
+        "ver": "1.181.358",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Enable storing configuration on Luminati servers on all OS"
+            }
+        ]
+    },
+    {
+        "ver": "1.181.265",
+        "type": "stable/dev",
+        "changes": []
+    },
+    {
         "ver": "1.181.265",
         "type": "stable",
         "changes": [

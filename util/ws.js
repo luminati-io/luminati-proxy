@@ -67,6 +67,7 @@ const debug_str_len = 4096;
 const default_win_size = 1048576;
 const SEC = 1000, MIN = 60000, vfd_sz = 8;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
+const net = is_node ? require('net') : null;
 
 function noop(){}
 
@@ -447,6 +448,11 @@ class Client extends WS {
         this.retry_max = opt.retry_max||this.retry_interval;
         this.next_retry = this.retry_interval;
         this.no_retry = opt.no_retry;
+        this._retry_count = 0;
+        this.lookup = opt.lookup;
+        this.lookup_ip = opt.lookup_ip;
+        this.fallback = opt.fallback &&
+            assign({retry_threshold: 1, retry_mod: 5}, opt.fallback);
         if (is_node)
         {
             this.headers = assign(
@@ -488,14 +494,31 @@ class Client extends WS {
         this.reason = undefined;
         this.reconnect_timer = undefined;
         let opt = {headers: this.headers};
+        let url = this.url, lookup_ip = this.lookup_ip, fb = this.fallback, v;
+        if (fb && fb.url && this._retry_count%fb.retry_mod>fb.retry_threshold)
+        {
+            url = fb.url;
+            lookup_ip = fb.lookup_ip;
+        }
         if (!is_rn)
         {
+            // XXX vladislavl: it won't work for uws out of box
             opt.agent = this.agent;
             opt.perMessageDeflate = this.deflate;
             opt.servername = this.servername;
+            opt.lookup = this.lookup;
+            if (lookup_ip && net && (v = net.isIP(lookup_ip)))
+            {
+                opt.lookup = (h, o, cb)=>{
+                    cb = cb||o;
+                    next_tick(()=>cb(undefined, lookup_ip, v));
+                };
+            }
         }
-        zerr.notice(`${this}: connecting to ${this.url}`);
-        this._assign(new this.impl(this.url, undefined, opt));
+        if (this.zc)
+            zcounter.set_level(`${this.zc}_fallback`, url==this.url ? 0 : 1);
+        zerr.notice(`${this}: connecting to ${url}`);
+        this._assign(new this.impl(url, undefined, opt));
         if (this.handshake_timeout)
         {
             this.handshake_timer = setTimeout(
@@ -518,12 +541,14 @@ class Client extends WS {
         }
         if (zerr.is.info())
             zerr.info(`${this}: will retry in ${delay}ms`);
+        this._retry_count++;
         this.reconnect_timer = setTimeout(()=>this._connect(), delay);
     }
     _on_open(){
         if (this.handshake_timer)
             this.handshake_timer = clearTimeout(this.handshake_timer);
         this.next_retry = this.retry_interval;
+        this._retry_count = 0;
         super._on_open();
     }
     _on_close(event){
@@ -552,12 +577,14 @@ class Client extends WS {
     inspect(){
         return assign(super.inspect(), {
             url: this.url,
+            lookup_ip: this.lookup_ip,
             retry_interval: this.retry_interval,
             retry_max: this.retry_max,
             next_retry: this.next_retry,
             handshake_timeout: this.handshake_timeout,
             deflate: this.deflate,
             reconnecting: !!this.reconnect_timer,
+            fallback: this.fallback,
         });
     }
 }

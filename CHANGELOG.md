@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.358 Stable
+- :star: Enable storing configuration on Luminati servers on all OS
+
+## 1.181.265 
+
 ## 1.181.265 Stable
 - :star: UI Improvements in the embedded Cloud LPM
 
