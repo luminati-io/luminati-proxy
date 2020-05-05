@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
+import Proxy_tester from './proxy_tester.js';
 import {Code} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
@@ -17,30 +18,39 @@ const Howto = withRouter(class Howto extends Pure_component {
         const pathname = `/howto/${option}`;
         this.props.history.push({pathname});
     };
+    option_to_text = {
+        code: 'from custom code',
+        browser: 'using browser',
+        proxy_tester: 'instantly from here',
+    };
     render(){
         const option = this.props.match.params.option||'code';
-        const cur_title = 'using '+option;
+        const cur_title = this.option_to_text[option];
         let Instructions = ()=>null;
         if (option=='browser')
             Instructions = Browser_instructions;
         else if (option=='code')
             Instructions = Code_instructions;
+        else if (option=='proxy_tester')
+            Instructions = Proxy_tester;
         return <T>{t=><div className="howto vbox">
               <div className="nav_header">
-                <h3>{t('How to use the Proxy Manager')} {t(cur_title)}</h3>
+                <h3>{t('How to use LPM')} {t(cur_title)}</h3>
               </div>
               <div className="howto_panel">
-                <div className="panel_inner">
+                <div className="panel_inner vbox">
                   <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
                     <Nav_tab id="code" title="Code"
                       tooltip="Examples how to use LPM programmatically"/>
                     <Nav_tab id="browser" title="Browser"
                       tooltip="Examples how to integrate LPM with the
                       browser"/>
+                    <Nav_tab id="proxy_tester" title="Web tester"
+                      tooltip="Send example requests from here"/>
                   </Nav_tabs>
                   <Instructions>{this.props.children}</Instructions>
                 </div>
-                <Animated_instructions/>
+                {false && <Animated_instructions/>}
               </div>
             </div>}</T>;
     }

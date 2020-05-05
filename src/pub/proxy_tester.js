@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {Loader, Warnings, Nav, with_proxy_ports, Add_icon,
+import {Loader, Warnings, with_proxy_ports, Add_icon,
     Remove_icon} from './common.js';
 import {Input} from './common/controls.js';
 import classnames from 'classnames';
@@ -19,15 +19,7 @@ import {report_exception} from './util.js';
 import './css/proxy_tester.less';
 const {SEC} = date.ms;
 
-const Proxy_tester = ()=>
-    <div className="vbox"
-      style={{paddingLeft: 15, paddingRight: 15, height: '100%'}}>
-      <Nav title="Proxy tester"
-        subtitle="Emulate requests from your proxies to any target URL"/>
-      <Tester/>
-    </div>;
-
-export const Tester = class Tester extends Pure_component {
+export default class Proxy_tester extends Pure_component {
     state = {};
     update_response = response=>this.setState({response});
     clear_response = ()=>this.setState({response: undefined});
@@ -40,7 +32,7 @@ export const Tester = class Tester extends Pure_component {
                 close={this.clear_response}/>
             </div>;
     }
-};
+}
 
 const Request = with_proxy_ports(withRouter(
 class Request extends Pure_component {
@@ -227,5 +219,3 @@ class New_header_params extends Pure_component {
             </div>}</T>;
     }
 }
-
-export default Proxy_tester;

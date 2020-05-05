@@ -71,7 +71,7 @@ class Stats extends Pure_component {
                       style={{flex: 1, overflowY: 'auto'}}
                       row_key="hostname" logs="domain" title="Domain"/>
                     <Stat_table stats={stats} tooltip="Protocol"
-                      style={{flex: 1, overflowY: 'auto'}}
+                      style={{flex: 'none', overflowY: 'auto'}}
                       ssl_warning={stats.ssl_warning} row_key="protocol"
                       logs="protocol" title="Protocol"/>
                   </React.Fragment>}

@@ -34,15 +34,13 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
     state = {lock: false};
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>
-            lock!==undefined&&this.setState({lock}));
+            lock!==undefined && this.setState({lock}));
     }
     render(){
         return <div className="nav_left">
               <div className={classnames('menu', {lock: this.state.lock})}>
                 <Nav_link to="/overview" name="overview" label="Overview"/>
-                <Nav_link to="/howto" name="howto" label="Instructions"/>
-                <Nav_link to="/proxy_tester" name="proxy_tester"
-                  label="Proxy tester"/>
+                <Nav_link to="/howto" name="howto" label="How to use LPM"/>
                 <Nav_link to="/logs" name="logs" label="Request logs"/>
                 <Nav_link to="/settings" name="general_config"
                   label="General settings"/>

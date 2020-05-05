@@ -21,7 +21,7 @@ import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {Toolbar_container, Toolbar_row, Toolbar_button,
-    Devider, Search_box} from './chrome_widgets.js';
+    Search_box} from './chrome_widgets.js';
 import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
@@ -709,10 +709,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         let show_table = !!proxies.length;
         if (this.state.loaded && !show_table)
             return <Proxy_blank/>;
-        return <div className="proxies_panel chrome">
+        return <React.Fragment>
+            <Add_proxy_btn on_click={this.proxy_add}/>
+            <div className="proxies_panel chrome">
               <div className="main_panel vbox">
-                <Toolbar proxy_add={this.proxy_add}
-                  edit_columns={this.edit_columns}
+                <Toolbar edit_columns={this.edit_columns}
                   download_csv={this.download_csv}
                   selected={this.state.selected_proxies}
                   open_delete_dialog={this.open_delete_dialog}
@@ -773,9 +774,20 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 close_dialog={this.close_delete_dialog}
                 proxies={this.state.delete_proxies}
                 update_proxies={this.update}/>
-            </div>;
+            </div>
+          </React.Fragment>;
     }
 });
+
+const Add_proxy_btn = props=>{
+    const style = {position: 'absolute', top: -33, right: 333, minWidth: 42};
+    return <T>{t=>
+          <Tooltip title={t('Add new port')}>
+            <button onClick={props.on_click} className="btn btn_lpm"
+              style={style}>+</button>
+          </Tooltip>
+        }</T>;
+};
 
 class Delete_dialog extends Pure_component {
     delete_proxies = e=>{
@@ -825,16 +837,10 @@ class Toolbar extends Pure_component {
         this.setState({filters: !this.state.filters});
     }
     render(){
-        const {proxy_add, edit_columns, download_csv} = this.props;
+        const {edit_columns, download_csv} = this.props;
         const to_delete = this.get_to_delete();
         return <Toolbar_container>
               <Toolbar_row>
-                <T>{t=><Toolbar_button id="add" tooltip={t('Add new proxy')}
-                  on_click={proxy_add}>
-                  <span style={{marginRight: 5, position: 'relative',
-                    top: -3}}><T>Add new proxy</T></span>
-                </Toolbar_button>}</T>
-                <Devider/>
                 <Toolbar_button tooltip="Filters"
                   on_click={()=>this.toggle_filters()} id="filters"/>
                 <Toolbar_button tooltip="Edit columns" on_click={edit_columns}

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.181.635",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI improvements for smaller resolutions"
+            }
+        ]
+    },
+    {
         "ver": "1.181.596",
         "type": "stable",
         "changes": [

@@ -222,38 +222,22 @@ const Step = ({title, step, curr_step, children})=>{
 const Created_port = ({port, preset})=>{
     const to_copy = instructions.code(port).shell;
     const code = prism.highlight(to_copy, prism.languages.clike);
-    const open_browser = ()=>etask(function*(){
-        const url = `/api/browser/${port}`;
-        const res = yield window.fetch(url);
-        if (res.status==206)
-            $('#fetching_chrome_modal').modal();
-    });
     return <div className="howto">
           <Note>
             Congratulation! You just created a port {port}.
           </Note>
-          {preset=='session_long' &&
-            <div>
-              <Note>
-                <span>You can start using the port by clicking </span>
-                <a onClick={open_browser} className="link">open a browser</a>
-              </Note>
+          <div>
+            <Note>
+              You can start using the port by running the following command:
+            </Note>
+            <div className="well instructions_well">
+              <pre>
+                <Code>
+                  <div dangerouslySetInnerHTML={{__html: code}}/>
+                </Code>
+              </pre>
             </div>
-          }
-          {preset!='session_long' &&
-            <div>
-              <Note>
-                You can start using the port by running the following command:
-              </Note>
-              <div className="well instructions_well">
-                <pre>
-                  <Code>
-                    <div dangerouslySetInnerHTML={{__html: code}}/>
-                  </Code>
-                </pre>
-              </div>
-            </div>
-          }
+          </div>
         </div>;
 };
 

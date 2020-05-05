@@ -15,7 +15,6 @@ import './css/app.less';
 import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
-import Proxy_tester from './proxy_tester.js';
 import Login from './login.js';
 import Overview from './overview.js';
 import Config from './config.js';
@@ -234,7 +233,6 @@ const Page = ()=>
             <Route path="/proxy/:port" component={Proxy_edit}/>
             <Route path="/howto/:option?/:suboption?" exact component={Howto}/>
             <Route path="/logs" exact component={Logs}/>
-            <Route path="/proxy_tester" exact component={Proxy_tester}/>
             <Route path="/config" exact component={Config}/>
             <Route path="/settings" exact component={Settings}/>
             <Route path="/" component={Overview}/>
