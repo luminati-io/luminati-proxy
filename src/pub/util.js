@@ -200,13 +200,14 @@ export const perr = (type, message, stack, context)=>etask(function*(){
     });
 });
 
-const undescribed_error = _.once((status_code, title)=>{
-    perr('undescribed_error', {status_code, title});
+const undescribed_error = _.once(message=>{
+    perr('undescribed_error', message);
 });
 
 export const get_troubleshoot = (body, status_code, headers)=>{
     let title;
     let info;
+    headers = headers||[];
     if (/([123]..|404)/.test(status_code))
         return {title, info};
     if (status_code=='canceled')
@@ -214,7 +215,7 @@ export const get_troubleshoot = (body, status_code, headers)=>{
         return {title: 'canceled by the sender', info: 'This request has been'
             +' canceled by the sender (your browser or scraper).'};
     }
-    title = (headers && headers.find(h=>
+    title = (headers.find(h=>
         h.name=='x-luminati-error'||h.name=='x-lpm-error')||{}).value||'';
     for (let {regex, description} of error_desc)
     {
@@ -222,6 +223,10 @@ export const get_troubleshoot = (body, status_code, headers)=>{
             return {title, info: description};
     }
     if (title)
-        undescribed_error(status_code, title);
+    {
+        let lpm = (headers.find(h=>h.name=='x-lpm-error')||{}).value||'';
+        let lum = (headers.find(h=>h.name=='x-luminati-error')||{}).value||'';
+        undescribed_error({status_code, title, lpm, lum});
+    }
     return {title, info: ''};
 };

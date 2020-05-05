@@ -62,7 +62,7 @@ const Nav_link = ({label, to, name})=>
     </Route>;
 
 const Nav_link_inner = ({label, to, name, match})=>
-    <Link to={to}>
+    <Link to={{pathname: to, search: document.location.search}}>
       <div className={classnames('menu_item', {active: match})}>
         <T>{t=><Tooltip title={t(label)} placement="right">
           <div className={classnames('icon', name)}/>
@@ -75,7 +75,11 @@ class Nav_top extends Pure_component {
         super(props);
         const url_o = zurl.parse(document.location.href);
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-        this.state = {ver: '', lock: false, embedded: qs_o.embedded=='true'};
+        this.state = {
+            ver: '',
+            lock: false,
+            embedded: qs_o.embedded=='true' || window.self!=window.top,
+        };
     }
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>
@@ -103,7 +107,9 @@ const Footer = with_www_api(class Footer extends Pure_component {
         super(props);
         const url_o = zurl.parse(document.location.href);
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-        this.state = {embedded: qs_o.embedded=='true'};
+        this.state = {
+            embedded: qs_o.embedded=='true' || window.self!=window.top,
+        };
     }
     render(){
         return <div className="footer">

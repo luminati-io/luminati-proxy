@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.181.596",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI improvements for the Cloud version"
+            }
+        ]
+    },
+    {
         "ver": "1.181.358",
         "type": "stable",
         "changes": [

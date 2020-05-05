@@ -23,7 +23,7 @@ class Overview extends Pure_component {
         this.state = {
             show_logs: null,
             tls_warning: false,
-            embedded: qs_o.embedded=='true',
+            embedded: qs_o.embedded=='true' || window.self!=window.top,
         };
     }
     componentDidMount(){

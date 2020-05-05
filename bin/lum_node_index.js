@@ -14,6 +14,8 @@ const child_process = require('child_process');
 const path = require('path');
 const util_lib = require('../lib/util.js');
 const upgrader = require('./upgrader.js');
+const string = require('../util/string.js');
+const qw = string.qw;
 
 class Lum_node_index {
     constructor(argv){
@@ -139,12 +141,25 @@ class Lum_node_index {
         logger.notice('Generating cert');
         ssl.gen_cert();
     }
+    _cleanup_file(file_path){
+        try {
+            file.unlink_e(path.resolve(lpm_file.work_dir, file_path));
+        } catch(e){
+            logger.debug(e.message);
+        }
+    }
+    _cleanup_local_files(){
+        const local_files = qw`.luminati.jar .luminati.json .first_actions.json
+            .luminati.db .luminati.db.0 .luminati.db.1 .luminati.db.2
+            .luminati.db.3 .luminati.db.4 .luminati.uuid`;
+        local_files.forEach(this._cleanup_file);
+    }
     restart_on_child_exit(opt){
         if (!this.child)
             return;
         this.child.removeListener('exit', this.restart_on_child_exit);
         if (opt.cleanup)
-            file.rm_rf_e(lpm_file.work_dir);
+            this._cleanup_local_files();
         setTimeout(()=>this.create_child(opt), 5000);
     }
     shutdown_on_child_exit(){

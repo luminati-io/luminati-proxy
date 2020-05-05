@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.596 Stable
+- :star: UI improvements for the Cloud version
+
 ## 1.181.358 Stable
 - :star: Enable storing configuration on Luminati servers on all OS
 
