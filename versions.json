@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.181.892",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "UI fixes"
+            }
+        ]
+    },
+    {
         "ver": "1.181.858",
         "type": "stable",
         "changes": [

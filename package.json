@@ -411,7 +411,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "fd269dd9d5874c1bb2b8eb4d4fb5a243"
+    "md5": "5f6c5b922027c8d521b7592e62c96107"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -444,5 +444,5 @@
     "stress-test": "node scripts/stress_test.js",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.181.858"
+  "version": "1.181.892"
 }
