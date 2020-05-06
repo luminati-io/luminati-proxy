@@ -306,8 +306,9 @@ export const tabs = {
                     IPs will be able to send requests to this port by default`
             },
             debug: {
-                label: 'Debug',
-                tooltip: 'Luminati request debug info',
+                label: 'Request details',
+                tooltip: `Luminati request details like response timeline or
+                    peer IP that was used to send a final request`,
             },
         },
     },

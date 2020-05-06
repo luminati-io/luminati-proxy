@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.858 Stable
+- :star: Enabled configuration synchronization on Mac
+- :sparkles: Improved applying new configuration mechanism
+
 ## 1.181.767 Stable
 - :bug: Disable storing configuration on Luminati servers for Win and Mac
 
