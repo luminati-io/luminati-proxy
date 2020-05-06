@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.181.767",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Disable storing configuration on Luminati servers for Win and Mac"
+            }
+        ]
+    },
+    {
         "ver": "1.181.745",
         "type": "stable",
         "changes": [

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.767 Stable
+- :bug: Disable storing configuration on Luminati servers for Win and Mac
+
 ## 1.181.745 Stable
 - :bug: Fix broken Rules tab
 
