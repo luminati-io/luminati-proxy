@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.745 Stable
+- :bug: Fix broken Rules tab
+
 ## 1.181.635 Stable
 - :star: UI improvements for smaller resolutions
 

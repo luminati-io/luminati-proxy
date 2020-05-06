@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.181.745",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix broken Rules tab"
+            }
+        ]
+    },
+    {
         "ver": "1.181.635",
         "type": "stable",
         "changes": [

@@ -46,6 +46,8 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
                   label="General settings"/>
                 <Nav_link to="/config" name="config"
                   label="Manual configuration"/>
+                <Nav_link ext to={swagger_url} name="api"
+                  label="API documentation"/>
               </div>
               <div className="menu_filler"/>
               <Footer/>
@@ -53,20 +55,32 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
     }
 });
 
-const Nav_link = ({label, to, name})=>
+const Nav_link = ({label, to, name, ext})=>
     <Route path={to}>
       {({match})=>
-        <Nav_link_inner label={label} to={to} name={name} match={match}/>}
+        <Nav_link_inner label={label} to={to} name={name} match={match}
+          ext={ext}/>}
     </Route>;
 
-const Nav_link_inner = ({label, to, name, match})=>
-    <Link to={{pathname: to, search: document.location.search}}>
-      <div className={classnames('menu_item', {active: match})}>
-        <T>{t=><Tooltip title={t(label)} placement="right">
-          <div className={classnames('icon', name)}/>
-        </Tooltip>}</T>
-      </div>
-    </Link>;
+const Nav_link_inner = ({label, to, name, match, ext})=>{
+    if (ext)
+    {
+        return <a href={to} target="_blank" rel="noopener noreferrer">
+              <div className="menu_item">
+                <T>{t=><Tooltip title={t(label)} placement="right">
+                  <div className={classnames('icon', name)}/>
+                </Tooltip>}</T>
+              </div>
+            </a>;
+    }
+    return <Link to={{pathname: to}}>
+          <div className={classnames('menu_item', {active: match})}>
+            <T>{t=><Tooltip title={t(label)} placement="right">
+              <div className={classnames('icon', name)}/>
+            </Tooltip>}</T>
+          </div>
+        </Link>;
+};
 
 class Nav_top extends Pure_component {
     constructor(props){
@@ -124,10 +138,6 @@ const Footer = with_www_api(class Footer extends Pure_component {
                 </div>
               </React.Fragment>
             }
-            <div>
-              <a rel="noopener noreferrer" target="_blank" href={swagger_url}
-                className="link"><T>API</T></a>
-            </div>
           </div>;
     }
 });

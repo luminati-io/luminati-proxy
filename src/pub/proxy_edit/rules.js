@@ -14,7 +14,7 @@ import zutil from '../../../util/util.js';
 import {Labeled_controller, with_proxy_ports, Cm_wrapper,
     Field_row_raw, Warning} from '../common.js';
 import {tabs} from './fields.js';
-import {Tester} from '../proxy_tester.js';
+import Proxy_tester from '../proxy_tester.js';
 import Tooltip from '../common/tooltip.js';
 import {T} from '../common/i18n.js';
 
@@ -208,7 +208,7 @@ const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
               <div className="nav_header" style={{marginBottom: 5}}>
                 <h3><T>Test rules</T></h3>
               </div>
-              <Tester port={this.props.match.params.port} no_labels/>
+              <Proxy_tester port={this.props.match.params.port} no_labels/>
             </div>;
     }
 });
