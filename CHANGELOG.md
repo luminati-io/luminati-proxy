@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.181.960 Stable
+- :star: Cloud LPM release - Host the LPM on Luminati server. Check luminati.io/cp/lpm
+
 ## 1.181.892 Stable
 - :bug: UI fixes
 
