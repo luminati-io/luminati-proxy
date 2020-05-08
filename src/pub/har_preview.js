@@ -272,13 +272,23 @@ const Status_value = ({value})=>{
         </div>;
 };
 
-class Pane_rules extends Pure_component {
+const Pane_rules = withRouter(class Pane_rules extends Pure_component {
+    goto_ssl = ()=>{
+        this.props.history.push({
+            pathname: `/proxy/${this.props.req.details.port}`,
+            state: {field: 'trigger_type'},
+        });
+    };
     render(){
         const {details: {rules}} = this.props.req;
         if (!rules || !rules.length)
         {
             return <Pane_info>
-                  <div>No rules have been triggered on this request.</div>
+                  <div>
+                    <span>No rules have been triggered on this request. </span>
+                    <a className="link" onClick={this.goto_ssl}>
+                      Configure Rules</a>
+                  </div>
                 </Pane_info>;
         }
         return <div className="rules_view_wrapper">
@@ -289,7 +299,7 @@ class Pane_rules extends Pure_component {
               </ol>
             </div>;
     }
-}
+});
 
 class Rule_preview extends Pure_component {
     state = {open: true};

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.182.94",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix possible EventEmitter memory leak for response listeners"
+            },
+            {
+                "type": "star",
+                "text": "Multiple UI fixes and improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.181.960",
         "type": "stable",
         "changes": [

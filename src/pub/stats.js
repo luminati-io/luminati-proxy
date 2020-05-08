@@ -4,6 +4,7 @@ import React from 'react';
 import {withRouter} from 'react-router-dom';
 import {status_codes} from './util.js';
 import ajax from '../../util/ajax.js';
+import etask from '../../util/etask.js';
 import {Tooltip_bytes, Loader_small} from './common.js';
 import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
@@ -12,6 +13,7 @@ import {Toolbar_button, Devider, Sort_icon,
     with_resizable_cols, Toolbar_container,
     Toolbar_row} from './chrome_widgets.js';
 import {T} from './common/i18n.js';
+import React_tooltip from 'react-tooltip';
 
 class Stats extends Pure_component {
     state = {stats: {}, toggling: false};
@@ -95,16 +97,44 @@ const Empty_row = ()=>
       <td>—</td><td>—</td><td>—</td><td>—</td>
     </tr>;
 
+// XXX krzysztof: merge with enable_ssl in har_viewer.js
+const enable_ssl_click = port=>etask(function*(){
+    yield window.fetch('/api/enable_ssl', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+    });
+    const proxies = yield ajax.json({url: '/api/proxies_running'});
+    setdb.set('head.proxies_running', proxies);
+});
+
 const Key_cell = ({title, warning, row_key})=>{
-    const warning_tooltip = 'Some of your proxy ports don\'t have SSL '
-    +'analyzing enabled and there are connections on HTTPS protocol detected';
     return <td>
-          <Cell row_key={row_key}>{title}</Cell>
-          {warning && <T>{t=>
-            <Tooltip title={t(warning_tooltip)}>
+          <Cell row_key={row_key} onClick={e=>e.stopPropagation()}>
+            {title}
+          </Cell>
+          {warning &&
+            <span onClick={e=>e.stopPropagation()}>
+            <React_tooltip id="ssl_warn" type="info" effect="solid"
+              delayHide={100} delayShow={0} delayUpdate={500}
+              offset={{top: -10}}>
+              <div>
+                Some of your proxy ports don't have SSL analyzing enabled and
+                there are connections on HTTPS protocol detected.
+              </div>
+              <div style={{marginTop: 10}}>
+                <a onClick={enable_ssl_click} className="link">
+                  Enable SSL analyzing
+                </a>
+                <span>
+                  to see {name} and other information about requests
+                </span>
+              </div>
+            </React_tooltip>
+            <span data-tip="React-tooltip" data-for="ssl_warn">
               <div className="ic_warning"/>
-            </Tooltip>
-          }</T>}
+            </span>
+            </span>
+          }
         </td>;
 };
 

@@ -36,8 +36,8 @@ const enable_ssl_click = port=>etask(function*(){
     loader.start();
     yield window.fetch('/api/enable_ssl', {
         method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({port}),
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({port}),
     });
     const proxies = yield ajax.json({url: '/api/proxies_running'});
     setdb.set('head.proxies_running', proxies);
@@ -879,8 +879,17 @@ class Data_row extends React.Component {
         return selection_changed||focused_changed&&selected||
             checked_all_changed||pending_changed;
     }
+    cell_clicked = idx=>{
+        if (idx==0)
+            return;
+        if (this.props.cols[idx].title=='Time')
+            setdb.emit('har_viewer.set_pane', 3);
+        if (this.props.cols[idx].title=='Troubleshooting')
+            setdb.emit('har_viewer.set_pane', 5);
+        this.props.open_preview(this.props.req);
+    };
     render(){
-        const {cur_preview, open_preview, cols, focused, req} = this.props;
+        const {cur_preview, cols, focused, req} = this.props;
         const selected = _.get(cur_preview, 'uuid')==req.uuid;
         const classes = classnames({
             selected,
@@ -890,7 +899,7 @@ class Data_row extends React.Component {
         });
         return <tr className={classes}>
               {cols.map((c, idx)=>
-                <td key={c.title} onClick={()=>idx!=0 && open_preview(req)}>
+                <td key={c.title} onClick={()=>this.cell_clicked(idx)}>
                   <Cell_value col={c.title} req={req}
                     checked_all={this.props.checked_all}/>
                 </td>

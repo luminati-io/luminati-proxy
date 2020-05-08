@@ -661,8 +661,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.setState({selected_proxies, checked_all});
     };
     cell_renderer = function Cell_renderer(props){
-        return <Cell {...props} mgr={this}
-              open_delete_dialog={this.open_delete_dialog}/>;
+        return <Cell {...props}
+            mgr={this}
+            history={this.props.history}
+            open_delete_dialog={this.open_delete_dialog}/>;
     };
     on_row_click = e=>{
         const proxy = e.rowData;
@@ -867,6 +869,16 @@ class Cell extends React.Component {
         return this.props.cellData!=next_props.cellData ||
             this.props.rowData!=next_props.rowData;
     }
+    cell_clicked = e=>{
+        const p = this.props.rowData;
+        if (!p.master_port && p.multiply && p.multiply>1)
+            return;
+        e.stopPropagation();
+        this.props.history.push({
+            pathname: `/proxy/${p.port}`,
+            state: {field: this.props.dataKey},
+        });
+    };
     render(){
         const props = this.props;
         const col = columns_obj[props.dataKey];
@@ -878,9 +890,12 @@ class Cell extends React.Component {
         else if (col.render)
         {
             const S_cell = col.render;
-            return <S_cell proxy={props.rowData} mgr={props.mgr}
-              col={props.dataKey}
-              open_delete_dialog={props.open_delete_dialog}/>;
+            return <span onClick={this.cell_clicked}>
+                <S_cell proxy={props.rowData}
+                  mgr={props.mgr}
+                  col={props.dataKey}
+                  open_delete_dialog={props.open_delete_dialog}/>
+              </span>;
         }
         return props.cellData||'';
     }

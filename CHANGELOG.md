@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.182.94 Stable
+- :bug: Fix possible EventEmitter memory leak for response listeners
+- :star: Multiple UI fixes and improvements
+
 ## 1.181.960 Stable
 - :star: Cloud LPM release - Host the LPM on Luminati server. Check luminati.io/cp/lpm
 
