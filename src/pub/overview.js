@@ -11,8 +11,10 @@ import {T} from './common/i18n.js';
 import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
 import {perr} from './util.js';
 import Tooltip from './common/tooltip.js';
+import {Modal} from './common/modals.js';
 import zurl from '../../util/url.js';
 import setdb from '../../util/setdb.js';
+import ajax from '../../util/ajax.js';
 import './css/overview.less';
 
 class Overview extends Pure_component {
@@ -27,8 +29,13 @@ class Overview extends Pure_component {
         };
     }
     componentDidMount(){
-        this.setdb_on('head.settings', settings=>settings &&
-            this.setState({show_logs: settings.logs>0}));
+        this.setdb_on('head.settings', settings=>{
+            if (!settings)
+                return;
+            this.setState({show_logs: settings.logs>0});
+            if (settings.sync_config==undefined)
+                $('#sync_config_modal').modal();
+        });
         this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&
             this.setState({tls_warning}));
         this.setdb_on('head.save_settings', save_settings=>
@@ -41,6 +48,21 @@ class Overview extends Pure_component {
             const settings = Object.assign({}, setdb.get('head.settings'));
             settings.logs = val;
             yield _this.save_settings(settings);
+        });
+    };
+    set_sync_config = val=>{
+        const _this = this;
+        this.etask(function*(){
+            this.finally(()=>$('#applying_config').modal('hide'));
+            const settings = Object.assign({}, setdb.get('head.settings'));
+            settings.sync_config = val;
+            if (val)
+                $('#applying_config').modal();
+            yield _this.save_settings(settings);
+            if (!val)
+                return;
+            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            setdb.set('head.proxies_running', proxies);
         });
     };
     render(){
@@ -79,6 +101,13 @@ class Overview extends Pure_component {
                 </div>}
               {show_logs===false &&
                 <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>}
+              <Modal id="sync_config_modal" ok_btn_title="Yes"
+                click_ok={()=>this.set_sync_config(true)}
+                cancel_clicked={()=>this.set_sync_config(false)}
+                title={<T>Enable configuration synchronization</T>}>
+                <T>Do you want to enable configuration synchronization? You
+                  can always change it later in settings.</T>
+              </Modal>
             </div>;
     }
 }

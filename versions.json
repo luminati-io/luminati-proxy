@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.182.272",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Config synchronization made disabled by default"
+            }
+        ]
+    },
+    {
         "ver": "1.182.94",
         "type": "stable",
         "changes": [

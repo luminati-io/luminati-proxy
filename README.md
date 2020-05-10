@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.182.94/luminati-proxy-manager-v1.182.94-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.182.272/luminati-proxy-manager-v1.182.272-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -242,6 +242,8 @@ Options:
                                 LPM                   [boolean] [default: false]
   --read_only                   Avoid saving current config in the config file
                                                       [boolean] [default: false]
+  --sync_config                 Synchronize LPM configuration with the cloud
+                                                                       [boolean]
   --no-www                      Disable local web
   --no-config                   Working without a config file
   --no-cookie                   Working without a cookie file

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.182.272 Stable
+- :sparkles: Config synchronization made disabled by default
+
 ## 1.182.94 Stable
 - :bug: Fix possible EventEmitter memory leak for response listeners
 - :star: Multiple UI fixes and improvements
