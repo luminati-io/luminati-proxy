@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.182.312 Stable
+- :bug: Fix memory leak caused by retry rules
+
 ## 1.182.272 Stable
 - :sparkles: Config synchronization made disabled by default
 

@@ -73,7 +73,12 @@ E.mkdirp_e = p=>etask(function*mkdirp_e(){
         if (e.code!='ENOENT')
             throw e;
         yield E.mkdirp_e(path.dirname(p));
-        yield E.mkdir_e(p, mode);
+        try { yield E.mkdir_e(p, mode); }
+        catch(e){ ef(e);
+            if (e.code=='EEXIST')
+                return;
+            throw e;
+        }
     }
 });
 E.mkdirp_file_e = f=>E.mkdirp_e(path.dirname(f));

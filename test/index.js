@@ -755,8 +755,7 @@ describe('proxy', ()=>{
             l.on('retry', opt=>{
                 if (opt.req.retry)
                     retry_count++;
-                l.lpm_request(opt.req, opt.res, opt.head);
-                l.once('response', opt.post);
+                l.lpm_request(opt.req, opt.res, opt.head, opt.post);
             });
             let r = yield l.test();
             assert.equal(retry_count, c);
@@ -781,8 +780,7 @@ describe('proxy', ()=>{
             l.on('retry', opt=>{
                 if (opt.req.retry)
                     retry_count++;
-                l.lpm_request(opt.req, opt.res, opt.head);
-                l.once('response', opt.post);
+                l.lpm_request(opt.req, opt.res, opt.head, opt.post);
             });
             let opt = {url: ping.http.url, method: 'POST', body: 'test'};
             let r = yield l.test(opt);
@@ -1001,7 +999,7 @@ describe('proxy', ()=>{
                         trigger_type: 'status',
                     }], insecure: true, ssl: true});
                     l.on('retry', opt=>{
-                        l.lpm_request(opt.req, opt.res, opt.head);
+                        l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
                     for (let i=0; i<2; i++)
                     {
@@ -1118,7 +1116,7 @@ describe('proxy', ()=>{
                         rules: [{action: {retry: true}, status: '200'}],
                     });
                     l.on('retry', opt=>{
-                        l.lpm_request(opt.req, opt.res, opt.head);
+                        l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
                     let session_a = l.session_mgr.sessions.sessions[0].session;
                     yield l.test({fake: 1});
@@ -1134,7 +1132,7 @@ describe('proxy', ()=>{
                                 action_type: 'save_to_pool', status: '201'},
                             {action: {retry: true}, status: '200'}]});
                     l.on('retry', opt=>{
-                        l.lpm_request(opt.req, opt.res, opt.head);
+                        l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
                     let [sb1, sb2] = l.session_mgr.sessions.sessions;
                     yield l.test({fake: 1});
@@ -1154,7 +1152,7 @@ describe('proxy', ()=>{
                                 action_type: 'save_to_pool', status: '201'},
                             {action: {retry: 2}, status: '200'}]});
                     l.on('retry', opt=>{
-                        l.lpm_request(opt.req, opt.res, opt.head);
+                        l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
                     let [sb1, sb2] = l.session_mgr.sessions.sessions;
                     let res = yield l.test({fake: 1});
@@ -1175,7 +1173,7 @@ describe('proxy', ()=>{
                 let p1, p2;
                 l.on('retry', opt=>{
                     p1 = opt.req.ctx.port;
-                    l2.lpm_request(opt.req, opt.res, opt.head);
+                    l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     p2 = opt.req.ctx.port;
                 });
                 yield l.test({fake: 1});
@@ -1377,7 +1375,7 @@ describe('proxy', ()=>{
                 l.on('retry', opt=>{
                     called = true;
                     assert.equal(opt.port, 24001);
-                    l2.lpm_request(opt.req, opt.res, opt.head);
+                    l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
                 });
                 yield l.test(ping.http.url);
                 assert.ok(called);
@@ -1418,8 +1416,7 @@ describe('proxy', ()=>{
                     rules: [get_banip_rule(30)],
                 });
                 l.on('retry', opt=>{
-                    l2.lpm_request(opt.req, opt.res, opt.head);
-                    l2.once('response', opt.post);
+                    l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
                 });
                 inject_headers(l2);
                 const ban_stub = sinon.stub(l, 'banip');
@@ -1434,8 +1431,7 @@ describe('proxy', ()=>{
                 const l2 = yield lum({port: 24001,
                     rules: [get_banip_rule(30)]});
                 l.on('retry', opt=>{
-                    l2.lpm_request(opt.req, opt.res, opt.head);
-                    l2.once('response', opt.post);
+                    l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
                 });
                 const header_stub = inject_headers(l);
                 const header_stub_l2 = inject_headers(l2, 'ip2');
@@ -1458,8 +1454,7 @@ describe('proxy', ()=>{
                 const l2 = yield lum({port: 24001,
                     rules: [get_banip_rule(30)]});
                 l.on('retry', opt=>{
-                    l2.lpm_request(opt.req, opt.res, opt.head);
-                    l2.once('response', opt.post);
+                    l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
                 });
                 inject_headers(l);
                 inject_headers(l2);
@@ -1613,8 +1608,7 @@ describe('proxy', ()=>{
                     smtp.last_connection.end();
             });
             l.on('retry', _opt=>{
-                l.lpm_request(_opt.req, _opt.res, _opt.head);
-                l.once('response', _opt.post);
+                l.lpm_request(_opt.req, _opt.res, _opt.head, _opt.post);
             });
             l.on('usage', ()=>this.continue());
             l.on('usage_abort', ()=>this.continue());
