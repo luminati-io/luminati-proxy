@@ -33,7 +33,7 @@ class Overview extends Pure_component {
             if (!settings)
                 return;
             this.setState({show_logs: settings.logs>0});
-            if (settings.sync_config==undefined)
+            if (settings.ask_sync_config)
                 $('#sync_config_modal').modal();
         });
         this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&
@@ -104,9 +104,17 @@ class Overview extends Pure_component {
               <Modal id="sync_config_modal" ok_btn_title="Yes"
                 click_ok={()=>this.set_sync_config(true)}
                 cancel_clicked={()=>this.set_sync_config(false)}
-                title={<T>Enable configuration synchronization</T>}>
-                <T>Do you want to enable configuration synchronization? You
-                  can always change it later in settings.</T>
+                title={<T>Do you want to enable configuration
+                    synchronization?</T>}>
+                <p>
+                  <T>
+                    Synchronizing your LPM configuration gives you reliable
+                    backup, single configuration across all instances which
+                    propagates automatically and central control via control
+                    panel.
+                  </T>
+                </p>
+                <p><T>You can always change it later in settings.</T></p>
               </Modal>
             </div>;
     }

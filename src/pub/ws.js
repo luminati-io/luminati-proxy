@@ -7,7 +7,7 @@ class Ws_wrapper extends EventTarget {
     constructor(){
         super();
         this.url = location.hostname;
-        this.port = location.origin.split(':').slice(-1)[0]||80;
+        this.port = location.port||80;
         this.protocol = location.protocol=='https:' ? 'wss' : 'ws';
         this.create_socket();
     }

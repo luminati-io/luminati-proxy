@@ -962,8 +962,8 @@ class Cell_value extends React.Component {
         }
         else if (col=='Date')
         {
-            const local = moment(new Date(req.startedDateTime||
-                req.details.timestamp)).format('YYYY-MM-DD HH:mm:ss');
+            const local = moment(new Date(req.details.timestamp))
+                .format('YYYY-MM-DD HH:mm:ss');
             return <Tooltip_and_value val={local}/>;
         }
         else if (col=='Troubleshooting')

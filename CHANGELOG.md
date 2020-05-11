@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.182.426 Stable
+- :bug: Fix date column sorting
+- :bug: Fix websocket error when LPM works on default port 80
+- :sparkles: Enable config synchronization for new LPM users by default
+
 ## 1.182.312 Stable
 - :bug: Fix memory leak caused by retry rules
 

@@ -684,6 +684,30 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.182.312', v=>{
+        it('disables config sync and sets ask_sync_config', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {sync_config: false, ask_sync_config: true},
+                proxies: [],
+            });
+        });
+        it('keeps enabled config sync and not set ask_sync_config', ()=>{
+            const conf = {
+                _defaults: {sync_config: true},
+                proxies: [],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {sync_config: true},
+                proxies: [],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

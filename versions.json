@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.182.426",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix date column sorting"
+            },
+            {
+                "type": "bug",
+                "text": "Fix websocket error when LPM works on default port 80"
+            },
+            {
+                "type": "sparkles",
+                "text": "Enable config synchronization for new LPM users by default"
+            }
+        ]
+    },
+    {
         "ver": "1.182.312",
         "type": "stable",
         "changes": [

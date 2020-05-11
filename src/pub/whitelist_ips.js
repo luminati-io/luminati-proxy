@@ -33,7 +33,7 @@ export default class Whitelist_ips extends Pure_component {
 }
 
 const Admin_steps = ({ip})=>{
-    const port = location.origin.split(':').slice(-1)[0]||80;
+    const port = location.port||80;
     let cmd = `lpm_whitelist_ip ${ip}`;
     if (port!=22999)
         cmd += ' '+port;
