@@ -195,12 +195,12 @@ class Form extends Pure_component {
                 tooltip={tooltips.har_limit}/>
               <Labeled_controller val={s.log}
                 type="select" on_change_wrapper={this.log_level_changed}
-                data={this.log_level_opts}
+                data={this.log_level_opts} disabled={s.zagent}
                 label="Log level / API logs" tooltip={tooltips.log_level}/>
               <Labeled_controller val={s.sync_config}
                 type="yes_no" on_change_wrapper={this.sync_config_changed}
                 label="Sync configuration" default={true}
-                tooltip={tooltips.sync_config}/>
+                tooltip={tooltips.sync_config} disabled={s.zagent}/>
               <Loader_small show={this.state.saving}/>
             </div>;
     }

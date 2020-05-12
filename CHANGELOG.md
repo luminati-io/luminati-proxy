@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.182.564 Stable
+- :sparkles: When running UI on https listen also for http requests to redirect to https
+- :sparkles: Always enable config synchronization for Cloud LPM
+
 ## 1.182.426 Stable
 - :bug: Fix date column sorting
 - :bug: Fix websocket error when LPM works on default port 80

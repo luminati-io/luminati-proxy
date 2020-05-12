@@ -47,10 +47,14 @@ E.write_e = (path, data, opt)=>etask(function*write_e(){
     yield check_file(path, opt);
     yield etask.nfn_apply(fs.writeFile, [path, data]);
 });
+E.tmp_path = file=>{
+    let name = path.basename(file), dir = path.dirname(file);
+    return dir+'/.'+name+'.'+(1000000*Math.random()|0)+'.tmp';
+};
 E.write_atomic_e = (file, data, opt)=>etask(function*write_atomic_e(){
     opt = opt||{};
     yield check_file(file, opt);
-    let tmpfile = file+'.'+(1000000*Math.random()|0)+'.tmp';
+    let tmpfile = E.tmp_path(file);
     try {
         yield etask.nfn_apply(fs.writeFile, [tmpfile, data]);
         yield etask.nfn_apply(fs.rename, [tmpfile, file]);
@@ -178,6 +182,8 @@ E.find_e = (dir, opt)=>etask(function*find_e(){
     let exclude = opt.exclude, match = opt.match, strip = opt.strip;
     for (let f of yield E.readdir_e(dir))
     {
+        if (!opt.dotfile && f.startsWith('.'))
+            continue;
         let name = file.normalize(dir+'/'+f);
         let stripped = strip ? name.replace(strip, '') : name;
         if (exclude && exclude.test(stripped))

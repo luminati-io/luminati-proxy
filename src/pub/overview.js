@@ -33,7 +33,7 @@ class Overview extends Pure_component {
             if (!settings)
                 return;
             this.setState({show_logs: settings.logs>0});
-            if (settings.ask_sync_config)
+            if (settings.ask_sync_config&&!settings.zagent)
                 $('#sync_config_modal').modal();
         });
         this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.182.564",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "When running UI on https listen also for http requests to redirect to https"
+            },
+            {
+                "type": "sparkles",
+                "text": "Always enable config synchronization for Cloud LPM"
+            }
+        ]
+    },
+    {
         "ver": "1.182.426",
         "type": "stable",
         "changes": [
