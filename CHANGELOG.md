@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.182.667 Stable
+- :bug: Fix erasing whitelisted IPs
+
 ## 1.182.564 Stable
 - :sparkles: When running UI on https listen also for http requests to redirect to https
 - :sparkles: Always enable config synchronization for Cloud LPM

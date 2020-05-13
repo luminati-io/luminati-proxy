@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.182.667",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix erasing whitelisted IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.182.564",
         "type": "stable",
         "changes": [
