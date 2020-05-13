@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.182.691 Stable
+- :sparkles: Allow to add arbitrary IPs to the SSL certificate
+
 ## 1.182.667 Stable
 - :bug: Fix erasing whitelisted IPs
 

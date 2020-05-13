@@ -85,6 +85,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     www: 22999,
     www_whitelist_ips: [],
     whitelist_ips: [],
+    extra_ssl_ips: [],
     dropin: true,
     dropin_port: 22225,
     no_usage_stats: false,
