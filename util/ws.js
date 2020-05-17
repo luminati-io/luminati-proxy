@@ -446,6 +446,7 @@ class Client extends WS {
         this.servername = opt.servername;
         this.retry_interval = opt.retry_interval||10000;
         this.retry_max = opt.retry_max||this.retry_interval;
+        this.retry_random = opt.retry_random;
         this.next_retry = this.retry_interval;
         this.no_retry = opt.no_retry;
         this._retry_count = 0;
@@ -535,7 +536,8 @@ class Client extends WS {
             delay = delay();
         else
         {
-            this.next_retry = Math.min(delay*2,
+            let coeff = this.retry_random ? 1+Math.random() : 2;
+            this.next_retry = Math.min(Math.round(delay*coeff),
                 typeof this.retry_max=='function'
                     ? this.retry_max() : this.retry_max);
         }

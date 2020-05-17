@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.183.23 Stable
+- :sparkles: Offer to run upgrade command manually if request for privileges fails
+
 ## 1.182.691 Stable
 - :sparkles: Allow to add arbitrary IPs to the SSL certificate
 

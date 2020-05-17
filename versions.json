@@ -1,5 +1,16 @@
 [
     {
+        "ver": "1.183.23",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Offer to run upgrade command manually if request for privileges fails"
+            }
+
+        ]
+    },
+    {
         "ver": "1.182.691",
         "type": "stable",
         "changes": [

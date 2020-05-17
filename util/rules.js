@@ -5,7 +5,7 @@ const _ = require('lodash');
 const E = exports;
 
 E.select_rules = (all_rules, selector)=>{
-    let matches = all_rules.filter(x=>matches_rule(x.match, selector));
+    let matches = (all_rules||[]).filter(x=>matches_rule(x.match, selector));
     return _.merge({}, ...matches.map(x=>x.rules), (dest, src)=>{
         if (Array.isArray(src))
             return src;

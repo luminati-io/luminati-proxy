@@ -37,10 +37,7 @@ E.upgrade = cb=>etask(function*(){
         return logger.notice('Already the newest version');
     sudo_run(bash_cmd('lpm_upgrade.sh'), e=>{
         if (e)
-        {
-            logger.error('Could not upgrade: %s', e.message);
             zerr.perr('upgrade_error');
-        }
         else
         {
             logger.notice('Finished upgrading!');
@@ -56,13 +53,13 @@ E.downgrade = cb=>{
     logger.notice('Downgrading...');
     sudo_run(bash_cmd('lpm_downgrade.sh'), e=>{
         if (e && e.code==1)
-            e = 'Luminati proxy manager backup version does not exist!';
-        if (e)
         {
-            logger.warn(e);
-            zerr.perr('downgrade_error');
+            e = 'Luminati proxy manager backup version does not exist!';
+            logger.error(e);
         }
-        if (!e)
+        if (e)
+            zerr.perr('downgrade_error');
+        else
         {
             logger.notice('Finished downgrading!');
             zerr.perr('downgrade_finish');
@@ -82,7 +79,10 @@ const sudo_run = (cmd, cb, opt={})=>{
         if (cb)
             cb(e, stdout, stderr);
         if (e)
-            return logger.error(e.message);
+        {
+            logger.error('Could not execute command. Run it manually:');
+            return logger.error('sudo '+cmd);
+        }
         if (stderr)
             logger.error(stderr);
         if (opt.log && stdout)
