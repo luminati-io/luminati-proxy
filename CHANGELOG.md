@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.183.101 Stable
+- :bug: Fix stats table sorting
+
 ## 1.183.23 Stable
 - :sparkles: Offer to run upgrade command manually if request for privileges fails
 

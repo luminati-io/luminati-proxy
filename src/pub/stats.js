@@ -211,8 +211,10 @@ const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
         const field = cols[sorting.col].id;
         const val_a = a[field];
         const val_b = b[field];
-        let res = val_a>val_b;
-        return sorting.dir==-1 ? res : !res;
+        if (val_a==val_b)
+            return 0;
+        let res = val_a>val_b ? 1 : -1;
+        return sorting.dir==-1 ? res : -res;
     });
     return <div className="data_container">
           <table>
