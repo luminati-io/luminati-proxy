@@ -988,7 +988,9 @@ describe('proxy', ()=>{
                     assert.ok(add_stub.called);
                     assert.ok(refresh_stub.called);
                 }));
-                let t = (name, req, fake)=>it(name, ()=>etask(function*(){
+                let t = (name, req, fake, is_ssl)=>it(name, ()=>etask(
+                    function*()
+                {
                     proxy.fake = !!fake;
                     sandbox.stub(Server, 'get_random_ip', ()=>'1.1.1.1');
                     sandbox.stub(common, 'get_random_ip', ()=>'1.1.1.1');
@@ -997,7 +999,7 @@ describe('proxy', ()=>{
                         action_type: 'ban_ip',
                         status: '200',
                         trigger_type: 'status',
-                    }], insecure: true, ssl: true});
+                    }], insecure: true, ssl: is_ssl});
                     l.on('retry', opt=>{
                         l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
@@ -1014,9 +1016,10 @@ describe('proxy', ()=>{
                             type: 'after_hdr'}]);
                     }
                 }));
-                t('ban_ip fake req', ()=>({fake: 1}));
-                t('ban_ip http req', ()=>({url: ping.http.url}));
-                t('ban_ip https req', ()=>({url: ping.https.url}), true);
+                t('ban_ip fake', ()=>({fake: 1}), false, true);
+                t('ban_ip http', ()=>({url: ping.http.url}), false, true);
+                t('ban_ip https', ()=>({url: ping.https.url}), true, false);
+                t('ban_ip https ssl', ()=>({url: ping.https.url}), true, true);
             });
             describe('request_url', ()=>{
                 let req, req_stub;

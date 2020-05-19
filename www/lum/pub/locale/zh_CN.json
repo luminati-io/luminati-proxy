@@ -4047,7 +4047,7 @@
   "Click on the 'Withdraw commission' button to get your commission": "如需领取佣金，请点击“提取佣金”按钮。",
   "Special promotion - get 5% bonus by asking for Luminati credit reward!": "特殊优惠 - 选择通过您在Luminati的账户获取佣金，您将获得额外9.5折的折扣。",
   "Withdraw commission": "提取佣金",
-  "cp_referral.sum": "个推荐",
+  "cp_referral.sum": "推荐的人",
   "cp_referral.Comission balance": "未付佣金",
   "You can receive your commission by a credit to your [%pay_opts] payment": "您可以通过[%pay_opts]领取您的佣金。",
   "Luminati account, Paypal, Wire transfer or Payoneer": "Luminati帐户、贝宝、电汇或派安盈",
@@ -4329,7 +4329,7 @@
   "Open Terminal on your Mac": "在Mac上打开终端",
   "Run “luminati” command and wait until it boots": "运行“luminati”指令并等待其启动",
   "Open the following URL 127.0.0.1:22299 in your browser": "在浏览器中打开以下URL 127.0.0.1:22299",
-  "Referral": "推荐",
+  "Referral": "个推荐",
   "Referrals revenue": "推荐收入",
   "New referrals": "新的推荐",
   "Withdraw commission": "提取佣金",
@@ -4519,5 +4519,8 @@
   "Country" : "国家",
   "Phone number" : "手机号码",
   "Email" : "电子邮件",
-  "Switch over to P-A-Y-G!" : "立即开始现付现用"
+  "Switch over to P-A-Y-G!" : "立即开始现付现用",
+  "Referrals" : "我的推荐",
+  "Withdraw commission" : "提取佣金",
+  "Referrals of" : "的推荐"
 }

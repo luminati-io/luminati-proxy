@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.183.313 Stable
+- :sparkles: Implement Ban IP rule for not analyzed https requests
+
 ## 1.183.101 Stable
 - :bug: Fix stats table sorting
 
