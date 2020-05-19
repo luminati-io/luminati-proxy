@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
 import {EventTarget} from 'event-target-shim';
-import { default_ports } from'./util';
+import { default_ports } from './util';
 import setdb from '../../util/setdb.js';
 
 class Ws_wrapper extends EventTarget {

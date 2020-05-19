@@ -7,7 +7,7 @@ import {Logo, Code, with_www_api} from './common.js';
 import {Instructions, Li} from './common/bullets.js';
 import ws from './ws.js';
 import './css/whitelist_ips.less';
-import { default_ports } from'./util';
+import { default_ports } from './util';
 
 export default class Whitelist_ips extends Pure_component {
     state = {};
