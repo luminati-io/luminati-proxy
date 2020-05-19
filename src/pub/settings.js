@@ -47,6 +47,8 @@ const tooltips = {
             calls</li>
           <li><strong>debug: </strong>all the above and debug info</li>
         </ul>`,
+    sync_config: `All changes on LPMs with enabled config synchronization
+        will be propagated and applied immediately.`,
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
@@ -115,6 +117,10 @@ class Form extends Pure_component {
             prev=>({settings: {...prev.settings, request_stats: val}}),
             this.debounced_save);
     };
+    sync_config_changed = val=>{
+        this.setState(prev=>({settings: {...prev.settings, sync_config: val}}),
+            this.debounced_save);
+    };
     lock_nav = lock=>setdb.set('head.lock_navigation', lock);
     save = ()=>{
         if (this.saving || !this.save_settings)
@@ -144,6 +150,11 @@ class Form extends Pure_component {
             yield _this.save_settings(body);
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('head.zones', zones);
+            if (_this.state.settings.sync_config)
+            {
+                const proxies = yield ajax.json({url: '/api/proxies_running'});
+                setdb.set('head.proxies_running', proxies);
+            }
         });
     };
     debounced_save = _.debounce(this.save, 500);
@@ -184,8 +195,12 @@ class Form extends Pure_component {
                 tooltip={tooltips.har_limit}/>
               <Labeled_controller val={s.log}
                 type="select" on_change_wrapper={this.log_level_changed}
-                data={this.log_level_opts}
+                data={this.log_level_opts} disabled={s.zagent}
                 label="Log level / API logs" tooltip={tooltips.log_level}/>
+              <Labeled_controller val={s.sync_config}
+                type="yes_no" on_change_wrapper={this.sync_config_changed}
+                label="Sync configuration" default={true}
+                tooltip={tooltips.sync_config} disabled={s.zagent}/>
               <Loader_small show={this.state.saving}/>
             </div>;
     }

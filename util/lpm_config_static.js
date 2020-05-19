@@ -50,7 +50,7 @@ const conf = {
     },
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
-    'version');
+    'version', 'ask_sync_config');
 conf.first_actions = '~/luminati_proxy_manager/.first_actions.json';
 conf.proxy_params = Object.keys(swagger.definitions.proxy.properties);
 conf.server_default = {
@@ -85,6 +85,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     www: 22999,
     www_whitelist_ips: [],
     whitelist_ips: [],
+    extra_ssl_ips: [],
     dropin: true,
     dropin_port: 22225,
     no_usage_stats: false,
@@ -100,6 +101,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     read_only: false,
     cloud: true,
     zagent: false,
+    sync_config: true,
 });
 conf.log_levels = {
     error: 0,

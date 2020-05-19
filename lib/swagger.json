@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.182.94",
+        "version": "1.183.313",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1396,6 +1396,15 @@
                 "read_only": {
                     "type": "boolean",
                     "description": "Avoid saving current config in the config file"
+                },
+                "sync_config": {
+                    "type": "boolean",
+                    "description": "Synchronize LPM configuration with the cloud"
+                },
+                "extra_ssl_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of IPs to add to SSL certificate"
                 }
             }
         },

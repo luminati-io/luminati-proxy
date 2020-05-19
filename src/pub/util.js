@@ -65,7 +65,7 @@ export const status_codes = {
 };
 
 const error_desc = [
-    // proxy.js err_messages
+    // proxy.js
     {
         regex: /Bad Port. Ports we support/,
         description: <span/>,
@@ -78,7 +78,6 @@ const error_desc = [
         regex: /Request is not allowed from peers and sent from super proxy/,
         description: <span/>,
     },
-    // proxy.js check_blocked_target
     {
         regex: /You tried to target .* but got blocked/,
         description: <span/>,
@@ -89,6 +88,34 @@ const error_desc = [
     },
     {
         regex: /target site requires special permission/,
+        description: <span/>,
+    },
+    {
+        regex: /target site requires exclusive domains permission/,
+        description: <span/>,
+    },
+    {
+        regex: /Forbidden Host/,
+        description: <span/>,
+    },
+    {
+        regex: /Forbidden auth key ipv6/,
+        description: <span/>,
+    },
+    {
+        regex: /Zone has reached its usage limit/,
+        description: <span/>,
+    },
+    {
+        regex: /Request rate too high/,
+        description: <span/>,
+    },
+    {
+        regex: /Host is blocked in requested country/,
+        description: <span/>,
+    },
+    {
+        regex: /Zone has reached its usage limit/,
         description: <span/>,
     },
     // agent_conn.js find_reasons
@@ -165,6 +192,27 @@ const error_desc = [
         regex: /Plan disabled/,
         description: <span/>,
     },
+    // other errors
+    {
+        regex: /socket hang up/,
+        description: <span/>,
+    },
+    {
+        regex: /Could not resolve host/,
+        description: <span/>,
+    },
+    {
+        regex: /ECONNREFUSED/,
+        description: <span/>,
+    },
+    {
+        regex: /EADDRINUSE/,
+        description: <span/>,
+    },
+    {
+        regex: /ENETUNREACH/,
+        description: <span/>,
+    }
 ];
 
 export const get_static_country = (proxy, zones)=>{

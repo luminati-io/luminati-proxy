@@ -219,6 +219,9 @@ const Old_modals = ()=>
       <Modal id="fetching_chrome_modal"
         title="Downloading Chromium. Please wait..." no_cancel_btn>
       </Modal>
+      <Modal id="applying_config"
+        title="Synchronizing LPM configuration. Please wait..." no_cancel_btn>
+      </Modal>
     </div>;
 
 const Page = ()=>

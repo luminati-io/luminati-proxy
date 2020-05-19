@@ -1,5 +1,35 @@
 Luminati Proxy manager - Change Log
 
+## 1.183.313 Stable
+- :sparkles: Implement Ban IP rule for not analyzed https requests
+
+## 1.183.101 Stable
+- :bug: Fix stats table sorting
+
+## 1.183.23 Stable
+- :sparkles: Offer to run upgrade command manually if request for privileges fails
+
+## 1.182.691 Stable
+- :sparkles: Allow to add arbitrary IPs to the SSL certificate
+
+## 1.182.667 Stable
+- :bug: Fix erasing whitelisted IPs
+
+## 1.182.564 Stable
+- :sparkles: When running UI on https listen also for http requests to redirect to https
+- :sparkles: Always enable config synchronization for Cloud LPM
+
+## 1.182.426 Stable
+- :bug: Fix date column sorting
+- :bug: Fix websocket error when LPM works on default port 80
+- :sparkles: Enable config synchronization for new LPM users by default
+
+## 1.182.312 Stable
+- :bug: Fix memory leak caused by retry rules
+
+## 1.182.272 Stable
+- :sparkles: Config synchronization made disabled by default
+
 ## 1.182.94 Stable
 - :bug: Fix possible EventEmitter memory leak for response listeners
 - :star: Multiple UI fixes and improvements

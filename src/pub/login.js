@@ -96,12 +96,16 @@ const Login = withRouter(class Login extends Pure_component {
                 yield _this.get_in();
         });
     };
-    verify_two_step = data=>{
+    verify_two_step = two_step_token=>{
         const _this = this;
         this.etask(function*(){
             _this.setState({loading: true});
-            const res = yield ajax.json({url: '/api/verify_two_step',
-                method: 'POST', data, no_throw: true});
+            const res = yield ajax.json({
+                url: '/api/creds_user',
+                method: 'POST',
+                data: {two_step_token},
+                no_throw: true,
+            });
             if (res && res.error)
             {
                 _this.setState({loading: false, error_message:
@@ -311,30 +315,29 @@ class Customers_form extends Pure_component {
 
 class Two_step_form extends Pure_component {
     state = {token: ''};
-    componentDidMount(){
-        this.props.send_two_step_email();
-    }
     on_key_up = e=>{
         if (e.keyCode==13)
-            this.props.verify_two_step(this.state);
+            this.submit();
+    };
+    submit = ()=>{
+        this.props.verify_two_step(this.state.token);
     };
     on_token_change = e=>this.setState({token: e.target.value});
     render(){
-        const {verify_two_step, send_two_step_email, verifying_token,
-            sending_email, email} = this.props;
+        const {send_two_step_email, verifying_token} = this.props;
         return <T>{t=><div className="row customers_form">
               <div className="warning choose_customer">
                 2-Step Verification
               </div>
               {t('A Luminati 2-Step Verification email containing a token '
               +'was sent to ')}
-              {email}
+              {this.props.email}
               {t('. The token is valid for ')+'15 '+ t('minutes.')}
               <div className="form-group">
                 <input className="two_step_input" onKeyUp={this.on_key_up}
                   onChange={this.on_token_change} placeholder={t('Token')}/>
               </div>
-              {sending_email ?
+              {this.props.sending_email ?
                   t('Sending email...') :
                   <React.Fragment>
                     {t('Can’t find it? Check your spam folder or click ')}
@@ -344,8 +347,8 @@ class Two_step_form extends Pure_component {
                     {t(' to resend the email.')}
                   </React.Fragment>
               }
-              <button onClick={()=>verify_two_step(this.state)}
-                className="btn btn_lpm btn_login" disabled={verifying_token}>
+              <button onClick={this.submit} className="btn btn_lpm btn_login"
+                disabled={verifying_token}>
                 {verifying_token ? t('Verifying...') : t('Verify')}
               </button>
             </div>}</T>;

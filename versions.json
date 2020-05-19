@@ -1,5 +1,107 @@
 [
     {
+        "ver": "1.183.313",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Implement Ban IP rule for not analyzed https requests"
+            }
+        ]
+    },
+    {
+        "ver": "1.183.101",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix stats table sorting"
+            }
+        ]
+    },
+    {
+        "ver": "1.183.23",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Offer to run upgrade command manually if request for privileges fails"
+            }
+        ]
+    },
+    {
+        "ver": "1.182.691",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Allow to add arbitrary IPs to the SSL certificate"
+            }
+        ]
+    },
+    {
+        "ver": "1.182.667",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix erasing whitelisted IPs"
+            }
+        ]
+    },
+    {
+        "ver": "1.182.564",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "When running UI on https listen also for http requests to redirect to https"
+            },
+            {
+                "type": "sparkles",
+                "text": "Always enable config synchronization for Cloud LPM"
+            }
+        ]
+    },
+    {
+        "ver": "1.182.426",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix date column sorting"
+            },
+            {
+                "type": "bug",
+                "text": "Fix websocket error when LPM works on default port 80"
+            },
+            {
+                "type": "sparkles",
+                "text": "Enable config synchronization for new LPM users by default"
+            }
+        ]
+    },
+    {
+        "ver": "1.182.312",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix memory leak caused by retry rules"
+            }
+        ]
+    },
+    {
+        "ver": "1.182.272",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Config synchronization made disabled by default"
+            }
+        ]
+    },
+    {
         "ver": "1.182.94",
         "type": "stable",
         "changes": [
