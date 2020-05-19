@@ -7,6 +7,7 @@ import {Logo, Code, with_www_api} from './common.js';
 import {Instructions, Li} from './common/bullets.js';
 import ws from './ws.js';
 import './css/whitelist_ips.less';
+import { default_ports } from'./util';
 
 export default class Whitelist_ips extends Pure_component {
     state = {};
@@ -33,9 +34,9 @@ export default class Whitelist_ips extends Pure_component {
 }
 
 const Admin_steps = ({ip})=>{
-    const port = location.port;
+    const port = location.port||default_ports[location.protocol];
     let cmd = `lpm_whitelist_ip ${ip}`;
-    if (port!=22999)
+    if (port!==22999)
         cmd += ' '+port;
     return <div className="steps">
           <h3>How to whitelist your IP?</h3>

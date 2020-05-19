@@ -1,14 +1,15 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
 import {EventTarget} from 'event-target-shim';
+import { default_ports } from'./util';
 import setdb from '../../util/setdb.js';
 
 class Ws_wrapper extends EventTarget {
     constructor(){
         super();
         this.url = location.hostname;
-        this.port = location.port;
-        this.protocol = location.protocol=='https:' ? 'wss' : 'ws';
+        this.port = location.port||default_ports[location.protocol];
+        this.protocol = location.protocol==='https:' ? 'wss' : 'ws';
         this.create_socket();
     }
     create_socket = ()=>{

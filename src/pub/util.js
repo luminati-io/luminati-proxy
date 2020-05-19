@@ -278,3 +278,8 @@ export const get_troubleshoot = (body, status_code, headers)=>{
     }
     return {title, info: ''};
 };
+
+export const default_ports = {
+    'http:': 80,
+    'https:': 443
+};
