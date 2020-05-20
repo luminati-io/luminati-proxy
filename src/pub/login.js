@@ -112,21 +112,7 @@ const Login = withRouter(class Login extends Pure_component {
                     token_err_msg[res.message]||token_err_msg.default});
             }
             else
-                _this.setState({two_step_verified: true}, _this.save_user);
-        });
-    };
-    send_two_step_email = ()=>{
-        const _this = this;
-        this.etask(function*(){
-            this.on('finally', ()=>_this.setState({sending_email: false}));
-            _this.setState({sending_email: true});
-            const res = yield ajax.json({url: '/api/send_two_step_email',
-                method: 'POST', no_throw: true});
-            if (res && res.error)
-            {
-                _this.setState({error_message:
-                    res.error.message||'Something went wrong'});
-            }
+                _this.setState({two_step_verified: true}, _this.get_in);
         });
     };
     get_in = ()=>{
@@ -187,7 +173,6 @@ const Login = withRouter(class Login extends Pure_component {
                 update_username={this.update_username}
                 select_customer={this.select_customer}
                 select_final_customer={this.select_final_customer}
-                send_two_step_email={this.send_two_step_email}
                 verify_two_step={this.verify_two_step}/>
             </div>;
     }
@@ -268,7 +253,6 @@ const Form = props=>{
     if (props.two_step)
     {
         return <Two_step_form verify_two_step={props.verify_two_step}
-              send_two_step_email={props.send_two_step_email}
               email={props.username} verifying_token={props.loading}
               sending_email={props.sending_email}/>;
     }
@@ -324,7 +308,7 @@ class Two_step_form extends Pure_component {
     };
     on_token_change = e=>this.setState({token: e.target.value});
     render(){
-        const {send_two_step_email, verifying_token} = this.props;
+        const {verifying_token} = this.props;
         return <T>{t=><div className="row customers_form">
               <div className="warning choose_customer">
                 2-Step Verification
@@ -339,13 +323,7 @@ class Two_step_form extends Pure_component {
               </div>
               {this.props.sending_email ?
                   t('Sending email...') :
-                  <React.Fragment>
-                    {t('Can’t find it? Check your spam folder or click ')}
-                    <a className="link" onClick={send_two_step_email}>
-                      {t('here')}
-                    </a>
-                    {t(' to resend the email.')}
-                  </React.Fragment>
+                  t('Can’t find it? Check your spam folder')
               }
               <button onClick={this.submit} className="btn btn_lpm btn_login"
                 disabled={verifying_token}>

@@ -4,8 +4,11 @@ require('./config.js');
 const _ = require('lodash');
 const E = exports;
 
+E.find_matches = (all_rules, selector)=>
+    (all_rules||[]).filter(x=>matches_rule(x.match, selector));
+
 E.select_rules = (all_rules, selector)=>{
-    let matches = (all_rules||[]).filter(x=>matches_rule(x.match, selector));
+    let matches = E.find_matches(all_rules, selector);
     return _.merge({}, ...matches.map(x=>x.rules), (dest, src)=>{
         if (Array.isArray(src))
             return src;

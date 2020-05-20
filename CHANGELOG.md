@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.183.458 Stable
+- :sparkles: Improved config synchronization perfomance
+
 ## 1.183.313 Stable
 - :sparkles: Implement Ban IP rule for not analyzed https requests
 
