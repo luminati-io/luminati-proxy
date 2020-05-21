@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.183.659 Stable
+- :bug: Fix memory leak on frequent config synchronization
+
 ## 1.183.544 Stable
 - :sparkles: Partial gIPs support. Implement 'Refresh IP' rule
 
