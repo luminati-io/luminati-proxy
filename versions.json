@@ -1,5 +1,25 @@
 [
     {
+        "ver": "1.183.544",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Partial gIPs support. Implement 'Refresh IP' rule"
+            }
+        ]
+    },
+    {
+        "ver": "1.183.458",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved config synchronization perfomance"
+            }
+        ]
+    },
+    {
         "ver": "1.183.313",
         "type": "stable",
         "changes": [

@@ -362,7 +362,11 @@ class Action extends Pure_component {
         const {zones, curr_zone} = this.state;
         const zone = (zones.zones||[]).find(z=>z.name==curr_zone);
         const plan = zone && zone.plan || {};
-        return ['static', 'static_res'].includes(plan.type) && plan.ips;
+        if (['static', 'static_res'].includes(plan.type))
+            return plan.ips>0;
+        if (plan.type=='resident')
+            return plan.vips>0;
+        return false;
     };
     request_methods = ()=>
         ['GET', 'POST', 'PUT', 'DELETE'].map(m=>({key: m, value: m}));
