@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.184.296 Stable
+## 1.184.310 Stable
 - :sparkles: Implement sorting for ports table
 - :sparkles: Make ports filter works also for zone names
 - :star: Improved security in Cloud LPM
