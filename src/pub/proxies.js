@@ -478,7 +478,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             selected_proxies: {},
             checked_all: false,
             proxy_filter: '',
-            filtered_proxies: [],
+            sort: {sort_by: 'port', sort_direction: 'asc'},
+            visible_proxies: [],
             loaded: false,
             height: window.innerHeight,
             open_delete_dialog: false,
@@ -492,10 +493,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             let proxy_filter = proxies.length ? this.state.proxy_filter : '';
             proxies = this.prepare_proxies(proxies);
-            const filtered_proxies = this.filter_proxies(
+            const visible_proxies = this.get_visible_proxies(
                 proxies, this.props.master_port, proxy_filter);
             this.setState(
-                {proxies, filtered_proxies, proxy_filter, loaded: true});
+                {proxies, visible_proxies, proxy_filter, loaded: true});
         });
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -515,25 +516,36 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     componentDidUpdate(prev_props){
         if (prev_props.master_port!=this.props.master_port)
         {
-            const filtered_proxies = this.filter_proxies(this.state.proxies,
-                this.props.master_port);
-            this.setState({filtered_proxies});
+            const visible_proxies = this.get_visible_proxies(
+                this.state.proxies, this.props.master_port);
+            this.setState({visible_proxies});
         }
     }
     willUnmount(){
         window.clearTimeout(this.timeout_id);
         window.removeEventListener('resize', this.update_window_dimensions);
     }
-    filter_proxies = (proxies, mp, proxy_filter)=>{
+    get_visible_proxies = (proxies, mp, proxy_filter, sort)=>{
         if (proxy_filter===undefined)
             proxy_filter = this.state.proxy_filter;
-        return proxies.filter(p=>{
-            if (proxy_filter && !(p.internal_name||'').includes(proxy_filter))
+        sort = sort||this.state.sort;
+        proxies = proxies.filter(p=>{
+            if (proxy_filter &&
+                !(p.internal_name||'').includes(proxy_filter) &&
+                !(p.zone||'').includes(proxy_filter))
+            {
                 return false;
+            }
             if (mp)
                 return ''+p.port==mp||''+p.master_port==mp;
             return p.proxy_type!='duplicate';
         });
+        let {zones} = this.state;
+        return _.orderBy(proxies, value=>{
+            if (sort.sort_by=='country')
+                return get_static_country(value, zones)||value.country||'any';
+            return value[sort.sort_by];
+        }, sort.sort_direction);
     };
     prepare_proxies = proxies=>{
         proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
@@ -600,9 +612,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                         }
                     }
                 }
-                const filtered_proxies = _this.filter_proxies(
+                const visible_proxies = _this.get_visible_proxies(
                     Object.values(new_proxies), _this.props.master_port);
-                return {proxies: Object.values(new_proxies), filtered_proxies,
+                return {proxies: Object.values(new_proxies), visible_proxies,
                     stats};
             });
             yield etask.sleep(1000);
@@ -654,7 +666,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     all_rows_select = ()=>{
         const checked_all = !this.state.checked_all;
         const selected_proxies = checked_all ?
-            this.state.filtered_proxies.reduce((obj, p)=>{
+            this.state.visible_proxies.reduce((obj, p)=>{
                 obj[p.port] = p;
                 return obj;
             }, {}) : {};
@@ -683,7 +695,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         }
         return columns.filter(col=>this.state.selected_cols.includes(col.key)
             || col.sticky || col.calc_show && col.calc_show(
-                this.state.filtered_proxies, this.props.master_port));
+                this.state.visible_proxies, this.props.master_port));
     };
     open_delete_dialog = proxies=>{
         this.setState({delete_proxies: proxies, open_delete_dialog: true});
@@ -693,9 +705,16 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     };
     set_proxy_filter(e){
         let proxy_filter = e.target.value;
-        const filtered_proxies = this.filter_proxies(this.state.proxies,
+        const visible_proxies = this.get_visible_proxies(this.state.proxies,
             this.props.master_port, proxy_filter);
-        this.setState({proxy_filter, filtered_proxies, selected_proxies: {}});
+        this.setState({proxy_filter, visible_proxies, selected_proxies: {}});
+    }
+    set_sort({sortBy: sort_by, sortDirection: sort_direction}){
+        sort_direction = sort_direction.toLowerCase();
+        let sort = {sort_by, sort_direction};
+        const visible_proxies = this.get_visible_proxies(this.state.proxies,
+            this.props.master_port, undefined, sort);
+        this.setState({sort, visible_proxies, selected_proxies: {}});
     }
     render(){
         const cols = this.get_cols();
@@ -708,6 +727,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             </div>;
         }
         let {proxies, proxy_filter} = this.state;
+        let {sort_by, sort_direction} = this.state.sort;
         let show_table = !!proxies.length;
         if (this.state.loaded && !show_table)
             return <Proxy_blank/>;
@@ -738,9 +758,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                             headerClassName="chrome_th"
                             rowClassName="chrome_tr"
                             rowHeight={22}
-                            rowCount={this.state.filtered_proxies.length+1}
+                            sort={sort=>this.set_sort(sort)}
+                            sortBy={sort_by}
+                            sortDirection={sort_direction.toUpperCase()}
+                            rowCount={this.state.visible_proxies.length+1}
                             rowGetter={({index})=>
-                              this.state.filtered_proxies[index]||'filler'}>
+                              this.state.visible_proxies[index]||'filler'}>
                             <Column key="select"
                               cellRenderer={this.select_renderer.bind(this)}
                               label={<Checkbox checked={this.state.checked_all}

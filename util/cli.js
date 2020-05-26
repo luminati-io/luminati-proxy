@@ -259,7 +259,7 @@ E.process_exit = (promise, opt)=>etask(function*process_main(){
             }
         }
     } catch(e){ ef(e);
-        console.error(opt.skip_stack ? ''+e : e.stack||e);
+        console.error(opt.skip_stack ? e.message : e.stack||e);
         return exit_with_code(opt, 1);
     }
     // XXX vladimir: make use_retval default

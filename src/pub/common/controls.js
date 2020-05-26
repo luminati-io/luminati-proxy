@@ -294,7 +294,7 @@ export class Select_number extends Pure_component {
     }
 }
 
-class Select_multiple extends Pure_component {
+export class Select_multiple extends Pure_component {
     styles = {
         clearIndicator: base=>({
             ...base,

@@ -140,14 +140,26 @@
                 align-items: baseline;
                 input[type=text] {
                     margin-right: 9px;
-                    width: 100px;
                 }
                 .list {
                     .single_header {
-                        width: 365px;
                         display: flex;
                         align-items: center;
-                        padding: 3px;
+                        padding: 3px 0;
+                        .header_name {
+                            margin-right: 5px;
+                            display: flex;
+                            align-items: baseline;
+                        }
+                        .header_value {
+                            margin-right: 5px;
+                        }
+                        .react_select__control {
+                            width: 100%;
+                        }
+                        .select_multiple {
+                            min-width: 220px;
+                        }
                     }
                 }
             }

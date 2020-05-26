@@ -487,7 +487,7 @@ E.ensure_array = function(v, split){
     if (v==null || Array.isArray(v))
         return v||[];
     if (split && typeof v=='string')
-        return v.split(split==true ? /[ ,]+/ : split).filter(Boolean);
+        return v.split(split==true ? /[\s,]+/ : split).filter(Boolean);
     return [v];
 };
 

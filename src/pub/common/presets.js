@@ -29,18 +29,18 @@ const presets = {
             opt.session = '';
             opt.rotate_session = true;
             opt.sticky_ip = false;
-            opt.user_agent = 'random_desktop';
+            opt.headers = opt.headers||[];
+            opt.headers['user-agent'] = 'random_desktop';
         },
         clean: opt=>{
             opt.rotate_session = false;
             opt.pool_size = 0;
-            opt.user_agent = '';
+            opt.headers = [];
         },
         disabled: {
             sticky_ip: true,
             session: true,
             rotate_session: true,
-            user_agent: true,
         },
     },
     unblocker: {
@@ -69,7 +69,6 @@ const presets = {
             insecure: true,
             smtp: true,
             trigger_type: true,
-            user_agent: true,
             override_headers: true,
         },
         hidden: true,
@@ -82,7 +81,6 @@ const presets = {
         set: opt=>{
             opt.session = '';
             opt.dns = 'remote';
-            opt.user_agent = 'random_desktop';
             opt.override_headers = true;
             opt.ssl = true;
             opt.rules = opt.rules||[];
@@ -105,13 +103,11 @@ const presets = {
         },
         clean: opt=>{
             opt.dns = '';
-            opt.user_agent = '';
             if (!opt.rules)
                 return;
             opt.rules = opt.rules.filter(r=>!r.action || !r.action.process);
         },
         disabled: {
-            user_agent: 'random_desktop',
             sticky_ip: true,
             session: true,
             ssl: true,

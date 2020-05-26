@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.184.296",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Implement sorting for ports table"
+            },
+            {
+                "type": "sparkles",
+                "text": "Make ports filter works also for zone names"
+            },
+            {
+                "type": "star",
+                "text": "Improved security in Cloud LPM"
+            }
+        ]
+    },
+    {
         "ver": "1.183.659",
         "type": "stable",
         "changes": [

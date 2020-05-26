@@ -18,8 +18,8 @@ export const bytes_format = (bytes, number)=>{
 };
 
 export const formatted_user_agents = user_agent_gen.map(u=>({
-    key: u.name,
     value: u.value,
+    label: u.name,
 }));
 
 export const status_codes = {

@@ -201,8 +201,10 @@ function cpu_diff(prev, curr){
     var d = {};
     for (var i in curr)
         d[i] = curr[i]-prev[i];
-    d.busy = d.user+d.nice+d.system+d.irq+d.softirq+d.steal+d.guest+
-        d.guest_nice;
+    // vitaly: ignoring steal diff<0 to mitigate decreasing steal
+    // https://0xstubs.org/debugging-a-flaky-cpu-steal-time-counter-on-a-paravirtualized-xen-guest/
+    d.busy = d.user+d.nice+d.system+d.irq+d.softirq+Math.max(d.steal, 0)
+        +d.guest+d.guest_nice;
     d.total = d.busy+d.idle+d.iowait;
     if (d.total>0)
         d.busy_ratio = d.busy/d.total;

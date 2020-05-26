@@ -131,4 +131,10 @@ E.longest = function(){
     return s;
 };
 
+// trims newlines, nbsp, zwnj
+E.trim = function(s){
+    return (''+s).replace(/^[\s\u00a0\u200c]*/g, '')
+        .replace(/[\s\u00a0\u200c]*$/g, '');
+};
+
 return E; }); }());

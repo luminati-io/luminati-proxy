@@ -35,8 +35,12 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>
             lock!==undefined && this.setState({lock}));
+        this.setdb_on('head.settings', settings=>this.setState({settings}));
     }
     render(){
+        if (!this.state.settings)
+            return null;
+        const zagent = this.state.settings.zagent;
         return <div className="nav_left">
               <div className={classnames('menu', {lock: this.state.lock})}>
                 <Nav_link to="/overview" name="overview" label="Overview"/>
@@ -44,8 +48,10 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
                 <Nav_link to="/logs" name="logs" label="Request logs"/>
                 <Nav_link to="/settings" name="general_config"
                   label="General settings"/>
-                <Nav_link to="/config" name="config"
-                  label="Manual configuration"/>
+                {!zagent &&
+                  <Nav_link to="/config" name="config"
+                    label="Manual configuration"/>
+                }
                 <Nav_link ext to={swagger_url} name="api"
                   label="API documentation"/>
               </div>
