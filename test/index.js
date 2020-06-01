@@ -71,7 +71,14 @@ describe('proxy', ()=>{
                 }
                 delete req_opt.fake;
             }
-            return yield etask.nfn_apply(_this, '.request', [req_opt]);
+            if (req_opt.no_usage)
+                return yield etask.nfn_apply(_this, '.request', [req_opt]);
+            let w = etask.wait();
+            l.on('usage', ()=>w.continue());
+            l.on('usage_abort', ()=>w.continue());
+            let res = yield etask.nfn_apply(_this, '.request', [req_opt]);
+            yield w;
+            return res;
         });
         yield l.listen();
         l.session_mgr._request_session({}, {init: true});
@@ -547,7 +554,7 @@ describe('proxy', ()=>{
             it('http reject', etask._fn(function*(){
                 l = yield lum({whitelist_ips: ['1.1.1.1']});
                 sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
-                let res = yield l.test({url: test_url.http});
+                let res = yield l.test({url: test_url.http, no_usage: true});
                 assert.equal(res.statusCode, 407);
                 assert.equal(res.body, undefined);
             }));
@@ -1182,7 +1189,7 @@ describe('proxy', ()=>{
                     l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     p2 = opt.req.ctx.port;
                 });
-                yield l.test({fake: 1});
+                yield l.test({fake: 1, no_usage: true});
                 assert.notEqual(p1, p2);
                 l2.stop(true);
             }));
@@ -1443,14 +1450,14 @@ describe('proxy', ()=>{
                 const header_stub_l2 = inject_headers(l2, 'ip2');
                 const ban_stub = sinon.stub(l, 'banip');
                 const ban_stub_l2 = sinon.stub(l2, 'banip');
-                yield l.test(ping.http.url);
+                yield l.test({url: ping.http.url, no_usage: true});
                 sinon.assert.calledWith(ban_stub, 'ip', 600000);
                 sinon.assert.calledWith(ban_stub_l2, 'ip2', 1800000);
                 header_stub.restore();
                 header_stub_l2.restore();
                 inject_headers(l, 'ip3');
                 inject_headers(l2, 'ip4');
-                yield l.test(ping.http.url);
+                yield l.test({url: ping.http.url, no_usage: true});
                 sinon.assert.calledWith(ban_stub, 'ip3', 600000);
                 sinon.assert.calledWith(ban_stub_l2, 'ip4', 1800000);
                 l2.stop(true);
@@ -1466,7 +1473,7 @@ describe('proxy', ()=>{
                 inject_headers(l2);
                 const ban_stub = sinon.stub(l, 'banip');
                 const ban_stub_l2 = sinon.stub(l2, 'banip');
-                yield l.test(ping.http.url);
+                yield l.test({url: ping.http.url, no_usage: true});
                 sinon.assert.calledWith(ban_stub, 'ip', 600000);
                 sinon.assert.calledWith(ban_stub_l2, 'ip', 1800000);
                 l2.stop(true);

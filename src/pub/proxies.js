@@ -463,6 +463,25 @@ class Columns_modal extends Pure_component {
     }
 }
 
+function header_renderer({dataKey, label, sortBy, sortDirection}){
+    let show_sort_indicator = sortBy===dataKey;
+    let title = 'string'==typeof label ? label : null;
+    let children = [
+        <span className="ReactVirtualized__Table__headerTruncatedText"
+          key="label" title={title}>{label}</span>
+    ];
+    if (show_sort_indicator)
+    {
+        let sort = sortDirection=='ASC' ? 'sort_asc' : 'sort_desc';
+        children.push(
+            <div key="sort_indicator" className="sort_icon">
+              <span className={classnames(['small_icon_mask', sort])}/>
+            </div>
+        );
+    }
+    return children;
+}
+
 const Proxies = withRouter(class Proxies extends Pure_component {
     update_window_dimensions = ()=>
         this.setState({height: window.innerHeight});
@@ -775,6 +794,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                               width={27}/>
                             {cols.map(col=>
                               <Column key={col.key}
+                                headerRenderer={header_renderer}
                                 cellRenderer={this.cell_renderer.bind(this)}
                                 label={t(col.title)}
                                 className="chrome_td"

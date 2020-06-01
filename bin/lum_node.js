@@ -64,7 +64,7 @@ const add_alias_for_whitelist_ips = ()=>{
         `    fi\n`+
         `    ENDPOINT="http://127.0.0.1:$PORT/api/add_whitelist_ip"\n`+
         `    DATA="ip="$1\n`+
-        `    curl $ENDPOINT -X POST -d $DATA\n`+
+        `    curl $ENDPOINT -X POST -d $DATA --post301 -L -k\n`+
         `}`;
     const name = 'lpm_whitelist_ip';
     const cmd = 'curl_add_ip';

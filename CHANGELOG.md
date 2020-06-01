@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.184.905 Stable
+- :bug: Fix for smtp and https requests when rule might not be triggered
+
 ## 1.184.310 Stable
 - :sparkles: Implement sorting for ports table
 - :sparkles: Make ports filter works also for zone names
