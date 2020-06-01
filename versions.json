@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.184.973",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Introduced zones synchronization"
+            }
+        ]
+    },
+    {
         "ver": "1.184.905",
         "type": "stable",
         "changes": [

@@ -102,6 +102,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     cloud: true,
     zagent: false,
     sync_config: true,
+    sync_zones: true,
 });
 conf.log_levels = {
     error: 0,

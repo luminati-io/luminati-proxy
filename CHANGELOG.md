@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.184.973 Stable
+- :star: Introduced zones synchronization
+
 ## 1.184.905 Stable
 - :bug: Fix for smtp and https requests when rule might not be triggered
 

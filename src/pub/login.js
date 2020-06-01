@@ -143,7 +143,7 @@ const Login = withRouter(class Login extends Pure_component {
             }
             ets.push(etask(function*_get_zones(){
                 const zones = yield ajax.json({url: '/api/zones'});
-                setdb.set('head.zones', zones);
+                setdb.set('ws.zones', zones);
             }));
             ets.push(etask(function*_get_proxies_running(){
                 const proxies = yield ajax.json({url: '/api/proxies_running'});

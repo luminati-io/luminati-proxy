@@ -545,7 +545,7 @@ export const Select_zone = withRouter(
 class Select_zone extends Pure_component {
     state = {refreshing_zones: false, zones: {zones: []}};
     componentDidMount(){
-        this.setdb_on('head.zones', zones=>{
+        this.setdb_on('ws.zones', zones=>{
             if (zones)
                 this.setState({zones});
         });
@@ -563,7 +563,7 @@ class Select_zone extends Pure_component {
                 return _this.props.history.push({pathname: '/login'});
             const zones = yield ajax.json({url: '/api/zones'});
             _this.setState({refreshing_zones: false});
-            setdb.set('head.zones', zones);
+            setdb.set('ws.zones', zones);
         });
     };
     render(){

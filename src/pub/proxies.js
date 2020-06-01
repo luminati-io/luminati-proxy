@@ -523,7 +523,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             const countries = locations.countries_by_code;
             this.setState({countries});
         });
-        this.setdb_on('head.zones', zones=>{
+        this.setdb_on('ws.zones', zones=>{
             if (!zones)
                 return;
             this.setState({zones});

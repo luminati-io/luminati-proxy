@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.184.905/luminati-proxy-manager-v1.184.905-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.184.973/luminati-proxy-manager-v1.184.973-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -221,6 +221,7 @@ Options:
   --cloud                                              [boolean] [default: true]
   --zagent                                            [boolean] [default: false]
   --cluster                                            [boolean] [default: true]
+  --sync_zones                                         [boolean] [default: true]
   --request_stats               Enable requests statistics
                                                        [boolean] [default: true]
   --test_url                    Url for testing proxy

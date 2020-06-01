@@ -149,7 +149,7 @@ class Form extends Pure_component {
             const body = {..._this.state.settings};
             yield _this.save_settings(body);
             const zones = yield ajax.json({url: '/api/zones'});
-            setdb.set('head.zones', zones);
+            setdb.set('ws.zones', zones);
             if (_this.state.settings.sync_config)
             {
                 const proxies = yield ajax.json({url: '/api/proxies_running'});

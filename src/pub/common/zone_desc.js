@@ -11,7 +11,7 @@ import '../css/zone_desc.less';
 export default class Zone_description extends Pure_component {
     state = {};
     componentDidMount(){
-        this.setdb_on('head.zones', zones=>{
+        this.setdb_on('ws.zones', zones=>{
             if (!zones || this.props.zones)
                 return;
             this.setState({zones, zone: zones.def});

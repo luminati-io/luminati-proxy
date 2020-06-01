@@ -21,7 +21,7 @@ describe('config', ()=>{
             stats: false,
             customer: 'wrong_cust',
         }];
-        const conf_mgr = new Config(new Manager([]), Manager.default);
+        const conf_mgr = new Config(new Manager({}), Manager.default);
         const s = conf_mgr._serialize(proxies, {});
         const config = JSON.parse(s);
         const proxy = config.proxies[0];
@@ -31,8 +31,8 @@ describe('config', ()=>{
         assert.equal(proxy.port, 24000);
     });
     it('should not save file on read only mode', ()=>{
-        const conf = new Config({opts: {read_only: true}}, Manager.default,
-            {filname: '.luminati.json'});
+        const conf = new Config(new Manager({read_only: true}),
+            Manager.default, {filename: '.luminati.json'});
         const write_sync_stub = sinon.stub(fs, 'writeFileSync');
         const write_e_sync = sinon.stub(file, 'write_e');
         conf.save();

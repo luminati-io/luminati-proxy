@@ -72,7 +72,7 @@ class Schema extends Pure_component {
             if (proxies)
                 this.setState({proxies});
         });
-        this.setdb_on('head.zones', zones=>{
+        this.setdb_on('ws.zones', zones=>{
             if (zones)
                 this.setState({zones});
         });

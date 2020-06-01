@@ -51,7 +51,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 return;
             this.setState({proxies_running});
         });
-        this.setdb_on('head.zones', zones=>{
+        this.setdb_on('ws.zones', zones=>{
             if (!zones)
                 return;
             this.setState({zones});

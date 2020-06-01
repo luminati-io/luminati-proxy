@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.184.905-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.184.973-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -166,6 +166,7 @@ Options:
   --cloud                                              [boolean] [default: true]
   --zagent                                            [boolean] [default: false]
   --cluster                                            [boolean] [default: true]
+  --sync_zones                                         [boolean] [default: true]
   --request_stats               Enable requests statistics
                                                        [boolean] [default: true]
   --test_url                    Url for testing proxy

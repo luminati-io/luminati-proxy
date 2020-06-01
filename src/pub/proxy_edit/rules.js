@@ -310,7 +310,7 @@ class Action extends Pure_component {
             if (settings)
                 this.setState({settings});
         });
-        this.setdb_on('head.zones', zones=>{
+        this.setdb_on('ws.zones', zones=>{
             if (zones)
                 this.setState({zones});
         });

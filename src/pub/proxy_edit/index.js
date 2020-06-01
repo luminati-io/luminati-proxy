@@ -63,7 +63,7 @@ const Index = withRouter(class Index extends Pure_component {
             this.apply_preset(form, form.preset||'session_long');
             this.setState({proxies}, this.delayed_loader());
         });
-        this.setdb_on('head.zones', zones=>{
+        this.setdb_on('ws.zones', zones=>{
             if (zones)
                 this.setState({zones}, this.delayed_loader());
         });
@@ -448,7 +448,7 @@ class Nav extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
     is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
     componentDidMount(){
-        this.setdb_on('head.zones', zones=>zones && this.setState({zones}));
+        this.setdb_on('ws.zones', zones=>zones && this.setState({zones}));
     }
     _reset_fields = ()=>{
         this.set_field('ips', []);
