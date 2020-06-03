@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.185.470 Stable
+- :sparkles: Show update download progress on windows
+- :sparkles: Improved stats synchronization
+
 ## 1.184.973 Stable
 - :star: Introduced zones synchronization
 

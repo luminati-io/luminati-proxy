@@ -68,6 +68,15 @@ auto_updater.on('before-quit', ()=>{
         zerr.perr('upgrade_finish');
 });
 
+let prev_percent = 0;
+auto_updater.on('download-progress', progress_obj=>{
+    let current = (progress_obj.percent/10|0)*10;
+    if (current==prev_percent)
+        return;
+    prev_percent = current;
+    logger.notice(current+'% downloaded');
+});
+
 auto_updater.on('update-available', e=>etask(function*(){
     if (semver.lt(e.version, pkg.version))
     {

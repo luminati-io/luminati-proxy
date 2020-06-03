@@ -34,7 +34,7 @@ class Pure_component extends React.PureComponent {
         }
     }
     setdb_on(path, cb, opt){ this.listeners[path] = setdb.on(path, cb, opt); }
-    setdb_off(path){ setdb.off(this.listeners[path]); }
+    setdb_off(path){ this.listeners[path] && setdb.off(this.listeners[path]); }
     setdb_get(path){ return setdb.get(path); }
     setdb_set(path, curr, opt){ return setdb.set(path, curr, opt); }
     etask(sp){

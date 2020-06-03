@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.185.470",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Show update download progress on windows"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved stats synchronization"
+            }
+        ]
+    },
+    {
         "ver": "1.184.973",
         "type": "stable",
         "changes": [
