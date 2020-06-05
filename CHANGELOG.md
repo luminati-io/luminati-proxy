@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.185.803 Stable
+- :star: Added extra validation when editing proxy ports
+- :bug: Minor bug fixes
+
 ## 1.185.470 Stable
 - :sparkles: Show update download progress on windows
 - :sparkles: Improved stats synchronization

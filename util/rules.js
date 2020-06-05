@@ -7,9 +7,9 @@ const E = exports;
 E.find_matches = (all_rules, selector)=>
     (all_rules||[]).filter(x=>matches_rule(x.match, selector));
 
-E.select_rules = (all_rules, selector)=>{
+E.select_rules = (all_rules, selector, overrides=[])=>{
     let matches = E.find_matches(all_rules, selector);
-    return _.merge({}, ...matches.map(x=>x.rules), (dest, src)=>{
+    return _.merge({}, ...matches.map(x=>x.rules), ...overrides, (dest, src)=>{
         if (Array.isArray(src))
             return src;
     });

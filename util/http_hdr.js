@@ -440,7 +440,7 @@ E.like_browser_case_and_order = function(headers, browser, opt){
 
 // reverse pseudo headers (e.g. :method) because nodejs reverse it
 // before send to server
-// https://github.com/nodejs/node/blob/v12.x/lib/internal/http2/util.js#L473
+// https://github.com/nodejs/node/blob/v12.x/lib/internal/http2/util.js#L489
 E.reverse_http2_pseudo_headers_order = headers=>{
   let pseudo = {};
   let other = Object.keys(headers).reduce((r, h)=>{
