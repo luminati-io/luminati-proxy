@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.185.910 Stable
+- :star: Enabled config synchronization on Windows
+- :star: Config synchronization made disabled by default
+
 ## 1.185.803 Stable
 - :star: Added extra validation when editing proxy ports
 - :bug: Minor bug fixes

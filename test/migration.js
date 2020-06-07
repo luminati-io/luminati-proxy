@@ -708,6 +708,30 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.185.470', v=>{
+        it('set sync_config to true if was undefined', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {sync_config: true},
+                proxies: [],
+            });
+        });
+        it('dont change if sync_config was disabled', ()=>{
+            const conf = {
+                _defaults: {sync_config: false},
+                proxies: [],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {sync_config: false},
+                proxies: [],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

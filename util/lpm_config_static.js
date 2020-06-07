@@ -101,7 +101,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     read_only: false,
     cloud: true,
     zagent: false,
-    sync_config: true,
+    sync_config: false,
     sync_zones: true,
     sync_stats: true,
 });

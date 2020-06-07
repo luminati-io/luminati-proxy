@@ -119,11 +119,12 @@ E.extend = function(obj){ // like _.extend
     return obj;
 };
 
-function is_object(obj){
-    return obj && obj.constructor==Object; }
+E.is_object = function(obj){
+    return obj && obj.constructor==Object;
+};
 
 E.extend_deep = function(obj){
-    if (!is_object(obj))
+    if (!E.is_object(obj))
         return obj;
     for (var i=1; i<arguments.length; i++)
     {
@@ -132,7 +133,7 @@ E.extend_deep = function(obj){
             continue;
         for (var prop in source)
         {
-            if (is_object(source[prop]) && is_object(obj[prop]))
+            if (E.is_object(source[prop]) && E.is_object(obj[prop]))
                 E.extend_deep(obj[prop], source[prop]);
             else
                 obj[prop] = source[prop];
@@ -148,9 +149,9 @@ E.extend_deep_del_null = function(obj){
             continue;
         for (var prop in source)
         {
-            if (is_object(source[prop]))
+            if (E.is_object(source[prop]))
             {
-                if (!is_object(obj[prop]))
+                if (!E.is_object(obj[prop]))
                     obj[prop] = {};
                 E.extend_deep_del_null(obj[prop], source[prop]);
             }
@@ -180,14 +181,14 @@ E.defaults = function(obj){ // like _.defaults
     return obj;
 };
 E.defaults_deep = function(obj){
-    if (obj!==undefined && !is_object(obj))
+    if (obj!==undefined && !E.is_object(obj))
         return obj;
     for (var i=1; i<arguments.length; i++)
     {
         var source = arguments[i];
         if (obj===undefined)
             obj = E.clone_deep(source);
-        else if (is_object(source))
+        else if (E.is_object(source))
         {
             for (var prop in source)
             {
@@ -254,7 +255,7 @@ E.equal_deep = function(a, b){
         }
         return true;
     }
-    if (is_object(a))
+    if (E.is_object(a))
     {
         var a_keys = Object.keys(a), b_keys = Object.keys(b);
         if (a_keys.length!=b_keys.length)
@@ -458,7 +459,7 @@ E.if_set = function(val, o, name){
 };
 
 E.escape_dotted_keys = function(obj, repl){
-    if (!Array.isArray(obj) && !is_object(obj))
+    if (!Array.isArray(obj) && !E.is_object(obj))
         return obj;
     repl = repl||'_';
     for (var prop in obj)
@@ -477,7 +478,7 @@ E.escape_dotted_keys = function(obj, repl){
                     E.escape_dotted_keys(e, repl);
                 });
             }
-            else if (is_object(obj[new_prop]))
+            else if (E.is_object(obj[new_prop]))
                 E.escape_dotted_keys(obj[new_prop], repl);
         }
     }

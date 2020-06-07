@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.185.803/luminati-proxy-manager-v1.185.803-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.185.910/luminati-proxy-manager-v1.185.910-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -245,7 +245,7 @@ Options:
   --read_only                   Avoid saving current config in the config file
                                                       [boolean] [default: false]
   --sync_config                 Synchronize LPM configuration with the cloud
-                                                       [boolean] [default: true]
+                                                      [boolean] [default: false]
   --extra_ssl_ips               List of IPs to add to SSL certificate
                                                            [array] [default: []]
   --no-www                      Disable local web

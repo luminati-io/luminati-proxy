@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.185.910",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Enabled config synchronization on Windows"
+            },
+            {
+                "type": "star",
+                "text": "Config synchronization made disabled by default"
+            }
+        ]
+    },
+    {
         "ver": "1.185.803",
         "type": "stable",
         "changes": [
