@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.186.28",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added SNI support for web interface"
+            }
+        ]
+    },
+    {
         "ver": "1.185.910",
         "type": "stable",
         "changes": [
