@@ -68,7 +68,10 @@ const Login = withRouter(class Login extends Pure_component {
                 if (e.message=='Unauthorized')
                     update.error_message = 'Unauthorized';
                 else
-                    update.error_message = 'Something went wrong';
+                {
+                    update.error_message = 'Something went wrong: '
+                    +(e.message||'could not connect');
+                }
                 _this.setState(update);
             });
             this.on('finally', ()=>_this.setState({loading: false}));

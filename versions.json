@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.186.225",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed sessions/IPs rotation when using multiple CPUs"
+            }
+        ]
+    },
+    {
         "ver": "1.186.153",
         "type": "stable",
         "changes": [

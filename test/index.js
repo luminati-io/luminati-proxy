@@ -81,7 +81,7 @@ describe('proxy', ()=>{
             return res;
         });
         yield l.listen();
-        l.session_mgr._request_session({}, {init: true});
+        l.session_mgr._request_session({});
         l.history = [];
         l.on('usage', data=>l.history.push(data));
         l.on('usage_abort', data=>l.history.push(data));
@@ -318,27 +318,6 @@ describe('proxy', ()=>{
             }));
         });
         describe('pool', ()=>{
-            describe('pool_size', ()=>{
-                const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
-                    l = yield lum({pool_size});
-                    yield l.test({fake: 1});
-                    assert.equal(proxy.history.length, 0);
-                    assert.equal(proxy.full_history.length, 0);
-                    assert.equal(l.session_mgr.sessions.sessions.length,
-                        pool_size);
-                    const sessions = {};
-                    for (let i=0; i<pool_size; i++)
-                    {
-                        let s = l.session_mgr.sessions.sessions[i];
-                        assert.equal(s.host, '127.0.0.1');
-                        assert.ok(!sessions[s.session]);
-                        sessions[s.session] = true;
-                    }
-                }));
-                t(1);
-                t(3);
-                t(10);
-            });
             describe('rotate_session', ()=>{
                 it('disabled', ()=>etask(function*(){
                     l = yield lum({rotate_session: false});
@@ -463,29 +442,16 @@ describe('proxy', ()=>{
                 const auth = res.body.auth;
                 assert.ok(session.test(auth.session));
             });
-            const t1 = (name, opt, before, after)=>it(name, ()=>etask(
+            const t = (name, opt, before, after)=>it(name, ()=>etask(
             function*(){
                 l = yield lum(opt);
                 yield test_session(before);
                 yield l.session_mgr.refresh_sessions();
                 yield test_session(after);
             }));
-            t1('pool', {pool_size: 1}, /24000_1/, /24000_2/);
-            t1('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_1/,
+            t('pool', {pool_size: 1}, /24000_0/, /24000_1/);
+            t('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_1/,
                 /24000_127_0_0_1_2/);
-            it('default', ()=>etask(function*(){
-                // XXX krzysztof: should it refresh all the sessions or one?
-                l = yield lum({pool_size: 3});
-                assert.ok(!l.sessions);
-                yield l.session_mgr.refresh_sessions();
-                const pre = l.session_mgr.sessions.sessions.map(s=>s.session);
-                yield l.session_mgr.refresh_sessions();
-                const after = l.session_mgr.sessions.sessions
-                    .map(s=>s.session);
-                const first = pre.shift();
-                after.forEach(a=>assert.notEqual(a, first));
-                assert_has(after, pre);
-            }));
         });
         describe('history aggregation', ()=>{
             let clock;
@@ -1131,13 +1097,12 @@ describe('proxy', ()=>{
                     l.on('retry', opt=>{
                         l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
-                    let session_a = l.session_mgr.sessions.sessions[0].session;
+                    const session_a = l.session_mgr.session;
                     yield l.test({fake: 1});
-                    let session_b = l.session_mgr.sessions.sessions[0].session;
+                    const session_b = l.session_mgr.session;
                     assert.notEqual(session_a, session_b);
                 }));
-                it('retry should rotate the session if it has ip',
-                    ()=>etask(
+                it('retry should rotate the session if it has ip', ()=>etask(
                 function*(){
                     l = yield lum({pool_size: 2, ips: ['1.1.1.1', '1.1.1.2'],
                         rules: [
@@ -1147,35 +1112,10 @@ describe('proxy', ()=>{
                     l.on('retry', opt=>{
                         l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
-                    let [sb1, sb2] = l.session_mgr.sessions.sessions;
+                    const session_a = l.session_mgr.session;
                     yield l.test({fake: 1});
-                    let [sa1, sa2] = l.session_mgr.sessions.sessions;
-                    assert.equal(sb1.session, sa2.session);
-                    assert.equal(sb1.ip, sa2.ip);
-                    assert.equal(sb2.session, sa1.session);
-                    assert.equal(sb2.ip, sa1.ip);
-                    assert.equal(sa2.count, 0);
-                }));
-                it('retry should not add session if pool is not full',
-                    ()=>etask(
-                function*(){
-                    l = yield lum({pool_size: 2, ips: ['1.1.1.1'],
-                        rules: [
-                            {action: {reserve_session: true},
-                                action_type: 'save_to_pool', status: '201'},
-                            {action: {retry: 2}, status: '200'}]});
-                    l.on('retry', opt=>{
-                        l.lpm_request(opt.req, opt.res, opt.head, opt.post);
-                    });
-                    let [sb1, sb2] = l.session_mgr.sessions.sessions;
-                    let res = yield l.test({fake: 1});
-                    assert.equal(res.body, '1.1.1.3');
-                    let [sa1, sa2] = l.session_mgr.sessions.sessions;
-                    assert.equal(sb1.session, sa1.session);
-                    assert.equal(sb1.ip, sa1.ip);
-                    assert.equal(sa1.count, 0);
-                    assert.equal(sb2, undefined);
-                    assert.equal(sa2, undefined);
+                    const session_b = l.session_mgr.session;
+                    assert.notEqual(session_a, session_b);
                 }));
             });
             it('retry_port should update context port', ()=>etask(function*(){
@@ -1247,23 +1187,6 @@ describe('proxy', ()=>{
                     yield l.test();
                     sinon.assert.calledOnce(stub);
                     assert.ok(!l.opt.ips.includes('1.2.3.4'));
-                }));
-                it('does not replace session on remove', ()=>etask(function*(){
-                    l = yield lum({
-                        rules: [{
-                            action_type: 'ban_ip',
-                            status: '200',
-                            action: {ban_ip: 0},
-                        }],
-                        pool_size: 2,
-                        ips: ['1.2.3.4', '2.3.4.5'],
-                    });
-                    inject_headers(l, '1.2.3.4');
-                    const stub = sinon.stub(l.mgr.config, 'save');
-                    assert.equal(l.session_mgr.sessions.sessions.length, 2);
-                    yield l.test();
-                    sinon.assert.calledOnce(stub);
-                    assert.equal(l.session_mgr.sessions.sessions.length, 1);
                 }));
             });
             describe('ban_ip per domain', ()=>{
@@ -1487,17 +1410,6 @@ describe('proxy', ()=>{
                         sticky_ip: false,
                     }, opt));
                 });
-                const t = (desc, opt)=>it(desc, ()=>etask(function*(){
-                    yield prepare_lum(opt);
-                    yield l.test({fake: 1});
-                    const first_session = l.session_mgr.sessions.sessions[0];
-                    yield l.test({fake: 1});
-                    const second_session = l.session_mgr.sessions.sessions[0];
-                    assert.ok(first_session!=second_session);
-                }));
-                t('long session');
-                t('random user agent', {user_agent: 'random_desktop'});
-                t('custom', {session: false});
                 it('default pool', ()=>etask(function*(){
                     yield prepare_lum({pool_size: 0});
                     yield l.test({fake: 1});
@@ -1507,32 +1419,13 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 it('per machine', ()=>etask(function*(){
-                    yield prepare_lum({session: false, pool_size: 0,
-                        sticky_ip: true});
+                    yield prepare_lum({session: true, sticky_ip: true});
                     yield l.test({fake: 1});
                     const sticky_sessions = l.session_mgr.sticky_sessions;
                     const first_session = Object.values(sticky_sessions)[0];
                     yield l.test({fake: 1});
                     const second_session = Object.values(sticky_sessions)[0];
-                    assert.ok(first_session!=second_session);
-                }));
-                it('default pool', ()=>etask(function*(){
-                    yield prepare_lum({pool_size: 2, rotate_session: true});
-                    yield l.test({fake: 1});
-                    const first_session = l.session_mgr.sessions.sessions[0];
-                    yield l.test({fake: 1});
-                    const second_session = l.session_mgr.sessions.sessions[1];
-                    assert.ok(first_session!=second_session);
-                }));
-                it('high performance', ()=>etask(function*(){
-                    yield prepare_lum({pool_size: 2});
-                    yield l.test({fake: 1});
-                    const first_sessions = l.session_mgr.sessions.sessions
-                        .map(s=>s.session);
-                    yield l.test({fake: 1});
-                    const second_sessions = l.session_mgr.sessions.sessions
-                        .map(s=>s.session);
-                    assert.notDeepEqual(first_sessions, second_sessions);
+                    assert.ok(first_session==second_session);
                 }));
             });
         });
@@ -1567,7 +1460,7 @@ describe('proxy', ()=>{
                 }});
                 assert.equal(r.body, consts.SESSION_TERMINATED_BODY);
                 assert.equal(r.statusCode, 400);
-                assert.ok(l.session_mgr.sessions.sessions[0].terminated);
+                assert.ok(l.session_mgr.session.terminated);
             }));
             it('should not terminate when rotating', etask._fn(function*(){
                 l = yield lum({pool_size: 0, rotate_session: true,
@@ -1581,14 +1474,14 @@ describe('proxy', ()=>{
             }));
             it('should not send requests on terminated', etask._fn(function*(){
                 l = yield lum({pool_size: 1, session_termination: true});
-                l.session_mgr.sessions.sessions[0].terminated = true;
+                l.session_mgr.session.terminated = true;
                 const r = yield l.test({fake: 1});
                 assert.equal(r.body, consts.SESSION_TERMINATED_BODY);
                 assert.equal(r.statusCode, 400);
             }));
             it('should unblock when session refreshed', etask._fn(function*(){
                 l = yield lum({pool_size: 1, session_termination: true});
-                l.session_mgr.sessions.sessions[0].terminated = true;
+                l.session_mgr.session.terminated = true;
                 l.session_mgr.refresh_sessions();
                 const r = yield l.test({fake: 1});
                 assert.equal(r.statusCode, 200);
