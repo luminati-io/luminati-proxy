@@ -662,9 +662,9 @@ class Tables_container extends Pure_component {
                     total: prev.stats.total+
                         all_reqs.filter(r=>r.pending).length,
                     sum_out: prev.stats.sum_out+all_reqs.reduce((acc, r)=>
-                        acc+r.details.out_bw||0, 0),
+                        acc+(r.details.out_bw||0), 0),
                     sum_in: prev.stats.sum_in+all_reqs.reduce((acc, r)=>
-                        acc+r.details.in_bw||0, 0),
+                        acc+(r.details.in_bw||0), 0),
                 };
             }
             else

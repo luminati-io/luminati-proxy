@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.186.335",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed live bandwitdh calculation in summary section"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed WS Server creation in SSL mode"
+            }
+        ]
+    },
+    {
         "ver": "1.186.225",
         "type": "stable/dev",
         "changes": [

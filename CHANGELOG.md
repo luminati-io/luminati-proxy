@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.186.335 Stable
+- :bug: Fixed live bandwitdh calculation in summary section
+- :bug: Fixed WS Server creation in SSL mode
+
 ## 1.186.225 
 - :bug: Fixed sessions/IPs rotation when using multiple CPUs
 

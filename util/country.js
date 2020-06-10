@@ -2108,7 +2108,6 @@ E.cnlabel2code = function(label){
     return '';
 };
 
-
 E.mixed2code = function(mixed){
     if (!mixed)
         return;
