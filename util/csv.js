@@ -105,7 +105,13 @@ E.escape_field = function(s, opt){
     // opt not fully supported
     if (s==null && opt && opt.null_to_empty)
         return '';
-    s = ''+s;
+    if (typeof s=='object' && (!Array.isArray(s) ||
+        s.some(function(e){ return typeof e=='object'; })))
+    {
+        s = JSON.stringify(s);
+    }
+    else
+        s = ''+s;
     if (!/["'\n,]/.test(s))
         return s;
     return '"'+s.replace(/"/g, '""')+'"';

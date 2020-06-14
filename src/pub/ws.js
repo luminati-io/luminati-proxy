@@ -2,12 +2,13 @@
 'use strict'; /*jslint browser:true, react:true, es6:true*/
 import {EventTarget} from 'event-target-shim';
 import setdb from '../../util/setdb.js';
+import {get_location_port} from './util.js';
 
 class Ws_wrapper extends EventTarget {
     constructor(){
         super();
         this.url = location.hostname;
-        this.port = location.port||80;
+        this.port = get_location_port();
         this.protocol = location.protocol=='https:' ? 'wss' : 'ws';
         this.create_socket();
     }

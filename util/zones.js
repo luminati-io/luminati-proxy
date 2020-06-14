@@ -25,8 +25,6 @@ E.get_perm = zone=>{
         res = perm.asn;
     if (plan.vips_type=='domain_p')
         res += ' vip_all';
-    if (plan.google_search)
-        res += ' google_search';
     if (plan.state)
         res += ' state';
     return res;

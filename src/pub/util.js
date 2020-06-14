@@ -278,3 +278,6 @@ export const get_troubleshoot = (body, status_code, headers)=>{
     }
     return {title, info: ''};
 };
+
+export const get_location_port = ()=>window.location.port ||
+    {'http:': 80, 'https:': 443}[window.location.protocol];

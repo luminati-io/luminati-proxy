@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.186.827",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed displaying TLS Warning"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed default port when UI is served via HTTPS on port 443"
+            }
+        ]
+    },
+    {
         "ver": "1.186.335",
         "type": "stable",
         "changes": [

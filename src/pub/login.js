@@ -9,6 +9,7 @@ import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {Loader, Logo, with_www_api} from './common.js';
+import {get_location_port} from './util.js';
 import {T} from './common/i18n.js';
 import './css/login.less';
 
@@ -243,8 +244,8 @@ const Form = props=>{
     +'www.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account';
     const google_click = e=>{
         const l = window.location;
-        const href = google_login_url+'&state='+encodeURIComponent(
-            l.protocol+'//'+l.hostname+':'+(l.port||80)+'?api_version=3');
+        const href = google_login_url+'&state='+encodeURIComponent(l.protocol
+            +'//'+l.hostname+':'+get_location_port()+'?api_version=3');
         window.location = href;
     };
     if (props.user_customers && !props.customer_selected)

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.186.827 Stable
+- :bug: Fixed displaying TLS Warning
+- :bug: Fixed default port when UI is served via HTTPS on port 443
+
 ## 1.186.335 Stable
 - :bug: Fixed live bandwitdh calculation in summary section
 - :bug: Fixed WS Server creation in SSL mode
