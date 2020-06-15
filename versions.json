@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.186.952",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed setting HAR limit to unlimited"
+            }
+        ]
+    },
+    {
         "ver": "1.186.827",
         "type": "stable",
         "changes": [
@@ -29,7 +39,7 @@
     },
     {
         "ver": "1.186.225",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "bug",

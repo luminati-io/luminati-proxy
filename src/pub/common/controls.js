@@ -252,7 +252,13 @@ export class Select_status extends Pure_component {
 
 export class Select_number extends Pure_component {
     _fmt_num = n=>n && n.toLocaleString({useGrouping: true}) || n;
-    _get_data = ()=>this.props.data ? this.props.data : this.opt_from_range();
+    _get_data = ()=>{
+        if (!this.props.data)
+            return this.opt_from_range();
+        if (this.props.data[0] && this.props.data[0].value)
+            return this.props.data.map(d=>d.value);
+        return this.props.data;
+    };
     value_to_option = value=>{
         if (value && value.label)
             return value;

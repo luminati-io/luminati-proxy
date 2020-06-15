@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.186.952 Stable
+- :bug: Fixed setting HAR limit to unlimited
+
 ## 1.186.827 Stable
 - :bug: Fixed displaying TLS Warning
 - :bug: Fixed default port when UI is served via HTTPS on port 443
@@ -8,7 +11,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed live bandwitdh calculation in summary section
 - :bug: Fixed WS Server creation in SSL mode
 
-## 1.186.225 
+## 1.186.225 Stable
 - :bug: Fixed sessions/IPs rotation when using multiple CPUs
 
 ## 1.186.153 Stable

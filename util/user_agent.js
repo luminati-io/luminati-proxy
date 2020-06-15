@@ -30,7 +30,6 @@ var arch_mapping = {
 var check_hola = /\bhola_android\b/i;
 var check_android_cdn = /Android.* CDNService\/([0-9\.]+)$/;
 var check_ios_cdn = / CDNService\/([0-9\.]+)$/;
-var check_hola_player_app = / (Spark|Hola)Player/;
 var check_opera = /\bOPR\b\/(\d+)/i;
 var check_edge = /\bEdge\b\/(\d+)/i;
 var check_xbox = /\bxbox\b/i;
@@ -112,7 +111,6 @@ E.guess_browser = function(ua){
             hola_android: check_hola.test(ua),
             hola_browser: chromium_based=='Hola',
             hola_app: check_android_cdn.test(ua),
-            hola_player_app: check_hola_player_app.test(ua),
             chromium_based: chromium_based,
             opera: opera && !!opera[1],
             opera_version: opera ? opera[1] : undefined,
@@ -137,7 +135,6 @@ E.guess_browser = function(ua){
         return {browser: 'chrome', version: res[1], android: true,
             webview: true, hola_android: check_hola.test(ua),
             hola_app: check_android_cdn.test(ua),
-            hola_player_app: check_hola_player_app.test(ua),
             ucbrowser: ucbrowser && !!ucbrowser[1],
             ucbrowser_version: ucbrowser ? ucbrowser[1] : undefined,
             samsung_browser: /SamsungBrowser/.test(ua)};
@@ -189,8 +186,6 @@ E.browser_to_string = function(browser){
         s += ' hola_android';
     if (browser.hola_app)
         s += ' hola_app';
-    if (browser.hola_player_app)
-        s += ' hola_player_app';
     if (browser.ucbrowser)
     {
         s += ' ucbrowser';
