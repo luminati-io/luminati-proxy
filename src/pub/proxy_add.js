@@ -101,6 +101,9 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxy_add.Proxy_add.save');
             }));
+            this.finally(()=>{
+                _this.setState({show_loader: false});
+            });
             _this.setState({show_loader: true});
             const resp = yield _this.persist();
             if (resp.errors)
@@ -108,8 +111,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 _this.setState({error_list: resp.errors});
                 $('#add_proxy_errors').modal('show');
             }
-            if (resp.port)
-                _this.setState({show_loader: false});
             if (resp.port)
                 _this.setState({created_port: resp.port});
             if (!resp.errors)

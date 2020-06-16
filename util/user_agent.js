@@ -27,9 +27,6 @@ var arch_mapping = {
     arm: 'arm',
 };
 
-var check_hola = /\bhola_android\b/i;
-var check_android_cdn = /Android.* CDNService\/([0-9\.]+)$/;
-var check_ios_cdn = / CDNService\/([0-9\.]+)$/;
 var check_opera = /\bOPR\b\/(\d+)/i;
 var check_edge = /\bEdge\b\/(\d+)/i;
 var check_xbox = /\bxbox\b/i;
@@ -52,15 +49,12 @@ function ios_ua(ua, safari_ver){
         var ios_ver = res[1];
         var is_chrome = /CriOS/.test(ua);
         var is_firefox = /FxiOS/.test(ua);
-        var is_hola_ios = is_browser&&(window.hola_cdn_sdk||
-            window.spark_ios_sdk) || check_ios_cdn.test(ua);
         var ucbrowser_ver = (check_ucbrowser.exec(ua)||[])[1];
         var is_ucbrowser = !!ucbrowser_ver;
         return {
             browser: 'safari',
             version: safari_ver||ios_ver,
             ios: ios_ver,
-            hola_ios: is_hola_ios,
             chrome: is_chrome,
             firefox: is_firefox,
             ucbrowser: is_ucbrowser,
@@ -68,12 +62,9 @@ function ios_ua(ua, safari_ver){
             webview: /Twitter/.test(ua) ? 'twitter' :
                 /GSA\/\d+/.test(ua) ? 'googlesearch' :
                 /FBAV\/\d+/.test(ua) ? 'facebook' :
-                !safari_ver && !is_chrome && !is_firefox && !is_ucbrowser &&
-                !is_hola_ios,
+                !safari_ver && !is_chrome && !is_firefox && !is_ucbrowser,
         };
     }
-    if (/HolaCDN iOS/.exec(ua))
-        return {browser: 'safari', hola_ios: true};
 }
 
 function check_chromium(ua){
@@ -108,9 +99,6 @@ E.guess_browser = function(ua){
         return {browser: 'chrome', version: res[1],
             android: ua.match(/Android/),
             webview: ua.match(check_webview),
-            hola_android: check_hola.test(ua),
-            hola_browser: chromium_based=='Hola',
-            hola_app: check_android_cdn.test(ua),
             chromium_based: chromium_based,
             opera: opera && !!opera[1],
             opera_version: opera ? opera[1] : undefined,
@@ -133,9 +121,7 @@ E.guess_browser = function(ua){
         if (!ua.match(/Android/))
             return ios_ua(ua, res[1])||{browser: 'safari', version: res[1]};
         return {browser: 'chrome', version: res[1], android: true,
-            webview: true, hola_android: check_hola.test(ua),
-            hola_app: check_android_cdn.test(ua),
-            ucbrowser: ucbrowser && !!ucbrowser[1],
+            webview: true, ucbrowser: ucbrowser && !!ucbrowser[1],
             ucbrowser_version: ucbrowser ? ucbrowser[1] : undefined,
             samsung_browser: /SamsungBrowser/.test(ua)};
     }
@@ -144,8 +130,6 @@ E.guess_browser = function(ua){
         return {browser: 'firefox', version: res[2],
             palemoon: res[1]=='PaleMoon'};
     }
-    if (/Hola\/\d+\.\d+.*?(?:iPhone|iPad|iPod)/.exec(ua))
-        return {browser: 'safari', version: 'Hola'};
     if (res = ios_ua(ua))
         return res;
     return {};
@@ -182,10 +166,6 @@ E.browser_to_string = function(browser){
         if (browser.opera_version)
             s += '-'+browser.opera_version;
     }
-    if (browser.hola_android)
-        s += ' hola_android';
-    if (browser.hola_app)
-        s += ' hola_app';
     if (browser.ucbrowser)
     {
         s += ' ucbrowser';
@@ -254,7 +234,7 @@ E.guess = function(ua, platform){
     }
     if (res = /(?:iPhone|iPad|iPod|iPod touch);.*?OS (\d+[._]\d+)/.exec(ua))
         return {os: 'ios', version: res[1].replace('_', '.'), mobile: true};
-    if (/iPhone|iPad|iPod|HolaCDN iOS/.exec(ua))
+    if (/iPhone|iPad|iPod iOS/.exec(ua))
         return {os: 'ios', mobile: true};
     if (/PLAYSTATION/.exec(ua))
         return {os: 'ps', mobile: false};

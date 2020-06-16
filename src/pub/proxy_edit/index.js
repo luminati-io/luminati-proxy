@@ -371,7 +371,7 @@ const Index = withRouter(class Index extends Pure_component {
               </div>
               {this.state.zones && <Main_window/>}
               <Modal className="warnings_modal" id="save_proxy_errors"
-                title={t('Error')} no_cancel_btn>
+                style={{zIndex: 10000}} title={t('Error')} no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
               <Alloc_modal type={type} form={this.state.form} zone={zone}

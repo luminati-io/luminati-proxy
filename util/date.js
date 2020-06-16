@@ -285,14 +285,15 @@ function normalize_dur(dur){
     return norm;
 }
 
-E.describe_interval = function(_ms){
-    return _ms<2*ms.MIN ? Math.round(_ms/ms.SEC)+' sec' :
-        _ms<2*ms.HOUR ? Math.round(_ms/ms.MIN)+' min' :
-        _ms<2*ms.DAY ? Math.round(_ms/ms.HOUR)+' hours' :
-        _ms<2*ms.WEEK ? Math.round(_ms/ms.DAY)+' days' :
-        _ms<2*ms.MONTH ? Math.round(_ms/ms.WEEK)+' weeks' :
-        _ms<2*ms.YEAR ? Math.round(_ms/ms.MONTH)+' months' :
-        Math.round(_ms/ms.YEAR)+' years';
+E.describe_interval = function(_ms, decimals){
+    var rmult = Math.pow(10, decimals||0);
+    return _ms<2*ms.MIN ? Math.round(_ms/ms.SEC*rmult)/rmult+' sec' :
+        _ms<2*ms.HOUR ? Math.round(_ms/ms.MIN*rmult)/rmult+' min' :
+        _ms<2*ms.DAY ? Math.round(_ms/ms.HOUR*rmult)/rmult+' hours' :
+        _ms<2*ms.WEEK ? Math.round(_ms/ms.DAY*rmult)/rmult+' days' :
+        _ms<2*ms.MONTH ? Math.round(_ms/ms.WEEK*rmult)/rmult+' weeks' :
+        _ms<2*ms.YEAR ? Math.round(_ms/ms.MONTH*rmult)/rmult+' months' :
+        Math.round(_ms/ms.YEAR*rmult)/rmult+' years';
 };
 
 E.time_ago = function(d, until_date){

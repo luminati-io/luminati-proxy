@@ -10,8 +10,6 @@ conf.hola_agent = 'proxy='+pkg.version+' node='+process.version
         +' platform='+process.platform;
 conf.is_lum = file.exists(file.cyg2unix('/usr/local/hola/zon_config.sh'));
 conf.work_dir = lpm_file.work_dir;
-conf.first_actions = lpm_file.get_file_path(
-    '.first_actions.json'.substr(conf.is_win ? 1 : 0));
 Object.assign(conf.manager_default, {
     api_domain: process.env.LPM_API||pkg.api_domain,
     config: lpm_file.get_file_path(

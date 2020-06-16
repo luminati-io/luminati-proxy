@@ -51,7 +51,6 @@ const conf = {
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
     'version', 'ask_sync_config');
-conf.first_actions = '~/luminati_proxy_manager/.first_actions.json';
 conf.proxy_params = Object.keys(swagger.definitions.proxy.properties);
 conf.server_default = {
     debug: 'full',
@@ -92,6 +91,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     request_stats: true,
     logs: 1000,
     har_limit: 1024,
+    ports_limit: 10000,
     reverse_lookup_dns: false,
     force: false,
     session_termination: false,

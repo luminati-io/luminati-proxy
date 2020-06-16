@@ -149,7 +149,7 @@ class Lum_node_index {
         }
     }
     _cleanup_local_files(){
-        const local_files = qw`.luminati.jar .luminati.json .first_actions.json
+        const local_files = qw`.luminati.jar .luminati.json
             .luminati.db .luminati.db.0 .luminati.db.1 .luminati.db.2
             .luminati.db.3 .luminati.db.4 .luminati.uuid`;
         local_files.forEach(this._cleanup_file);

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.187.214 Stable
+- :sparkles: Introduced configurable limit for number of proxy ports to avoid out of memory crashes
+
 ## 1.186.952 Stable
 - :bug: Fixed setting HAR limit to unlimited
 

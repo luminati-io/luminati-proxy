@@ -93,7 +93,8 @@ export class Modal extends React.Component {
         const header_classes = classnames('modal-header',
             {no_header: this.props.no_header});
         return <div id={this.props.id} tabIndex="-1" ref={this.set_ref}
-              className={classnames('modal', 'fade', this.props.className)}>
+              className={classnames('modal', 'fade', this.props.className)}
+              style={this.props.style}>
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className={header_classes}>

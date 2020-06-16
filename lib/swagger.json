@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.186.952",
+        "version": "1.187.214",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1378,6 +1378,10 @@
                 "har_limit": {
                     "type": "number",
                     "description": "Number of bytes to store"
+                },
+                "ports_limit": {
+                    "type": "integer",
+                    "description": "Limit the numer of open proxy ports at the same time"
                 },
                 "force": {
                     "type": "boolean",

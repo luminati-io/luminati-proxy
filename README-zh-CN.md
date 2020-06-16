@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.186.952-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.187.214-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -176,6 +176,8 @@ Options:
   --logs                        Enable logs for all proxies
                                                        [boolean] [default: 1000]
   --har_limit                   Number of bytes to store[number] [default: 1024]
+  --ports_limit                 Limit the numer of open proxy ports at the same
+                                time                            [default: 10000]
   --force                       Kill other instances of LPM if there are any
                                                       [boolean] [default: false]
   --session_termination         Stop sending new requests when the peer IP
