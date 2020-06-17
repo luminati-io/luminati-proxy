@@ -38,7 +38,7 @@ export default class Zone_description extends Pure_component {
         },
         unblocker: {
             label: 'Unblocker',
-            tooltip: 'Smart proxy which automatically manages IPs, headers, '
+            tooltip: 'Clever proxy which automatically manages IPs, headers, '
                 +'and network',
         },
     };

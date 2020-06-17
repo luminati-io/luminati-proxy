@@ -210,12 +210,6 @@ describe('manager', ()=>{
             app = yield app_with_config(config);
             const proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
-            for (let prop of ['hosts', 'mobile', 'ssl_perm', 'static'])
-            {
-                assert(prop in proxies[0]);
-                assert(!(prop in proxies[0].config),
-                    'calculated config values are leaked into raw config');
-            }
         }));
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
@@ -349,8 +343,6 @@ describe('manager', ()=>{
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});
                     assert_has(res, {data: res_proxy}, 'proxies');
-                    res = yield json('api/proxies_running');
-                    assert_has(res, [res_proxy], 'proxies');
                     res = yield json('api/proxies');
                     assert.equal(res.length, 1);
                 }));
@@ -400,8 +392,6 @@ describe('manager', ()=>{
                     let res = yield json('api/proxies/24000', 'put',
                         {proxy: put_proxy});
                     assert_has(res, {data: res_proxy});
-                    res = yield json('api/proxies_running');
-                    assert_has(res, [res_proxy], 'proxies');
                 }));
                 it('conflict', etask._fn(function*(_this){
                     let proxies = [{port: 24000}, {port: 24001}];

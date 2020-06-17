@@ -432,11 +432,15 @@ E.inherit_init = function(obj, ctor, params){
 };
 
 E.pick = function(obj){
-    var i, o = {};
+    var i, j, o = {};
     for (i=1; i<arguments.length; i++)
     {
-        if (E.own(obj, arguments[i]))
-            o[arguments[i]] = obj[arguments[i]];
+        var fields = E.ensure_array(arguments[i]);
+        for (j=0; j<fields.length; j++)
+        {
+            if (E.own(obj, fields[j]))
+                o[fields[j]] = obj[fields[j]];
+        }
     }
     return o;
 };

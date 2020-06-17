@@ -452,3 +452,9 @@ export const Ext_tooltip = with_www_api(props=>
             proxies by Luminati network
         </a>
     </div>);
+
+export const debug = str=>{
+    const d = new Date();
+    console.debug('%d:%d:%d.%d: %s', d.getHours(), d.getMinutes(),
+        d.getSeconds(), d.getMilliseconds(), str);
+};

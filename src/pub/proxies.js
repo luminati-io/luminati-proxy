@@ -498,7 +498,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             checked_all: false,
             proxy_filter: '',
             sort: {sort_by: 'port', sort_direction: 'asc'},
-            visible_proxies: [],
+            visible_proxies: null,
             loaded: false,
             height: window.innerHeight,
             open_delete_dialog: false,
@@ -560,11 +560,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return p.proxy_type!='duplicate';
         });
         let {zones} = this.state;
-        return _.orderBy(proxies, value=>{
+        const res = _.orderBy(proxies, value=>{
             if (sort.sort_by=='country')
                 return get_static_country(value, zones)||value.country||'any';
             return value[sort.sort_by];
         }, sort.sort_direction);
+        return res;
     };
     prepare_proxies = proxies=>{
         proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
@@ -597,7 +598,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             }
             _this.setState(prev=>{
-                const new_proxies = prev.proxies.map(p=>{
+                const new_proxies_a = prev.proxies.map(p=>{
                     let stat = {reqs: 0, success: 0, in_bw: 0, out_bw: 0,
                         bw: 0};
                     if (''+p.port in stats.ports)
@@ -609,7 +610,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                     p.success = stat.success;
                     p.last_req = {url: stat.url, ts: stat.timestamp};
                     return p;
-                }).reduce((acc, p)=>({...acc, [p.port]: p}), {});
+                });
+                const new_proxies = {};
+                for (let p of new_proxies_a)
+                    new_proxies[p.port] = p;
                 if (!_this.props.master_port)
                 {
                     for (let p of Object.values(new_proxies))
@@ -714,7 +718,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         }
         return columns.filter(col=>this.state.selected_cols.includes(col.key)
             || col.sticky || col.calc_show && col.calc_show(
-                this.state.visible_proxies, this.props.master_port));
+                this.state.visible_proxies||[], this.props.master_port));
     };
     open_delete_dialog = proxies=>{
         this.setState({delete_proxies: proxies, open_delete_dialog: true});
@@ -736,8 +740,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.setState({sort, visible_proxies, selected_proxies: {}});
     }
     render(){
+        let {proxies, visible_proxies, proxy_filter} = this.state;
         const cols = this.get_cols();
-        if (!this.state.zones || !this.state.countries)
+        if (!this.state.zones || !this.state.countries || !visible_proxies)
         {
             return <div className="proxies_panel chrome">
               <div className="main_panel vbox">
@@ -745,7 +750,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
               </div>
             </div>;
         }
-        let {proxies, proxy_filter} = this.state;
         let {sort_by, sort_direction} = this.state.sort;
         let show_table = !!proxies.length;
         if (this.state.loaded && !show_table)
@@ -780,9 +784,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                             sort={sort=>this.set_sort(sort)}
                             sortBy={sort_by}
                             sortDirection={sort_direction.toUpperCase()}
-                            rowCount={this.state.visible_proxies.length+1}
+                            rowCount={visible_proxies.length+1}
                             rowGetter={({index})=>
-                              this.state.visible_proxies[index]||'filler'}>
+                              visible_proxies[index]||'filler'}>
                             <Column key="select"
                               cellRenderer={this.select_renderer.bind(this)}
                               label={<Checkbox checked={this.state.checked_all}
