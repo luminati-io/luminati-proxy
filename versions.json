@@ -1,5 +1,31 @@
 [
     {
+        "ver": "1.187.569",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed memory leak on proxy ports multiplication"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved config synchronization flow when cloud config is empty"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed default zone mismatch to active zones"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added a message to the UI when no active zones"
+            },
+            {
+                "type": "sparkles",
+                "text": "Possibility to disable/enable specific rules on the UI"
+            }
+        ]
+    },
+    {
         "ver": "1.187.411",
         "type": "stable",
         "changes": [

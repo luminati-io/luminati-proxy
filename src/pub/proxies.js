@@ -15,7 +15,7 @@ import {get_static_country, report_exception} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
-import {Checkbox, any_flag, flag_with_title,
+import {Checkbox, any_flag, flag_with_title, No_zones,
     Tooltip_bytes, Loader_small} from './common.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
@@ -752,6 +752,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         }
         let {sort_by, sort_direction} = this.state.sort;
         let show_table = !!proxies.length;
+        if (!this.state.zones.zones.length)
+            return <No_zones/>;
         if (this.state.loaded && !show_table)
             return <Proxy_blank/>;
         return <React.Fragment>

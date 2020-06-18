@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {Loader, Warnings, with_proxy_ports, Add_icon,
+import {Loader, Warnings, with_proxy_ports, Add_icon, No_zones,
     Remove_icon} from './common.js';
 import {Input} from './common/controls.js';
 import classnames from 'classnames';
@@ -50,6 +50,11 @@ class Request extends Pure_component {
         const port = this.props.port||params.port;
         this.setState({params: {url, port}});
         this.setdb_on('head.lock_navigation', lock=>this.setState({lock}));
+        this.setdb_on('ws.zones', zones=>{
+            if (!zones)
+                return;
+            this.setState({zones});
+        });
     }
     add_header = ()=>{
         this.setState(prev_state=>({
@@ -111,6 +116,8 @@ class Request extends Pure_component {
         });
     };
     render(){
+        if (this.state.zones && !this.state.zones.zones.length)
+            return <No_zones/>;
         if (!this.props.ports.length)
             return <Proxy_blank/>;
         return <T>{t=><div className="panel no_border request">

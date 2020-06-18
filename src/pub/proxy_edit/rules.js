@@ -17,6 +17,7 @@ import {tabs} from './fields.js';
 import Proxy_tester from '../proxy_tester.js';
 import Tooltip from '../common/tooltip.js';
 import {T} from '../common/i18n.js';
+import Toggle_on_off from '../common/toggle_on_off.js';
 
 const rule_prepare = rule=>{
     const action = {};
@@ -62,6 +63,8 @@ const rule_prepare = rule=>{
             trigger_type: rule.trigger_type,
             url: rule.trigger_url_regex,
         };
+        if (rule.active===false)
+            result.active = false;
     }
     if (rule.trigger_type=='status')
         result.status = rule.status||'';
@@ -110,6 +113,7 @@ export const map_rule_to_form = rule=>{
         result.process = JSON.stringify(rule.action.process, null, '  ');
     result.trigger_code = rule.trigger_code;
     result.type = rule.type;
+    result.active = rule.active;
     return result;
 };
 
@@ -282,8 +286,14 @@ class Rule extends Pure_component {
             this.setState({ui_blocked: false});
         }
     };
+    toggle_active = e=>{
+        const active = this.props.rule.active===undefined||
+            this.props.rule.active;
+        this.set_rule_field('active', !active);
+    };
     render(){
-        const {rule_del, rule, ssl, disabled} = this.props;
+        let {rule_del, rule, ssl, disabled} = this.props;
+        const active = rule.active===undefined||rule.active;
         const {ui_blocked} = this.state;
         return <div>
           <div className="rule_wrapper">
@@ -293,6 +303,7 @@ class Rule extends Pure_component {
             <Action rule={rule} set_rule_field={this.set_rule_field}
               change_ui_block={this.change_ui_block}/>
             <Btn_rule_del on_click={()=>rule_del(rule.id)}/>
+            <Toggle_on_off val={active} on_click={this.toggle_active}/>
           </div>
         </div>;
     }

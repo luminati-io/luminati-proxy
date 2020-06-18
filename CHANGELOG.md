@@ -1,5 +1,12 @@
 Luminati Proxy manager - Change Log
 
+## 1.187.569 Stable
+- :bug: Fixed memory leak on proxy ports multiplication
+- :sparkles: Improved config synchronization flow when cloud config is empty
+- :bug: Fixed default zone mismatch to active zones
+- :sparkles: Added a message to the UI when no active zones
+- :sparkles: Possibility to disable/enable specific rules on the UI
+
 ## 1.187.411 Stable
 - :sparkles: Optimizations for a large number of proxy ports
 

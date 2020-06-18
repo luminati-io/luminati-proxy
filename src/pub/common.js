@@ -458,3 +458,12 @@ export const debug = str=>{
     console.debug('%d:%d:%d.%d: %s', d.getHours(), d.getMinutes(),
         d.getSeconds(), d.getMilliseconds(), str);
 };
+
+export const No_zones = with_www_api(props=>
+    <div>
+      <div className="no_zones">
+        <T>No active zones found. You can activate them</T>{' '}
+        <a className="link" target="_blank" rel="noopener noreferrer"
+          href={`${props.www_api}/cp/zones`}><T>here</T></a>.
+      </div>
+    </div>);

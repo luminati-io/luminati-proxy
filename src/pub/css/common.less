@@ -1102,4 +1102,64 @@ span.icon_link {
         }
     }
 }
+.no_zones {
+    text-align: center;
+}
 .modal-backdrop.fade.in { opacity: 0.15; }
+.toggle_on_off {
+    width: 42px;
+    height: 18px;
+    position: relative;
+    border-radius: 9px;
+    padding: 9px;
+    background-color: rgba(0,77,116,0.1);
+    overflow: hidden;
+    cursor: pointer;
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transition: opacity 350ms ease;
+        background-color: @first_color;
+        border-radius: 9px;
+        opacity: 0;
+    }
+    &_label {
+        position: absolute;
+        top: 5px;
+        font-size: 8px;
+        font-weight: bold;
+        line-height: 1.2;
+        transition: opacity 350ms ease, transform 350ms ease;
+        opacity: 0;
+        &_off {
+            left: 21px;
+            color: rgba(0,77,116,0.7);
+            transform: translateX(24px);
+        }
+        &_on {
+            left: 7px;
+            color: #ffffff;
+            transform: translateX(-24px);
+        }
+        &_active {
+            opacity: 1;
+            transform: none;
+        }
+    }
+    &_handle {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-radius: 7px;
+        background-color: #ffffff;
+        transition: transform 350ms ease;
+        left: 0;
+        top: 2px;
+        &_active { transform: translateX(24px); }
+    }
+    &_active:before { opacity: 1; }
+}
