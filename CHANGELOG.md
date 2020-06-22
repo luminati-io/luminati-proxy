@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.187.913 Stable
+- :sparkles: Improved performance for update settings API when a large number of proxy ports created
+
 ## 1.187.569 Stable
 - :bug: Fixed memory leak on proxy ports multiplication
 - :sparkles: Improved config synchronization flow when cloud config is empty

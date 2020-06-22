@@ -209,6 +209,9 @@ E.is_valid_email = function(email, is_signup){
     return !!(n && E.is_valid_domain(n[1]));
 };
 
+E.get_first_valid_email = function(email){
+    return email.split(/\s+/).find(E.is_valid_email); };
+
 // XXX dmitriie: move to email.js:is_alias
 E.is_alias_email = function(email){
     if (!E.is_valid_email(email))

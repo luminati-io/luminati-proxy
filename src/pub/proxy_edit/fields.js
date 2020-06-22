@@ -103,8 +103,10 @@ export const tabs = {
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
                 placeholder: `i.e. (captcha|robot)`,
-                tooltip: `A string (regular expression) to be scanned in the
-                    body of the response`,
+                tooltip: `A string (or a regular expression) to be scanned in
+                    the body of the response. You can type any kind of regex
+                    manually or generate it by choosing from the offered
+                    formats above the input`,
             },
             min_req_time: {
                 label: 'Request time more than',
