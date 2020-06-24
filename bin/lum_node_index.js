@@ -170,7 +170,6 @@ class Lum_node_index {
         const child_opt = {
             stdio: 'inherit',
             env: process.env,
-            execArgv: ['--max-http-header-size=160000'],
         };
         this.child = child_process.fork(path.resolve(__dirname, 'lum_node.js'),
             process.argv.slice(2), child_opt);

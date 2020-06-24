@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.188.154 Stable
+## 1.188.184 Stable
 - :bug: Increased the headers size. Fixed: Parse Error: Header overflow
 
 ## 1.187.913 Stable
