@@ -190,7 +190,9 @@ E.is_ip_port = function(host){
 
 /* basic url validation to prevent script injection like 'javascript:....' */
 E.is_valid_url = function(url){
-    return /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z0-9-]+(\/.*)?$/i.test(url); };
+    return /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z0-9-]+(:\d+)?(\/.*)?$/i
+    .test(url);
+};
 
 E.is_valid_domain = function(domain){
     return /^([a-z0-9]([a-z0-9-_]*[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain); };

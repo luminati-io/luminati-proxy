@@ -167,9 +167,13 @@ class Lum_node_index {
     }
     create_child(opt={}){
         process.env.LUM_MAIN_CHILD = true;
-        this.child = child_process.fork(
-            path.resolve(__dirname, 'lum_node.js'),
-            process.argv.slice(2), {stdio: 'inherit', env: process.env});
+        const child_opt = {
+            stdio: 'inherit',
+            env: process.env,
+            execArgv: ['--max-http-header-size=160000'],
+        };
+        this.child = child_process.fork(path.resolve(__dirname, 'lum_node.js'),
+            process.argv.slice(2), child_opt);
         this.child.on('message', this.msg_handler.bind(this));
         this.child.on('exit', this.shutdown_on_child_exit);
         this.child.send(Object.assign(opt, {command: 'run', argv: this.argv}));
