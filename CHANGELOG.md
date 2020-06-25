@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.188.363 Stable
+- :bug: Fixed socket closing on proxy port restart
+
 ## 1.188.184 Stable
 - :bug: Increased the headers size. Fixed: Parse Error: Header overflow
 

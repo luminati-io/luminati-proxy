@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.188.363",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed socket closing on proxy port restart"
+            }
+        ]
+    },
+    {
         "ver": "1.188.184",
         "type": "stable",
         "changes": [

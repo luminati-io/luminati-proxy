@@ -2611,7 +2611,7 @@
   "Yes (default)": "Sí (por defecto)",
   "Minimum monthly payment": "Pago mínimo mensual",
   "Recharges account when it reaches low balance, preventing account suspension": "Se recarga en cuenta cuando el balance es bajo, evitando suspensión de la cuenta",
-  "Once your Consumed balance reaches 85% of your Balance or your balance is lower than $100, the system automatically charges your account with the amount you have set preventing it from being suspended. You will immediately get a notification email when this happens. Your remaining balance at end of the month will be credited to you at the beginning of the next month.": "Una vez que tu saldo consumido alcanza el 85% de su saldo, o su saldo es inferior a $ 100, el sistema carga automáticamente a su cuenta con la cantidad que haya configurado evitando que se suspenda la cuenta. Inmediatamente recibirás una notificación por correo electrónico cuando esto sucede. Su saldo restante al final del mes será acreditado a tu cuenta en el comienzo del próximo mes.",
+  "Once your Consumed balance reaches 85% of your Balance or your balance is lower than $100, the system automatically charges your account with the amount you have set preventing it from being suspended. You will immediately get a notification email when this happens.": "Una vez que tu saldo consumido alcanza el 85% de su saldo, o su saldo es inferior a $ 100, el sistema carga automáticamente a su cuenta con la cantidad que haya configurado evitando que se suspenda la cuenta. Inmediatamente recibirás una notificación por correo electrónico cuando esto sucede. Su saldo restante al final del mes será acreditado a tu cuenta en el comienzo del próximo mes.",
   "Method": "Método",
   "Add funds": "Añadir fondos",
   "Pay": "Pagar",
