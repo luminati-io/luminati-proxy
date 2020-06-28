@@ -897,6 +897,7 @@ span.icon_link {
     .field_row {
         display: inline-block;
         .field_row_inner {
+            min-height: 38px;
             display: flex;
             align-items: center;
             padding: 3px;
@@ -1107,12 +1108,13 @@ span.icon_link {
 }
 .modal-backdrop.fade.in { opacity: 0.15; }
 .toggle_on_off {
+    outline: none !important;
     width: 42px;
     height: 18px;
     position: relative;
     border-radius: 9px;
     padding: 9px;
-    background-color: rgba(0,77,116,0.1);
+    background-color: rgba(0, 77, 116, 0.2);
     overflow: hidden;
     cursor: pointer;
     &:before {

@@ -19,7 +19,6 @@ import Rules from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
 import Rotation from './rotation.js';
-import Speed from './speed.js';
 import Headers from './headers.js';
 import Logs from './logs.js';
 import Alloc_modal from './alloc_modal.js';
@@ -382,8 +381,7 @@ const Index = withRouter(class Index extends Pure_component {
 
 const Nav_tabs_wrapper = withRouter(
 class Nav_tabs_wrapper extends Pure_component {
-    tabs = ['logs', 'target', 'rotation', 'speed', 'rules', 'headers',
-        'general'];
+    tabs = ['logs', 'target', 'rotation', 'rules', 'headers', 'general'];
     set_tab = id=>{
         const port = this.props.match.params.port;
         const pathname = `/proxy/${port}/${id}`;
@@ -431,7 +429,6 @@ const Main_window = withRouter(({match})=>
     <div className="main_window">
       <Switch>
         <Route path={`${match.path}/target`} component={Targeting}/>
-        <Route path={`${match.path}/speed`} component={Speed}/>
         <Route path={`${match.path}/rules`} component={Rules}/>
         <Route path={`${match.path}/rotation`} component={Rotation}/>
         <Route path={`${match.path}/headers`} component={Headers}/>

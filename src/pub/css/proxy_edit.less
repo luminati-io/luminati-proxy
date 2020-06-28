@@ -71,7 +71,6 @@
             }
         }
         .target .desc { width: 110px; }
-        .speed .desc { width: 175px; }
         .rotation .desc { width: 125px; }
         .headers .desc { width: 145px; }
         .general .desc { width: 195px; }
@@ -79,9 +78,14 @@
             max-width: 100%;
             .desc { width: 200px; min-width: 200px; }
             .rule_wrapper {
+                &.collapsed {
+                    cursor: pointer;
+                    border-color: @grey;
+                }
+                border: solid 1px @first_color;
+                outline: none !important;
                 position: relative;
                 margin-top: 15px;
-                border: solid 1px @grey;
                 border-radius: 4px;
                 display: grid;
                 grid-template-columns: auto 1fr;
@@ -118,14 +122,30 @@
                     border-left: 1px solid @grey;
                     overflow: hidden;
                 }
-                .btn_rule_del {
+                .btn_rule {
+                    outline: none !important;
                     position: absolute;
-                    top: 5px;
-                    right: 5px;
-                    background: url(/img/delete.svg);
+                    top: 9px;
                     width: 16px;
                     height: 16px;
                     border: none;
+                    &.del {
+                        right: 5px;
+                        background: url(/img/delete.svg);
+                    }
+                    &.toggle {
+                        right: 30px;
+                        cursor: pointer;
+                        button {
+                            border: none;
+                            height: 3px;
+                            width: 100%;
+                            background-color: #004D74;
+                            opacity: 0.4;
+                            position: relative;
+                            top: -5px;
+                        }
+                    }
                 }
             }
             .rule_add_btn {
@@ -135,8 +155,8 @@
             }
             .btn.toggle_on_off {
                 position: absolute;
-                right: 30px;
-                top: 3px;
+                right: 55px;
+                top: 8px;
             }
         }
         .headers {
@@ -179,7 +199,7 @@
             font-weight: bold;
             height: 40px;
         }
-        .note { margin-bottom: 5px; }
+        .note { margin-bottom: 0; }
         .desc {
             line-height: 1.07;
             padding-right: 10px;

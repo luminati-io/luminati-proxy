@@ -19,6 +19,7 @@ import {T} from './i18n.js';
 import {Ext_tooltip, Loader} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
+import Toggle_on_off from './toggle_on_off.js';
 const ANY_IP = '0.0.0.0/0';
 
 export class Pins extends Pure_component {
@@ -349,17 +350,14 @@ export class Select_multiple extends Pure_component {
 }
 
 export class Yes_no extends Pure_component {
-    options = t=>{
-        return this.props.default ? [
-            {key: 'Yes (default)', value: true},
-            {key: 'No', value: false}
-        ] : [
-            {key: 'No (default)', value: false},
-            {key: 'Yes', value: true}
-        ];
+    toggle_active = ()=>{
+        this.props.on_change_wrapper(!this.props.val);
     };
     render(){
-        return <T>{t=><Select {...this.props} data={this.options(t)}/>}</T>;
+        return <Toggle_on_off
+            val={this.props.val}
+            on_click={this.toggle_active}
+            disabled={this.props.disabled}/>;
     }
 }
 
@@ -519,7 +517,8 @@ export const Select = props=>{
     const conf = (props.data||[]).find(c=>c.value==props.val);
     return <Tooltip key={props.val} title={conf&&conf.tooltip||''}>
           <T>{t=><select value={''+props.val}
-            onChange={e=>update(e.target.value)} disabled={props.disabled}>
+            onChange={e=>update(e.target.value)}
+            disabled={props.disabled}>
             {(props.data||[]).map((c, i)=>
               <option key={i} value={c.value !== undefined ? c.value : c}>
                 {t(c.key||c)}

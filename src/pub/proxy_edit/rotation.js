@@ -8,6 +8,23 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
 
+const reverse_lookup_opt = [
+    {key: 'No', value: ''},
+    {key: 'DNS', value: 'dns'},
+    {key: 'File', value: 'file'},
+    {key: 'Values', value: 'values'},
+];
+
+const dns_opt = [
+    {key: 'Local (default) - resolved by the super proxy', value: 'local'},
+    {key: 'Remote - resolved by peer', value: 'remote'},
+];
+
+const proxy_opt = [
+    {key: 'Automatic (default)', value: ''},
+    {key: 'China', value: `servercountry-cn.zproxy.lum-superproxy.io`},
+];
+
 export default class Rotation extends Pure_component {
     state = {};
     goto_field = setdb.get('head.proxy_edit.goto_field');
@@ -66,6 +83,14 @@ export default class Rotation extends Pure_component {
                 <Config type="text" id="session"/>
                 <Config type="yes_no" id="session_termination"
                   note={sess_note}/>
+                <Config type="select" id="proxy" data={proxy_opt}/>
+                <Config type="select" id="dns" data={dns_opt}/>
+                <Config type="select" id="reverse_lookup"
+                  data={reverse_lookup_opt}/>
+                {this.state.form.reverse_lookup=='file' &&
+                  <Config type="text" id="reverse_lookup_file"/>}
+                {this.state.form.reverse_lookup=='values' &&
+                  <Config type="textarea" id="reverse_lookup_values"/>}
               </Tab_context.Provider>
             </div>;
     }

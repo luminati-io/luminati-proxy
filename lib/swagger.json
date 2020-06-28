@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.188.363",
+        "version": "1.188.647",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1567,10 +1567,6 @@
                     "type": "array",
                     "items": {"type": "object"},
                     "description": "Proxy request rules"
-                },
-                "race_reqs": {
-                    "type": "integer",
-                    "description": "Race several requests at once and choose fastest"
                 },
                 "route_err": {
                     "type": "string",

@@ -303,11 +303,6 @@ const columns = [
         ext: true,
     },
     {
-        key: 'race_reqs',
-        title: 'Parallel race requests',
-        type: 'number',
-    },
-    {
         key: 'dns',
         title: 'DNS',
         type: 'options',

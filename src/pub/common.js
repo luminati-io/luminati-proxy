@@ -18,16 +18,21 @@ import {Toolbar_button} from './chrome_widgets.js';
 
 export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
     bytes = bytes||0;
-    const tooltip = [0, 1, 2, 3]
-        .map(n=>{
-            const bw = bytes_format(bytes, n);
-            const bw_out = bytes_format(bytes_out, n);
-            const bw_in = bytes_format(bytes_in, n);
-            const details = bytes_out && bytes_in &&
-                `(${bw_out} up | ${bw_in} down)` || '';
-            return `<div><strong>${bw}</strong> ${details}</div>`;
-        })
-        .join('');
+    let n;
+    if (bytes < 1e3)
+        n = 0;
+    else if (bytes < 1e6)
+        n = 1;
+    else if (bytes < 1e9)
+        n = 2;
+    else
+        n = 3;
+    const bw = bytes_format(bytes, n);
+    const bw_out = bytes_format(bytes_out, n);
+    const bw_in = bytes_format(bytes_in, n);
+    const details = bytes_out && bytes_in &&
+        `(${bw_out} up | ${bw_in} down)` || '';
+    const tooltip = `<div><strong>${bw}</strong> ${details}</div>`;
     return <Tooltip title={bytes ? tooltip : ''}>
           <div className="disp_value">
             {bytes_format(bytes)||'—'}

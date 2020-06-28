@@ -374,7 +374,7 @@ E.unset = function(o, path){
 var has_unique = {};
 E.has = function(o, path){ return E.get(o, path, has_unique)!==has_unique; };
 E.own = function(o, prop){
-    return Object.prototype.hasOwnProperty.call(o, prop); };
+    return o!=null && Object.prototype.hasOwnProperty.call(o, prop); };
 
 E.bool_lookup = function(a, split){
     var ret = {}, i;

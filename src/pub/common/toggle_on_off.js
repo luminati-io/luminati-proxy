@@ -5,11 +5,11 @@ import Pure_component from '/www/util/pub/pure_component.js';
 
 export default class Toggle_on_off extends Pure_component {
     render(){
-        const {readonly, val} = this.props;
-        const style = readonly ? {pointerEvents: 'none'} : {};
+        const {disabled, val} = this.props;
+        const style = disabled ? {pointerEvents: 'none'} : {};
         const cls = 'btn toggle_on_off '+(val ? 'toggle_on_off_active' : '');
         return <button type="button" className={cls} style={style}
-              disabled={readonly} onClick={this.props.on_click}>
+              disabled={disabled} onClick={this.props.on_click}>
               <span className={'toggle_on_off_label toggle_on_off_label_off '
                 +(val ? '': 'toggle_on_off_label_active')}>Off</span>
               <span className={'toggle_on_off_label toggle_on_off_label_on '

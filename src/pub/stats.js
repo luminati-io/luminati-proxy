@@ -150,8 +150,8 @@ const Cell = ({row_key, children})=>{
         </Tooltip>;
 };
 
-const Stat_table = with_resizable_cols([{id: 'key'}, {id: 'out_bw'},
-    {id: 'in_bw'}, {id: 'reqs'}],
+const Stat_table = with_resizable_cols([{id: 'key'}, {id: 'bw'},
+    {id: 'reqs'}],
 class Stat_table extends Pure_component {
     state = {sorting: {col: 0, dir: 1}};
     sort = col=>{
@@ -183,10 +183,8 @@ const Header_container = ({title, cols, sorting, sort, tooltip})=>
           <tr>
             <Header sort={sort} id={0} label={title} sorting={sorting}
               tooltip={tooltip}/>
-            <Header sort={sort} id={1} label="BW up" sorting={sorting}
-              tooltip="Outgoing bandwidth"/>
-            <Header sort={sort} id={2} label="BW down" sorting={sorting}
-              tooltip="Incoming bandwidth"/>
+            <Header sort={sort} id={1} label="Bandwith" sorting={sorting}
+              tooltip="Bandwith sent through Luminati"/>
             <Header sort={sort} id={3} label="Requests" sorting={sorting}
               tooltip="Number of sent requests"/>
           </tr>
@@ -249,8 +247,13 @@ const Row = withRouter(class Row extends Pure_component {
         const {stat, row_key, warning} = this.props;
         return <tr onClick={this.click}>
               <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
-              <td><Tooltip_bytes chrome_style bytes={stat.out_bw}/></td>
-              <td><Tooltip_bytes chrome_style bytes={stat.in_bw}/></td>
+              <td>
+                <Tooltip_bytes
+                  chrome_style
+                  bytes_in={stat.in_bw}
+                  bytes_out={stat.out_bw}
+                  bytes={stat.in_bw+stat.out_bw}/>
+              </td>
               <td><Cell>{stat.reqs||'—'}</Cell></td>
             </tr>;
     }

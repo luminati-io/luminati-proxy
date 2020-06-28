@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.188.363/luminati-proxy-manager-v1.188.363-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.188.647/luminati-proxy-manager-v1.188.647-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -190,8 +190,6 @@ Options:
                                                       [boolean] [default: false]
   --throttle                    Throttle requests above given number    [number]
   --rules                       Proxy request rules                      [array]
-  --race_reqs                   Race several requests at once and choose fastest
-                                                                        [number]
   --route_err                   Block or allow requests to be automatically sent
                                 through super proxy on error
                                                   [string] [default: "pass_dyn"]

@@ -49,47 +49,6 @@ export const tabs = {
             },
         },
     },
-    speed: {
-        label: 'Request speed',
-        tooltip: 'Control the speed of your request to improve performance',
-        fields: {
-            proxy: {
-                label: `Super Proxy location`,
-                tooltip: `Location of Super Proxy is chosen automatically.
-                    Sometimes choosing Chinese Super Proxy works better when
-                    also using Chinese peers`,
-            },
-            race_reqs: {
-                label: 'Parallel race requests',
-                tooltip: `Sends multiple requests in parallel via different
-                    Super Proxies and uses the fastest request.`,
-                placeholder: 'Number of parallel requests'
-            },
-            throttle: {
-                label: 'Throttle requests',
-                tooltip: `Throttle requests above the given number.
-                    Allow a maximal number of parallel requests.`,
-                ext: true,
-            },
-            dns: {
-                label: 'DNS lookup',
-                tooltip: 'Location of DNS resolve',
-            },
-            reverse_lookup: {
-                label: 'Reverse DNS lookup',
-                tooltip: 'Resolve DNS from IP to url',
-                ext: true,
-            },
-            reverse_lookup_file: {
-                label: 'Path to file',
-                placeholder: '/path/to/file',
-            },
-            reverse_lookup_values: {
-                label: 'Values',
-                placeholder: '1.1.1.1 example.com',
-            },
-        },
-    },
     rules: {
         label: 'Rules',
         tooltip: 'Define custom action for specific rule',
@@ -207,6 +166,35 @@ export const tabs = {
                 tooltip: `Stop sending new requests when the peer IP becomes
                     unavailable and redirect to confirmation page before new IP
                     is taken`,
+            },
+            proxy: {
+                label: `Super Proxy location`,
+                tooltip: `Location of Super Proxy is chosen automatically.
+                    Sometimes choosing Chinese Super Proxy works better when
+                    also using Chinese peers`,
+            },
+            throttle: {
+                label: 'Throttle requests',
+                tooltip: `Throttle requests above the given number.
+                    Allow a maximal number of parallel requests.`,
+                ext: true,
+            },
+            dns: {
+                label: 'DNS lookup',
+                tooltip: 'Location of DNS resolve',
+            },
+            reverse_lookup: {
+                label: 'Reverse DNS lookup',
+                tooltip: 'Resolve DNS from IP to url',
+                ext: true,
+            },
+            reverse_lookup_file: {
+                label: 'Path to file',
+                placeholder: '/path/to/file',
+            },
+            reverse_lookup_values: {
+                label: 'Values',
+                placeholder: '1.1.1.1 example.com',
             },
         },
     },

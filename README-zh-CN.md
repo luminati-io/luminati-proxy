@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.188.363-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.188.647-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -135,8 +135,6 @@ Options:
                                                       [boolean] [default: false]
   --throttle                    Throttle requests above given number    [number]
   --rules                       Proxy request rules                      [array]
-  --race_reqs                   Race several requests at once and choose fastest
-                                                                        [number]
   --route_err                   Block or allow requests to be automatically sent
                                 through super proxy on error
                                                   [string] [default: "pass_dyn"]

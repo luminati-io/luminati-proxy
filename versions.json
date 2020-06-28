@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.188.647",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Adjustments for LPM in the Cloud"
+            }
+        ]
+    },
+    {
         "ver": "1.188.363",
         "type": "stable",
         "changes": [

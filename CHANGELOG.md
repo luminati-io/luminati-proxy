@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.188.647 Stable
+- :sparkles: Adjustments for LPM in the Cloud
+
 ## 1.188.363 Stable
 - :bug: Fixed socket closing on proxy port restart
 

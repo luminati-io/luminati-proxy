@@ -197,7 +197,9 @@ export default class Rules extends Pure_component {
                 <i className="glyphicon glyphicon-plus"/>
               </button>
               {rules.map(r=>
-                <Rule key={r.id} rule={r} rule_del={this.rule_del}
+                <Rule key={r.id}
+                  rule={r}
+                  rule_del={this.rule_del}
                   www={www} ssl={ssl_analyzing_enabled}
                   disabled={disabled_fields.rules}/>
               )}
@@ -266,7 +268,7 @@ const Ban_ips_note = withRouter(({match, history})=>{
 });
 
 class Rule extends Pure_component {
-    state = {};
+    state = {expanded: false};
     componentDidMount(){
         const rule = this.props.rule;
         if (rule && (rule.trigger_code || rule.type))
@@ -287,22 +289,47 @@ class Rule extends Pure_component {
         }
     };
     toggle_active = e=>{
+        e.stopPropagation();
         const active = this.props.rule.active===undefined||
             this.props.rule.active;
         this.set_rule_field('active', !active);
+    };
+    expand = ()=>{
+        this.setState({expanded: true});
+    };
+    collapse = ()=>{
+        this.setState({expanded: false});
     };
     render(){
         let {rule_del, rule, ssl, disabled} = this.props;
         const active = rule.active===undefined||rule.active;
         const {ui_blocked} = this.state;
+
+        const trigger = trigger_types.find(t=>t.value==rule.trigger_type);
+        const tv = trigger && ': '+(rule[trigger.value] ?
+            rule[trigger.value] : 'not set');
+        const trigger_label = trigger ? trigger.key+tv : 'Click to edit';
         return <div>
-          <div className="rule_wrapper">
-            <Trigger rule={rule} ui_blocked={ui_blocked} ssl={ssl}
-              set_rule_field={this.set_rule_field} disabled={disabled}
-              change_ui_block={this.change_ui_block}/>
-            <Action rule={rule} set_rule_field={this.set_rule_field}
-              change_ui_block={this.change_ui_block}/>
+          <div className={classnames('rule_wrapper',
+            {collapsed: !this.state.expanded})}
+            onClick={this.expand}>
+            {this.state.expanded &&
+              <React.Fragment>
+                <Trigger rule={rule} ui_blocked={ui_blocked} ssl={ssl}
+                  set_rule_field={this.set_rule_field} disabled={disabled}
+                  change_ui_block={this.change_ui_block}/>
+                <Action rule={rule} set_rule_field={this.set_rule_field}
+                  change_ui_block={this.change_ui_block}/>
+              </React.Fragment>
+            }
+            {!this.state.expanded &&
+              <div className="ui">
+                {trigger_label}
+              </div>
+            }
             <Btn_rule_del on_click={()=>rule_del(rule.id)}/>
+            <Btn_rule_toggle expanded={this.state.expanded}
+              collapse={this.collapse} expand={this.expand}/>
             <Toggle_on_off val={active} on_click={this.toggle_active}/>
           </div>
         </div>;
@@ -500,7 +527,7 @@ class Trigger extends Pure_component {
                 it based on your selections.`;
         }
         return <React.Fragment>
-              <div className="trigger ui">
+              <div className="trigger ui" onFocus={e=>e.stopPropagation()}>
                 <Tooltip title={tip}>
                 <div className={classnames('mask', {active: ui_blocked})}>
                   <button className="btn btn_lpm btn_lpm_small reset_btn"
@@ -578,4 +605,21 @@ class Trigger_code extends Pure_component {
 }
 
 const Btn_rule_del = ({on_click})=>
-    <button className="btn_rule_del" onClick={on_click}/>;
+    <button tabIndex={-1} className="btn_rule del" onClick={on_click}
+    onFocus={e=>e.stopPropagation()}/>;
+
+const Btn_rule_toggle = ({expanded, expand, collapse})=>{
+    const on_click = e=>{
+        e.stopPropagation();
+        if (expanded)
+            return collapse();
+        expand();
+    };
+    return <div
+        tabIndex={-1}
+        className="btn_rule toggle"
+        onClick={on_click}
+        onFocus={e=>e.stopPropagation()}>
+        <button className={classnames({expanded, collapsed: !expanded})}/>
+      </div>;
+};

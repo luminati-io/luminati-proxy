@@ -5,9 +5,11 @@ const file = require('./file.js');
 const pkg = require('../package.json');
 let conf = require('./lpm_config_static.js');
 
+const is_zagent = process.argv.some((a, idx, src)=>
+    a=='--zagent'&&src[idx+1]!='false');
 conf.version = pkg.version;
 conf.hola_agent = 'proxy='+pkg.version+' node='+process.version
-        +' platform='+process.platform;
+    +' platform='+process.platform+(is_zagent ? ' cloud_lpm=1' : '');
 conf.is_lum = file.exists(file.cyg2unix('/usr/local/hola/zon_config.sh'));
 conf.work_dir = lpm_file.work_dir;
 Object.assign(conf.manager_default, {
