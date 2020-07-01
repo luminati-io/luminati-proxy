@@ -188,15 +188,23 @@ class Form extends Pure_component {
                 data={[0, 100, 1000, 10000]}
                 label="Limit for request logs" default
                 tooltip={tooltips.logs}/>
-              <Labeled_controller val={s.har_limit}
-                type="select_number" on_change_wrapper={this.har_limit_changed}
+              <Labeled_controller
+                val={s.har_limit}
+                type="select_number"
+                on_change_wrapper={this.har_limit_changed}
                 data={har_limit_options}
-                label="Response limit to save" default={1024}
+                disabled={s.zagent}
+                label="Response limit to save"
+                default={1024}
                 tooltip={tooltips.har_limit}/>
-              <Labeled_controller val={s.log}
-                type="select" on_change_wrapper={this.log_level_changed}
-                data={this.log_level_opts} disabled={s.zagent}
-                label="Log level / API logs" tooltip={tooltips.log_level}/>
+              <Labeled_controller
+                val={s.log}
+                type="select"
+                on_change_wrapper={this.log_level_changed}
+                data={this.log_level_opts}
+                disabled={s.zagent}
+                label="Log level / API logs"
+                tooltip={tooltips.log_level}/>
               <Labeled_controller val={s.sync_config}
                 type="yes_no" on_change_wrapper={this.sync_config_changed}
                 label="Sync configuration" default={false}

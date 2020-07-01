@@ -185,7 +185,7 @@ const Header_container = ({title, cols, sorting, sort, tooltip})=>
               tooltip={tooltip}/>
             <Header sort={sort} id={1} label="Bandwith" sorting={sorting}
               tooltip="Bandwith sent through Luminati"/>
-            <Header sort={sort} id={3} label="Requests" sorting={sorting}
+            <Header sort={sort} id={2} label="Requests" sorting={sorting}
               tooltip="Number of sent requests"/>
           </tr>
         </tbody>

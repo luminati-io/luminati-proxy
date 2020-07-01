@@ -564,8 +564,10 @@ class Select_zone extends Pure_component {
             _this.setState({refreshing_zones: true});
             const result = yield window.fetch('/api/refresh_zones',
                 {method: 'POST'});
-            if (result.status!=200)
+            if (result.status==400)
                 return _this.props.history.push({pathname: '/login'});
+            if (result.status==502)
+                return;
             const zones = yield ajax.json({url: '/api/zones'});
             _this.setState({refreshing_zones: false});
             setdb.set('ws.zones', zones);

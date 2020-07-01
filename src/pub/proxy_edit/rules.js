@@ -304,11 +304,25 @@ class Rule extends Pure_component {
         let {rule_del, rule, ssl, disabled} = this.props;
         const active = rule.active===undefined||rule.active;
         const {ui_blocked} = this.state;
-
         const trigger = trigger_types.find(t=>t.value==rule.trigger_type);
-        const tv = trigger && ': '+(rule[trigger.value] ?
-            rule[trigger.value] : 'not set');
-        const trigger_label = trigger ? trigger.key+tv : 'Click to edit';
+        let trigger_label;
+        if (rule.trigger_code)
+            trigger_label = 'Custom code';
+        else if (!trigger)
+            trigger_label = 'Trigger not set';
+        else
+        {
+            const tv = trigger && ': '+(rule[trigger.value] ?
+                rule[trigger.value] : 'not set');
+            trigger_label = trigger.key+tv;
+        }
+        const action = action_types.find(a=>a.value==rule.action);
+        const action_label = action ? action.key : 'Action not set';
+        let rule_label;
+        if (!trigger && !action)
+            rule_label = 'Click to edit';
+        else
+            rule_label = trigger_label+' -> '+action_label;
         return <div>
           <div className={classnames('rule_wrapper',
             {collapsed: !this.state.expanded})}
@@ -324,7 +338,7 @@ class Rule extends Pure_component {
             }
             {!this.state.expanded &&
               <div className="ui">
-                {trigger_label}
+                {rule_label}
               </div>
             }
             <Btn_rule_del on_click={()=>rule_del(rule.id)}/>
@@ -605,8 +619,10 @@ class Trigger_code extends Pure_component {
 }
 
 const Btn_rule_del = ({on_click})=>
-    <button tabIndex={-1} className="btn_rule del" onClick={on_click}
-    onFocus={e=>e.stopPropagation()}/>;
+    <Tooltip title="Delete">
+      <button tabIndex={-1} className="btn_rule del" onClick={on_click}
+        onFocus={e=>e.stopPropagation()}/>
+    </Tooltip>;
 
 const Btn_rule_toggle = ({expanded, expand, collapse})=>{
     const on_click = e=>{
@@ -615,11 +631,13 @@ const Btn_rule_toggle = ({expanded, expand, collapse})=>{
             return collapse();
         expand();
     };
-    return <div
-        tabIndex={-1}
+    const tip = expanded ? 'Collapse' : 'Expand';
+    return <Tooltip title={tip}>
+        <div tabIndex={-1}
         className="btn_rule toggle"
         onClick={on_click}
         onFocus={e=>e.stopPropagation()}>
-        <button className={classnames({expanded, collapsed: !expanded})}/>
-      </div>;
+          <button className={classnames({expanded, collapsed: !expanded})}/>
+        </div>
+      </Tooltip>;
 };

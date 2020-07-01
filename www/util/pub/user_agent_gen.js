@@ -6,10 +6,10 @@ define([], function(){
 const E = [
     {name: 'Chrome 71 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; '
         +'Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-        +'Chrome/83.0.4103.106 Safari/537.36'},
+        +'Chrome/83.0.4103.116 Safari/537.36'},
     {name: 'Chrome 71 Windows 7', value: 'Mozilla/5.0 (Windows NT 6.1; '
         +'Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-        +'Chrome/83.0.4103.106 Safari/537.36'},
+        +'Chrome/83.0.4103.116 Safari/537.36'},
     {name: 'Chrome 71 Android 4', value: 'Mozilla/5.0 (Linux; Android 4.1.1; '
         +'Nexus 7 Build/JRO03D) AppleWebKit/537.36 (KHTML, like Gecko) '
         +'Chrome/71.0.3578.99 Safari/537.36'},
@@ -18,9 +18,9 @@ const E = [
         +'Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36'},
     {name: 'Chrome 71 OSX 10.14.1', value: 'Mozilla/5.0 (Macintosh; Intel Mac '
         +'OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) '
-        +'Chrome/83.0.4103.106 Safari/537.36'},
+        +'Chrome/83.0.4103.116 Safari/537.36'},
     {name: 'Chrome 71 Linux', value: 'Mozilla/5.0 (X11; Linux x86_64) '
-        +'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 '
+        +'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 '
         +'Safari/537.36'},
     {name: 'Chrome 71 iOS 12.1', value: 'Mozilla/5.0 (iPhone; CPU iPhone OS '
         +'12_1 like Mac OS X) AppleWebKit/605.115 (KHTML, like Gecko) '
@@ -30,10 +30,10 @@ const E = [
         +'Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36'},
     {name: 'Chromium 70 Linux', value: 'Mozilla/5.0 (X11; Linux x86_64) '
         +'AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 '
-        +'Chrome/83.0.4103.106 Safari/537.36'},
+        +'Chrome/83.0.4103.116 Safari/537.36'},
     {name: 'Opera 56 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; '
         +'Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-        +'Chrome/81.0.4044.138 Safari/537.36 OPR/68.0.3618.165'},
+        +'Chrome/81.0.4044.138 Safari/537.36 OPR/68.0.3618.173'},
     {name: 'Firefox 63 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; '
         +'Win64; x64; rv:63.0) Gecko/20100101 Firefox/77.0'},
     {name: 'Firefox 63 Windows 7', value: 'Mozilla/5.0 (Windows NT 6.1; '

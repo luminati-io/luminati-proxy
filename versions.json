@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.189.26",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed logging out when luminati server is not available"
+            }
+        ]
+    },
+    {
         "ver": "1.188.647",
         "type": "stable",
         "changes": [
