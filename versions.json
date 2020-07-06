@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.189.541",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Rules UI improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.189.26",
         "type": "stable",
         "changes": [

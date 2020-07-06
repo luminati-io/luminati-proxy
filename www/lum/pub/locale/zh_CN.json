@@ -4592,5 +4592,19 @@
   "Company" : "公司",
   "Super proxy" : "超级代理",
   "Cookie policy" : "Cookie政策",
-  "ESG" : "环境、社会和公司治理"
+  "ESG" : "环境、社会和公司治理",
+  "Let's get your 7-day trial activated!" : "开通激活您的7天试用！",
+  "For registered companies only" : "试用仅开放给注册公司",
+  "For the activation, we need to better know you and how you plan to use Luminati's residential network." : "激活开通，我们需要更好地了解您以及您打算如何使用Luminati的动态住宅网络。",
+  "To activate your account on the Luminati network, we must verify that your activity on the network is for legitimate and legal purposes" : "激活开通您的Luminati网络帐户，我们需要验证您在网络上的活动是否合法，以及是否处于合法目的",
+  "Luminati takes and will take firm action against illegal or non-compliant use of the Luminati network, and will assist law enforcement in investigating potentially abusive activities of the Luminati network." : "Luminati将针对非法或不合规使用Luminati网络，采取坚决行动，并将协助执法机构调查潜在滥用Luminati网络的行为。",
+  "Any use of the Luminati network for illegal, fraudulent, or abusive activities is strictly prohibited" : "严禁将Luminati网络用于非法、欺诈或滥用行为",
+  "Any such suspected use will be investigated. These activities include, but are not limited to the following:" : "任何此类可疑用途将受到调查。 这些活动包括但不限于以下活动：",
+  "Any form of creating fake accounts or content" : "任何形式的虚假帐户或内容创建",
+  "hereby confirm that the company I represent (as stated above) will use the Luminati network only for permitted use cases that comply with the Luminati License Agreement, and will not use the Luminati network for any of the prohibited use cases as stated above or that do not comply with the applicable laws and regulations." : "特此确认，我代表的公司（如上所述）仅将Luminati网络用于符合Luminati许可协议的允许使用情况，而不会将Luminati网络用于上述任何禁止的使用情况，或不符合适用的法律和法规。",
+  "I further commit to immediately inform Luminati in any event such as illegal or non-compliant usage of the Luminati Network comes to my knowledge." : "我进一步承诺，在我所知的任何情况下，例如非法或不合规定地使用Luminati网络，都应立即通知Luminati。",
+  "Close activation form" : "关闭激活开通表格",
+  "Do you want to close the form and cancel the activation of residential IPs?" : "您是否要关闭表格并取消激活住宅IP？",
+  "Contact your account manager now" : "即刻联系您的客户经理",
+  "Schedule a call for later" : "稍后安排电话"
 }

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.189.541 Stable
+- :sparkles: Rules UI improvements
+
 ## 1.189.26 Stable
 - :bug: Fixed logging out when luminati server is not available
 

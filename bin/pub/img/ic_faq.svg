@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+<defs><style>.cls-1{fill:none;}.cls-2{fill:#004d74;}</style></defs>
+<g id="Layer_2" data-name="Layer 2">
+  <g id="Layer_1-2" data-name="Layer 1">
+    <rect class="cls-1" width="20" height="20"/>
+    <path class="cls-2" d="M10,1a9,9,0,1,0,9,9A9,9,0,0,0,10,1Zm0,17a8,8,0,1,1,8-8A8,8,0,0,1,10,18Z"/>
+    <path class="cls-2" d="M10,12a1.5,1.5,0,1,0,1.5,1.5A1.5,1.5,0,0,0,10,12Zm0,2a.5.5,0,1,1,.5-.5A.5.5,0,0,1,10,14Z"/><path class="cls-2" d="M10,4A3,3,0,0,0,7,7,.5.5,0,0,0,8,7a2,2,0,0,1,4,0c0,1-.45,1.23-1.08,1.54a2,2,0,0,0-1.42,2,.5.5,0,0,0,1,0c0-.61.27-.77.87-1.06A2.41,2.41,0,0,0,13,7,3,3,0,0,0,10,4Z"/></g></g></svg>

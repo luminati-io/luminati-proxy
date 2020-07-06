@@ -147,12 +147,6 @@ export default class Rules extends Pure_component {
             }),
         }), this.rules_update);
     };
-    rule_add = ()=>{
-        this.setState(prev=>({
-            rules: [{id: prev.max_id+1}, ...prev.rules],
-            max_id: prev.max_id+1,
-        }));
-    };
     rule_del = id=>{
         this.setState(prev=>{
             const new_state = {rules: prev.rules.filter(r=>r.id!=id)};
@@ -170,6 +164,44 @@ export default class Rules extends Pure_component {
         this.set_field('rules', rules);
     };
     goto_ssl = ()=>this.goto_field('ssl');
+    rule_add = (rule={})=>{
+        this.setState(prev=>{
+            rule.id = prev.max_id+1;
+            return {
+                rules: [rule, ...prev.rules],
+                max_id: prev.max_id+1,
+            };
+        });
+    };
+    rule_add_cb = ()=>{
+        this.rule_add();
+    };
+    images_rule_exists = ()=>{
+        return this.state.rules.some(r=>{
+            return r.action=='null_response' &&
+                r.trigger_url_regex.includes('jpg');
+        });
+    };
+    images_rule_add = ()=>{
+        this.rule_add({
+            action: 'null_response',
+            trigger_type: 'url',
+            trigger_url_regex: '\\.(png|jpg|jpeg|svg|gif|mp3|avi|mp4)$',
+        });
+    };
+    retry_rule_exists = ()=>{
+        return this.state.rules.some(r=>{
+            return r.action=='retry' && r.status=='(4|5)..';
+        });
+    };
+    retry_rule_add = ()=>{
+        this.rule_add({
+            action: 'retry',
+            trigger_type: 'status',
+            status: '(4|5)..',
+            retry_number: 1,
+        });
+    };
     render(){
         const {form, rules, disabled_fields, www} = this.state;
         if (!form)
@@ -191,11 +223,21 @@ export default class Rules extends Pure_component {
                   </React.Fragment>
                 }/>
               }
-              <button className="btn btn_lpm btn_lpm_small rule_add_btn"
-                onClick={this.rule_add} disabled={disabled_fields.rules}>
-                <T>New rule</T>
-                <i className="glyphicon glyphicon-plus"/>
-              </button>
+              <New_rule_btn
+                disabled={disabled_fields.rules}
+                on_click={this.rule_add_cb}>
+                <T>New custom rule</T>
+              </New_rule_btn>
+              <New_rule_btn
+                disabled={disabled_fields.rules || this.images_rule_exists()}
+                on_click={this.images_rule_add}>
+                <T>Skip images</T>
+              </New_rule_btn>
+              <New_rule_btn
+                disabled={disabled_fields.rules || this.retry_rule_exists()}
+                on_click={this.retry_rule_add}>
+                <T>Retry failed requests</T>
+              </New_rule_btn>
               {rules.map(r=>
                 <Rule key={r.id}
                   rule={r}
@@ -207,6 +249,14 @@ export default class Rules extends Pure_component {
             </div>;
     }
 }
+
+const New_rule_btn = ({on_click, disabled, children})=>{
+    return <button className="btn btn_lpm btn_lpm_small rule_add_btn"
+          onClick={on_click} disabled={disabled}>
+          {children}
+          <i className="glyphicon glyphicon-plus"/>
+        </button>;
+};
 
 const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
     render(){
@@ -320,7 +370,7 @@ class Rule extends Pure_component {
         const action_label = action ? action.key : 'Action not set';
         let rule_label;
         if (!trigger && !action)
-            rule_label = 'Click to edit';
+            rule_label = 'Empty rule - click to edit';
         else
             rule_label = trigger_label+' -> '+action_label;
         return <div>
