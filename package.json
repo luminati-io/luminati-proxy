@@ -140,7 +140,7 @@
     "babel-plugin-transform-object-rest-spread": "6.23.0",
     "babel-plugin-transform-runtime": "6.23.0",
     "css-loader": "0.28.4",
-    "electron": "4.0.4",
+    "electron": "9.1.0",
     "electron-builder": "16.6.1",
     "electron-rebuild": "1.8.4",
     "html-webpack-plugin": "2.30.1",
