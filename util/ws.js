@@ -395,8 +395,6 @@ class WS extends events.EventEmitter {
         if (this.ws.readyState==2) // ws.CLOSING
             return;
         this.ws.ping();
-        if (is_mocha)
-            console.log(`ws; ping sent at ${Date.now()}`);
         this.ping_timer = setTimeout(this._ping_expire.bind(this),
             this.ping_timeout);
         this.ping_last = Date.now();

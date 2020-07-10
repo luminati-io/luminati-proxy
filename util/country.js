@@ -1195,7 +1195,7 @@ E.regions = {
     TR: ['South-Eastern Europe', 'EMEA'],
     TT: ['Caribbean', 'AMER'],
     TV: ['Polynesia', 'AMER'],
-    TW: ['Eastern Asia', 'APAC'],
+    TW: ['Eastern Asia', 'China'],
     TZ: ['Eastern Africa', 'EMEA'],
     UA: ['Eastern Europe', 'EMEA'],
     UG: ['Eastern Africa', 'EMEA'],

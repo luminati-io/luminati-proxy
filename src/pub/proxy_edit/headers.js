@@ -54,7 +54,7 @@ export default class Headers extends Pure_component {
         new_headers = this.normalize_empty(new_headers);
         this.set_field('headers', new_headers);
     };
-    goto_ssl = ()=>this.goto_field('ssl');
+    turn_ssl = ()=>this.set_field('ssl', true);
     render(){
         if (!this.state.form)
             return null;
@@ -65,7 +65,7 @@ export default class Headers extends Pure_component {
             return <Warning text={
                 <React.Fragment>
                   <span><T>These options are available only when using </T>
-                  <a className="link" onClick={this.goto_ssl}>
+                  <a className="link" onClick={this.turn_ssl}>
                   <T>SSL analyzing</T></a></span>
                 </React.Fragment>
             }/>;

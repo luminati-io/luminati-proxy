@@ -161,6 +161,21 @@ E.ext_min = (server, name, value, agg_srv)=>
     E.min(server+'/'+name, value, agg_srv);
 E.ext_get = (server, name)=>E.get(server+'/'+name);
 
+// The group_* versions of the functions provide group reporting for zagents
+// metrics while regular reporting for servers
+E.group_avg = E.avg;
+E.group_max = E.max;
+if (env.ZCOUNTER_GROUP!==undefined)
+{
+    let groups = ['', '_g_'+env.ZCOUNTER_GROUP];
+    if (env.AGENT_DC)
+        groups.push('_g_'+env.AGENT_COUNTRY+'_'+env.AGENT_DC);
+    E.group_avg = (name, value, agg_srv)=>groups.forEach(g=>
+        E.avg('glob/'+name+g, value, agg_srv));
+    E.group_max = (name, value, agg_srv)=>groups.forEach(g=>
+        E.max('glob/'+name+g, value, agg_srv));
+}
+
 E.glob_inc = (name, inc, agg_srv)=>E.inc('glob/'+name, inc, agg_srv);
 E.glob_avg = (name, value, agg_srv)=>E.avg('glob/'+name, value, agg_srv);
 E.glob_max = (name, value, agg_srv)=>E.max('glob/'+name, value, agg_srv);

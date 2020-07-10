@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.190.176",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvements: show the optimized bandwidth in the stats"
+            }
+        ]
+    },
+    {
         "ver": "1.189.541",
         "type": "stable",
         "changes": [

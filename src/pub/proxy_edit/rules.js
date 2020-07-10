@@ -163,7 +163,7 @@ export default class Rules extends Pure_component {
         const rules = this.state.rules.map(rule_prepare).filter(Boolean);
         this.set_field('rules', rules);
     };
-    goto_ssl = ()=>this.goto_field('ssl');
+    turn_ssl = ()=>this.set_field('ssl', true);
     rule_add = (rule={})=>{
         this.setState(prev=>{
             rule.id = prev.max_id+1;
@@ -171,20 +171,20 @@ export default class Rules extends Pure_component {
                 rules: [rule, ...prev.rules],
                 max_id: prev.max_id+1,
             };
-        });
+        }, this.rules_update);
     };
     rule_add_cb = ()=>{
         this.rule_add();
     };
-    images_rule_exists = ()=>{
+    savebw_rule_exists = ()=>{
         return this.state.rules.some(r=>{
-            return r.action=='null_response' &&
+            return r.action=='bypass_proxy' &&
                 r.trigger_url_regex.includes('jpg');
         });
     };
-    images_rule_add = ()=>{
+    savebw_rule_add = ()=>{
         this.rule_add({
-            action: 'null_response',
+            action: 'bypass_proxy',
             trigger_type: 'url',
             trigger_url_regex: '\\.(png|jpg|jpeg|svg|gif|mp3|avi|mp4)$',
         });
@@ -217,7 +217,7 @@ export default class Rules extends Pure_component {
                         Most of the options here are available only when using
                       </T>
                       {' '}
-                      <a className="link" onClick={this.goto_ssl}>
+                      <a className="link" onClick={this.turn_ssl}>
                       <T>SSL analyzing</T></a>
                     </span>
                   </React.Fragment>
@@ -229,9 +229,9 @@ export default class Rules extends Pure_component {
                 <T>New custom rule</T>
               </New_rule_btn>
               <New_rule_btn
-                disabled={disabled_fields.rules || this.images_rule_exists()}
-                on_click={this.images_rule_add}>
-                <T>Skip images</T>
+                disabled={disabled_fields.rules || this.savebw_rule_exists()}
+                on_click={this.savebw_rule_add}>
+                <T>Save bandwidth</T>
               </New_rule_btn>
               <New_rule_btn
                 disabled={disabled_fields.rules || this.retry_rule_exists()}

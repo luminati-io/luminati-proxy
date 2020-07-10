@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.190.176 Stable
+- :sparkles: UI improvements: show the optimized bandwidth in the stats
+
 ## 1.189.541 Stable
 - :sparkles: Rules UI improvements
 
