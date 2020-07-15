@@ -181,7 +181,6 @@ describe('manager', ()=>{
         sandbox = sinon.sandbox.create();
         sandbox.stub(os, 'cpus').returns([1, 1]);
         nock(api_base).get('/').times(2).reply(200, {});
-        nock(api_base).post('/lpm/update_stats').query(true).reply(200, {});
         nock(api_base).get('/lpm/server_conf').query(true).reply(200, {});
     });
     afterEach('after manager 2', ()=>{

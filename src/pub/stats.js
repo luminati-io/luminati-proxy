@@ -184,7 +184,7 @@ const Header_container = ({title, cols, sorting, sort, tooltip})=>
             <Header sort={sort} id={0} label={title} sorting={sorting}
               tooltip={tooltip}/>
             <Header sort={sort} id={1} label="Total BW" sorting={sorting}
-              tooltip="Bandwith sent through Luminati"/>
+              tooltip="Total bandwith sent through Proxy Manager"/>
             <Header sort={sort} id={2} label="Saved BW" sorting={sorting}
               tooltip="Saved bandwidth represents the traffic sent through
                 your local IP or external proxy. Go to the Rules tab

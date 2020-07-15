@@ -112,12 +112,12 @@ E.avgw = (name, value, weight, agg_srv='avg')=>{
     entry.w += weight;
 };
 
-E.max = (name, value, agg_srv='max')=>{
+E.max = (name, value, agg_srv='max', agg_tm='max')=>{
     if (!Number.isFinite(value))
         return void report_invalid_val(name, value);
     let _type = type.max_level, entry = _type[name];
     if (!entry)
-        entry = _type[name] = {v: value, agg_srv, agg_tm: 'max'};
+        entry = _type[name] = {v: value, agg_srv, agg_tm};
     if (entry.v<value)
         entry.v = value;
 };
@@ -164,7 +164,7 @@ E.ext_get = (server, name)=>E.get(server+'/'+name);
 // The group_* versions of the functions provide group reporting for zagents
 // metrics while regular reporting for servers
 E.group_avg = E.avg;
-E.group_max = E.max;
+E.group_max = (name, value, agg_srv)=>E.max(name, value, agg_srv, 'avg');
 if (env.ZCOUNTER_GROUP!==undefined)
 {
     let groups = ['', '_g_'+env.ZCOUNTER_GROUP];
@@ -173,7 +173,7 @@ if (env.ZCOUNTER_GROUP!==undefined)
     E.group_avg = (name, value, agg_srv)=>groups.forEach(g=>
         E.avg('glob/'+name+g, value, agg_srv));
     E.group_max = (name, value, agg_srv)=>groups.forEach(g=>
-        E.max('glob/'+name+g, value, agg_srv));
+        E.avg('glob/'+name+g, value, agg_srv));
 }
 
 E.glob_inc = (name, inc, agg_srv)=>E.inc('glob/'+name, inc, agg_srv);

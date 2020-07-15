@@ -79,7 +79,7 @@ E.get_root_domain = function(domain){
 
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
-    var match = email.toLowerCase().match(/^[a-z0-9_.\-+]+@(.*)$/);
+    var match = email.toLowerCase().match(/^[a-z0-9_.\-+*]+@(.*)$/);
     return match && match[1];
 };
 
@@ -204,7 +204,7 @@ E.is_hola_domain = function(domain){
 
 // XXX josh: move to email.js:is_valid
 E.is_valid_email = function(email, is_signup){
-    var re = /^[a-z0-9_\-+]+(?:\.[a-z0-9_\-+]+)*@(.*)$/;
+    var re = /^[a-z0-9_\-+*]+(?:\.[a-z0-9_\-+*]+)*@(.*)$/;
     var n = email.toLowerCase().match(re);
     if ((n&&is_signup&&email.split('@')[0].match(/\+/g)||[]).length>1)
         return false;
@@ -218,7 +218,7 @@ E.get_first_valid_email = function(email){
 E.is_alias_email = function(email){
     if (!E.is_valid_email(email))
         return false;
-    var n = email.toLowerCase().match(/^([a-z0-9_.\-+]+)@.*$/);
+    var n = email.toLowerCase().match(/^([a-z0-9_.\-+*]+)@.*$/);
     return !!(n && /.+\+.+/.test(n[1]));
 };
 

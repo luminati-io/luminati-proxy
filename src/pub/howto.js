@@ -7,10 +7,9 @@ import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
 import Proxy_tester from './proxy_tester.js';
-import {Code} from './common.js';
+import {Code, with_www_api} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
-import {swagger_url} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 
 const Howto = withRouter(class Howto extends Pure_component {
@@ -72,7 +71,7 @@ const Lang_btn = props=>{
     return <button className={class_names}>{props.text}</button>;
 };
 
-const Code_instructions = withRouter(
+const Code_instructions = with_www_api(withRouter(
 class Code_instructions extends Pure_component {
     click_lang = lang=>{
         const pathname = `/howto/code/${lang}`;
@@ -88,6 +87,7 @@ class Code_instructions extends Pure_component {
             'quickstart-first-proxy')||24000;
         const to_copy = instructions.code(tutorial_port)[lang];
         const code = prism.highlight(to_copy, prism.languages.clike);
+        const api_url = this.props.www_api+'/doc/api#lpm_endpoints';
         return <div className="code_instructions">
               <div className="options">
                 <Lang_btn_clickable lang="shell" text="Shell"/>
@@ -112,13 +112,13 @@ class Code_instructions extends Pure_component {
               <div>
                 <T>To view available API endpoints</T>
                 <a rel="noopener noreferrer" target="_blank"
-                  className="link api_link" href={swagger_url}>
+                  className="link api_link" href={api_url}>
                   <T>click here</T>
                 </a>
               </div>
             </div>;
     }
-});
+}));
 
 const Browser_instructions = withRouter(
 class Browser_instructions extends Pure_component {

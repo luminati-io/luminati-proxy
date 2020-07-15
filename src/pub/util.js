@@ -230,10 +230,6 @@ export const get_static_country = (proxy, zones)=>{
     return false;
 };
 
-export const swagger_url = 'http://petstore.swagger.io/?url=https://'
-+'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/'
-+'swagger.json#/Proxy';
-
 export const report_exception = (error, context)=>etask(function*(){
     this.on('uncaught', e=>console.log(e));
     const {message=error} = error;

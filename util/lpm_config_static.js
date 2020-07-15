@@ -1,7 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const _ = require('lodash');
-const swagger = require('../lib/swagger.json');
+let lpm_api_models;
+//need to have import from ZON because this file is used in Jakefile
+try { lpm_api_models = require('../../../www/lum/pub/faq/lpm_api_models.js'); }
+catch(e){ lpm_api_models = require('../www/lum/pub/faq/lpm_api_models.js'); }
 
 const prop_by_type = (props, type)=>
     Object.keys(props).filter(k=>props[k].type==type);
@@ -13,12 +16,12 @@ const conf = {
     daemon_name: 'luminati_proxy_manager',
     work_dir: '',
     is_electron: process.versions && !!process.versions.electron,
-    proxy_fields: Object.assign({}, swagger.definitions.proxy.properties,
-        swagger.definitions.manager.properties),
-    mgr_fields: Object.keys(swagger.definitions.manager.properties),
-    numeric_fields: prop_by_type(swagger.definitions.proxy.properties,
+    proxy_fields: Object.assign({}, lpm_api_models.proxy_fields,
+        lpm_api_models.manager_fields),
+    mgr_fields: Object.keys(lpm_api_models.manager_fields),
+    numeric_fields: prop_by_type(lpm_api_models.proxy_fields,
         'integer'),
-    boolean_fields: prop_by_type(swagger.definitions.proxy.properties,
+    boolean_fields: prop_by_type(lpm_api_models.proxy_fields,
         'boolean'),
     credential_fields: ['customer', 'zone', 'password', 'token_auth',
         'lpm_token'],
@@ -51,7 +54,7 @@ const conf = {
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
     'version', 'ask_sync_config');
-conf.proxy_params = Object.keys(swagger.definitions.proxy.properties);
+conf.proxy_params = Object.keys(lpm_api_models.proxy_fields);
 conf.server_default = {
     debug: 'full',
     port: 24000,

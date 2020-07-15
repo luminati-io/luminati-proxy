@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.190.701",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "API documentation moved from swagger to https://luminati.io/doc/api#lpm_endpoints"
+            }
+        ]
+    },
+    {
         "ver": "1.190.176",
         "type": "stable",
         "changes": [

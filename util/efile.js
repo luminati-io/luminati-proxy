@@ -88,6 +88,30 @@ E.mkdirp_e = p=>etask(function*mkdirp_e(){
 E.mkdirp_file_e = f=>E.mkdirp_e(path.dirname(f));
 E.readdir_e = path=>etask.nfn_apply(fs.readdir, [path]);
 E.rmdir_e = path=>etask.nfn_apply(fs.rmdir, [path]);
+E.rmdirs_empty_e = (dir, base)=>etask(function*(){
+    dir = path.resolve(dir);
+    if (base)
+    {
+        base = path.resolve(base);
+        if (!dir.startsWith(base))
+            throw new Error('dir should starts with base');
+    }
+    let parts = dir.split(path.sep);
+    for (let i=parts.length; i>0; --i)
+    {
+        let p = path.sep+path.join(...parts.slice(1, i));
+        if (base && p==base)
+            return;
+        try {
+            yield E.rmdir_e(p);
+        } catch(e){
+            if (e.code=='ENOTEMPTY')
+                return;
+            throw e;
+        }
+    }
+});
+E.rmdirs_empty_file_e = (f, base)=>E.rmdirs_empty_e(path.dirname(f), base);
 E.fwrite_e = (fd, buf, pos, size, len)=>etask(function*fwrite_e(){
     let written, offset = 0;
     len = len||buf.length;

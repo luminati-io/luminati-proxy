@@ -9,7 +9,6 @@ import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
-import {swagger_url} from './util.js';
 import Schema from './schema.js';
 import Report_bug_modal from './report_bug.js';
 import Cpu_warning from './cpu_warning.js';
@@ -43,6 +42,7 @@ class Nav_left extends Pure_component {
             return null;
         const zagent = this.state.settings.zagent;
         const faq_url = this.props.www_api+'/faq#proxy';
+        const api_url = this.props.www_api+'/doc/api#lpm_endpoints';
         return <div className="nav_left">
               <div className={classnames('menu', {lock: this.state.lock})}>
                 <Nav_link to="/overview" name="overview" label="Overview"/>
@@ -54,7 +54,7 @@ class Nav_left extends Pure_component {
                   <Nav_link to="/config" name="config"
                     label="Manual configuration"/>
                 }
-                <Nav_link ext to={swagger_url} name="api"
+                <Nav_link ext to={api_url} name="api"
                   label="API documentation"/>
                 {!zagent &&
                    <Nav_link ext to={faq_url} name="faq" label="FAQ"/>

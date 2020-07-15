@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.190.701 Stable
+- :sparkles: API documentation moved from swagger to https://luminati.io/doc/api#lpm_endpoints
+
 ## 1.190.176 Stable
 - :sparkles: UI improvements: show the optimized bandwidth in the stats
 

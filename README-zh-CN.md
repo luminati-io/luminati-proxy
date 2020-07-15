@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.190.176-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.190.701-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -86,9 +86,7 @@ Options:
   --help, -h, -?                Show help                              [boolean]
   --version, -v                 Show version number                    [boolean]
   --port, -p                    Port for the HTTP proxy                 [number]
-  --proxy_type                  Decide if to save proxy into the configuration
-                                file. Specifying "persist" in "proxy_type" value
-                                will create port and save it in the
+  --proxy_type                  Set to "persist" to save proxy into the
                                 configuration file.                     [string]
   --multiply                    Multiply the port definition given number of
                                 times                      [number] [default: 0]
@@ -98,7 +96,7 @@ Options:
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
   --iface                       Interface or IP to listen on            [string]
   --customer                    Luminati customer                       [string]
-  --zone                        Zone                [string] [default: "static"]
+  --zone                        Luminati zone       [string] [default: "static"]
   --password                    Zone password                           [string]
   --proxy                       Hostname or IP of super proxy
                                   [string] [default: "zproxy.lum-superproxy.io"]
@@ -118,9 +116,9 @@ Options:
   --vip                         gIP                                     [number]
   --ext_proxies                 A list of proxies from external vendors. Format:
                                 [username:password@]ip[:port]            [array]
-  --ext_proxy_username          default username for external vendor ips[string]
-  --ext_proxy_password          default password for external vendor ips[string]
-  --ext_proxy_port              default port for external vendor ips    [number]
+  --ext_proxy_username          Default username for external vendor ips[string]
+  --ext_proxy_password          Default password for external vendor ips[string]
+  --ext_proxy_port              Default port for external vendor ips    [number]
   --dns                         DNS resolving                           [string]
   --reverse_lookup_dns          Process reverse lookup via DNS
                                                       [boolean] [default: false]
@@ -130,9 +128,8 @@ Options:
                                                         [string] [default: true]
   --sticky_ip                   Use session per requesting host to maintain IP
                                 per host              [boolean] [default: false]
-  --pool_size                   Session pool size                       [number]
-  --rotate_session              Rotate sessions on each request
-                                                      [boolean] [default: false]
+  --pool_size                                                           [number]
+  --rotate_session              Session pool size     [boolean] [default: false]
   --throttle                    Throttle requests above given number    [number]
   --rules                       Proxy request rules                      [array]
   --route_err                   Block or allow requests to be automatically sent
@@ -144,6 +141,11 @@ Options:
   --headers                     Request headers                          [array]
   --debug                       Luminati request debug info
                                                       [string] [default: "full"]
+  --socket_inactivity_timeout                         [number] [default: 120000]
+  --multiply_ips                                      [boolean] [default: false]
+  --multiply_vips                                     [boolean] [default: false]
+  --max_ban_retries                                       [number] [default: 10]
+  --preset                                    [string] [default: "session_long"]
   --whitelist_ips               Default for all proxies whitelist ip list for
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser
@@ -164,6 +166,8 @@ Options:
   --cloud                                              [boolean] [default: true]
   --zagent                                            [boolean] [default: false]
   --cluster                                            [boolean] [default: true]
+  --sync_config                 Synchronize LPM configuration with the cloud
+                                                      [boolean] [default: false]
   --sync_zones                                         [boolean] [default: true]
   --sync_stats                                         [boolean] [default: true]
   --request_stats               Enable requests statistics
@@ -189,8 +193,6 @@ Options:
                                 LPM                   [boolean] [default: false]
   --read_only                   Avoid saving current config in the config file
                                                       [boolean] [default: false]
-  --sync_config                 Synchronize LPM configuration with the cloud
-                                                      [boolean] [default: false]
   --extra_ssl_ips               List of IPs to add to SSL certificate
                                                            [array] [default: []]
   --no-www                      Disable local web
@@ -210,11 +212,6 @@ Options:
   --auto-upgrade                Enable auto upgrade
   --start-upgrader              Install CRON process that checks upgrades
   --stop-upgrader               Removes CRON process that checks upgrades
-  --socket_inactivity_timeout                                  [default: 120000]
-  --preset                                             [default: "session_long"]
-  --multiply_ips                                                [default: false]
-  --max_ban_retries                                                [default: 10]
-  --multiply_vips                                               [default: false]
   --bw_limit                                                        [default: 0]
   --api_domain_fallback                                   [default: "l-lpm.com"]
 ```
@@ -247,7 +244,7 @@ docker run luminati/luminati-proxy luminati --version
 
 API的解说文件能在APP里找着
 
-详细解释能在 [这里](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json) 找到
+详细解释能在 [这里](https://lum-lpm.com/doc/api#lpm_endpoints) 找到
 
 ## Node.js API
 
