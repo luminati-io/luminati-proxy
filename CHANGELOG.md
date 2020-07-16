@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.190.862 Stable
+- :bug: Fixed legacy API page in Swagger
+
 ## 1.190.701 Stable
 - :sparkles: API documentation moved from swagger to https://luminati.io/doc/api#lpm_endpoints
 

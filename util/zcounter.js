@@ -13,7 +13,7 @@ const zutil = require('./util.js');
 const env = process.env, ef = etask.ef, ms = date.ms;
 const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
-const max_age = 30*ms.SEC;
+const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
 
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
@@ -42,7 +42,7 @@ E.to_valid_id = id=>to_valid_ids[id]||
     (to_valid_ids[id]=id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
 
 let type = {sum: {}, avg: {}, sum_mono: {}, avg_level: {}, sum_level: {},
-    max_level: {}, min_level: {}};
+    max_level: {}, min_level: {}, sum_level_eco: {}};
 
 let reported_names = {};
 function report_invalid_val(name, value){
@@ -82,6 +82,16 @@ E.inc_level = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
     if (!Number.isFinite(inc))
         return void report_invalid_val(name, inc);
     let _type = type[agg_mas+'_level'], entry = _type[name];
+    if (!entry)
+        entry = _type[name] = {v: 0, agg_srv};
+    entry.v += inc;
+};
+
+// current in-progress counter: num of open tcp connections: +1 open, -1 close
+E.inc_level_eco = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
+    if (!Number.isFinite(inc))
+        return void report_invalid_val(name, inc);
+    let _type = type[agg_mas+'_level_eco'], entry = _type[name];
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v += inc;
@@ -212,7 +222,7 @@ function agg_avgw(val, cnt){
 
 const aggs = {sum: agg_sum, sum_mono: agg_sum, avg_level: agg_avg,
     max_level: agg_max, min_level: agg_min, sum_level: agg_sum,
-    avg: agg_avgw};
+    avg: agg_avgw, sum_level_eco: agg_sum};
 function mas_agg_counters(worker_counters){
     let res = zutil.map_obj(aggs, (agg, key)=>{
         let worker_counter = pluck(worker_counters, key);
@@ -237,7 +247,26 @@ function mas_agg_counters(worker_counters){
 
 E.on_send = [];
 
+const level_eco_ts = {};
+
 let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
+    let eco = type.sum_level_eco;
+    let now = Date.now();
+    for (let t in eco)
+    {
+        let c = eco[t];
+        if (c.v)
+        {
+            level_eco_ts[t] = now;
+            continue;
+        }
+        let ts = level_eco_ts[t];
+        if (!ts || now-ts>level_eco_dispose)
+        {
+            delete level_eco_ts[t];
+            delete eco[t];
+        }
+    }
     let ret = type;
     if (update_prev)
     {
@@ -254,7 +283,7 @@ let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
         }
         type = {sum: {}, avg: {}, sum_mono,
             avg_level: type.avg_level, sum_level: type.sum_level,
-            max_level: {}, min_level: {}};
+            max_level: {}, min_level: {}, sum_level_eco: type.sum_level_eco};
     }
     return ret;
 });
@@ -301,7 +330,7 @@ function agg_mas_level_fn(id, c){
 const agg_mas_fn = {sum: agg_mas_sum_fn, sum_mono: agg_mas_sum_fn,
     avg: agg_mas_avg_fn, avg_level: agg_mas_level_fn,
     sum_level: agg_mas_level_fn, max_level: agg_mas_level_fn,
-    min_level: agg_mas_level_fn};
+    min_level: agg_mas_level_fn, sum_level_eco: agg_mas_level_fn};
 
 let prepare = ()=>etask(function*zcounter_prepare(){
     let get_counters_fn = Object.keys(cluster.workers).length

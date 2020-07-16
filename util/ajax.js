@@ -80,7 +80,7 @@ function ajax(opt){
         if (xhr.statusText=='timeout')
             E.events.emit('timeout', this);
         if (xhr.status==403)
-            E.events.emit('unauthorized', this);
+            E.events.emit('unauthorized', this, xhr);
         if (opt.no_throw)
         {
             return {
