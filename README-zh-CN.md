@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.190.862-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.191.312-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -107,7 +107,7 @@ Options:
   --proxy_retry                 Automatically retry on super proxy failure
                                                            [number] [default: 2]
   --insecure                    Enable SSL connection/analyzing to insecure
-                                hosts                 [boolean] [default: false]
+                                hosts                                  [boolean]
   --country                     Country                                 [string]
   --state                       State                                   [string]
   --city                        City                                    [string]
@@ -136,7 +136,7 @@ Options:
                                 through super proxy on error
                                                   [string] [default: "pass_dyn"]
   --smtp                                                                 [array]
-  --override_headers                                   [boolean] [default: true]
+  --override_headers                                                   [boolean]
   --os                          Operating System of the Peer IP         [string]
   --headers                     Request headers                          [array]
   --debug                       Luminati request debug info
@@ -213,6 +213,7 @@ Options:
   --start-upgrader              Install CRON process that checks upgrades
   --stop-upgrader               Removes CRON process that checks upgrades
   --bw_limit                                                        [default: 0]
+  --flex_tls                                                    [default: false]
   --api_domain_fallback                                   [default: "l-lpm.com"]
 ```
 

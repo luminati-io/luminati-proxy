@@ -2621,7 +2621,7 @@
   "Used to process monthly and auto recharge payments": "Se utiliza para procesar los pagos mensuales y auto recargas",
   "Confirmed!": "¡Confirmado!",
   "Click for details": "Haga clic para más detalles",
-  "Negative balance, add funds to reactivate account": "saldo negativo, añadir fondos para reactivar la cuenta",
+  "Insufficient funds, add funds to reactivate account": "saldo negativo, añadir fondos para reactivar la cuenta",
   "Upload Payment Proof": "Sube la Prueba del Pago",
   "Bank details:": "Detalles del banco:",
   "Consumed balance": "Balance consumido",

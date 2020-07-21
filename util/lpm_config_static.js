@@ -2,7 +2,7 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const _ = require('lodash');
 let lpm_api_models;
-//need to have import from ZON because this file is used in Jakefile
+// need to have import from ZON because this file is used in Jakefile
 try { lpm_api_models = require('../../../www/lum/pub/faq/lpm_api_models.js'); }
 catch(e){ lpm_api_models = require('../www/lum/pub/faq/lpm_api_models.js'); }
 
@@ -62,7 +62,6 @@ conf.server_default = {
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
     sticky_ip: false,
-    insecure: false,
     proxy_connection_type: 'http',
     ssl: false,
     test_url: 'http://lumtest.com/myip.json',
@@ -79,7 +78,6 @@ conf.server_default = {
     multiply: 0,
     rotate_session: false,
     session: true,
-    override_headers: true,
     bw_limit: 0,
     log: 'notice',
 };
@@ -103,6 +101,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     cluster: true,
     read_only: false,
     cloud: true,
+    flex_tls: false,
     zagent: false,
     sync_config: false,
     sync_zones: true,

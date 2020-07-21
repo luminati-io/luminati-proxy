@@ -54,7 +54,6 @@ define(['/util/conv.js', '/util/etask.js', '/util/events.js',
     '/util/string.js', '/util/zerr.js'],
     function(conv, etask, events, string, zerr){
 
-const is_mocha = require('./util.js').is_mocha();
 const ef = etask.ef, assign = Object.assign;
 // for security reasons 'func' is disabled by default
 const zjson_opt = {func: false, date: true, re: true};
@@ -377,8 +376,6 @@ class WS extends events.EventEmitter {
         }
     }
     _on_pong(){
-        if (is_mocha)
-            console.log(`ws: pong received at ${Date.now()}`);
         clearTimeout(this.ping_timer);
         let rtt = Date.now()-this.ping_last;
         this.ping_last = undefined;
@@ -401,11 +398,7 @@ class WS extends events.EventEmitter {
         if (zerr.is.debug())
             zerr.debug(`${this}> ping (max ${this.ping_timeout}ms)`);
     }
-    _ping_expire(){
-        if (is_mocha)
-            console.log(`ws: ping expired at ${Date.now()}`);
-        this.abort(1002, 'Ping timeout');
-    }
+    _ping_expire(){ this.abort(1002, 'Ping timeout'); }
     _idle(){
         if (this.zc)
             zcounter.inc(`${this.zc}_idle_timeout`);

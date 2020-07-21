@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.190.862",
+        "version": "1.191.312",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1346,6 +1346,9 @@
                 "cloud": {
                     "type": "boolean"
                 },
+                "flex_tls": {
+                    "type": "boolean"
+                },
                 "zagent": {
                     "type": "boolean"
                 },
@@ -1478,10 +1481,6 @@
                     "type": "integer",
                     "description": "Automatically retry on super proxy failure"
                 },
-                "insecure": {
-                    "type": "boolean",
-                    "description": "Enable SSL connection/analyzing to insecure hosts"
-                },
                 "country": {
                     "type": "string",
                     "description": "Country"
@@ -1575,9 +1574,6 @@
                 "smtp": {
                     "type": "array",
                     "items": {"type": "string"}
-                },
-                "override_headers": {
-                    "type": "boolean"
                 },
                 "os": {
                     "type": "string",

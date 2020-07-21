@@ -42,7 +42,7 @@ E.to_valid_id = id=>to_valid_ids[id]||
     (to_valid_ids[id]=id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
 
 let type = {sum: {}, avg: {}, sum_mono: {}, avg_level: {}, sum_level: {},
-    max_level: {}, min_level: {}, sum_level_eco: {}};
+    max_level: {}, min_level: {}, avg_level_eco: {}, sum_level_eco: {}};
 
 let reported_names = {};
 function report_invalid_val(name, value){
@@ -87,7 +87,7 @@ E.inc_level = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
     entry.v += inc;
 };
 
-// current in-progress counter: num of open tcp connections: +1 open, -1 close
+// inc_level but starts sending after non-0 value and stops after 0-only for 1h
 E.inc_level_eco = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
     if (!Number.isFinite(inc))
         return void report_invalid_val(name, inc);
@@ -103,6 +103,16 @@ E.set_level = (name, value, agg_mas='avg', agg_srv='avg')=>{
     if (!Number.isFinite(value))
         return void report_invalid_val(name, value);
     let _type = type[agg_mas+'_level'], entry = _type[name];
+    if (!entry)
+        entry = _type[name] = {v: 0, agg_srv};
+    entry.v = value;
+};
+
+// set_level but starts sending after non-0 value and stops after 0-only for 1h
+E.set_level_eco = (name, value, agg_mas='avg', agg_srv='avg')=>{
+    if (!Number.isFinite(value))
+        return void report_invalid_val(name, value);
+    let _type = type[agg_mas+'_level_eco'], entry = _type[name];
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v = value;
@@ -171,19 +181,25 @@ E.ext_min = (server, name, value, agg_srv)=>
     E.min(server+'/'+name, value, agg_srv);
 E.ext_get = (server, name)=>E.get(server+'/'+name);
 
-// The group_* versions of the functions provide group reporting for zagents
-// metrics while regular reporting for servers
+// The group_* versions of the functions provide group reporting for non-tun
+// zagents metrics while regular reporting for servers and tun zagents
+E.group_inc = E.inc;
 E.group_avg = E.avg;
 E.group_max = (name, value, agg_srv)=>E.max(name, value, agg_srv, 'avg');
+E.group_set_level = E.set_level;
 if (env.ZCOUNTER_GROUP!==undefined)
 {
     let groups = ['', '_g_'+env.ZCOUNTER_GROUP];
     if (env.AGENT_DC)
         groups.push('_g_'+env.AGENT_COUNTRY+'_'+env.AGENT_DC);
+    E.group_inc = (name, inc, agg_srv)=>groups.forEach(g=>
+        E.inc('glob/'+name+g, inc, agg_srv));
     E.group_avg = (name, value, agg_srv)=>groups.forEach(g=>
         E.avg('glob/'+name+g, value, agg_srv));
     E.group_max = (name, value, agg_srv)=>groups.forEach(g=>
         E.avg('glob/'+name+g, value, agg_srv));
+    E.group_set_level = (name, value, agg_mas, agg_srv)=>groups.forEach(g=>
+        E.set_level('glob/'+name+g, value, agg_mas, agg_srv));
 }
 
 E.glob_inc = (name, inc, agg_srv)=>E.inc('glob/'+name, inc, agg_srv);
@@ -222,7 +238,7 @@ function agg_avgw(val, cnt){
 
 const aggs = {sum: agg_sum, sum_mono: agg_sum, avg_level: agg_avg,
     max_level: agg_max, min_level: agg_min, sum_level: agg_sum,
-    avg: agg_avgw, sum_level_eco: agg_sum};
+    avg: agg_avgw, avg_level_eco: agg_avg, sum_level_eco: agg_sum};
 function mas_agg_counters(worker_counters){
     let res = zutil.map_obj(aggs, (agg, key)=>{
         let worker_counter = pluck(worker_counters, key);
@@ -250,23 +266,6 @@ E.on_send = [];
 const level_eco_ts = {};
 
 let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
-    let eco = type.sum_level_eco;
-    let now = Date.now();
-    for (let t in eco)
-    {
-        let c = eco[t];
-        if (c.v)
-        {
-            level_eco_ts[t] = now;
-            continue;
-        }
-        let ts = level_eco_ts[t];
-        if (!ts || now-ts>level_eco_dispose)
-        {
-            delete level_eco_ts[t];
-            delete eco[t];
-        }
-    }
     let ret = type;
     if (update_prev)
     {
@@ -283,8 +282,27 @@ let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
         }
         type = {sum: {}, avg: {}, sum_mono,
             avg_level: type.avg_level, sum_level: type.sum_level,
-            max_level: {}, min_level: {}, sum_level_eco: type.sum_level_eco};
+            max_level: {}, min_level: {}, avg_level_eco: type.avg_level_eco,
+            sum_level_eco: type.sum_level_eco};
     }
+    let now = Date.now();
+    [type.avg_level_eco, type.sum_level_eco].forEach(eco=>{
+        for (let t in eco)
+        {
+            let c = eco[t];
+            if (c.v)
+            {
+                level_eco_ts[t] = now;
+                continue;
+            }
+            let ts = level_eco_ts[t];
+            if (!ts || now-ts>level_eco_dispose)
+            {
+                delete level_eco_ts[t];
+                delete eco[t];
+            }
+        }
+    });
     return ret;
 });
 
@@ -330,7 +348,8 @@ function agg_mas_level_fn(id, c){
 const agg_mas_fn = {sum: agg_mas_sum_fn, sum_mono: agg_mas_sum_fn,
     avg: agg_mas_avg_fn, avg_level: agg_mas_level_fn,
     sum_level: agg_mas_level_fn, max_level: agg_mas_level_fn,
-    min_level: agg_mas_level_fn, sum_level_eco: agg_mas_level_fn};
+    min_level: agg_mas_level_fn, avg_level_eco: agg_mas_level_fn,
+    sum_level_eco: agg_mas_level_fn};
 
 let prepare = ()=>etask(function*zcounter_prepare(){
     let get_counters_fn = Object.keys(cluster.workers).length

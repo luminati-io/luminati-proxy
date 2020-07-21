@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 import Proxies from './proxies.js';
 import Stats from './stats.js';
 import Har_viewer from './har_viewer';
@@ -82,6 +83,7 @@ class Overview extends Pure_component {
                   </React.Fragment>
                 }
                 <Tls_warning show={this.state.tls_warning}/>
+                <Whitelist_warning/>
                 <Warnings warnings={this.state.warnings}/>
               </div>
               <div className="proxies nav_header">
@@ -237,5 +239,33 @@ class Upgrade_warning extends Pure_component {
             </Warning>;
     }
 }
+
+const Whitelist_warning = withRouter(
+class Whitelist_warning extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('ws.not_whitelisted', details=>
+            this.setState({not_whitelisted: details}));
+    }
+    on_click(){
+        const {type, port} = this.state.not_whitelisted;
+        const path = type=='proxy' ? `/proxy/${port}/general` : '/settings';
+        this.props.history.push({pathname: path});
+    }
+    render(){
+        const {not_whitelisted} = this.state;
+        if (!not_whitelisted)
+            return null;
+        return <Warning id="not_whitelisted_warning">
+              <span>
+                <strong><T>Security issues found. Proxy Manager accepts
+                connections from all the IPs</T></strong>{' '}
+                <T>Click here to</T>{' '}
+                <a className="link" onClick={this.on_click.bind(this)}><T>see
+                  whitelisted IPs.</T></a>
+              </span>
+            </Warning>;
+    }
+});
 
 export default Overview;

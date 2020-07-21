@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.191.312",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Security improvements for Cloud Proxy Manager"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added warning when connections from any IP allowed"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed file descriptors and memory leak caused by client errors when using socks proxy"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed multiple errors in the UI"
+            }
+        ]
+    },
+    {
         "ver": "1.190.862",
         "type": "stable",
         "changes": [

@@ -202,19 +202,7 @@ export const tabs = {
         label: 'Headers',
         tooltip: `Set default headers that are sent with each request from this
             proxy port`,
-        fields: {
-            user_agent: {
-                label: 'User-Agent',
-                tooltip: `Choose a User-Agent header that will be used for
-                    sending requests`,
-            },
-            override_headers: {
-                label: 'Override headers',
-                tooltip: `If you use a browser or other software, then requests
-                    may already have defined a few headers for you. Enabling
-                    this option will allow overriding those headers`,
-            },
-        },
+        fields: {},
     },
     general: {
         label: 'General',
@@ -276,13 +264,6 @@ export const tabs = {
                 label: 'Interface',
                 tooltip: 'Define a specific network interface on which '
                     +'the local machine is running',
-                ext: true,
-            },
-            insecure: {
-                label: 'Ignore certificates',
-                tooltip: `It works only when SSL analyzing is enabled. You can
-                    enable this option to ignore checking certificates of SSL
-                    connection`,
                 ext: true,
             },
             smtp: {

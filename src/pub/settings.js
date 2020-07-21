@@ -7,7 +7,9 @@ import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import {report_exception} from './util.js';
 import _ from 'lodash';
+import $ from 'jquery';
 import {Select_zone, Pins} from './common/controls.js';
+import Warnings_modal from './common/warnings_modal.js';
 import './css/settings.less';
 
 export default function Settings(){
@@ -147,7 +149,12 @@ class Form extends Pure_component {
                 }
             });
             const body = {..._this.state.settings};
-            yield _this.save_settings(body);
+            const save_res = yield _this.save_settings(body);
+            if (save_res.err)
+            {
+                return _this.setState({api_error: [{msg: save_res.err}]}, ()=>
+                    $('#upd_settings_error').modal('show'));
+            }
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('ws.zones', zones);
             if (_this.state.settings.sync_config)
@@ -164,6 +171,8 @@ class Form extends Pure_component {
             return null;
         const wl = s.fixed_whitelist_ips.concat(s.whitelist_ips);
         return <div className="settings_form">
+              <Warnings_modal id='upd_settings_error'
+                warnings={this.state.api_error}/>
               <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
                 <Select_zone val={s.zone} preview
                   on_change_wrapper={this.zone_change}/>
@@ -171,11 +180,12 @@ class Form extends Pure_component {
               <Labeled_controller label="Admin whitelisted IPs"
                 tooltip={tooltips.www_whitelist_ips}>
                 <Pins val={s.www_whitelist_ips} pending={s.pending_www_ips}
-                  on_change_wrapper={this.www_whitelist_ips_change}/>
+                  on_change_wrapper={this.www_whitelist_ips_change}
+                  no_any={s.zagent}/>
               </Labeled_controller>
               <Labeled_controller type="pins" label="Proxy whitelisted IPs"
                 tooltip={tooltips.whitelist_ips}>
-                <Pins val={wl} pending={s.pending_ips}
+                <Pins val={wl} pending={s.pending_ips} no_any={s.zagent}
                   disabled_ips={s.fixed_whitelist_ips}
                   on_change_wrapper={this.whitelist_ips_change}/>
               </Labeled_controller>

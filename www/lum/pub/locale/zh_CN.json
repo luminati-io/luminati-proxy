@@ -3608,7 +3608,7 @@
   "unpaid": "未支付",
   "Upload Payment Proof": "上传付款证明",
   "Payoneer details:": "Payoneer详细信息：",
-  "Negative balance, add funds to reactivate account": "余额不足，请添加资金以重新激活帐户。",
+  "Insufficient funds, add funds to reactivate account": "余额不足，请添加资金以重新激活帐户。",
   "Payoneer": "Payoneer",
   "Transaction ID": "交易ID",
   "Upload": "上传",

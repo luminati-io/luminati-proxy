@@ -8,7 +8,7 @@ import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import {qw} from '../../../util/string.js';
-import {Loader, Warnings, Loader_small, Preset_description, Ext_tooltip,
+import {Loader, Loader_small, Preset_description, Ext_tooltip,
     Checkbox} from '../common.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import React_tooltip from 'react-tooltip';
@@ -28,6 +28,7 @@ import {Modal} from '../common/modals.js';
 import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
 import {report_exception} from '../util.js';
+import Warnings_modal from '../common/warnings_modal.js';
 import '../css/proxy_edit.less';
 
 const Index = withRouter(class Index extends Pure_component {
@@ -369,10 +370,8 @@ const Index = withRouter(class Index extends Pure_component {
                 <Nav_tabs_wrapper/>
               </div>
               {this.state.zones && <Main_window/>}
-              <Modal className="warnings_modal" id="save_proxy_errors"
-                style={{zIndex: 10000}} title={t('Error')} no_cancel_btn>
-                <Warnings warnings={this.state.error_list}/>
-              </Modal>
+              <Warnings_modal id="save_proxy_errors"
+                warnings={this.state.error_list}/>
               <Alloc_modal type={type} form={this.state.form} zone={zone}
                 plan={curr_plan}/>
             </div>}</T>;

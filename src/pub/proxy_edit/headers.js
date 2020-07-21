@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Config, Tab_context} from './common.js';
+import {Tab_context} from './common.js';
 import {Remove_icon, Field_row_raw, Warning} from '../common.js';
 import * as util from '../util.js';
 import Tooltip from '../common/tooltip.js';
@@ -72,7 +72,6 @@ export default class Headers extends Pure_component {
         }
         return <div className="headers">
               <Tab_context.Provider value="headers">
-                <Config type="yes_no" id="override_headers"/>
                 <Field_row_raw inner_class_name="headers">
                   <div className="desc">
                     <T>{t=><Tooltip title={t('Custom headers')}>

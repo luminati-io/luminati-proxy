@@ -172,10 +172,9 @@ describe('proxy', ()=>{
             t('https post', tls,
                 ()=>({url: ping.https.url, method: 'POST', body: 'test body'}),
                 {ssl: false});
-            t('https sniffing', tls, ()=>ping.https.url, {insecure: true});
-            t('https sniffing post', tls,
-                ()=>({url: ping.https.url, method: 'POST', body: 'test body'}),
-                {insecure: true});
+            t('https sniffing', tls, ()=>ping.https.url);
+            t('https sniffing post', tls, ()=>({
+                url: ping.https.url, method: 'POST', body: 'test body'}));
         }
     });
     describe('encoding', ()=>{
@@ -236,9 +235,9 @@ describe('proxy', ()=>{
             t('bypass proxy', ()=>ping.http.url, pre_rule('bypass_proxy'),
                 ()=>ping.history[0]);
             t('http', ()=>test_url.http, {}, ()=>proxy.history[0]);
-            t('https sniffing', ()=>ping.https.url,
-                {insecure: true, ssl: true}, ()=>proxy.history[0]);
-            t('https connect', ()=>ping.https.url, {insecure: true, ssl: true},
+            t('https sniffing', ()=>ping.https.url, {ssl: true},
+                ()=>proxy.history[0]);
+            t('https connect', ()=>ping.https.url, {ssl: true},
                 ()=>proxy.history[0]);
         });
         describe('keep letter caseing and order', ()=>{
@@ -258,19 +257,18 @@ describe('proxy', ()=>{
             }));
             t('http', ()=>test_url.http);
             t('https', ()=>ping.https.url, {ssl: false});
-            t('https sniffing', ()=>ping.https.url, {insecure: true});
+            t('https sniffing', ()=>ping.https.url);
             t('bypass http', ()=>ping.http.url, pre_rule('bypass_proxy'));
             t('bypass https', ()=>ping.https.url, Object.assign(
                 pre_rule('bypass_proxy'), {ssl: false}));
             t('bypass https sniffing', ()=>ping.https.url+'?match',
-                Object.assign(pre_rule('bypass_proxy', 'match'),
-                {insecure: true}));
+                Object.assign(pre_rule('bypass_proxy', 'match')));
         });
         describe('added headers in request', ()=>{
             it('should set User-Agent only when user_agent field is set',
             ()=>etask(function*(){
                 const req = {headers: {'user-agent': 'from_req'}};
-                l = yield lum({override_headers: true});
+                l = yield lum({});
                 l.add_headers(req);
                 assert.ok(req.headers['user-agent']=='from_req');
             }));
@@ -484,12 +482,12 @@ describe('proxy', ()=>{
                 port: 24000,
                 url: 'localhost:'+ping.https.port,
                 method: 'CONNECT',
-            }), {insecure: true, ssl: false});
+            }), {ssl: false});
             t('https sniffing', ()=>ping.https.url, ()=>({
                 port: 24000,
                 method: 'GET',
                 url: ping.https.url,
-            }), {insecure: true, ssl: true});
+            }), {ssl: true});
             t('bypass http', ()=>ping.http.url, ()=>({
                 port: 24000,
                 url: ping.http.url,
@@ -502,7 +500,7 @@ describe('proxy', ()=>{
                 method: 'CONNECT',
                 super_proxy: null,
             }), Object.assign(pre_rule('bypass_proxy'),
-                {insecure: true, ssl: false}));
+                {ssl: false}));
             t('null_response', ()=>ping.http.url, ()=>({
                 port: 24000,
                 status_code: 200,
@@ -975,7 +973,7 @@ describe('proxy', ()=>{
                         action_type: 'ban_ip',
                         status: '200',
                         trigger_type: 'status',
-                    }], insecure: true, ssl: is_ssl});
+                    }], ssl: is_ssl});
                     l.on('retry', opt=>{
                         l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });

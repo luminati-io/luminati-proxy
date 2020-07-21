@@ -1,5 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.191.312 Stable
+- :sparkles: Security improvements for Cloud Proxy Manager
+- :sparkles: Added warning when connections from any IP allowed
+- :bug: Fixed file descriptors and memory leak caused by client errors when using socks proxy
+- :bug: Fixed multiple errors in the UI
+
 ## 1.190.862 Stable
 - :bug: Fixed legacy API page in Swagger
 

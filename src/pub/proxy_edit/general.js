@@ -62,10 +62,6 @@ export default class General extends Pure_component {
         this.set_field('pool_size', size);
         this.set_field('multiply', 1);
     };
-    on_change_ssl = ssl=>{
-        if (!ssl && this.state.form.insecure)
-            this.set_field('insecure', false);
-    };
     open_static_modal = ()=>$('#allocated_ips').modal('show');
     open_users_modal = ()=>$('#users_modal').modal('show');
     render(){
@@ -93,21 +89,18 @@ export default class General extends Pure_component {
             <a className="link" onClick={this.open_users_modal}>
               <T>Select users</T>
             </a> : null;
-        let {ssl} = form, def_ssl = this.state.defaults.ssl;
-        let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
         return <div className="general">
               <Tab_context.Provider value="general">
                 <Users_modal form={this.state.form}/>
                 <Config type="text" id="internal_name"/>
                 <Config type="number" id="port"/>
                 <Config type="pins" id="whitelist_ips"
-                  disabled_ips={disabled_wl}/>
+                  disabled_ips={disabled_wl}
+                  no_any={this.state.settings.zagent}/>
                 <T>{t=><Config type="select"
                   data={this.proxy_connection_type_opt(t)}
                   id="proxy_connection_type"/>}</T>
-                <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
-                <Config type="yes_no" id="insecure"
-                  disabled={!ssl_analyzing_enabled}/>
+                <Config type="yes_no" id="ssl"/>
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply"
                   data={[0, 5, 20, 100, 500]}/>

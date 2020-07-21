@@ -49,11 +49,9 @@ const presets = {
         subtitle: 'Unblocker handles IP management automatically',
         set: opt=>{
             opt.rotate_session = true;
-            opt.insecure = true;
         },
         clean: opt=>{
             opt.rotate_session = false;
-            opt.insecure = false;
         },
         disabled: {
             pool_size: true,
@@ -66,10 +64,8 @@ const presets = {
             proxy: true,
             dns: true,
             reverse_lookup: true,
-            insecure: true,
             smtp: true,
             trigger_type: true,
-            override_headers: true,
         },
         hidden: true,
     },
@@ -81,7 +77,6 @@ const presets = {
         set: opt=>{
             opt.session = '';
             opt.dns = 'remote';
-            opt.override_headers = true;
             opt.ssl = true;
             opt.rules = opt.rules||[];
             if (opt.rules.find(r=>r.action && r.action.process))

@@ -179,7 +179,7 @@ export default class Rules extends Pure_component {
     savebw_rule_exists = ()=>{
         return this.state.rules.some(r=>{
             return r.action=='bypass_proxy' &&
-                r.trigger_url_regex.includes('jpg');
+                (r.trigger_url_regex||'').includes('jpg');
         });
     };
     savebw_rule_add = ()=>{

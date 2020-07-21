@@ -139,8 +139,11 @@ const App = withRouter(class App extends Pure_component {
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify(settings),
           });
+          if (raw.status!=200)
+              return {err: yield raw.text()};
           const new_settings = yield raw.json();
           setdb.set('head.settings', new_settings);
+          return new_settings;
       });
     };
     render(){

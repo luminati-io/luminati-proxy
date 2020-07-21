@@ -3057,7 +3057,7 @@
   "Upload Payment Proof": "Fazer upload da prova de pagamento",
   "Bank details:": "Detalhes bancários:",
   "Recharges account when it reaches low balance, preventing account suspension": "Recarrega a conta quando esta atinge o saldo baixo, impedindo suspensão conta",
-  "Negative balance, add funds to reactivate account": "saldo negativo, adicionar fundos para reativar conta",
+  "Insufficient funds, add funds to reactivate account": "saldo negativo, adicionar fundos para reativar conta",
   "Once your Consumed balance reaches 85% of your Balance or your balance is lower than $100, the system automatically charges your account with the amount you have set preventing it from being suspended. You will immediately get a notification email when this happens.": "Uma vez que seu saldo Consumido chega a 85% do seu saldo ou o saldo é inferior a US $ 100, o sistema carrega automaticamente a sua conta com o valor que você definiu impedindo que ele seja suspenso. Você receberá imediatamente um email de notificação quando isso acontece. Seu saldo remanescente no final do mês será creditado a você no início do próximo mês.",
   "Click for details": "Clique para detalhes",
   "Done": "Feito",
