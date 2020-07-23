@@ -61,7 +61,8 @@ export class Modal extends React.Component {
     click_cancel(){
         if (this.props.cancel_clicked)
             this.props.cancel_clicked();
-        $('#'+this.props.id).modal('hide');
+        if (!this.props.cancel_no_close)
+            $('#'+this.props.id).modal('hide');
     }
     click_ok(){
         if (!this.props.no_ok_close)
@@ -87,6 +88,7 @@ export class Modal extends React.Component {
                   ok_clicked={this.click_ok.bind(this)}
                   ok_btn_title={this.props.ok_btn_title}
                   ok_btn_classes={this.props.ok_btn_classes}
+                  cancel_btn_title={this.props.cancel_btn_title}
                   no_cancel_btn={this.props.no_cancel_btn}
                   left_item={this.props.left_footer_item}/>;
         }
@@ -120,6 +122,7 @@ export class Modal extends React.Component {
 
 const Footer_default = props=>{
     const ok_title = props.ok_btn_title||'OK';
+    const cancel_title = props.cancel_btn_title||'Cancel';
     const ok_classes = props.ok_btn_classes||'btn btn_lpm btn_lpm_primary ok';
     return <div className="default_footer">
           {props.left_item &&
@@ -127,7 +130,7 @@ const Footer_default = props=>{
           {!props.no_cancel_btn &&
             <button onClick={props.cancel_clicked}
               className="btn btn_lpm cancel">
-              Cancel
+              {cancel_title}
             </button>
           }
           {props.ok_href &&

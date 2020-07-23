@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.191.644 Stable
+- :bug: Prevent creation of conflicting proxy ports
+- :sparkles: Added upgrade warning when submiting a bug from non-latest version
+
 ## 1.191.312 Stable
 - :sparkles: Security improvements for Cloud Proxy Manager
 - :sparkles: Added warning when connections from any IP allowed

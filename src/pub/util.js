@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import _ from 'lodash';
+import semver from 'semver';
 import user_agent_gen from '/www/util/pub/user_agent_gen.js';
 import etask from '../../util/etask.js';
 
@@ -277,3 +278,18 @@ export const get_troubleshoot = (body, status_code, headers)=>{
 
 export const get_location_port = ()=>window.location.port ||
     {'http:': 80, 'https:': 443}[window.location.protocol];
+
+export const get_last_versions = (ver_cur, ver_last)=>{
+    if (!ver_cur || !ver_last)
+        return {versions: [], changes: []};
+    const versions = ver_last.versions.filter(v=>semver.lt(ver_cur, v.ver));
+    const changes = versions.reduce((acc, ver)=>acc.concat(ver.changes), []);
+    return {versions, changes};
+};
+
+export const get_changes_tooltip = changes=>{
+    if (!changes || !changes.length)
+        return '';
+    const list = changes.map(c=>`<li>${c.text}</li>`).join('\n');
+    return `Changes: <ul>${list}</ul>`;
+};

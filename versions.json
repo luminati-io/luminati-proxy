@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.191.644",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Prevent creation of conflicting proxy ports"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added upgrade warning when submiting a bug from non-latest version"
+            }
+        ]
+    },
+    {
         "ver": "1.191.312",
         "type": "stable",
         "changes": [

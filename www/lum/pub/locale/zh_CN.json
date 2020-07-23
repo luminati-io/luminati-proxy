@@ -4270,6 +4270,7 @@
   "Remove selected file": "删除所选文件",
   "Thank you for providing us with proofs of identity.": "感谢您向我们提供身份证明。",
   "This process can take up to 1 business days to be completed, a notification will be sent in an email once this is done.": "此验证过程最多可能需要1个工作日才能完成，完成后将通过电子邮件通知您。",
+  "We recently failed to validate your account payment information, please contact your account manager to complete the validation process.": "我们未能验证通过您帐户的付款信息，请与您的<客户经理>联系并完成验证过程。",
   "Data center": "数据中心",
   "Static res": "静态住宅",
   "Resi": "动态住宅",
