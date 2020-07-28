@@ -1,7 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import _ from 'lodash';
 import semver from 'semver';
 import user_agent_gen from '/www/util/pub/user_agent_gen.js';
 import etask from '../../util/etask.js';
@@ -245,9 +244,15 @@ export const perr = (type, message, stack, context)=>etask(function*(){
     });
 });
 
-const undescribed_error = _.once(message=>{
-    perr('undescribed_error', message);
-});
+const undescribed_error = (()=>{
+    let executed;
+    return message=>{
+        if (executed)
+            return;
+        perr('undescribed_error', message);
+        executed = true;
+    };
+})();
 
 export const get_troubleshoot = (body, status_code, headers)=>{
     let title;
@@ -292,4 +297,8 @@ export const get_changes_tooltip = changes=>{
         return '';
     const list = changes.map(c=>`<li>${c.text}</li>`).join('\n');
     return `Changes: <ul>${list}</ul>`;
+};
+
+export const bind_all = (_this, methods)=>{
+    methods.forEach(m=>_this[m] = _this[m].bind(_this));
 };

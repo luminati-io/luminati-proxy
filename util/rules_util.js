@@ -64,8 +64,6 @@ E.action_types = [
     {key: 'Direct super proxy', value: 'direct', tooltip: `Requests will be
         passed through super proxy (not through peers)`, type: 'pre',
         only_url: true, url: true},
-    {key: 'Process data', value: 'process', only_url: true, url: true,
-        type: 'post'},
     {key: 'Request URL', value: 'request_url', tooltip: `Defined URL will be
         requested after current request is finished`, url: true, type: 'post'},
 ];
@@ -117,8 +115,6 @@ E.migrate_trigger = rule=>{
         +`  return false;\n`;
         type = 'after_body';
     }
-    if (rule.action && rule.action.process)
-        type = 'after_body';
     if (rule.url)
     {
         body += `if (!new RegExp(String.raw\`${rule.url}\`).test(opt.url))\n`

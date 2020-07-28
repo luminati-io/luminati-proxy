@@ -12,6 +12,7 @@ import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import zescape from '../../util/escape.js';
+import zutil from '../../util/util.js';
 import {status_codes, bytes_format, report_exception,
     get_troubleshoot} from './util.js';
 import {Waypoint} from 'react-waypoint';
@@ -647,8 +648,8 @@ class Tables_container extends Pure_component {
         const dir = this.state.sorted.dir;
         const new_reqs = Object.values(new_reqs_set)
         .sort((a, b)=>{
-            const val_a = _.get(a, sorted_field);
-            const val_b = _.get(b, sorted_field);
+            const val_a = zutil.get(a, sorted_field);
+            const val_b = zutil.get(b, sorted_field);
             if (val_a==val_b)
                 return a.uuid > b.uuid ? -1*dir : dir;
             return val_a > val_b ? -1*dir : dir;
@@ -867,9 +868,9 @@ class Data_rows extends React.Component {
 
 class Data_row extends React.Component {
     shouldComponentUpdate(next_props){
-        const selected = _.get(this.props.cur_preview, 'uuid')==
+        const selected = zutil.get(this.props.cur_preview, 'uuid')==
             this.props.req.uuid;
-        const will_selected = _.get(next_props.cur_preview, 'uuid')==
+        const will_selected = zutil.get(next_props.cur_preview, 'uuid')==
             next_props.req.uuid;
         const selection_changed = selected!=will_selected;
         const focused_changed = this.props.focused!=next_props.focused;
@@ -890,7 +891,7 @@ class Data_row extends React.Component {
     };
     render(){
         const {cur_preview, cols, focused, req} = this.props;
-        const selected = _.get(cur_preview, 'uuid')==req.uuid;
+        const selected = zutil.get(cur_preview, 'uuid')==req.uuid;
         const classes = classnames({
             selected,
             focused: selected&&focused,

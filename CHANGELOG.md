@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.192.271 Stable
+- :sparkles: Improved logging: added host and username for easier debugging
+
 ## 1.191.644 Stable
 - :bug: Prevent creation of conflicting proxy ports
 - :sparkles: Added upgrade warning when submiting a bug from non-latest version

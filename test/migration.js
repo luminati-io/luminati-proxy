@@ -382,10 +382,6 @@ describe('migration', ()=>{
             +`  if (!new RegExp(String.raw\`captcha\`).test(opt.body))\n`
             +`    return false;\n`
             +`  return true;\n}`, 'after_body');
-        t('process data', {action: {process: {
-            title: "$('#productTitle').text()"}}},
-            `function trigger(opt){\n`
-            +`  return true;\n}`, 'after_body');
     });
     describe_version('1.136.76', v=>{
         it('should migrate preset round_robin -> rotating', ()=>{

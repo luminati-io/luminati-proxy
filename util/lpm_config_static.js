@@ -1,6 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
-const _ = require('lodash');
 let lpm_api_models;
 // need to have import from ZON because this file is used in Jakefile
 try { lpm_api_models = require('../../../www/lum/pub/faq/lpm_api_models.js'); }
@@ -81,7 +80,7 @@ conf.server_default = {
     bw_limit: 0,
     log: 'notice',
 };
-conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
+conf.manager_default = Object.assign({}, conf.server_default, {
     www: 22999,
     www_whitelist_ips: [],
     whitelist_ips: [],
@@ -107,6 +106,7 @@ conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     sync_zones: true,
     sync_stats: true,
 });
+delete conf.manager_default.port;
 conf.log_levels = {
     error: 0,
     warn: 1,

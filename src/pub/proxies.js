@@ -9,10 +9,10 @@ import setdb from '../../util/setdb.js';
 import zescape from '../../util/escape.js';
 import csv from '../../util/csv.js';
 import etask from '../../util/etask.js';
+import zutil from '../../util/util.js';
 import classnames from 'classnames';
 import filesaver from 'file-saver';
 import {get_static_country, report_exception} from './util.js';
-import _ from 'lodash';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title, No_zones,
@@ -555,11 +555,16 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return p.proxy_type!='duplicate';
         });
         let {zones} = this.state;
-        const res = _.orderBy(proxies, value=>{
+        const res = [...proxies].sort((p1, p2)=>{
+            let v1 = p1[sort.sort_by], v2 = p2[sort.sort_by];
             if (sort.sort_by=='country')
-                return get_static_country(value, zones)||value.country||'any';
-            return value[sort.sort_by];
-        }, sort.sort_direction);
+            {
+                v1 = get_static_country(p1, zones)||p1.country||'any';
+                v2 = get_static_country(p2, zones)||p2.country||'any';
+            }
+            return (sort.sort_direction=='asc' ? 1 : -1) *
+                (v1 > v2 ? 1 : v1 < v2 ? -1 : 0);
+        });
         return res;
     };
     prepare_proxies = proxies=>{
@@ -586,7 +591,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             const stats = yield ajax.json({url});
             setdb.set('head.recent_stats', stats);
             if (!_this.state.proxies.length ||
-                _.isEqual(stats, _this.state.stats))
+                zutil.equal_deep(stats, _this.state.stats))
             {
                 yield etask.sleep(1000);
                 _this.req_status();
@@ -651,7 +656,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         const titles = [cols.map(col=>col.title)];
         const data = titles.concat(this.state.proxies.map(p=>{
             return cols.map(col=>{
-                const val = _.get(p, col.key);
+                const val = zutil.get(p, col.key);
                 if (val==undefined)
                     return '-';
                 return val;

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
-const _ = require('lodash');
 const yargs = require('yargs');
 const pkg = require('../package.json');
 const perr = require('../lib/perr.js');
 const lpm_config = require('./lpm_config.js');
 const zerr = require('../util/zerr.js');
+const zutil = require('../util/util.js');
 const E = module.exports;
 
 const parse_env_params = (env, fields)=>{
@@ -71,8 +71,8 @@ E.init_args = args=>{
     argv.log = argv.log.toLowerCase();
     if (argv.session=='true')
         argv.session = true;
-    argv.explicit_opt = _.pick(argv, [...lpm_config.proxy_params, 'test_url']
-        .filter(p=>args.includes(`--${p}`)));
+    argv.explicit_opt = zutil.pick(argv, ...[...lpm_config.proxy_params,
+        'test_url'].filter(p=>args.includes(`--${p}`)));
     if (args.includes('-p'))
         argv.explicit_opt.port = argv.port;
     argv.daemon_opt = args.filter(arg=>arg.includes('daemon')||arg=='-d')

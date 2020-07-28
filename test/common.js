@@ -1,6 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
-const _ = require('lodash');
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
@@ -14,6 +13,7 @@ const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
 const etask = require('../util/etask.js');
 const date = require('../util/date.js');
+const zutil = require('../util/util.js');
 const restore_case = require('../util/http_hdr.js').restore_case;
 const customer = 'abc';
 const password = 'xyz';
@@ -77,10 +77,11 @@ E.http_proxy = port=>etask(function*(){
             uri: req.url,
             method: req.method,
             path: url.parse(req.url).path,
-            headers: _.omit(req.headers, 'proxy-authorization'),
+            headers: zutil.omit(req.headers, 'proxy-authorization'),
         }).on('response', _res=>{
             res.writeHead(_res.statusCode, _res.statusMessage,
-                _.assign({'x-luminati-ip': E.get_random_ip()}, _res.headers));
+                Object.assign({'x-luminati-ip': E.get_random_ip()},
+                    _res.headers));
             _res.pipe(res);
         }).on('error', this.throw_fn()));
     };
@@ -100,7 +101,7 @@ E.http_proxy = port=>etask(function*(){
                 proxy.https = https.createServer(
                     Object.assign({requestCert: false}, ssl()),
                     (_req, _res, _head)=>{
-                        _.defaults(_req.headers,
+                        zutil.defaults(_req.headers,
                             headers[_req.socket.remotePort]||{});
                         handler(_req, _res, _head);
                     }

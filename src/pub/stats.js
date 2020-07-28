@@ -259,9 +259,7 @@ const Row = withRouter(class Row extends Pure_component {
                   bytes={stat.in_bw+stat.out_bw}/>
               </td>
               <td>
-                <Tooltip_bytes
-                  chrome_style
-                  bytes={stat.bypass_bw}/>
+                <Tooltip_bytes bytes={stat.bypass_bw} cost={stat.bypass_cost}/>
               </td>
               <td><Cell>{stat.reqs||'—'}</Cell></td>
             </tr>;

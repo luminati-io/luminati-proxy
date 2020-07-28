@@ -3,11 +3,11 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
-import _ from 'lodash';
 import Tooltip from './common/tooltip.js';
 import {Checkbox} from './common.js';
 import './css/chrome_widgets.less';
 import {T} from './common/i18n.js';
+import zutil from '../../util/util.js';
 
 export const Toolbar_button = ({id, tooltip, active, href, placement,
     ...props})=>
@@ -24,7 +24,7 @@ export const Devider = ()=><div className="devider"/>;
 export const with_resizable_cols = (cols, Table)=>{
     class Resizable extends Pure_component {
         state = {};
-        cols = _.cloneDeep(cols);
+        cols = zutil.clone_deep(cols);
         min_width = 22;
         moving_col = null;
         style = {position: 'relative', display: 'flex', flex: 'auto',

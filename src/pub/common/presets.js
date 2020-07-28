@@ -69,45 +69,6 @@ const presets = {
         },
         hidden: true,
     },
-    shop: {
-        title: 'Online shopping',
-        subtitle: `Scrape data from shopping websites. This preset is
-            configured for product pages but can be freely modified for any
-            other use-cases`,
-        set: opt=>{
-            opt.session = '';
-            opt.dns = 'remote';
-            opt.ssl = true;
-            opt.rules = opt.rules||[];
-            if (opt.rules.find(r=>r.action && r.action.process))
-                return;
-            opt.rules.push({
-                action: {
-                    process: {
-                        title: `$('#productTitle').text()`,
-                        price: `$('#priceblock_ourprice').text().trim()`,
-                        bullets: `$('#featurebullets_feature_div li span')`
-                            +`.map(function(){ return $(this).text() })`
-                            +`.get()`,
-                    },
-                },
-                action_type: 'process',
-                trigger_type: 'url',
-                url: 'luminati.io|dp\\/[A-Z0-9]{10}',
-            });
-        },
-        clean: opt=>{
-            opt.dns = '';
-            if (!opt.rules)
-                return;
-            opt.rules = opt.rules.filter(r=>!r.action || !r.action.process);
-        },
-        disabled: {
-            sticky_ip: true,
-            session: true,
-            ssl: true,
-        },
-    },
     custom: {
         title: 'Custom',
         subtitle: `Manually adjust all settings to your needs for advanced

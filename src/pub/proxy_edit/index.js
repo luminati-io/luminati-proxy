@@ -27,7 +27,7 @@ import Tooltip from '../common/tooltip.js';
 import {Modal} from '../common/modals.js';
 import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
-import {report_exception} from '../util.js';
+import {report_exception, bind_all} from '../util.js';
 import Warnings_modal from '../common/warnings_modal.js';
 import '../css/proxy_edit.less';
 
@@ -60,7 +60,7 @@ const Index = withRouter(class Index extends Pure_component {
             if (!proxy)
                 return this.props.history.push('/overview');
             const form = Object.assign({}, proxy);
-            this.apply_preset(form, form.preset||'session_long');
+            this.apply_preset(form);
             this.setState({proxies}, this.delayed_loader());
         });
         this.setdb_on('ws.zones', zones=>{
@@ -172,6 +172,10 @@ const Index = withRouter(class Index extends Pure_component {
         return false;
     };
     apply_preset = (_form, preset)=>{
+        if (!preset)
+            preset = _form.preset;
+        if (!presets.get(preset))
+            preset = presets.get_default().key;
         const form = Object.assign({}, _form);
         const last_preset = form.preset ? presets.get(form.preset) : null;
         if (last_preset && last_preset.key!=preset && last_preset.clean)
@@ -530,7 +534,7 @@ class Confirmation_modal extends Pure_component {
     constructor(props){
         super(props);
         this.state = {no_confirm: false};
-        _.bindAll(this, qw`toggle_dismiss handle_ok handle_dismiss`);
+        bind_all(this, qw`toggle_dismiss handle_ok handle_dismiss`);
     }
     componentDidMount(){
         let no_confirm = localStorage.getItem('no-confirm-zone-preset');

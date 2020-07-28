@@ -12,7 +12,7 @@ import {migrate_trigger, no_ssl_trigger_types, trigger_types,
 import {ms} from '../../../util/date.js';
 import zutil from '../../../util/util.js';
 import {Labeled_controller, with_proxy_ports, Cm_wrapper,
-    Field_row_raw, Warning} from '../common.js';
+    Warning} from '../common.js';
 import {tabs} from './fields.js';
 import Proxy_tester from '../proxy_tester.js';
 import Tooltip from '../common/tooltip.js';
@@ -37,8 +37,6 @@ const rule_prepare = rule=>{
         action.refresh_ip = true;
     else if (rule.action=='save_to_pool')
         action.reserve_session = true;
-    else if (rule.action=='process')
-        action.process = rule.process && JSON.parse(rule.process);
     else if (rule.action=='request_url')
     {
         action.request_url = {
@@ -109,8 +107,6 @@ export const map_rule_to_form = rule=>{
         result.ban_ip_duration = rule.action.ban_ip_global/ms.MIN;
     if (rule.action.ban_ip_domain)
         result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
-    if (rule.action.process)
-        result.process = JSON.stringify(rule.action.process, null, '  ');
     result.trigger_code = rule.trigger_code;
     result.type = rule.type;
     result.active = rule.active;
@@ -531,16 +527,6 @@ class Action extends Pure_component {
                   <Rule_config id="ban_ip_duration" type="select_number"
                     data={[0, 1, 5, 10, 30, 60]} sufix="minutes" rule={rule}
                     note={<Ban_ips_note/>}/>
-                }
-                {rule.action=='process' &&
-                  <div>
-                    <Rule_config id="process" type="json" rule={rule}/>
-                    <Field_row_raw>
-                      Test data processing in
-                      <a onClick={this.goto_tester} className="link api_link">
-                        proxy tester</a>
-                    </Field_row_raw>
-                  </div>
                 }
                 {rule.action=='request_url' &&
                   <div>

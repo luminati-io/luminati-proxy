@@ -1,6 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
-const _ = require('lodash');
 const assert = require('assert');
 const dns = require('dns');
 const net = require('net');
@@ -13,6 +12,7 @@ const request = require('request');
 const lolex = require('lolex');
 const etask = require('../util/etask.js');
 const {ms} = require('../util/date.js');
+const zutil = require('../util/util.js');
 const sinon = require('sinon');
 const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
@@ -249,7 +249,7 @@ describe('proxy', ()=>{
                 };
                 l = yield lum(opt);
                 const res = yield l.test({url: _url(), headers});
-                const site_headers = _.omit(res.body.headers,
+                const site_headers = zutil.omit(res.body.headers,
                     qw`proxy-authorization x-hola-agent`);
                 assert_has(site_headers, headers, 'value');
                 assert_has(Object.keys(site_headers), Object.keys(headers),
@@ -773,71 +773,6 @@ describe('proxy', ()=>{
                 return handle_proxy_resp_org(...args)(_res);
             });
         };
-        const make_process_rule_req=(proxy_res, html, res)=>etask(function*(){
-            const req = {ctx: {response: {}, proxies: [],
-                timeline: {track: ()=>null, req: {create: Date.now()}},
-                log: {info: ()=>null}, skip_rule: ()=>false}};
-            Object.assign(proxy_res, {
-                end: ()=>null, pipe: ()=>({pipe: ()=>null}),
-                on: function(event, fn){
-                    if (event=='data')
-                    {
-                        fn(Buffer.from(html));
-                        fn(Buffer.from('random data'));
-                    }
-                    return this;
-                },
-                once: function(event, fn){
-                    if (event=='end')
-                        fn();
-                    return this;
-                }
-            });
-            res.end = ()=>null;
-            const et = etask.wait();
-            l.handle_proxy_resp(req, res, {}, et)(proxy_res);
-            return yield et;
-        });
-        it('should process data', ()=>etask(function*(){
-            const process = {price: `$('#priceblock_ourprice').text()`};
-            l = yield lum({rules: [{action: {process}, type: 'after_body'}]});
-            const html = `
-              <body>
-                <div>
-                  <p id="priceblock_ourprice">$12.99</p>
-                </div>
-              </body>`;
-            const proxy_res = {headers: {'content-encoding': 'text'}};
-            const res = {write: sinon.spy()};
-            const response = yield make_process_rule_req(proxy_res, html, res);
-            assert.ok(!proxy_res.headers['content-encoding']);
-            assert.equal(proxy_res.headers['content-type'],
-                'application/json; charset=utf-8');
-            const new_body = JSON.parse(
-                lutil.decode_body(response.body).toString());
-            assert.deepEqual(new_body, {price: '$12.99'});
-            sinon.assert.calledWith(res.write, response.body[0]);
-        }));
-        it('should process data with error', ()=>etask(function*(){
-            const process = {price: 'a-b-v'};
-            l = yield lum({rules: [{action: {process}, type: 'after_body'}]});
-            const html = `
-              <body>
-                <div>
-                  <p id="priceblock_ourprice">$12.99</p>
-                </div>
-              </body>`;
-            const proxy_res = {headers: {'content-encoding': 'text'}};
-            const res = {write: sinon.spy()};
-            const response = yield make_process_rule_req(proxy_res, html, res);
-            assert.ok(!proxy_res.headers['content-encoding']);
-            assert.equal(proxy_res.headers['content-type'],
-                'application/json; charset=utf-8');
-            const new_body = JSON.parse(response.body.toString());
-            assert.deepEqual(new_body, {price: {context: 'a-b-v',
-                error: 'processing data', message: 'a is not defined'}});
-            sinon.assert.calledWith(res.write, response.body[0]);
-        }));
         it('check Trigger', ()=>{
             const Trigger = require('../lib/rules').t.Trigger;
             const t = (code, _url, expected)=>{
@@ -917,20 +852,6 @@ describe('proxy', ()=>{
             l = yield lum({rules: [{type: 'after_body', body: '1',
                 url: 'test'}]});
             t({ctx: {url: 'test'}}, true);
-        }));
-        it('check post_body', ()=>etask(function*(){
-            l = yield lum({rules: [{
-                body: 'test',
-                action: {process: {}},
-                url: 'test',
-            }]});
-            const t = (req, _res, body, expected)=>{
-                const r = l.rules.post_body(req, {}, {}, _res, body);
-                assert.equal(r, expected);
-            };
-            sinon.stub(l.rules, 'action').returns(true);
-            sinon.stub(l.rules, 'process_response');
-            t({ctx: {h_context: 'STATUS CHECK'}});
         }));
         it('check post', ()=>etask(function*(){
             l = yield lum({rules: [{url: 'test'}]});
@@ -1517,25 +1438,28 @@ describe('proxy', ()=>{
             l.on('usage', ()=>this.continue());
             l.on('usage_abort', ()=>this.continue());
             yield this.wait();
-            assert.equal(_.get(l, 'history.0.status_code'), expected_status);
-            assert.equal(_.get(l, 'history.0.rules.length'), expected_rules);
+            assert.equal(zutil.get(l, 'history.0.status_code'),
+                expected_status);
+            assert.equal(zutil.get(l, 'history.0.rules.length'),
+                expected_rules);
         }));
         let config = {smtp: ['127.0.0.1:'+TEST_SMTP_PORT]};
         let rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
             body: '220', trigger_type: 'body'}];
         t('rules is triggered regular req',
-            _.assign({}, config, {rules}), 200, 1, {close: true});
+            Object.assign({}, config, {rules}), 200, 1, {close: true});
         t('rules is triggered when server ends connection',
-            _.assign({}, config, {rules}), 200, 1, {smtp_close: true});
+            Object.assign({}, config, {rules}), 200, 1, {smtp_close: true});
         // XXX viktor: fix code for test to pass
         // rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
         //     body: '^$', trigger_type: 'body'}];
         // t('rules is triggered on abort',
-        //     _.assign({}, config, {rules}), 'canceled', 0, {abort: true});
+        //     Object.assign({}, config, {rules}), 'canceled', 0,
+        //     {abort: true});
         // XXX viktor: fix code for test to pass
         // rules = [{action: {retry: 2}, action_type: 'retry',
         //     body: '^$', trigger_type: 'body'}];
-        // t('retry rule on timeout', _.assign({}, config, {rules}),
+        // t('retry rule on timeout', Object.assign({}, config, {rules}),
         //     'canceled', 1, {silent_timeout: true});
     });
     describe('util', ()=>{
