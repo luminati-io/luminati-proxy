@@ -23,8 +23,12 @@
 ### 软件更新要求
 - 2GB RAM
 - 1 CPU
+- 3GB HDD
+
+### 需要的组态
+- 4GB RAM
+- 2 CPUs
 - 3GB SSD
-- Ubuntu 16 LTS
 
 ## 安装
 
@@ -35,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.192.271-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.192.577-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -165,7 +169,7 @@ Options:
   --high_perf                                         [boolean] [default: false]
   --cloud                                              [boolean] [default: true]
   --zagent                                            [boolean] [default: false]
-  --cluster                                            [boolean] [default: true]
+  --cluster                                             [string] [default: true]
   --sync_config                 Synchronize LPM configuration with the cloud
                                                       [boolean] [default: false]
   --sync_zones                                         [boolean] [default: true]

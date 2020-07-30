@@ -26,13 +26,17 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ### Minimal requirements
 - 2GB RAM
 - 1 CPU
+- 3GB HDD
+
+### Recommended requirements
+- 4GB RAM
+- 2 CPUs
 - 3GB SSD
-- Ubuntu 16 LTS
 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.192.271/luminati-proxy-manager-v1.192.271-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.192.577/luminati-proxy-manager-v1.192.577-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -220,7 +224,7 @@ Options:
   --high_perf                                         [boolean] [default: false]
   --cloud                                              [boolean] [default: true]
   --zagent                                            [boolean] [default: false]
-  --cluster                                            [boolean] [default: true]
+  --cluster                                             [string] [default: true]
   --sync_config                 Synchronize LPM configuration with the cloud
                                                       [boolean] [default: false]
   --sync_zones                                         [boolean] [default: true]

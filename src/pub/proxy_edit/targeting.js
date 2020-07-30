@@ -20,9 +20,8 @@ const carriers_note = (()=>{
 
 export default with_www_api(class Targeting extends Pure_component {
     state = {};
-    def_value = {key: 'Any (default)', value: ''};
     os_opt = [
-        this.def_value,
+        {key: 'Any (default)', value: ''},
         {key: 'Windows', value: 'win'},
         {key: 'MacOS', value: 'mac'},
         {key: 'Android', value: 'android'},
@@ -50,47 +49,40 @@ export default with_www_api(class Targeting extends Pure_component {
             form && this.setState({form});
         });
     }
-    allowed_countries = t=>{
+    allowed_countries = ()=>{
         let res = this.state.locations.countries.map(c=>({
-            key: c.country_name, value: c.country_id, mob: c.mob}));
+            label: c.country_name, id: c.country_id, mob: c.mob}));
         const curr_plan = this.get_curr_plan();
-        let list = [this.def_value];
+        let list = [];
         if (curr_plan && curr_plan.country)
         {
             let countries = curr_plan.country.split(' ');
-            res = res.filter(r=>countries.includes(r.value));
-            if (res.length==1)
-                list[0] = {key: `${res[0].key} (default)`, value: ''};
-            else if (res.length>1)
-            {
-                let key = `${res[0].key} + ${res.length-1} `+t('countries');
-                list[0] = {key, value: ''};
-            }
+            res = res.filter(r=>countries.includes(r.id));
         }
         else if (curr_plan && curr_plan.ip_alloc_preset=='shared_block')
         {
             res = res.filter(r=>
-                this.state.locations.shared_countries.includes(r.value));
+                this.state.locations.shared_countries.includes(r.id));
         }
         if (curr_plan && curr_plan.mobile)
             res = res.filter(r=>r.mob);
         return list.concat(res);
     };
     country_changed = ()=>{
-        this.set_field('city', []);
+        this.set_field('city', '');
         this.set_field('state', '');
     };
     states = ()=>{
-        const country = this.state.form.country;
+        const {country} = this.state.form;
         if (!country||country=='*')
             return [];
         const curr_plan = this.get_curr_plan();
         const res = (this.state.locations.regions[country]||[])
         .filter(r=>!curr_plan||!curr_plan.mobile||r.mob)
-        .map(r=>({key: r.region_name, value: r.region_id}));
-        return [this.def_value, ...res];
+        .map(r=>({label: r.region_name, id: r.region_id}));
+        return res;
     };
-    state_changed = ()=>this.set_field('city', []);
+    state_changed = ()=>this.set_field('city', '');
     cities = ()=>{
         const {country, state} = this.state.form;
         let res;
@@ -104,9 +96,9 @@ export default with_www_api(class Targeting extends Pure_component {
             res = res.filter(c=>c.region_id==state);
         const regions = this.states();
         res = res.map(c=>{
-            const region = regions.filter(r=>r.value==c.region_id)[0];
-            return {label: c.city_name+' ('+region.value+')', id: c.city_name,
-                region: region.value};
+            const region = regions.find(r=>r.id==c.region_id);
+            return {label: c.city_name+' ('+region.id+')',
+                id: c.city_name+'|'+region.id};
         });
         return res;
     };
@@ -121,7 +113,7 @@ export default with_www_api(class Targeting extends Pure_component {
         }
         else
             asns = locations.asns[country]||{};
-        return Object.keys(asns).map(a=>({id: a, label: a}));
+        return Object.keys(asns).map(a=>({id: Number(a), label: a}));
     };
     carriers = ()=>{
         const {country} = this.state.form;
@@ -140,8 +132,8 @@ export default with_www_api(class Targeting extends Pure_component {
         ];
     };
     city_changed = e=>{
-        if (e && e.length)
-            this.set_field('state', e[0].region);
+        if (e)
+            this.set_field('state', e.split('|')[1]);
     };
     render(){
         if (!this.state.locations || !this.state.carriers || !this.state.form)
@@ -195,22 +187,18 @@ export default with_www_api(class Targeting extends Pure_component {
                     <span>{' '}<T>and change your zone plan.</T></span>
                   </Note>
                 }
-                <T>{t=><Config type="select" id="country"
-                  data={this.allowed_countries(t)}
-                  on_change={this.country_changed}/>}</T>
-                <Config type="select" id="state" data={this.states()}
+                <Config type="typeahead" id="country"
+                  data={this.allowed_countries()}
+                  on_change={this.country_changed}/>
+                <Config type="typeahead" id="state" data={this.states()}
                   on_change={this.state_changed}/>
                 <Config type="typeahead" id="city" data={this.cities()}
                   on_change={this.city_changed}/>
-                {!this.state.form.asn || !this.state.form.asn[1] &&
-                  <Config type="typeahead" id="asn" data={this.asns()}
-                    disabled={!!this.state.form.carrier} update_on_input
-                    depend_a={this.state.form.zone}
-                    filter_by={filter_by_asns}/>
-                }
+                <Config type="typeahead" id="asn" data={this.asns()}
+                  disabled={!!this.state.form.carrier} update_on_input
+                  filter_by={filter_by_asns}/>
                 <Config type="select" id="carrier" data={this.carriers()}
-                  note={carriers_note} disabled={carrier_disabled}
-                  depend_a={this.state.form.zone}/>
+                  note={carriers_note} disabled={carrier_disabled}/>
                 <Config type="select" id="os" data={this.os_opt}
                   disabled={is_static}/>
               </Tab_context.Provider>

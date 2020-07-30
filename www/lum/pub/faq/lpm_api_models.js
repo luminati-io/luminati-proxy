@@ -100,7 +100,7 @@ E.manager_fields = {
     high_perf: {type: 'boolean'},
     cloud: {type: 'boolean'},
     zagent: {type: 'boolean'},
-    cluster: {type: 'boolean'},
+    cluster: {type: 'string'},
     sync_config: {type: 'boolean', desc: 'Synchronize LPM configuration with '
         +'the cloud'},
     sync_zones: {type: 'boolean'},

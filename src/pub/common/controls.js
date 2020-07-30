@@ -20,6 +20,7 @@ import {Ext_tooltip, Loader} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
 import Toggle_on_off from './toggle_on_off.js';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 const ANY_IP = '0.0.0.0/0';
 
 export class Pins extends Pure_component {
@@ -499,11 +500,30 @@ export const Textarea = props=>{
           onChange={e=>props.on_change_wrapper(e.target.value)}/>;
 };
 
-export const Typeahead_wrapper = props=>
-    <Typeahead id={props.id} options={props.data} maxResults={10}
-      minLength={1} disabled={props.disabled} selectHintOnEnter
-      onChange={props.on_change_wrapper} selected={props.val}
-      onInputChange={props.on_input_change} filterBy={props.filter_by}/>;
+export const Typeahead_wrapper = props=>{
+    const translate = (t, data)=>{
+        if (typeof data == 'string')
+            return t(data);
+        let _d = data.map(d=>typeof d == 'string' ?
+            t(d) : Object.assign({}, d, {label: t(d.label)}));
+        return _d;
+    };
+    const on_change_wrapper = val=>props.on_change_wrapper(
+        typeof val == 'string' ? val : val.length ? val[0].id : '');
+    const get_selected = (t, val)=>{
+        const _val = props.data.find(d=>(d.id||d)==val);
+        if (!_val)
+            return [];
+        return translate(t, typeof _val == 'string' ? _val : [_val]);
+    };
+    return <T>{t=><Typeahead id={props.id} options={translate(t, props.data)}
+          maxResults={10} disabled={props.disabled} selectHintOnEnter
+          onChange={on_change_wrapper} selected={get_selected(t, props.val)}
+          onInputChange={props.on_input_change} filterBy={props.filter_by}
+          clearButton placeholder={t(props.placeholder)}
+          emptyLabel={t('No matched found.')}
+          paginationText={t('Display additional results...')}/>}</T>;
+};
 
 export const Select = props=>{
     const update = val=>{

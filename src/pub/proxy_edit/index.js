@@ -204,21 +204,13 @@ const Index = withRouter(class Index extends Pure_component {
             form.vips = [];
         if (!form.users)
             form.users = [];
-        if (form.city && !Array.isArray(form.city) && form.state)
-        {
-            form.city = [{id: form.city,
-                label: form.city+' ('+form.state+')'}];
-        }
-        else if (!Array.isArray(form.city))
-            form.city = [];
-        if (form.asn && !Array.isArray(form.asn))
-            form.asn = [{id: ''+form.asn, label: ''+form.asn}];
-        else if (!Array.isArray(form.asn))
-            form.asn = [];
+        qw`country state`.forEach(k=>{
+            form[k] = (form[k]||'').toLowerCase();
+        });
+        if (form.city && !form.city.includes('|') && form.state)
+            form.city = form.city+'|'+form.state;
         if (!this.original_form)
             this.original_form = form;
-        form.country = (form.country||'').toLowerCase();
-        form.state = (form.state||'').toLowerCase();
         if (form.session==='true'||form.session===true)
             delete form.session;
         this.setState({form});
@@ -323,14 +315,10 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.smtp = save_form.smtp.filter(Boolean);
         else
             save_form.smtp = [];
-        if (save_form.city.length)
-            save_form.city = save_form.city[0].id;
-        else
-            save_form.city = '';
-        if (save_form.asn.length==1)
-            save_form.asn = Number(save_form.asn[0].id);
-        else if (!save_form.asn.length)
-            save_form.asn = '';
+        if (save_form.city)
+            save_form.city = save_form.city.split('|')[0];
+        if (save_form.asn)
+            save_form.asn = Number(save_form.asn);
         if (save_form.headers)
             save_form.headers = save_form.headers.filter(h=>h.name&&h.value);
         if (save_form.session && save_form.session.replace)
@@ -484,12 +472,7 @@ class Nav extends Pure_component {
         for (let field in save_form)
         {
             if (!this.is_valid_field(field, new_zone))
-            {
-                let v = '';
-                if (field=='city'||field=='asn')
-                    v = [];
-                this.set_field(field, v);
-            }
+                this.set_field(field, '');
         }
     };
     is_unblocker(zone_name){

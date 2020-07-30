@@ -16,10 +16,12 @@ export const tabs = {
             country: {
                 label: 'Country',
                 tooltip: 'Choose your exit country for your requests',
+                placeholder: 'Type in country name',
             },
             state: {
                 label: 'State',
                 tooltip: 'Specific state in a given country',
+                placeholder: 'Type in state name',
             },
             city: {
                 label: 'City',

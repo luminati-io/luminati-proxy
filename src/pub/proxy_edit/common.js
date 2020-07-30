@@ -20,7 +20,7 @@ export const Config = withRouter(class Config extends Pure_component {
     };
     on_input_change = val=>{
         if (this.props.update_on_input)
-            this.set_field(this.props.id, [{id: val, label: val}]);
+            this.set_field(this.props.id, val);
     };
     on_change_wrapper = (value, _id)=>{
         const opt = {};

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.192.577 Stable
+- :sparkles: Updated minimal requirements and added recommended
+- :bug: Made country and state inputs searching for data by typing
+
 ## 1.192.271 Stable
 - :sparkles: Improved logging: added host and username for easier debugging
 

@@ -741,4 +741,24 @@ describe('manager', ()=>{
         t('should not run migrations if config exists and version is new',
             false, {_defaults: {version: '1.120.0'}});
     });
+    describe('stop', ()=>{
+        afterEach(()=>{ app = null; });
+        let t = name=>it(name, etask._fn(function*(_this){
+            const proxies = [{port: 24000, multiply: 5}];
+            let spies = [];
+            app = yield app_with_proxies(proxies);
+            Object.values(app.manager.proxy_ports).forEach(p=>{
+                const spy = sinon.spy();
+                const _stop_port = p.stop_port.bind(p);
+                p.stop_port = ()=>{
+                    spy();
+                    _stop_port();
+                };
+                spies.push(spy);
+            });
+            yield app.manager.stop();
+            spies.forEach(s=>sinon.assert.calledOnce(s));
+        }));
+        t('stop multiplied ports once');
+    });
 });

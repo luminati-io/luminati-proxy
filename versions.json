@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.192.577",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Updated minimal requirements and added recommended"
+            },
+            {
+                "type": "bug",
+                "text": "Made country and state inputs searching for data by typing"
+            }
+        ]
+    },
+    {
         "ver": "1.192.271",
         "type": "stable",
         "changes": [
