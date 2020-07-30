@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.192.600",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Fixed balancing super proxies when passing explicit usernames"
+            }
+        ]
+    },
+    {
         "ver": "1.192.577",
         "type": "stable",
         "changes": [

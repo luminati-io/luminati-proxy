@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.192.600 Stable
+- :sparkles: Fixed balancing super proxies when passing explicit usernames
+
 ## 1.192.577 Stable
 - :sparkles: Updated minimal requirements and added recommended
 - :bug: Made country and state inputs searching for data by typing

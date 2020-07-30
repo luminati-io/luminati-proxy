@@ -315,51 +315,28 @@ describe('proxy', ()=>{
                 assert.equal(res.body.auth.password, 'abc');
             }));
         });
-        describe('pool', ()=>{
-            describe('rotate_session', ()=>{
-                it('disabled', ()=>etask(function*(){
-                    l = yield lum({rotate_session: false});
-                    assert.equal(l.session_mgr.opt.rotate_session, false);
-                }));
-                const test_call = ()=>etask(function*(){
-                    const res = yield l.test({fake: 1});
-                    assert.ok(res.body);
-                    return res.body;
-                });
-                it('off, default', ()=>etask(function*(){
-                    l = yield lum({rotate_session: false});
-                    const session_a = yield test_call();
-                    const session_b = yield test_call();
-                    assert.equal(session_a, session_b);
-                }));
-                it('on, default', ()=>etask(function*(){
-                    l = yield lum({rotate_session: true});
-                    const session_a = yield test_call();
-                    const session_b = yield test_call();
-                    assert.notEqual(session_a, session_b);
-                }));
-                // t('on, sticky_ip', {rotate_session: true, sticky_ip: true});
+        describe('session control', ()=>{
+            it('disabled', ()=>etask(function*(){
+                l = yield lum({rotate_session: false});
+                assert.equal(l.session_mgr.opt.rotate_session, false);
+            }));
+            const test_call = ()=>etask(function*(){
+                const res = yield l.test({fake: 1});
+                assert.ok(res.body);
+                return res.body;
             });
-            describe('fastest', ()=>{
-                const t = size=>it(''+size, etask._fn(function*(_this){
-                    proxy.connection = hold_request;
-                    l = yield lum({pool_type: 'fastest', pool_size: size});
-                    for (let i = 0; i < size; ++i)
-                    {
-                        assert.equal(waiting.length, 0);
-                        let req = l.test();
-                        yield etask.sleep(100);
-                        assert.equal(waiting.length, size);
-                        waiting.splice(i, 1)[0]();
-                        yield req;
-                        if (waiting.length)
-                            release(waiting.length);
-                        yield etask.sleep(100);
-                    }
-                }));
-                t(1);
-                // broken t(2);
-            });
+            it('single session, default', ()=>etask(function*(){
+                l = yield lum({});
+                const session_a = yield test_call();
+                const session_b = yield test_call();
+                assert.equal(session_a, session_b);
+            }));
+            it('rotate_session', ()=>etask(function*(){
+                l = yield lum({rotate_session: true});
+                const session_a = yield test_call();
+                const session_b = yield test_call();
+                assert.notEqual(session_a, session_b);
+            }));
         });
         describe('luminati params', ()=>{
             const t = (name, target, expected)=>it(name, ()=>etask(function*(){
@@ -1450,18 +1427,8 @@ describe('proxy', ()=>{
             Object.assign({}, config, {rules}), 200, 1, {close: true});
         t('rules is triggered when server ends connection',
             Object.assign({}, config, {rules}), 200, 1, {smtp_close: true});
-        // XXX viktor: fix code for test to pass
-        // rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
-        //     body: '^$', trigger_type: 'body'}];
-        // t('rules is triggered on abort',
-        //     Object.assign({}, config, {rules}), 'canceled', 0,
-        //     {abort: true});
-        // XXX viktor: fix code for test to pass
-        // rules = [{action: {retry: 2}, action_type: 'retry',
-        //     body: '^$', trigger_type: 'body'}];
-        // t('retry rule on timeout', Object.assign({}, config, {rules}),
-        //     'canceled', 1, {silent_timeout: true});
     });
+    // XXX krzysztof/vitkor: move to util.js
     describe('util', ()=>{
         describe('create_count_stream', ()=>{
             let t = (name, limit, chunks, expected)=>it(name, function(done){
