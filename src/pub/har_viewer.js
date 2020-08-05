@@ -225,11 +225,7 @@ class Toolbar extends Pure_component {
             return;
         }
         const _this = this;
-        this.etask(function*(){
-            const settings = Object.assign({}, setdb.get('head.settings'));
-            settings.logs = 0;
-            yield _this.save_settings(settings);
-        });
+        this.etask(function*(){ yield _this.save_settings({logs: 0}); });
     };
     render(){
         const {clear, search_val, on_change_search, type_filter,
@@ -762,7 +758,7 @@ class Header_container extends Pure_component {
         if (only_name)
             cols = [cols[1]];
         return <div className="header_container">
-              <table>
+              <table className="chrome_table">
                 <colgroup>
                   {cols.map((c, idx)=>
                     <col key={c.title}
@@ -824,7 +820,7 @@ class Data_container extends Pure_component {
             return {...c, width: 0};
         });
         return <div ref={this.dc} className="data_container">
-              <table>
+              <table className="chrome_table">
                 <colgroup>
                   {cols.map((c, idx)=>
                     <col key={c.title}

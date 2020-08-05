@@ -5,7 +5,7 @@
 @light_grey: #e2e2e2;
 @dark_grey: #d7d7d7;
 @light: #B4E6EE;
-@x_light: #E6F6F9;
+@x_light: #F2F6F8;
 @xx_light: #F3FBFC;
 @dark: #003d5b;
 @error_dark: #eb3a28;
@@ -17,6 +17,9 @@
 @link: #428bca;
 @tooltip: #154055;
 @chrome_border: #d0d0d0;
+@cp_border: rgba(0,77,116,0.1);
+@cp_dark: #E5EDF1;
+@cp_second: rgba(0,77,116,0.5);
 @font-face {
   font-family: 'Lato';
   font-style: normal;
@@ -174,6 +177,12 @@ h4 { margin: 0; }
     flex-direction: column !important;
     position: relative;
 }
+.main_panel {
+    height: 100%;
+}
+.flex {
+    flex: 1;
+}
 .flag-icon {
     border-radius: 2px;
     margin-right: 2px;
@@ -270,7 +279,6 @@ h4 { margin: 0; }
     .logo {
         height: 60px;
         width: 50px;
-        background-color: @x_light;
         display: inline-block;
         background-image: url('img/lum_logo_short.svg');
         background-position: center;
@@ -776,6 +784,61 @@ span.icon_link {
         position: absolute;
         right: 1px;
         top: 6px;
+    }
+}
+.cp_panel {
+    border: 1px solid @cp_border;
+    background: white;
+    border-radius: 3px;
+    padding: 20px;
+    .cp_panel_header {
+        display: flex;
+        margin-bottom: 10px;
+        h2 {
+            font-size: 20px;
+            flex: 1;
+        }
+    }
+    .cp_tr {
+        outline: none;
+        .cp_th {
+            outline: none;
+            font-size: 12px;
+            text-transform: none;
+            font-weight: normal;
+            color: @cp_second;
+            &.ReactVirtualized__Table__sortableHeaderColumn {
+                display: flex;
+                position: relative;
+            }
+        }
+        .cp_td {
+            input[type=checkbox] { top: 5px; }
+            font-size: 12px;
+        }
+    }
+    .ReactVirtualized__Grid.ReactVirtualized__Table__Grid {
+        outline: none;
+    }
+    .ReactVirtualized__Table__headerRow {
+        border-bottom: 1px solid @cp_border;
+    }
+    .ReactVirtualized__Table__row {
+        cursor: pointer;
+        &:hover {
+            background-color: @cp_dark;
+            .proxies_actions {
+                visibility: visible;
+            }
+            .proxies_actions_local {
+                visibility: visible;
+            }
+        }
+    }
+    svg.ReactVirtualized__Table__sortableHeaderIcon {
+        position: absolute;
+        right: 0;
+        top: 8px;
     }
 }
 .panel {

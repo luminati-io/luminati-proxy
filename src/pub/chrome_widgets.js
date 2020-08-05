@@ -263,7 +263,7 @@ export class Chrome_table extends Pure_component {
 
 const Data_container = ({cols=[], children, selectable})=>{
     return <div className="data_container">
-          <table>
+          <table className="chrome_table">
             <colgroup>
               {selectable &&
                 <col key="select_all" style={{width: 20}}/>
@@ -285,7 +285,7 @@ const Data_container = ({cols=[], children, selectable})=>{
 
 const Header_container = ({cols, selectable, selected_all, toggle_all})=>
     <div className="header_container">
-      <table>
+      <table className="chrome_table">
         <colgroup>
           {selectable && <col key="select_all" style={{width: 20}}/>}
           {(cols||[]).map((c, idx)=><col key={idx} style={{width: c.width}}/>)}

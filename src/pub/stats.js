@@ -45,9 +45,7 @@ class Stats extends Pure_component {
         this.setState({toggling: true});
         this.etask(function*(){
             this.on('finally', ()=>_this.setState({toggling: false}));
-            const settings = Object.assign({}, setdb.get('head.settings'));
-            settings.request_stats = val;
-            yield _this.save_settings(settings);
+            yield _this.save_settings({request_stats: val});
         });
     };
     render(){
@@ -175,7 +173,7 @@ class Stat_table extends Pure_component {
 
 const Header_container = ({title, cols, sorting, sort, tooltip})=>
     <div className="header_container">
-      <table>
+      <table className="chrome_table">
         <colgroup>
           {(cols||[]).map((c, idx)=><col key={idx} style={{width: c.width}}/>)}
         </colgroup>
@@ -219,7 +217,7 @@ const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
         return sorting.dir==-1 ? res : -res;
     });
     return <div className="data_container">
-          <table>
+          <table className="chrome_table">
             <colgroup>
               {(cols||[]).map((c, idx)=>
                 <col key={idx} style={{width: c.width}}/>

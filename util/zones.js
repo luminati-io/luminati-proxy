@@ -38,6 +38,11 @@ E.get_password = (proxy, zone_name, zones)=>{
         return proxy.password;
 };
 
+E.get_gb_cost = (zone_name, zones)=>{
+    const zone = zones.find(z=>z.zone==zone_name);
+    return zone && zone.cost && zone.cost.gb || 0;
+};
+
 const get_plan = (zone_name, zones, type)=>{
     const zone = zones.find(z=>z.zone==zone_name);
     return zone && zone.plan || {};

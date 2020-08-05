@@ -2,18 +2,15 @@
 .nav_left {
     .menu {
         z-index: 10;
-        background-color: @x_light;
         top: 60px;
         position: fixed;
         width: 50px;
         .menu_item {
-            opacity: 0.65;
-            background-color: @x_light;
             height: 40px;
             position: relative;
             cursor: pointer;
             &.active {
-                background-color: @light;
+                background-color: @cp_dark;
                 cursor: default;
                 .text { color: @first_color; }
             }
@@ -46,12 +43,12 @@
         }
     }
     .menu_filler {
-        background-color: @x_light;
+        border-right: 1px solid rgba(0,77,116,0.1);
+        background-color: white;
         height: 100%;
         position: fixed;
         width: 50px;
         z-index: 1;
-        top: 10px;
     }
     .footer {
         z-index: 5;

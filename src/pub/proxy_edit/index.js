@@ -116,7 +116,9 @@ const Index = withRouter(class Index extends Pure_component {
     set_field = (field_name, value, opt={})=>{
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
-            return {form: new_form};
+            const pending_form = {...prev_state.pending_form,
+                [field_name]: value};
+            return {form: new_form, pending_form};
         }, this.start_saving.bind(null, opt));
         setdb.set('head.proxy_edit.form.'+field_name, value);
     };
@@ -172,29 +174,30 @@ const Index = withRouter(class Index extends Pure_component {
         return false;
     };
     apply_preset = (_form, preset)=>{
+        const form_upd = {};
+        const form = Object.assign({}, _form);
         if (!preset)
-            preset = _form.preset;
+            preset = form.preset;
         if (!presets.get(preset))
             preset = presets.get_default().key;
-        const form = Object.assign({}, _form);
         const last_preset = form.preset ? presets.get(form.preset) : null;
         if (last_preset && last_preset.key!=preset && last_preset.clean)
-            last_preset.clean(form);
-        form.preset = preset;
-        presets.get(preset).set(form);
+            last_preset.clean(form_upd);
+        form_upd.preset = preset;
+        presets.get(preset).set(form_upd, form);
         const disabled_fields = presets.get(preset).disabled||{};
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this.apply_rules(form);
         if (form.reverse_lookup===undefined)
         {
             if (form.reverse_lookup_dns)
-                form.reverse_lookup = 'dns';
+                form_upd.reverse_lookup = 'dns';
             else if (form.reverse_lookup_file)
-                form.reverse_lookup = 'file';
+                form_upd.reverse_lookup = 'file';
             else if (form.reverse_lookup_values)
             {
-                form.reverse_lookup = 'values';
-                form.reverse_lookup_values = form.reverse_lookup_values
+                form_upd.reverse_lookup = 'values';
+                form_upd.reverse_lookup_values = form.reverse_lookup_values
                 .join('\n');
             }
         }
@@ -209,11 +212,15 @@ const Index = withRouter(class Index extends Pure_component {
         });
         if (form.city && !form.city.includes('|') && form.state)
             form.city = form.city+'|'+form.state;
+        Object.assign(form, form_upd);
         if (!this.original_form)
             this.original_form = form;
         if (form.session==='true'||form.session===true)
+        {
             delete form.session;
-        this.setState({form});
+            delete form_upd.session;
+        }
+        this.setState({form, pending_form: form_upd});
         setdb.set('head.proxy_edit.form', form);
         for (let i in form)
             setdb.emit('head.proxy_edit.form.'+i, form[i]);
@@ -244,6 +251,7 @@ const Index = withRouter(class Index extends Pure_component {
             return;
         }
         const data = this.prepare_to_save();
+        this.setState({pending_form: {}});
         this.saving = true;
         const _this = this;
         this.etask(function*(){
@@ -282,49 +290,45 @@ const Index = withRouter(class Index extends Pure_component {
         });
     };
     prepare_to_save = ()=>{
-        const save_form = Object.assign({}, this.state.form);
+        const save_form = Object.assign({}, this.state.pending_form);
         for (let field in save_form)
         {
-            let before_save;
-            if (before_save = all_fields[field] &&
-                all_fields[field].before_save)
-            {
-                save_form[field] = before_save(save_form[field]);
-            }
             if (!this.is_valid_field(field)||save_form[field]===null)
                 save_form[field] = '';
-        }
-        save_form.zone = save_form.zone || this.state.zones.def;
-        save_form.proxy_type = 'persist';
-        if (save_form.reverse_lookup=='dns')
-            save_form.reverse_lookup_dns = true;
-        else
-            save_form.reverse_lookup_dns = '';
-        if (save_form.reverse_lookup!='file')
-            save_form.reverse_lookup_file = '';
-        if (save_form.reverse_lookup=='values')
-        {
-            save_form.reverse_lookup_values =
-                save_form.reverse_lookup_values.split('\n');
-        }
-        else
-            save_form.reverse_lookup_values = '';
-        delete save_form.reverse_lookup;
-        // XXX krzysztof: extract the logic of mapping specific fields
-        if (save_form.smtp)
-            save_form.smtp = save_form.smtp.filter(Boolean);
-        else
-            save_form.smtp = [];
-        if (save_form.city)
-            save_form.city = save_form.city.split('|')[0];
-        if (save_form.asn)
-            save_form.asn = Number(save_form.asn);
-        if (save_form.headers)
-            save_form.headers = save_form.headers.filter(h=>h.name&&h.value);
-        if (save_form.session && save_form.session.replace)
-        {
-            save_form.session = save_form.session.replace(/-/g, '')
-                .replace(/ /g, '');
+            if (field=='reverse_lookup')
+            {
+                qw`dns file values`.forEach(f=>{
+                    if (save_form[field]!=f)
+                        save_form[field+'_'+f] = '';
+                });
+                if (save_form[field]=='dns')
+                    save_form.reverse_lookup_dns = true;
+                if (save_form[field]=='values')
+                {
+                    save_form.reverse_lookup_values =
+                        save_form.reverse_lookup_values.split('\n');
+                }
+                delete save_form.reverse_lookup;
+            }
+            if (field=='smtp' && save_form[field])
+            {
+                save_form.smtp = save_form.smtp ?
+                    save_form.smtp.filter(Boolean) : [];
+            }
+            if (field=='city' && save_form[field])
+                save_form.city = save_form.city.split('|')[0];
+            if (field=='asn' && save_form[field])
+                save_form.asn = Number(save_form.asn);
+            if (field=='headers' && save_form[field])
+            {
+                save_form.headers = save_form.headers.filter(h=>
+                    h.name&&h.value);
+            }
+            if (field=='session'&&save_form[field]&&save_form[field].replace)
+            {
+                save_form.session = save_form.session.replace(/-/g, '')
+                    .replace(/ /g, '');
+            }
         }
         return save_form;
     };
@@ -345,17 +349,17 @@ const Index = withRouter(class Index extends Pure_component {
             type = 'vips';
         const zone = this.state.form.zone ||
             this.state.zones && this.state.zones.def;
-        return <T>{t=><div className="proxy_edit">
+        return <div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
-                <div className="nav_header">
+                <T>{t=><div className="nav_header">
                   <Port_title port={this.props.match.params.port}
                     name={this.state.form.internal_name} t={t}/>
                   <Loader_small saving={this.state.saving}
                     std_msg={t('All changes saved in LPM')}
                     std_tooltip=
                     {t('All changes are automatically saved to LPM')}/>
-                </div>
+                </div>}</T>
                 <Nav disabled={!!this.state.form.ext_proxies}
                   form={this.state.form} plan={curr_plan}
                   on_change_preset={this.apply_preset}/>
@@ -366,7 +370,7 @@ const Index = withRouter(class Index extends Pure_component {
                 warnings={this.state.error_list}/>
               <Alloc_modal type={type} form={this.state.form} zone={zone}
                 plan={curr_plan}/>
-            </div>}</T>;
+            </div>;
     }
 });
 

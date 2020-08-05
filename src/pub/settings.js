@@ -88,40 +88,18 @@ class Form extends Pure_component {
         this.setState(prev=>({settings: {...prev.settings, zone: val}}),
             this.debounced_save);
     };
-    whitelist_ips_change = val=>{
-        this.setState(
-            ({settings})=>{
-                const whitelist_ips = val.filter(
-                    ip=>!settings.fixed_whitelist_ips.includes(ip));
-                return {settings: {...settings, whitelist_ips}};
-            },
-            this.debounced_save);
-    };
-    www_whitelist_ips_change = val=>{
-        this.setState(
-            prev=>({settings: {...prev.settings, www_whitelist_ips: val}}),
-            this.debounced_save);
-    };
-    logs_changed = val=>{
-        this.setState(prev=>({settings: {...prev.settings, logs: +val}}),
-            this.debounced_save);
-    };
-    har_limit_changed = val=>{
-        this.setState(prev=>({settings: {...prev.settings, har_limit: +val}}),
-            this.debounced_save);
-    };
-    log_level_changed = val=>{
-        this.setState(prev=>({settings: {...prev.settings, log: val}}),
-            this.debounced_save);
-    };
-    request_stats_changed = val=>{
-        this.setState(
-            prev=>({settings: {...prev.settings, request_stats: val}}),
-            this.debounced_save);
-    };
-    sync_config_changed = val=>{
-        this.setState(prev=>({settings: {...prev.settings, sync_config: val}}),
-            this.debounced_save);
+    on_change_handler = (field, opt)=>val=>{
+        opt = opt||{};
+        const {settings, pending_settings} = this.state;
+        let value = val;
+        if (field=='whitelist_ips')
+            value = val.filter(ip=>!settings.fixed_whitelist_ips.includes(ip));
+        if (opt.number)
+            value = +value;
+        this.setState({
+            settings: {...settings, [field]: value},
+            pending_settings: {...pending_settings, [field]: value},
+        }, this.debounced_save);
     };
     lock_nav = lock=>setdb.set('head.lock_navigation', lock);
     save = ()=>{
@@ -148,7 +126,8 @@ class Form extends Pure_component {
                     _this.save();
                 }
             });
-            const body = {..._this.state.settings};
+            const body = {..._this.state.pending_settings};
+            _this.setState({pending_settings: {}});
             const save_res = yield _this.save_settings(body);
             if (save_res.err)
             {
@@ -175,48 +154,39 @@ class Form extends Pure_component {
                 warnings={this.state.api_error}/>
               <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
                 <Select_zone val={s.zone} preview
-                  on_change_wrapper={this.zone_change}/>
+                  on_change_wrapper={this.on_change_handler('zone')}/>
               </Labeled_controller>
               <Labeled_controller label="Admin whitelisted IPs"
                 tooltip={tooltips.www_whitelist_ips}>
                 <Pins val={s.www_whitelist_ips} pending={s.pending_www_ips}
-                  on_change_wrapper={this.www_whitelist_ips_change}
-                  no_any={s.zagent}/>
+                  no_any={s.zagent} on_change_wrapper={
+                      this.on_change_handler('www_whitelist_ips')}/>
               </Labeled_controller>
               <Labeled_controller type="pins" label="Proxy whitelisted IPs"
                 tooltip={tooltips.whitelist_ips}>
                 <Pins val={wl} pending={s.pending_ips} no_any={s.zagent}
                   disabled_ips={s.fixed_whitelist_ips}
-                  on_change_wrapper={this.whitelist_ips_change}/>
+                  on_change_wrapper={this.on_change_handler('whitelist_ips')}/>
               </Labeled_controller>
-              <Labeled_controller val={s.request_stats}
-                type="yes_no" on_change_wrapper={this.request_stats_changed}
+              <Labeled_controller val={s.request_stats} type="yes_no"
+                on_change_wrapper={this.on_change_handler('request_stats')}
                 label="Enable recent stats" default={true}
                 tooltip={tooltips.request_stats}/>
-              <Labeled_controller val={s.logs}
-                type="select_number" on_change_wrapper={this.logs_changed}
-                data={[0, 100, 1000, 10000]}
-                label="Limit for request logs" default
-                tooltip={tooltips.logs}/>
-              <Labeled_controller
-                val={s.har_limit}
-                type="select_number"
-                on_change_wrapper={this.har_limit_changed}
-                data={har_limit_options}
-                disabled={s.zagent}
-                label="Response limit to save"
-                default={1024}
+              <Labeled_controller val={s.logs} type="select_number"
+                on_change_wrapper={this.on_change_handler('logs', {number: 1})}
+                data={[0, 100, 1000, 10000]} label="Limit for request logs"
+                default tooltip={tooltips.logs}/>
+              <Labeled_controller val={s.har_limit} type="select_number"
+                on_change_wrapper={this.on_change_handler('har_limit',
+                    {number: 1})} data={har_limit_options} disabled={s.zagent}
+                label="Response limit to save" default={1024}
                 tooltip={tooltips.har_limit}/>
-              <Labeled_controller
-                val={s.log}
-                type="select"
-                on_change_wrapper={this.log_level_changed}
-                data={this.log_level_opts}
-                disabled={s.zagent}
-                label="Log level / API logs"
-                tooltip={tooltips.log_level}/>
-              <Labeled_controller val={s.sync_config}
-                type="yes_no" on_change_wrapper={this.sync_config_changed}
+              <Labeled_controller val={s.log} type="select"
+                on_change_wrapper={this.on_change_handler('log')}
+                data={this.log_level_opts} disabled={s.zagent}
+                label="Log level / API logs" tooltip={tooltips.log_level}/>
+              <Labeled_controller val={s.sync_config} type="yes_no"
+                on_change_wrapper={this.on_change_handler('sync_config')}
                 label="Sync configuration" default={false}
                 tooltip={tooltips.sync_config} disabled={s.zagent}/>
               <Loader_small show={this.state.saving}/>

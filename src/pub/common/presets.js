@@ -25,12 +25,12 @@ const presets = {
             single request. This preset also rotates the User-Agent header
             automatically. It's the best for scraping API when you don't load
             the full pages.`,
-        set: opt=>{
+        set: (opt, old_opt)=>{
             opt.session = '';
             opt.rotate_session = true;
             opt.sticky_ip = false;
-            opt.headers = opt.headers||[];
-            opt.headers['user-agent'] = 'random_desktop';
+            opt.headers = (old_opt||opt).headers||[];
+            opt.headers.push({name: 'user-agent', value: 'random_desktop'});
         },
         clean: opt=>{
             opt.rotate_session = false;

@@ -4,7 +4,7 @@ import React from 'react';
 import {withRouter} from 'react-router-dom';
 import Proxies from './proxies.js';
 import Stats from './stats.js';
-import Har_viewer from './har_viewer';
+import Har_viewer from './har_viewer.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {T} from './common/i18n.js';
@@ -44,21 +44,15 @@ class Overview extends Pure_component {
     toggle_logs = val=>{
         const _this = this;
         this.setState({show_logs: null});
-        this.etask(function*(){
-            const settings = Object.assign({}, setdb.get('head.settings'));
-            settings.logs = val;
-            yield _this.save_settings(settings);
-        });
+        this.etask(function*(){ yield _this.save_settings({logs: val}); });
     };
     set_sync_config = val=>{
         const _this = this;
         this.etask(function*(){
             this.finally(()=>$('#applying_config').modal('hide'));
-            const settings = Object.assign({}, setdb.get('head.settings'));
-            settings.sync_config = val;
             if (val)
                 $('#applying_config').modal();
-            yield _this.save_settings(settings);
+            yield _this.save_settings({sync_config: val});
             if (!val)
                 return;
             const proxies = yield ajax.json({url: '/api/proxies_running'});

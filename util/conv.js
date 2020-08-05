@@ -293,7 +293,7 @@ E.JSON_stringify = function(obj, opt){
     opt = opt||{};
     if (opt.date)
         _date = typeof opt.date=='function' ? opt.date : date_stringify;
-    if (opt.mongo)
+    if (opt.mongo||opt.mongoku)
         _date = date_stringify;
     if (_date)
     {
@@ -393,8 +393,11 @@ E.JSON_stringify = function(obj, opt){
         if (opt.re)
             re_class.prototype.toJSON = prev_re;
     }
-    if (opt.mongo)
-        s = s.replace(/\{"__ISODate__":("[0-9TZ:.-]+")\}/g, 'ISODate($1)');
+    if (opt.mongo||opt.mongoku)
+    {
+        s = s.replace(/\{"__ISODate__":("[0-9TZ:.-]+")\}/g,
+            opt.mongoku ? 'Date($1)' : 'ISODate($1)');
+    }
     return s;
 };
 

@@ -458,25 +458,6 @@ class Columns_modal extends Pure_component {
     }
 }
 
-function header_renderer({dataKey, label, sortBy, sortDirection}){
-    let show_sort_indicator = sortBy===dataKey;
-    let title = 'string'==typeof label ? label : null;
-    let children = [
-        <span className="ReactVirtualized__Table__headerTruncatedText"
-          key="label" title={title}>{label}</span>
-    ];
-    if (show_sort_indicator)
-    {
-        let sort = sortDirection=='ASC' ? 'sort_asc' : 'sort_desc';
-        children.push(
-            <div key="sort_indicator" className="sort_icon">
-              <span className={classnames(['small_icon_mask', sort])}/>
-            </div>
-        );
-    }
-    return children;
-}
-
 const Proxies = withRouter(class Proxies extends Pure_component {
     update_window_dimensions = ()=>
         this.setState({height: window.innerHeight});
@@ -670,7 +651,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     proxy_add = ()=>$('#add_new_proxy_modal').modal('show');
     select_renderer = function Select_renderer(props){
         if (props.rowData=='filler')
-            return <div className="chrome_td"></div>;
+            return <div className="cp_td"></div>;
         const {selected_proxies} = this.state;
         const checked = !!selected_proxies[props.rowData.port];
         return <Checkbox checked={checked}
@@ -733,6 +714,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.setState({proxy_filter, visible_proxies, selected_proxies: {}});
     }
     set_sort({sortBy: sort_by, sortDirection: sort_direction}){
+        if (sort_by=='select')
+            return;
         sort_direction = sort_direction.toLowerCase();
         let sort = {sort_by, sort_direction};
         const visible_proxies = this.get_visible_proxies(this.state.proxies,
@@ -744,7 +727,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         const cols = this.get_cols();
         if (!this.state.zones || !this.state.countries || !visible_proxies)
         {
-            return <div className="proxies_panel chrome">
+            return <div className="proxies_panel">
               <div className="main_panel vbox">
                 <Loader_small show loading_msg="Loading..."/>
               </div>
@@ -758,65 +741,58 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return <Proxy_blank/>;
         return <React.Fragment>
             <Add_proxy_btn on_click={this.proxy_add}/>
-            <div className="proxies_panel chrome">
-              <div className="main_panel vbox">
-                <Toolbar edit_columns={this.edit_columns}
+              <div className="main_panel vbox cp_panel proxies_panel">
+                <Header_panel edit_columns={this.edit_columns}
                   download_csv={this.download_csv}
                   selected={this.state.selected_proxies}
                   open_delete_dialog={this.open_delete_dialog}
                   proxy_filter={proxy_filter}
                   on_proxy_filter_change={e=>this.set_proxy_filter(e)}/>
                 {this.state.loaded && show_table &&
-                  <React.Fragment>
-                    <div className="chrome chrome_table vbox">
-                      <div className="tables_container header_container hack">
-                      <div className="chrome_table">
-                      <AutoSizer>
-                        {({height, width})=>
-                          <T>{t=><Table width={width}
-                            height={height}
-                            onRowClick={this.on_row_click}
-                            onHeaderClick={({dataKey})=>dataKey=='select' &&
-                              this.all_rows_select()}
-                            gridClassName="chrome_grid"
-                            headerHeight={27}
-                            headerClassName="chrome_th"
-                            rowClassName="chrome_tr"
-                            rowHeight={22}
-                            sort={sort=>this.set_sort(sort)}
-                            sortBy={sort_by}
-                            sortDirection={sort_direction.toUpperCase()}
-                            rowCount={visible_proxies.length+1}
-                            rowGetter={({index})=>
-                              visible_proxies[index]||'filler'}>
-                            <Column key="select"
-                              cellRenderer={this.select_renderer.bind(this)}
-                              label={<Checkbox checked={this.state.checked_all}
-                                on_change={()=>null}/>}
-                              dataKey="select"
-                              className="chrome_td"
-                              flexGrow={0}
-                              flexShrink={1}
-                              width={27}/>
-                            {cols.map(col=>
-                              <Column key={col.key}
-                                headerRenderer={header_renderer}
-                                cellRenderer={this.cell_renderer.bind(this)}
-                                label={t(col.title)}
-                                className="chrome_td"
-                                dataKey={col.key}
-                                flexGrow={col.grow!==undefined ? col.grow : 1}
-                                flexShrink={col.shrink!==undefined ?
-                                  col.shrink : 1}
-                                width={col.width||100}/>
-                            )}
-                          </Table>}</T>
-                        }
-                      </AutoSizer>
-                      </div>
-                      </div>
+                  <div className="main_panel vbox">
+                    <div className="main_panel flex">
+                    <AutoSizer>
+                      {({height, width})=>
+                        <T>{t=><Table width={width}
+                          height={height}
+                          onRowClick={this.on_row_click}
+                          onHeaderClick={({dataKey})=>dataKey=='select' &&
+                            this.all_rows_select()}
+                          headerHeight={30}
+                          headerClassName="cp_th"
+                          rowClassName="cp_tr"
+                          rowHeight={40}
+                          sort={sort=>this.set_sort(sort)}
+                          sortBy={sort_by}
+                          sortDirection={sort_direction.toUpperCase()}
+                          rowCount={visible_proxies.length}
+                          rowGetter={({index})=>
+                            visible_proxies[index]||'filler'}>
+                          <Column key="select"
+                            cellRenderer={this.select_renderer.bind(this)}
+                            label={<Checkbox checked={this.state.checked_all}
+                              on_change={()=>null}/>}
+                            dataKey="select"
+                            className="cp_td"
+                            flexGrow={0}
+                            flexShrink={0}
+                            width={14}/>
+                          {cols.map(col=>
+                            <Column key={col.key}
+                              cellRenderer={this.cell_renderer.bind(this)}
+                              label={t(col.title)}
+                              className="cp_td"
+                              dataKey={col.key}
+                              flexGrow={col.grow!==undefined ? col.grow : 1}
+                              flexShrink={col.shrink!==undefined ?
+                                col.shrink : 1}
+                              width={col.width||100}/>
+                          )}
+                        </Table>}</T>
+                      }
+                    </AutoSizer>
                     </div>
-                  </React.Fragment>
+                  </div>
                 }
               </div>
               <Columns_modal selected_cols={this.state.selected_cols}
@@ -825,10 +801,15 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 close_dialog={this.close_delete_dialog}
                 proxies={this.state.delete_proxies}
                 update_proxies={this.update}/>
-            </div>
           </React.Fragment>;
     }
 });
+
+const Header_panel = props=>
+    <div className="cp_panel_header">
+      <h2>Proxy ports</h2>
+      <Toolbar {...props}/>
+    </div>;
 
 const Add_proxy_btn = props=>{
     const style = {position: 'absolute', top: -33, right: 333, minWidth: 42};
@@ -933,7 +914,7 @@ class Cell extends React.Component {
         const col = columns_obj[props.dataKey];
         const proxy = props.rowData;
         if (props.rowData=='filler')
-            return <div className="chrome_td"></div>;
+            return <div className="cp_td"></div>;
         else if (!col.ext && proxy.ext_proxies)
             return '—';
         else if (col.render)
@@ -1032,7 +1013,7 @@ class Actions extends Pure_component {
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
         return <div className={is_local() ? 'proxies_actions' :
-          'proxies_actions_3'}>
+          'proxies_actions_local'}>
             {!!persist &&
               <React.Fragment>
                 <Action_icon id="trash" scrolling={this.props.scrolling}

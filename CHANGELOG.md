@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.193.343 Stable
+- :sparkles: Refactored update general settings and update proxy port API to update only provided fields
+
 ## 1.192.600 Stable
 - :sparkles: Fixed balancing super proxies when passing explicit usernames
 

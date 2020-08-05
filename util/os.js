@@ -631,6 +631,9 @@ E.fd_use = opt=>etask(function*(){
         {
             res.use = use;
             res.pid = +pid;
+            let status = cyg_read(`/proc/${pid}/status`);
+            if (m = /^Name:\t(.*)/.exec(status))
+                res.name = m[1];
         }
         if (nopen>0 && opt.match)
         {

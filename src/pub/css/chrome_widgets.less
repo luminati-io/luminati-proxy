@@ -1,10 +1,5 @@
 @import (reference) 'common.less';
 .chrome {
-    // remove this class, set 100% inline
-    .chrome_table, &.chrome_table {
-        height: 100%;
-        &.in_modal_table { height: 300px; }
-    }
     font-size: 12px;
     font-family: Roboto, Ubuntu, Arial, sans-serif !important;
     color: rgb(48, 57, 66);
@@ -65,7 +60,6 @@
     }
     .main_panel {
         border: 1px solid @chrome_border;
-        height: 100%;
         z-index: 0;
     }
     .toolbar_container {
@@ -203,153 +197,6 @@
         background-color: #eee;
         * { flex: none; }
     }
-    .tables_container {
-        width: 100%;
-        outline: none;
-        position: relative;
-        flex: 1;
-        .reqs_container {
-            flex: auto;
-            position: relative;
-        }
-        table, div.chrome_table {
-            height: 100%;
-            width: 100%;
-            border-spacing: 0;
-            border-collapse: separate;
-            table-layout: fixed;
-            th, div.chrome_th {
-                font-weight: normal;
-            }
-            td, div.chrome_td, th, div.chrome_th {
-                text-transform: none;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                line-height: 18px;
-                padding: 1px 4px;
-                -webkit-user-select: none;
-                user-select: none;
-            }
-            td, div.chrome_td {
-                height: 18px;
-            }
-        }
-        &.header_container, .header_container {
-            height: 27px;
-            overflow: hidden;
-            table, .chrome_table {
-                .chrome_tr {
-                    background-color: #f3f3f3;
-                }
-                th, div.chrome_th {
-                    height: 100%;
-                    margin: 0;
-                    position: relative;
-                    background-color: #f3f3f3;
-                    border-top: 1px solid @chrome_border;
-                    border-bottom: 1px solid rgb(205, 205, 205);
-                    border-left: 1px solid rgb(205, 205, 205);
-                    cursor: default;
-                    &:first-child { border-left: none; }
-                    &:hover { background-color: hsla(0, 0%, 90%, 1); }
-                    &:after {
-                        content: "";
-                        position: absolute;
-                        left: 0;
-                        right: 0;
-                        top: 0;
-                        bottom: 0;
-                    }
-                    &:active {
-                        &:after { background-color: rgba(0, 0, 0, 0.15); }
-                    }
-                    .sort_icon {
-                        position: absolute;
-                        right: 0;
-                        top: 0;
-                        bottom: 0;
-                        display: flex;
-                        align-items: center;
-                        span {
-                            margin-right: 4px;
-                            margin-bottom: -2px;
-                        }
-                    }
-                }
-            }
-        }
-        .data_container {
-            position: absolute;
-            top: 27px;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            overflow-x: hidden;
-            overflow-y: overlay;
-        }
-        .data_container, &.hack {
-            table, div.chrome_grid {
-                outline: none;
-                tr, div.chrome_tr {
-                    outline: none;
-                    height: 20px;
-                    &:nth-child(even) { background-color: rgb(245, 245, 245); }
-                    &:nth-child(odd) { background-color: white; }
-                    &:hover { background-color: rgb(241, 246, 253); }
-                    &.selected {
-                        background-color: rgb(212, 212, 212);
-                        color: inherit;
-                        &.focused {
-                            background-color: #2196f3;
-                            color: white;
-                        }
-                    }
-                    &:last-child, &.filler {
-                        bottom: 0;
-                        height: auto !important;
-                        background-color: white;
-                        td {
-                            height: auto;
-                        }
-                        div.chrome_td {
-                            height: 100%;
-                        }
-                        td, div.chrome_td { cursor: default; }
-                    }
-                    &.error:not(.selected) { color: rgb(230, 0, 0); }
-                    &.pending { color: #7a8c9f; }
-                }
-                td, div.chrome_td {
-                    margin: 0;
-                    border-left: 1px solid #e1e1e1;
-                    height: 22px;
-                    cursor: pointer;
-                    &:first-child { border-left: none; }
-                    .disp_value {
-                        display: inline;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        .small_icon.info {
-                            display: inline-block;
-                            margin-left: 4px;
-                            margin-bottom: 0;
-                        }
-                    }
-                    .icon {
-                        width: 16px;
-                        height: 16px;
-                        float: left;
-                        margin-top: 1px;
-                        margin-right: 3px;
-                        &.script {
-                            background-image: url(/img/ic_resource_document.png)
-                        }
-                    }
-                }
-            }
-        }
-    }
     .data_grid_resizer {
         cursor: col-resize;
         position: absolute;
@@ -385,6 +232,158 @@
     &:hover { background-color: #333; }
     &.active { background-color: #2196f3; }
 }
+// remove this class, set 100% inline
+.chrome_table {
+    height: 100%;
+    &.in_modal_table { height: 300px; }
+}
+.chrome {
+.tables_container {
+    width: 100%;
+    outline: none;
+    position: relative;
+    flex: 1;
+    .reqs_container {
+        flex: auto;
+        position: relative;
+    }
+    .chrome_table, table.chrome_table {
+        height: 100%;
+        width: 100%;
+        border-spacing: 0;
+        border-collapse: separate;
+        table-layout: fixed;
+        .chrome_th, th {
+            font-weight: normal;
+        }
+        .chrome_td, td, .chrome_th, th {
+            text-transform: none;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 18px;
+            padding: 1px 4px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .chrome_td, td {
+            height: 18px;
+        }
+    }
+    &.header_container, .header_container {
+        height: 27px;
+        overflow: hidden;
+        .chrome_table, table.chrome_table {
+            .chrome_th, th {
+                height: 100%;
+                margin: 0;
+                position: relative;
+                background-color: #f3f3f3;
+                border-top: 1px solid @chrome_border;
+                border-bottom: 1px solid rgb(205, 205, 205);
+                border-left: 1px solid rgb(205, 205, 205);
+                cursor: default;
+                &:first-child { border-left: none; }
+                &:hover { background-color: hsla(0, 0%, 90%, 1); }
+                &:after {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                }
+                &:active {
+                    &:after { background-color: rgba(0, 0, 0, 0.15); }
+                }
+                .sort_icon {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    display: flex;
+                    align-items: center;
+                    span {
+                        margin-right: 4px;
+                        margin-bottom: -2px;
+                    }
+                }
+            }
+        }
+    }
+    .data_container {
+        position: absolute;
+        top: 27px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        overflow-x: hidden;
+        overflow-y: overlay;
+    }
+    .data_container, &.hack {
+        table {
+            outline: none;
+            .chrome_tr, tr {
+                outline: none;
+                height: 20px;
+                &:nth-child(even) { background-color: rgb(245, 245, 245); }
+                &:nth-child(odd) { background-color: white; }
+                &:hover { background-color: rgb(241, 246, 253); }
+                &.selected {
+                    background-color: rgb(212, 212, 212);
+                    color: inherit;
+                    &.focused {
+                        background-color: #2196f3;
+                        color: white;
+                    }
+                }
+                &:last-child, &.filler {
+                    bottom: 0;
+                    height: auto !important;
+                    background-color: white;
+                    .chrome_td, td {
+                        height: auto;
+                    }
+                    div {
+                        height: 100%;
+                    }
+                    .chrome_td, td { cursor: default; }
+                }
+                &.error:not(.selected) { color: rgb(230, 0, 0); }
+                &.pending { color: #7a8c9f; }
+            }
+            .chrome_td, td {
+                margin: 0;
+                border-left: 1px solid #e1e1e1;
+                height: 22px;
+                cursor: pointer;
+                &:first-child { border-left: none; }
+                .disp_value {
+                    display: inline;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    .small_icon.info {
+                        display: inline-block;
+                        margin-left: 4px;
+                        margin-bottom: 0;
+                    }
+                }
+                .icon {
+                    width: 16px;
+                    height: 16px;
+                    float: left;
+                    margin-top: 1px;
+                    margin-right: 3px;
+                    &.script {
+                        background-image: url(/img/ic_resource_document.png)
+                    }
+                }
+            }
+        }
+    }
+}
+}
+
 @-moz-document url-prefix() {
 .chrome_icon {
     background-color: rgba(0, 0, 0, 0);

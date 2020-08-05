@@ -2,7 +2,7 @@
 .proxies {
     &.nav_header { padding: 0 15px 10px; }
     .proxies_panel {
-        height: 100%;
+        padding-bottom: 0;
     }
     .proxies_actions {
         visibility: hidden;
@@ -14,7 +14,7 @@
         .refresh { grid-column: 3; }
         .browser { grid-column: 4; }
     }
-    .proxies_actions_3 {
+    .proxies_actions_local {
         visibility: hidden;
         display: grid;
         grid-template-columns: 33% 33% 33%;
@@ -23,15 +23,4 @@
         .duplicate { grid-column: 2; }
         .refresh { grid-column: 3; }
     }
-    .chrome_tr:hover {
-        .proxies_actions {
-            visibility: visible;
-        }
-        .proxies_actions_3 {
-            visibility: visible;
-        }
-    }
-}
-.proxies_panel {
-    .panel_container();
 }

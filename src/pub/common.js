@@ -32,13 +32,13 @@ export const Tooltip_bytes = props=>{
     const bw = bytes_format(bytes, n);
     const bw_out = bytes_format(bytes_out, n);
     const bw_in = bytes_format(bytes_in, n);
-    const display_cost = conv.fmt_currency(cost||0);
+    const display_cost = cost&&conv.fmt_currency(cost||0);
     const details = bytes_out&&bytes_in&&`(${bw_out} up | ${bw_in} down)` ||
         cost&&`(Estimated savings ${display_cost})` || '';
     const tooltip = `<div><strong>${bw}</strong> ${details}</div>`;
     return <Tooltip title={bytes ? tooltip : ''}>
           <div className="disp_value">
-            {bytes_format(bytes)||'—'}
+            {display_cost||bytes_format(bytes)||'—'}
           </div>
         </Tooltip>;
 };
@@ -467,11 +467,26 @@ export const debug = str=>{
         d.getSeconds(), d.getMilliseconds(), str);
 };
 
-export const No_zones = with_www_api(props=>
-    <div>
-      <div className="no_zones">
-        <T>No active zones found. You can activate them</T>{' '}
-        <a className="link" target="_blank" rel="noopener noreferrer"
-          href={`${props.www_api}/cp/zones`}><T>here</T></a>.
-      </div>
-    </div>);
+export const No_zones = with_www_api(class No_zones extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.settings', settings=>{
+            settings && this.setState({settings});
+        });
+    }
+    render(){
+        if (!this.state.settings)
+            return null;
+        const link_props = this.state.settings.zagent && window.parent ?
+            {onClick: ()=>window.parent.postMessage('no_zones',
+                this.props.www_api)} :
+            {target: '_blank', rel: 'noopener noreferrer',
+                href: `${this.props.www_api}/cp/zones`};
+        return <div>
+              <div className="no_zones">
+                <T>No active zones found. You can activate them</T>{' '}
+                <a className="link" {...link_props}><T>here</T></a>.
+              </div>
+            </div>;
+    }
+});
