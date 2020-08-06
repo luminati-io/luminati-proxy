@@ -1,10 +1,12 @@
 @import (reference) 'common.less';
 .proxy_edit {
     height: 100%;
-    display: flex;
-    flex-direction: column;
     font-size: 14px;
-    margin: 0 15px;
+    margin: 0 15px 15px;
+    .cp_panel {
+        height: 100%;
+        overflow: auto;
+    }
     .info_icon {
         background: url(/img/info.svg);
         width: 11px;
@@ -58,10 +60,7 @@
         flex: 1;
         margin-top: 10px;
         .in_logs {
-            .window_wrapper {
-                flex: 1;
-                padding: 15px 0;
-            }
+            .nav_tabs { margin-bottom: 15px; }
             .logs {
                 width: 100%;
                 .logs_panel { margin: 0; }
@@ -155,10 +154,12 @@
                 right: 55px;
                 top: 8px;
             }
+            .proxy_tester {
+                .panel { padding: 0; }
+            }
         }
         .headers {
             .field_row_inner.headers {
-                position: absolute;
                 align-items: baseline;
                 input[type=text] {
                     margin-right: 9px;

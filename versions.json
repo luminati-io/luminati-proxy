@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.193.514",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "New design of the UI"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added x-lpm-port header witht the final port number"
+            }
+        ]
+    },
+    {
         "ver": "1.193.343",
         "type": "stable",
         "changes": [

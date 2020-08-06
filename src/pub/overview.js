@@ -81,6 +81,7 @@ class Overview extends Pure_component {
               </div>
               <div className="proxies nav_header">
                 <h3>{title}</h3>
+                <Toolbar/>
               </div>
               <div className="panels" style={panels_style}>
                 <div className="proxies proxies_wrapper">
@@ -114,6 +115,22 @@ class Overview extends Pure_component {
             </div>;
     }
 }
+
+const Toolbar = ()=>
+  <div className="toolbar">
+    <Add_proxy_btn/>
+  </div>;
+
+const Add_proxy_btn = ()=>{
+  const open_modal = ()=>$('#add_new_proxy_modal').modal('show');
+  return <T>{t=>
+      <Tooltip title={t('Add new port')}>
+        <button onClick={open_modal} className="btn btn_lpm btn_lpm_primary">
+          Add new port
+        </button>
+      </Tooltip>
+    }</T>;
+};
 
 const Logs_off_btn = props=>
   <Tooltip title="Logs are disabled. Click here to turn it on again">

@@ -27,7 +27,7 @@ const Logs = withRouter(class Logs extends Pure_component {
         return <div className="in_logs vbox"
               style={{height: '100%', width: '100%'}}>
               <Nav set_tab={this.set_tab}/>
-              <div className="window_wrapper vbox">
+              <div className="vbox flex">
                 <Switch>
                   <Route path={`${path}/banned_ips`} component={Banned_ips}/>
                   <Route path={`${path}/har`} component={Har_viewer}/>

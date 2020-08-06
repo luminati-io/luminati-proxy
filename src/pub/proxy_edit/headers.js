@@ -60,17 +60,17 @@ export default class Headers extends Pure_component {
             return null;
         let {ssl} = this.state.form, def_ssl = this.state.defaults.ssl;
         let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
-        if (!ssl_analyzing_enabled)
-        {
-            return <Warning text={
+        return <div className="headers">
+            {!ssl_analyzing_enabled &&
+              <Warning text={
                 <React.Fragment>
                   <span><T>These options are available only when using </T>
                   <a className="link" onClick={this.turn_ssl}>
                   <T>SSL analyzing</T></a></span>
                 </React.Fragment>
-            }/>;
-        }
-        return <div className="headers">
+              }/>
+            }
+            {ssl_analyzing_enabled &&
               <Tab_context.Provider value="headers">
                 <Field_row_raw inner_class_name="headers">
                   <div className="desc">
@@ -90,7 +90,8 @@ export default class Headers extends Pure_component {
                   </div>
                 </Field_row_raw>
               </Tab_context.Provider>
-            </div>;
+            }
+          </div>;
     }
 }
 

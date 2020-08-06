@@ -18,6 +18,7 @@
 @tooltip: #154055;
 @chrome_border: #d0d0d0;
 @cp_border: rgba(0,77,116,0.1);
+@cp_border_dark: rgba(0,77,116,0.2);
 @cp_dark: #E5EDF1;
 @cp_second: rgba(0,77,116,0.5);
 @font-face {
@@ -188,37 +189,30 @@ h4 { margin: 0; }
     margin-right: 2px;
 }
 .howto {
-    flex: 1;
-    .nav_header { padding: 0 15px 10px; }
+    padding: 0 15px;
+    .panel_inner {
+        width: 100%;
+        min-width: 550px;
+    }
     .nav_tabs { margin-bottom: 15px; }
-    h1.header { width: auto; }
-    .howto_panel {
+    .gifs_inner {
         flex: 1;
-        margin: 0 15px;
-        display: flex;
-        .panel_inner {
-            width: 100%;
-            min-width: 550px;
-        }
-        .gifs_inner {
+        .gif {
             flex: 1;
-            .gif {
-                flex: 1;
-                margin-left: 20px;
-                max-width: 720px;
-                min-width: 400px;
-                background-repeat: no-repeat;
-                background-size: contain;
-                &.chrome_mac {
-                    background-image: url(https://lum.fleeq.io/l/lgqwdg3m1l-f1kbxvu0lx);
-                }
-                &.chrome_win {
-                    background-image: url(https://lum.fleeq.io/l/ixla2i9nr2-2ld5aufqf1);
-                }
-                &.ie { background-image: url(https://lum.fleeq.io/l/om9yter7qd-t5032zwo3g); }
-                &.firefox { background-image: url(https://lum.fleeq.io/l/5rzxcrg8zp-q6r2lmkiv8); }
-                &.safari { background-image: url(https://lum.fleeq.io/l/jij8ogkbry-boq8hoou0v); }
+            margin-left: 20px;
+            max-width: 720px;
+            min-width: 400px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            &.chrome_mac {
+                background-image: url(https://lum.fleeq.io/l/lgqwdg3m1l-f1kbxvu0lx);
             }
+            &.chrome_win {
+                background-image: url(https://lum.fleeq.io/l/ixla2i9nr2-2ld5aufqf1);
+            }
+            &.ie { background-image: url(https://lum.fleeq.io/l/om9yter7qd-t5032zwo3g); }
+            &.firefox { background-image: url(https://lum.fleeq.io/l/5rzxcrg8zp-q6r2lmkiv8); }
+            &.safari { background-image: url(https://lum.fleeq.io/l/jij8ogkbry-boq8hoou0v); }
         }
     }
     .well {
@@ -551,7 +545,7 @@ textarea {
     resize: vertical;
 }
 select {
-    background: url(/img/down.svg) no-repeat;
+    background: white url(/img/down.svg) no-repeat;
     background-position: right 10px center;
     &[disabled] { color: #8e8e8e; }
 }
@@ -765,7 +759,7 @@ span.icon_link {
         background-color: @error_x_light;
         color: @error_dark;
     }
-    margin: 10px 0;
+    margin-bottom: 15px;
     font-size: 14px;
     color: @dark;
     display: flex;
@@ -799,9 +793,10 @@ span.icon_link {
             flex: 1;
         }
     }
-    .cp_tr {
+    tr, .cp_tr {
         outline: none;
-        .cp_th {
+        th, .cp_th {
+            cursor: pointer;
             outline: none;
             font-size: 12px;
             text-transform: none;
@@ -812,7 +807,7 @@ span.icon_link {
                 position: relative;
             }
         }
-        .cp_td {
+        td, .cp_td {
             input[type=checkbox] { top: 5px; }
             font-size: 12px;
         }
@@ -820,11 +815,27 @@ span.icon_link {
     .ReactVirtualized__Grid.ReactVirtualized__Table__Grid {
         outline: none;
     }
-    .ReactVirtualized__Table__headerRow {
+    .header_container, .ReactVirtualized__Table__headerRow {
         border-bottom: 1px solid @cp_border;
+        height: 30px;
     }
-    .ReactVirtualized__Table__row {
+    .data_container {
+        overflow-x: hidden;
+        overflow-y: overlay;
+        table {
+            td {
+                .disp_value { display: inline; }
+            }
+        }
+    }
+    .data_container tr, .ReactVirtualized__Table__row {
         cursor: pointer;
+        height: 40px;
+        &.filler {
+            height: auto;
+            cursor: default;
+            &:hover { background-color: white; }
+        }
         &:hover {
             background-color: @cp_dark;
             .proxies_actions {
@@ -1135,7 +1146,7 @@ span.icon_link {
         &.clearfix:before { content: none; }
     }
     .rbt-input {
-        padding: 1px 25px 1px 10px;
+        padding: 1px 25px 1px 10px !important;
         color: @first_color;
         border-radius: 3px;
         border: solid 1px @grey;

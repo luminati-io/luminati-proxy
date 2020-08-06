@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.193.514 Stable
+- :sparkles: New design of the UI
+- :sparkles: Added x-lpm-port header witht the final port number
+
 ## 1.193.343 Stable
 - :sparkles: Refactored update general settings and update proxy port API to update only provided fields
 

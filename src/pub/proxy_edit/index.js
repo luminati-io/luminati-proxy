@@ -349,27 +349,29 @@ const Index = withRouter(class Index extends Pure_component {
             type = 'vips';
         const zone = this.state.form.zone ||
             this.state.zones && this.state.zones.def;
-        return <div className="proxy_edit">
-              <Loader show={this.state.show_loader||this.state.loading}/>
-              <div className="nav_wrapper">
-                <T>{t=><div className="nav_header">
-                  <Port_title port={this.props.match.params.port}
-                    name={this.state.form.internal_name} t={t}/>
-                  <Loader_small saving={this.state.saving}
-                    std_msg={t('All changes saved in LPM')}
-                    std_tooltip=
-                    {t('All changes are automatically saved to LPM')}/>
-                </div>}</T>
-                <Nav disabled={!!this.state.form.ext_proxies}
-                  form={this.state.form} plan={curr_plan}
-                  on_change_preset={this.apply_preset}/>
-                <Nav_tabs_wrapper/>
+        return <div className="proxy_edit vbox">
+              <div className="cp_panel vbox">
+                <Loader show={this.state.show_loader||this.state.loading}/>
+                <div className="nav_wrapper">
+                  <T>{t=><div className="nav_header">
+                    <Port_title port={this.props.match.params.port}
+                      name={this.state.form.internal_name} t={t}/>
+                    <Loader_small saving={this.state.saving}
+                      std_msg={t('All changes saved in LPM')}
+                      std_tooltip=
+                      {t('All changes are automatically saved to LPM')}/>
+                  </div>}</T>
+                  <Nav disabled={!!this.state.form.ext_proxies}
+                    form={this.state.form} plan={curr_plan}
+                    on_change_preset={this.apply_preset}/>
+                  <Nav_tabs_wrapper/>
+                </div>
+                {this.state.zones && <Main_window/>}
+                <Warnings_modal id="save_proxy_errors"
+                  warnings={this.state.error_list}/>
+                <Alloc_modal type={type} form={this.state.form} zone={zone}
+                  plan={curr_plan}/>
               </div>
-              {this.state.zones && <Main_window/>}
-              <Warnings_modal id="save_proxy_errors"
-                warnings={this.state.error_list}/>
-              <Alloc_modal type={type} form={this.state.form} zone={zone}
-                plan={curr_plan}/>
             </div>;
     }
 });

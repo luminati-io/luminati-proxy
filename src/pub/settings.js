@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
-import {Labeled_controller, Nav, Loader_small} from './common.js';
+import {Labeled_controller, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import {report_exception} from './util.js';
@@ -14,9 +14,12 @@ import './css/settings.less';
 
 export default function Settings(){
     return <div className="settings">
-          <Nav title="General settings"
-            subtitle="Global configuration of Luminati Proxy Manager"/>
-          <Form/>
+          <div className="cp_panel">
+            <div className="cp_panel_header">
+              <h2>General settings</h2>
+            </div>
+            <Form/>
+          </div>
         </div>;
 }
 

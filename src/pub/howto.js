@@ -32,26 +32,25 @@ const Howto = withRouter(class Howto extends Pure_component {
             Instructions = Code_instructions;
         else if (option=='proxy_tester')
             Instructions = Proxy_tester;
-        return <T>{t=><div className="howto vbox">
-              <div className="nav_header">
-                <h3>{t('How to use LPM')} {t(cur_title)}</h3>
+        return <T>{t=><div className="howto">
+            <div className="cp_panel vbox">
+              <div className="cp_panel_header">
+                <h2>{t('How to use LPM')} {t(cur_title)}</h2>
               </div>
-              <div className="howto_panel">
-                <div className="panel_inner vbox">
-                  <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
-                    <Nav_tab id="code" title="Code"
-                      tooltip="Examples how to use LPM programmatically"/>
-                    <Nav_tab id="browser" title="Browser"
-                      tooltip="Examples how to integrate LPM with the
-                      browser"/>
-                    <Nav_tab id="proxy_tester" title="Web tester"
-                      tooltip="Send example requests from here"/>
-                  </Nav_tabs>
-                  <Instructions>{this.props.children}</Instructions>
-                </div>
-                {false && <Animated_instructions/>}
+              <div className="panel_inner vbox">
+                <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
+                  <Nav_tab id="code" title="Code"
+                    tooltip="Examples how to use LPM programmatically"/>
+                  <Nav_tab id="browser" title="Browser"
+                    tooltip="Examples how to integrate LPM with the
+                    browser"/>
+                  <Nav_tab id="proxy_tester" title="Web tester"
+                    tooltip="Send example requests from here"/>
+                </Nav_tabs>
+                <Instructions>{this.props.children}</Instructions>
               </div>
-            </div>}</T>;
+              {false && <Animated_instructions/>}
+            </div></div>}</T>;
     }
 });
 

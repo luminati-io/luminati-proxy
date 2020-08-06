@@ -9,8 +9,7 @@ import {Tooltip_bytes, Loader_small} from './common.js';
 import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
-import {Toolbar_button, Devider, Sort_icon,
-    with_resizable_cols, Toolbar_container,
+import {Toolbar_button, Sort_icon, Toolbar_container,
     Toolbar_row} from './chrome_widgets.js';
 import {T} from './common/i18n.js';
 import React_tooltip from 'react-tooltip';
@@ -56,30 +55,34 @@ class Stats extends Pure_component {
               disabled={toggling}/>;
         }
         return <div className="stats_wrapper">
-              <div className="chrome stats_panel">
-                <div className="main_panel">
-                  {!request_stats &&
-                    <Loader_small show loading_msg="Loading..."/>
-                  }
-                  {request_stats && <React.Fragment>
-                    <Toolbar stats={stats}
-                      disable_stats={()=>this.toggle_stats(false)}/>
-                    <Stat_table stats={stats} tooltip="Status code"
-                      style={{flex: 1, overflowY: 'auto'}}
-                      row_key="status_code" logs="code" title="Code"/>
-                    <Stat_table stats={stats} tooltip="Domain name"
-                      style={{flex: 1, overflowY: 'auto'}}
-                      row_key="hostname" logs="domain" title="Domain"/>
-                    <Stat_table stats={stats} tooltip="Protocol"
-                      style={{flex: 'none', overflowY: 'auto'}}
-                      ssl_warning={stats.ssl_warning} row_key="protocol"
-                      logs="protocol" title="Protocol"/>
-                  </React.Fragment>}
-                </div>
+              <div className="stats_panel cp_panel vbox">
+                <Header_panel stats={stats}
+                  disable_stats={()=>this.toggle_stats(false)}/>
+                {!request_stats &&
+                  <Loader_small show loading_msg="Loading..."/>
+                }
+                {request_stats && <React.Fragment>
+                  <Stat_table stats={stats} tooltip="Status code"
+                    style={{flex: 1, overflowY: 'auto'}}
+                    row_key="status_code" logs="code" title="Code"/>
+                  <Stat_table stats={stats} tooltip="Domain name"
+                    style={{flex: 1, overflowY: 'auto'}}
+                    row_key="hostname" logs="domain" title="Domain"/>
+                  <Stat_table stats={stats} tooltip="Protocol"
+                    style={{flex: 'none', overflowY: 'auto'}}
+                    ssl_warning={stats.ssl_warning} row_key="protocol"
+                    logs="protocol" title="Protocol"/>
+                </React.Fragment>}
               </div>
             </div>;
     }
 }
+
+const Header_panel = props=>
+  <div className="cp_panel_header">
+    <h2>Statistics</h2>
+    <Toolbar stats={props.stats} disable_stats={props.disable_stats}/>
+  </div>;
 
 const Stats_off_btn = props=>
   <Tooltip title="Recent stats are disabled. Click here to turn it on again"
@@ -148,8 +151,6 @@ const Cell = ({row_key, children})=>{
         </Tooltip>;
 };
 
-const Stat_table = with_resizable_cols([{id: 'key'}, {id: 'bw'},
-    {id: 'bypass_bw'}, {id: 'reqs'}],
 class Stat_table extends Pure_component {
     state = {sorting: {col: 0, dir: 1}};
     sort = col=>{
@@ -158,8 +159,10 @@ class Stat_table extends Pure_component {
         this.setState({sorting: {dir, col}});
     };
     render(){
-        const {title, stats, row_key, logs, ssl_warning, cols} = this.props;
+        const {title, stats, row_key, logs, ssl_warning} = this.props;
         const cur_stats = stats[row_key]||[];
+        const cols = [{id: 'key'}, {id: 'bw'}, {id: 'bypass_bw'},
+            {id: 'reqs'}];
         return <div className="tables_container vbox">
               <Header_container title={title} cols={cols}
                 tooltip={this.props.tooltip}
@@ -169,7 +172,7 @@ class Stat_table extends Pure_component {
                 sorting={this.state.sorting}/>
             </div>;
     }
-});
+}
 
 const Header_container = ({title, cols, sorting, sort, tooltip})=>
     <div className="header_container">
@@ -274,11 +277,10 @@ class Toolbar extends Pure_component {
     render(){
         return <Toolbar_container>
               <Toolbar_row>
-                <Toolbar_button id="clear" tooltip="Clear"
-                  on_click={this.clear}/>
-                <Devider/>
                 <Success_ratio total={this.props.stats.total}
                   success={this.props.stats.success}/>
+                <Toolbar_button id="clear" tooltip="Clear"
+                  on_click={this.clear}/>
                 <Toolbar_button id="close_btn" tooltip="Disable"
                   placement="left" on_click={this.props.disable_stats}/>
               </Toolbar_row>

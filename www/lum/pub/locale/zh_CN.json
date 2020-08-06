@@ -4781,5 +4781,6 @@
   "Resume" : "重新开始",
   "The first 5,000 characters of response shown." : "显示前5000个响应的字节",
   "Click `copy` to get all of the response data." : "点击“复制”获取所有响应的数据",
-  "Disable the collector now" : "现在禁用收集器"
+  "Disable the collector now" : "现在禁用收集器",
+  "It might take up to 10 minutes until the balance is updated." : "最多10分钟您的账户余额会更新"
 }

@@ -648,7 +648,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     edit_columns = ()=>$('#edit_columns').modal('show');
     update_selected_columns = new_columns=>
         this.setState({selected_cols: new_columns});
-    proxy_add = ()=>$('#add_new_proxy_modal').modal('show');
     select_renderer = function Select_renderer(props){
         if (props.rowData=='filler')
             return <div className="cp_td"></div>;
@@ -740,67 +739,66 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         if (this.state.loaded && !show_table)
             return <Proxy_blank/>;
         return <React.Fragment>
-            <Add_proxy_btn on_click={this.proxy_add}/>
-              <div className="main_panel vbox cp_panel proxies_panel">
-                <Header_panel edit_columns={this.edit_columns}
-                  download_csv={this.download_csv}
-                  selected={this.state.selected_proxies}
-                  open_delete_dialog={this.open_delete_dialog}
-                  proxy_filter={proxy_filter}
-                  on_proxy_filter_change={e=>this.set_proxy_filter(e)}/>
-                {this.state.loaded && show_table &&
-                  <div className="main_panel vbox">
-                    <div className="main_panel flex">
-                    <AutoSizer>
-                      {({height, width})=>
-                        <T>{t=><Table width={width}
-                          height={height}
-                          onRowClick={this.on_row_click}
-                          onHeaderClick={({dataKey})=>dataKey=='select' &&
-                            this.all_rows_select()}
-                          headerHeight={30}
-                          headerClassName="cp_th"
-                          rowClassName="cp_tr"
-                          rowHeight={40}
-                          sort={sort=>this.set_sort(sort)}
-                          sortBy={sort_by}
-                          sortDirection={sort_direction.toUpperCase()}
-                          rowCount={visible_proxies.length}
-                          rowGetter={({index})=>
-                            visible_proxies[index]||'filler'}>
-                          <Column key="select"
-                            cellRenderer={this.select_renderer.bind(this)}
-                            label={<Checkbox checked={this.state.checked_all}
-                              on_change={()=>null}/>}
-                            dataKey="select"
+            <div className="main_panel vbox cp_panel proxies_panel">
+              <Header_panel edit_columns={this.edit_columns}
+                download_csv={this.download_csv}
+                selected={this.state.selected_proxies}
+                open_delete_dialog={this.open_delete_dialog}
+                proxy_filter={proxy_filter}
+                on_proxy_filter_change={e=>this.set_proxy_filter(e)}/>
+              {this.state.loaded && show_table &&
+                <div className="main_panel vbox">
+                  <div className="main_panel flex">
+                  <AutoSizer>
+                    {({height, width})=>
+                      <T>{t=><Table width={width}
+                        height={height}
+                        onRowClick={this.on_row_click}
+                        onHeaderClick={({dataKey})=>dataKey=='select' &&
+                          this.all_rows_select()}
+                        headerHeight={30}
+                        headerClassName="cp_th"
+                        rowClassName="cp_tr"
+                        rowHeight={40}
+                        sort={sort=>this.set_sort(sort)}
+                        sortBy={sort_by}
+                        sortDirection={sort_direction.toUpperCase()}
+                        rowCount={visible_proxies.length}
+                        rowGetter={({index})=>
+                          visible_proxies[index]||'filler'}>
+                        <Column key="select"
+                          cellRenderer={this.select_renderer.bind(this)}
+                          label={<Checkbox checked={this.state.checked_all}
+                            on_change={()=>null}/>}
+                          dataKey="select"
+                          className="cp_td"
+                          flexGrow={0}
+                          flexShrink={0}
+                          width={14}/>
+                        {cols.map(col=>
+                          <Column key={col.key}
+                            cellRenderer={this.cell_renderer.bind(this)}
+                            label={t(col.title)}
                             className="cp_td"
-                            flexGrow={0}
-                            flexShrink={0}
-                            width={14}/>
-                          {cols.map(col=>
-                            <Column key={col.key}
-                              cellRenderer={this.cell_renderer.bind(this)}
-                              label={t(col.title)}
-                              className="cp_td"
-                              dataKey={col.key}
-                              flexGrow={col.grow!==undefined ? col.grow : 1}
-                              flexShrink={col.shrink!==undefined ?
-                                col.shrink : 1}
-                              width={col.width||100}/>
-                          )}
-                        </Table>}</T>
-                      }
-                    </AutoSizer>
-                    </div>
+                            dataKey={col.key}
+                            flexGrow={col.grow!==undefined ? col.grow : 1}
+                            flexShrink={col.shrink!==undefined ?
+                              col.shrink : 1}
+                            width={col.width||100}/>
+                        )}
+                      </Table>}</T>
+                    }
+                  </AutoSizer>
                   </div>
-                }
-              </div>
-              <Columns_modal selected_cols={this.state.selected_cols}
-                update_selected_cols={this.update_selected_columns}/>
-              <Delete_dialog open={this.state.open_delete_dialog}
-                close_dialog={this.close_delete_dialog}
-                proxies={this.state.delete_proxies}
-                update_proxies={this.update}/>
+                </div>
+              }
+            </div>
+            <Columns_modal selected_cols={this.state.selected_cols}
+              update_selected_cols={this.update_selected_columns}/>
+            <Delete_dialog open={this.state.open_delete_dialog}
+              close_dialog={this.close_delete_dialog}
+              proxies={this.state.delete_proxies}
+              update_proxies={this.update}/>
           </React.Fragment>;
     }
 });
@@ -810,16 +808,6 @@ const Header_panel = props=>
       <h2>Proxy ports</h2>
       <Toolbar {...props}/>
     </div>;
-
-const Add_proxy_btn = props=>{
-    const style = {position: 'absolute', top: -33, right: 333, minWidth: 42};
-    return <T>{t=>
-          <Tooltip title={t('Add new port')}>
-            <button onClick={props.on_click} className="btn btn_lpm"
-              style={style}>+</button>
-          </Tooltip>
-        }</T>;
-};
 
 class Delete_dialog extends Pure_component {
     delete_proxies = e=>{
