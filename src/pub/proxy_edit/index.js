@@ -339,6 +339,9 @@ const Index = withRouter(class Index extends Pure_component {
         const zone = this.state.zones.zones.find(p=>p.name==zone_name) || {};
         return zone.plan || {};
     };
+    on_back_click = ()=>{
+        this.props.history.push({pathname: '/overview'});
+    };
     render(){
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
@@ -352,15 +355,11 @@ const Index = withRouter(class Index extends Pure_component {
         return <div className="proxy_edit vbox">
               <div className="cp_panel vbox">
                 <Loader show={this.state.show_loader||this.state.loading}/>
-                <div className="nav_wrapper">
-                  <T>{t=><div className="nav_header">
-                    <Port_title port={this.props.match.params.port}
-                      name={this.state.form.internal_name} t={t}/>
-                    <Loader_small saving={this.state.saving}
-                      std_msg={t('All changes saved in LPM')}
-                      std_tooltip=
-                      {t('All changes are automatically saved to LPM')}/>
-                  </div>}</T>
+                <div>
+                  <Header match={this.props.match}
+                    internal_name={this.state.form.internal_name}
+                    is_saving={this.state.saving}
+                    on_back_click={this.on_back_click}/>
                   <Nav disabled={!!this.state.form.ext_proxies}
                     form={this.state.form} plan={curr_plan}
                     on_change_preset={this.apply_preset}/>
@@ -392,10 +391,29 @@ class Nav_tabs_wrapper extends Pure_component {
     }
 });
 
+const Header = props=>
+  <T>{t=>
+    <div className="cp_panel_header">
+      <Back_btn click={props.on_back_click}/>
+      <Port_title port={props.match.params.port}
+        name={props.internal_name} t={t}/>
+      <Loader_small saving={props.is_saving}
+        std_msg={t('All changes saved in LPM')}
+        std_tooltip=
+        {t('All changes are automatically saved to LPM')}/>
+    </div>
+  }</T>;
+
+const Back_btn = props=>
+  <div className="back_wrapper" onClick={props.click}>
+    <div className="cp_icon back"/>
+    <span>Back to overview</span>
+  </div>;
+
 const Port_title = ({port, name, t})=>{
     if (name)
         port = port+` (${name})`;
-    return <h3>{t('Proxy on port')} {port}</h3>;
+    return <h2>{t('Proxy on port')} {port}</h2>;
 };
 
 class Open_browser_btn extends Pure_component {

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.193.647",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Increased limit for the string length in proxy port configuration"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed applying whitelist IPs from general settings"
+            }
+        ]
+    },
+    {
         "ver": "1.193.514",
         "type": "stable",
         "changes": [

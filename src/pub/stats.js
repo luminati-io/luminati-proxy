@@ -5,12 +5,11 @@ import {withRouter} from 'react-router-dom';
 import {status_codes} from './util.js';
 import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
-import {Tooltip_bytes, Loader_small} from './common.js';
+import {Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
 import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
-import {Toolbar_button, Sort_icon, Toolbar_container,
-    Toolbar_row} from './chrome_widgets.js';
+import {Sort_icon} from './chrome_widgets.js';
 import {T} from './common/i18n.js';
 import React_tooltip from 'react-tooltip';
 
@@ -275,16 +274,14 @@ class Toolbar extends Pure_component {
         });
     };
     render(){
-        return <Toolbar_container>
-              <Toolbar_row>
-                <Success_ratio total={this.props.stats.total}
-                  success={this.props.stats.success}/>
-                <Toolbar_button id="clear" tooltip="Clear"
-                  on_click={this.clear}/>
-                <Toolbar_button id="close_btn" tooltip="Disable"
-                  placement="left" on_click={this.props.disable_stats}/>
-              </Toolbar_row>
-            </Toolbar_container>;
+        return <div className="toolbar">
+              <Success_ratio total={this.props.stats.total}
+                success={this.props.stats.success}/>
+              <Toolbar_button id="remove" tooltip="Clear"
+                on_click={this.clear}/>
+              <Toolbar_button id="arrow_down" tooltip="Disable"
+                placement="left" on_click={this.props.disable_stats}/>
+            </div>;
     }
 }
 

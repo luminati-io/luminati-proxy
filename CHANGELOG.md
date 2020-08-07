@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.193.647 Stable
+- :sparkles: Increased limit for the string length in proxy port configuration
+- :bug: Fixed applying whitelist IPs from general settings
+
 ## 1.193.514 Stable
 - :sparkles: New design of the UI
 - :sparkles: Added x-lpm-port header witht the final port number

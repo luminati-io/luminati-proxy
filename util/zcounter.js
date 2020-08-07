@@ -42,7 +42,8 @@ E.to_valid_id = id=>to_valid_ids[id]||
     (to_valid_ids[id]=id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
 
 let type = {sum: {}, avg: {}, sum_mono: {}, avg_level: {}, sum_level: {},
-    max_level: {}, min_level: {}, avg_level_eco: {}, sum_level_eco: {}};
+    max_level: {}, min_level: {}, avg_level_eco: {}, sum_level_eco: {},
+    sum_mono_eco: {}};
 
 let reported_names = {};
 function report_invalid_val(name, value){
@@ -69,6 +70,19 @@ E.minc = (name, value, agg_srv='sum')=>{
     if (!Number.isFinite(value))
         return void report_invalid_val(name, value);
     let _type = type.sum_mono, entry = _type[name];
+    if (!entry)
+        entry = _type[name] = {v: 0, b: value, agg_srv, agg_tm: 'avg0'};
+    // handle wraparound
+    if (value<entry.b)
+        entry.b = value;
+    entry.v = value-entry.b;
+};
+
+// minc but starts sending after non-0 value and stops after 0-only for 1h
+E.minc_eco = (name, value, agg_srv='sum')=>{
+    if (!Number.isFinite(value))
+        return void report_invalid_val(name, value);
+    let _type = type.sum_mono_eco, entry = _type[name];
     if (!entry)
         entry = _type[name] = {v: 0, b: value, agg_srv, agg_tm: 'avg0'};
     // handle wraparound
@@ -154,7 +168,9 @@ E.min = (name, value, agg_srv='min')=>{
 
 function _get(_type, n){
     let c = _type.avg_level[n]||_type.sum_level[n]||_type.avg[n]||_type.sum[n]
-        ||_type.sum_mono[n]||_type.max_level[n]||_type.min_level[n];
+        ||_type.sum_mono[n]||_type.max_level[n]||_type.min_level[n]
+        ||_type.avg_level_eco[n]||_type.sum_level_eco[n]
+        ||_type.sum_mono_eco[n];
     if (c && c.w!==undefined)
         return c.v/c.w;
     return c ? c.v : 0;
@@ -238,7 +254,8 @@ function agg_avgw(val, cnt){
 
 const aggs = {sum: agg_sum, sum_mono: agg_sum, avg_level: agg_avg,
     max_level: agg_max, min_level: agg_min, sum_level: agg_sum,
-    avg: agg_avgw, avg_level_eco: agg_avg, sum_level_eco: agg_sum};
+    avg: agg_avgw, avg_level_eco: agg_avg, sum_level_eco: agg_sum,
+    sum_mono_eco: agg_sum};
 function mas_agg_counters(worker_counters){
     let res = zutil.map_obj(aggs, (agg, key)=>{
         let worker_counter = pluck(worker_counters, key);
@@ -263,7 +280,7 @@ function mas_agg_counters(worker_counters){
 
 E.on_send = [];
 
-const level_eco_ts = {};
+const eco_ts = {};
 
 let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
     let ret = type;
@@ -273,36 +290,57 @@ let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
             try { yield fn(); } catch(e){ ef(e); }
         // base gauge for 'sum_mono' kind should be reset so that next
         // measurement will be relative to the current value
-        let sum_mono = {};
-        for (let c in type.sum_mono)
-        {
-            let cur = type.sum_mono[c];
-            sum_mono[c] = {v: 0, b: cur.b+cur.v,
-                agg_srv: cur.agg_srv, agg_tm: cur.agg_tm};
-        }
-        type = {sum: {}, avg: {}, sum_mono,
+        let mono = {sum_mono: {}, sum_mono_eco: {}};
+        ['sum_mono', 'sum_mono_eco'].forEach(m=>{
+            let mono_new = mono[m];
+            let mono_cur = type[m];
+            for (let c in mono_cur)
+            {
+                let cur = mono_cur[c];
+                mono_new[c] = {v: 0, b: cur.b+cur.v, agg_srv: cur.agg_srv,
+                    agg_tm: cur.agg_tm};
+            }
+        });
+        type = {sum: {}, avg: {}, sum_mono: mono.sum_mono,
             avg_level: type.avg_level, sum_level: type.sum_level,
             max_level: {}, min_level: {}, avg_level_eco: type.avg_level_eco,
-            sum_level_eco: type.sum_level_eco};
+            sum_level_eco: type.sum_level_eco,
+            sum_mono_eco: mono.sum_mono_eco};
     }
     let now = Date.now();
-    [type.avg_level_eco, type.sum_level_eco].forEach(eco=>{
+    [ret.avg_level_eco, ret.sum_level_eco].forEach(eco=>{
         for (let t in eco)
         {
             let c = eco[t];
             if (c.v)
             {
-                level_eco_ts[t] = now;
+                eco_ts[t] = now;
                 continue;
             }
-            let ts = level_eco_ts[t];
+            let ts = eco_ts[t];
             if (!ts || now-ts>level_eco_dispose)
             {
-                delete level_eco_ts[t];
+                delete eco_ts[t];
                 delete eco[t];
             }
         }
     });
+    let sum_mono_eco = {};
+    let eco = ret.sum_mono_eco;
+    for (let t in eco)
+    {
+        let c = eco[t];
+        if (c.v)
+        {
+            eco_ts[t] = now;
+            sum_mono_eco[t] = c;
+            continue;
+        }
+        let ts = eco_ts[t];
+        if (ts && now-ts<level_eco_dispose)
+            sum_mono_eco[t] = c;
+    }
+    ret.sum_mono_eco = sum_mono_eco;
     return ret;
 });
 
@@ -349,7 +387,7 @@ const agg_mas_fn = {sum: agg_mas_sum_fn, sum_mono: agg_mas_sum_fn,
     avg: agg_mas_avg_fn, avg_level: agg_mas_level_fn,
     sum_level: agg_mas_level_fn, max_level: agg_mas_level_fn,
     min_level: agg_mas_level_fn, avg_level_eco: agg_mas_level_fn,
-    sum_level_eco: agg_mas_level_fn};
+    sum_level_eco: agg_mas_level_fn, sum_mono_eco: agg_mas_sum_fn};
 
 let prepare = ()=>etask(function*zcounter_prepare(){
     let get_counters_fn = Object.keys(cluster.workers).length

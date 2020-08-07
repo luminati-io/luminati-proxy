@@ -14,7 +14,6 @@ import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
     Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
 import {T, with_tt, Language} from './common/i18n.js';
-import {Toolbar_button} from './chrome_widgets.js';
 import conv from '../../util/conv.js';
 
 export const Tooltip_bytes = props=>{
@@ -490,3 +489,10 @@ export const No_zones = with_www_api(class No_zones extends Pure_component {
             </div>;
     }
 });
+
+export const Toolbar_button = props=>
+  <Tooltip title={props.tooltip}>
+    <div className={classnames('cp_icon', props.id)}
+      onClick={props.on_click}/>
+  </Tooltip>;
+

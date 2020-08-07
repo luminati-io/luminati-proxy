@@ -16,12 +16,11 @@ import {get_static_country, report_exception} from './util.js';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title, No_zones,
-    Tooltip_bytes, Loader_small} from './common.js';
+    Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
-import {Toolbar_container, Toolbar_row, Toolbar_button,
-    Search_box} from './chrome_widgets.js';
+import {Search_box} from './chrome_widgets.js';
 import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
@@ -840,7 +839,6 @@ class Delete_dialog extends Pure_component {
     }
 }
 
-
 class Toolbar extends Pure_component {
     state = {
         filters: false,
@@ -859,24 +857,22 @@ class Toolbar extends Pure_component {
     render(){
         const {edit_columns, download_csv} = this.props;
         const to_delete = this.get_to_delete();
-        return <Toolbar_container>
-              <Toolbar_row>
-                <Toolbar_button tooltip="Filters"
-                  on_click={()=>this.toggle_filters()} id="filters"/>
-                <Toolbar_button tooltip="Edit columns" on_click={edit_columns}
-                  id="actions"/>
-                <Toolbar_button tooltip="Download all proxy ports as CSV"
-                  on_click={download_csv} id="download"/>
-                {!!to_delete.length &&
-                <Toolbar_button tooltip="Delete selected proxies"
-                  on_click={this.open_delete_dialog_with_proxies} id="trash"/>
-                }
-              </Toolbar_row>
-            {this.state.filters && <Toolbar_row>
+        return <div className="toolbar">
+            {this.state.filters &&
               <Search_box val={this.props.proxy_filter}
                 on_change={this.props.on_proxy_filter_change}/>
-            </Toolbar_row>}
-            </Toolbar_container>;
+            }
+            <Toolbar_button tooltip="Filters"
+              on_click={()=>this.toggle_filters()} id="filters"/>
+            <Toolbar_button tooltip="Edit columns" on_click={edit_columns}
+              id="columns"/>
+            <Toolbar_button tooltip="Download all proxy ports as CSV"
+              on_click={download_csv} id="download"/>
+            {!!to_delete.length &&
+              <Toolbar_button tooltip="Delete selected proxies"
+                on_click={this.open_delete_dialog_with_proxies} id="remove"/>
+            }
+          </div>;
     }
 }
 
