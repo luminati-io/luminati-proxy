@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.193.847",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Introduced storing config changes on Luminati's servers"
+            },
+            {
+                "type": "sparkles",
+                "text": "Updated node and npm versions in installation script"
+            }
+        ]
+    },
+    {
         "ver": "1.193.647",
         "type": "stable",
         "changes": [

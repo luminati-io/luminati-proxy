@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.193.847 Stable
+- :sparkles: Introduced storing config changes on Luminati's servers
+- :sparkles: Updated node and npm versions in installation script
+
 ## 1.193.647 Stable
 - :sparkles: Increased limit for the string length in proxy port configuration
 - :bug: Fixed applying whitelist IPs from general settings

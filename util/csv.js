@@ -53,20 +53,18 @@ E.to_arr = function(data, opt){
         else
         {
             // value not escaped with quote
-            while (c && c!=field && c!=line &&
-                (!opt.trim || c!=' ' && c!='\t' && c!='\r'))
+            while (c && c!=field && c!=line)
             {
                 value += c;
                 c = data[++i];
             }
         }
+        if (opt.trim)
+            value = value.trim();
         // add the value to the array
         if (array.length<=row)
             array.push([]);
         array[row].push(value);
-        // skip whitespaces
-        while (opt.trim && (c==' ' || c=='\t' || c=='\r'))
-            c = data[++i];
         // go to the next row or column
         if (c==field);
         else if (c==line)

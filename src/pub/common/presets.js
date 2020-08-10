@@ -30,7 +30,13 @@ const presets = {
             opt.rotate_session = true;
             opt.sticky_ip = false;
             opt.headers = (old_opt||opt).headers||[];
-            opt.headers.push({name: 'user-agent', value: 'random_desktop'});
+            const rand_header = opt.headers.find(h=>
+                h.name=='user-agent'&&h.value=='random_desktop');
+            if (!rand_header)
+            {
+                opt.headers.push({name: 'user-agent',
+                    value: 'random_desktop'});
+            }
         },
         clean: opt=>{
             opt.rotate_session = false;
