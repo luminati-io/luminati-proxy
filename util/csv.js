@@ -7,7 +7,7 @@ if (!is_node)
     define = self.define;
 else
     define = require('./require_node.js').define(module, '../');
-define([], function(){
+define(['/util/util.js'], function(zutil){
 var E = {};
 var assign = Object.assign;
 
@@ -99,25 +99,53 @@ E.to_obj = function(data, opt){
     return result;
 };
 
-E.escape_field = function(s, opt){
+function is_complex(v){
+    return typeof v=='object' && (!Array.isArray(v) ||
+        v.some(function(e){ return typeof e=='object'; }));
+}
+
+E.escape_field = function(v, opt){
     // opt not fully supported
-    if (s==null && opt && opt.null_to_empty)
+    if (v==null && opt && opt.null_to_empty)
         return '';
-    if (typeof s=='object' && (!Array.isArray(s) ||
-        s.some(function(e){ return typeof e=='object'; })))
-    {
-        s = JSON.stringify(s);
-    }
+    if (is_complex(v))
+        v = JSON.stringify(v);
     else
-        s = ''+s;
-    if (!/["'\n,]/.test(s))
-        return s;
-    return '"'+s.replace(/"/g, '""')+'"';
+        v = ''+v;
+    if (!/["'\n,]/.test(v))
+        return v;
+    return '"'+v.replace(/"/g, '""')+'"';
 };
+
+// Note that, since we only take the first value into consideration to generate
+// keys, if there are other entries with different complex fields, those will
+// not be flattened. A consistent structure must be ensured when flatten==true
+function generate_keys(obj, opt){
+    var keys = opt.keys || Object.keys(obj);
+    if (!opt.flatten)
+        return keys;
+    return keys.reduce(function(arr, k){
+        if (is_complex(obj[k]))
+        {
+            arr = arr.concat(generate_keys(obj[k], zutil.omit(opt, 'keys'))
+                .map(function(h){ return k+opt.splitter+h; }));
+        }
+        else
+            arr.push(k);
+        return arr;
+    }, []);
+}
+
+function get_value(obj, key, opt){
+    if (obj.hasOwnProperty(key))
+        return obj[key];
+    return key.split(opt.splitter).reduce(
+        function(acc, v){ return acc&&acc[v]; }, obj);
+}
 
 E.to_str = function(csv, opt){
     var s = '', i, j, a;
-    opt = assign({field: ',', quote: '"', line: '\n'}, opt);
+    opt = assign({field: ',', quote: '"', line: '\n', splitter: '$$'}, opt);
     var line = opt.line, field = opt.field;
     function line_to_str(vals){
         var s = '';
@@ -135,14 +163,24 @@ E.to_str = function(csv, opt){
             s += line_to_str(csv[i]);
         return s;
     }
-    var keys = opt.keys || Object.keys(csv[0]);
+    var keys = generate_keys(csv[0], opt);
     if (opt.print_keys===undefined || opt.print_keys)
-        s += line_to_str(keys);
+    {
+        s += line_to_str(keys.map(function(k){
+            var parts = k.split(opt.splitter);
+            return parts.map(function(p){
+                // indexes start at 1
+                if (Number.isFinite(+p))
+                    p = +p+1;
+                return p;
+            }).join('_');
+        }));
+    }
     for (i=0; i<csv.length; i++)
     {
         for (j=0, a=[]; j<keys.length; j++)
         {
-            var v = csv[i][keys[j]];
+            var v = get_value(csv[i], keys[j], opt);
             a.push(v===undefined ? '' : v);
         }
         s += line_to_str(a);

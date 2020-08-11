@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.194.9",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed refreshing gIPs"
+            }
+        ]
+    },
+    {
         "ver": "1.193.847",
         "type": "stable",
         "changes": [

@@ -137,7 +137,7 @@ export default class Alloc_modal extends Pure_component {
     refresh_one = val=>{
         this.refresh([val]);
     };
-    refresh = ips=>{
+    refresh = vals=>{
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
@@ -148,7 +148,11 @@ export default class Alloc_modal extends Pure_component {
                 _this.loading(false);
             });
             _this.loading(true);
-            const data = {zone: _this.props.zone, ips};
+            const data = {zone: _this.props.zone};
+            if (_this.props.type=='ips')
+                data.ips = vals;
+            else
+                data.vips = vals;
             const url = '/api/refresh_ips';
             const res = yield ajax.json({method: 'POST', url, data});
             if (res.error || !res.ips && !res.vips)

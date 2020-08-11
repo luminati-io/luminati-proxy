@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.9 Stable
+- :bug: Fixed refreshing gIPs
+
 ## 1.193.847 Stable
 - :sparkles: Introduced storing config changes on Luminati's servers
 - :sparkles: Updated node and npm versions in installation script
