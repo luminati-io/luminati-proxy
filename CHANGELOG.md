@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.195 Stable
+- :bug: Fixed keeping the same IP over the longer time
+- :bug: Fixed refreshing sessions
+
 ## 1.194.180 Stable
 - :sparkles: Added filtering by port
 

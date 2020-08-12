@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.194.195",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed keeping the same IP over the longer time"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed refreshing sessions"
+            }
+        ]
+    },
+    {
         "ver": "1.194.180",
         "type": "stable",
         "changes": [
