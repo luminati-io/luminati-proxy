@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.194.126",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Updated node and npm versions in Docker file"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added zone validation in proxy ports when zones config changes"
+            },
+            {
+                "type": "sparkles",
+                "text": "Updated action icons in the UI"
+            }
+        ]
+    },
+    {
         "ver": "1.194.9",
         "type": "stable",
         "changes": [

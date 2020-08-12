@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="ic_browser_view" width="16" height="16" viewBox="0 0 16 16">
+    <defs>
+        <style>
+            .cls-2{fill:#004d74}
+        </style>
+    </defs>
+    <path id="Rectangle_116" fill="none" d="M0 0H16V16H0z" data-name="Rectangle 116"/>
+    <g id="Group_4138" data-name="Group 4138">
+        <path id="Path_52031" d="M14 1H2a2 2 0 0 0-2 2v8.879l2-2V3h12v10H7.121l-2 2H14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2z" class="cls-2" data-name="Path 52031"/>
+        <path id="Path_52032" d="M11 11V5H5l2.116 2.116-6.855 6.855A1.994 1.994 0 0 0 2 15h.768l6.116-6.116z" class="cls-2" data-name="Path 52032"/>
+    </g>
+</svg>

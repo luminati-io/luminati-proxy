@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.126 Stable
+- :star: Updated node and npm versions in Docker file
+- :sparkles: Added zone validation in proxy ports when zones config changes
+- :sparkles: Updated action icons in the UI
+
 ## 1.194.9 Stable
 - :bug: Fixed refreshing gIPs
 

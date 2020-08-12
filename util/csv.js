@@ -7,7 +7,7 @@ if (!is_node)
     define = self.define;
 else
     define = require('./require_node.js').define(module, '../');
-define(['/util/util.js'], function(zutil){
+define(['/util/array.js'], function(zarray){
 var E = {};
 var assign = Object.assign;
 
@@ -100,7 +100,7 @@ E.to_obj = function(data, opt){
 };
 
 function is_complex(v){
-    return typeof v=='object' && (!Array.isArray(v) ||
+    return v && typeof v=='object' && (!Array.isArray(v) ||
         v.some(function(e){ return typeof e=='object'; }));
 }
 
@@ -117,23 +117,64 @@ E.escape_field = function(v, opt){
     return '"'+v.replace(/"/g, '""')+'"';
 };
 
-// Note that, since we only take the first value into consideration to generate
-// keys, if there are other entries with different complex fields, those will
-// not be flattened. A consistent structure must be ensured when flatten==true
-function generate_keys(obj, opt){
-    var keys = opt.keys || Object.keys(obj);
-    if (!opt.flatten)
-        return keys;
-    return keys.reduce(function(arr, k){
+function flatten(obj, opt, keys){
+    var key_set = [], k;
+    for (var i = 0; i < keys.length; i++)
+    {
+        k = keys[i];
         if (is_complex(obj[k]))
         {
-            arr = arr.concat(generate_keys(obj[k], zutil.omit(opt, 'keys'))
-                .map(function(h){ return k+opt.splitter+h; }));
+            _get_flatenned_keys(obj[k], opt)
+                .forEach(function(h){ key_set.push(k+opt.splitter+h); });
         }
         else
-            arr.push(k);
-        return arr;
-    }, []);
+            key_set.push(k);
+    }
+    return zarray.unique(key_set);
+}
+
+function _get_flatenned_keys(obj, opt, keys){
+    keys = keys || Object.keys(obj);
+    if (Array.isArray(obj))
+    {
+        var key_set = [];
+        for (var i = 0; i < obj.length; i++)
+        {
+            flatten(obj[i], opt, Object.keys(obj[i])).forEach(
+                function(el){ key_set.push(el); });
+        }
+        return zarray.unique(key_set).reduce(function(_keys, k){
+            for (var j = 0; j < obj.length; j++)
+                _keys.push(j+opt.splitter+k);
+            return _keys;
+        }, []);
+    }
+    return flatten(obj, opt, keys);
+}
+
+function get_flatenned_keys(dataset, opt, keys){
+    var key_set = [];
+    for (var i = 0; i < dataset.length; i++)
+        key_set = key_set.concat(_get_flatenned_keys(dataset[i], opt, keys));
+    var arr = zarray.unique(key_set);
+    arr.sort();
+    return arr;
+}
+
+function generate_keys(dataset, opt){
+    var keys;
+    if (!opt.keys)
+        keys = Object.keys(dataset[0]);
+    else if (opt.keys=='auto')
+    {
+        var arr = [];
+        for (var i = 0; i < dataset.length; i++)
+            arr = arr.concat(Object.keys(dataset[i]));
+        keys = zarray.unique(arr);
+    }
+    else
+        keys = opt.keys;
+    return opt.flatten ? get_flatenned_keys(dataset, opt, keys) : keys;
 }
 
 function get_value(obj, key, opt){
@@ -148,12 +189,12 @@ E.to_str = function(csv, opt){
     opt = assign({field: ',', quote: '"', line: '\n', splitter: '$$'}, opt);
     var line = opt.line, field = opt.field;
     function line_to_str(vals){
-        var s = '';
-        for (var i=0; i<vals.length; i++)
-            s += (i ? field : '')+E.escape_field(vals[i], opt);
-        return s+line;
+        var _s = '';
+        for (var k=0; k<vals.length; k++)
+            _s += (k ? field : '')+E.escape_field(vals[k], opt);
+        return _s+line;
     }
-    if (!csv.length && !opt.keys)
+    if (!csv.length && (!opt.keys || opt.keys=='auto'))
         return '';
     if (Array.isArray(csv[0]))
     {
@@ -163,7 +204,7 @@ E.to_str = function(csv, opt){
             s += line_to_str(csv[i]);
         return s;
     }
-    var keys = generate_keys(csv[0], opt);
+    var keys = generate_keys(csv, opt);
     if (opt.print_keys===undefined || opt.print_keys)
     {
         s += line_to_str(keys.map(function(k){

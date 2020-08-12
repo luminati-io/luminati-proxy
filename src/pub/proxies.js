@@ -502,6 +502,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             if (!zones)
                 return;
             this.setState({zones});
+            return this.update();
         });
         this.timeout_id = window.setTimeout(this.req_status);
         this.update_window_dimensions();
@@ -1000,7 +1001,7 @@ class Actions extends Pure_component {
           'proxies_actions_local'}>
             {!!persist &&
               <React.Fragment>
-                <Action_icon id="trash" scrolling={this.props.scrolling}
+                <Action_icon id="remove" scrolling={this.props.scrolling}
                   on_click={this.open_delete_dialog_with_port}
                   tooltip="Delete" invisible={!persist}/>
                 <Action_icon id="duplicate" on_click={this.duplicate}
@@ -1025,7 +1026,7 @@ const Portal = props=>ReactDOM.createPortal(props.children,
 
 const Action_icon = props=>{
     let {on_click, invisible, id, tooltip, scrolling} = props;
-    const classes = classnames('action_icon', 'chrome_icon', id,
+    const classes = classnames('action_icon', 'cp_icon', id,
         {invisible});
     if (scrolling)
         return <div className={classes}/>;
