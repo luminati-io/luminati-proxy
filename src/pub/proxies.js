@@ -527,7 +527,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         proxies = proxies.filter(p=>{
             if (proxy_filter &&
                 !(p.internal_name||'').includes(proxy_filter) &&
-                !(p.zone||'').includes(proxy_filter))
+                !(p.zone||'').includes(proxy_filter) &&
+                !(''+p.port||'').includes(proxy_filter))
             {
                 return false;
             }
