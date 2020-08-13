@@ -1,6 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.365 Stable
+- :star: Added support for the authorization per request
+
 ## 1.194.314 Stable
+- :bug: Fixed x-lpm-port response headers for debugging
 - :sparkles: Added categories to dropdown UI
 
 ## 1.194.195 Stable

@@ -6,7 +6,7 @@ import Tooltip from './tooltip.js';
 import {get_static_country} from '../util.js';
 import {flag_with_title, any_flag} from '../common.js';
 import {T} from './i18n.js';
-import {network_types} from './network_types.js';
+import {get_plan_product, network_types} from './network_types.js';
 import '../css/zone_desc.less';
 
 export default class Zone_description extends Pure_component {
@@ -40,12 +40,13 @@ export default class Zone_description extends Pure_component {
         let c = any_flag;
         if (static_country && static_country!='any' && static_country!='*')
             c = flag_with_title(static_country, static_country.toUpperCase());
+        const plan_type = get_plan_product(plan);
         return <T>{t=><div className="zone_settings">
               <ul className="bullets">
                 <Zone_bullet atr="Network type"
                   tip="The network accessible by this zone">
-                  <Tooltip title={t(network_types[plan.type].tooltip)}>
-                    {t(network_types[plan.type].label)}
+                  <Tooltip title={t(network_types[plan_type].tooltip)}>
+                    {t(network_types[plan_type].label)}
                   </Tooltip>
                 </Zone_bullet>
                 <Zone_bullet show={plan.ips_type!==undefined}

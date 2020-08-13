@@ -1,22 +1,34 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, es6:true*/
 
+// XXX azamat/krzysztof: copy pasted from lum/pub/plans.js, fix webpack loader
+// and import it as a whole module
+export const get_plan_product = plan=>{
+    if (plan.type=='static')
+        return plan.pool_ip_type=='static_res'&&'res_static' || 'dc';
+    if ((plan.type=='resident' || plan.type=='unblocker') && plan.serp)
+        return 'serp';
+    if (!plan.type || plan.type=='resident')
+        return plan.mobile&&'mobile' || 'res_rotating';
+    return plan.type;
+};
+
 export const network_types = {
-    static: {
+    dc: {
         label: 'Data center',
         tooltip: 'Static IPs from various data centers located around '
             +'the globe',
     },
-    resident: {
+    res_rotating: {
         label: 'Residential',
         tooltip: 'P2P residential network. Millions of IPs from real '
             +'devices',
     },
-    custom: {
-        label: 'Custom',
+    mobile: {
+        label: 'Mobile',
         tooltip: '3G and 4G network from real mobile devices',
     },
-    static_res: {
+    res_static: {
         label: 'Static residential',
         tooltip: 'Static residential IPs',
     },
@@ -24,5 +36,9 @@ export const network_types = {
         label: 'Unblocker',
         tooltip: 'Clever proxy which automatically manages IPs, headers, '
             +'and network',
+    },
+    serp: {
+        label: 'SERP',
+        tooltip: 'Send Google search requests',
     },
 };

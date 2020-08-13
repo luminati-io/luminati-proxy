@@ -1,8 +1,22 @@
 [
     {
+        "ver": "1.194.365",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support for the authorization per request"
+            }
+        ]
+    },
+    {
         "ver": "1.194.314",
         "type": "stable",
         "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed x-lpm-port response headers for debugging"
+            },
             {
                 "type": "sparkles",
                 "text": "Added categories to dropdown UI"
