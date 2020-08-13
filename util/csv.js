@@ -153,11 +153,26 @@ function _get_flatenned_keys(obj, opt, keys){
 }
 
 function get_flatenned_keys(dataset, opt, keys){
-    var key_set = [];
-    for (var i = 0; i < dataset.length; i++)
+    var key_set = [], i;
+    for (i = 0; i < dataset.length; i++)
         key_set = key_set.concat(_get_flatenned_keys(dataset[i], opt, keys));
     var arr = zarray.unique(key_set);
     arr.sort();
+    // Removes keys where value is considered non-complex due to being an empty
+    // array but, in reality, it is complex in other entries
+    for (i = 0; i < arr.length-1; i++)
+    {
+        var k1 = arr[i], k2 = arr[i+1];
+        if (!k2.startsWith(k1+opt.splitter))
+            continue;
+        if (dataset.every(function(d){
+            var v = get_value(d, k1, opt);
+            return is_complex(v) || Array.isArray(v) && !v.length;
+        }))
+        {
+            arr = arr.filter(function(k){ return k!=k1; });
+        }
+    }
     return arr;
 }
 
@@ -196,7 +211,7 @@ E.to_str = function(csv, opt){
     }
     if (!csv.length && (!opt.keys || opt.keys=='auto'))
         return '';
-    if (Array.isArray(csv[0]))
+    if (Array.isArray(csv[0]) && !opt.flatten)
     {
         if (opt.keys)
             s += line_to_str(opt.keys);

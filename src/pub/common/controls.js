@@ -20,6 +20,7 @@ import {Ext_tooltip, Loader} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
 import Toggle_on_off from './toggle_on_off.js';
+import {network_types} from './network_types.js';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 const ANY_IP = '0.0.0.0/0';
 
@@ -539,13 +540,26 @@ export const Select = props=>{
           <T>{t=><select value={''+props.val}
             onChange={e=>update(e.target.value)}
             disabled={props.disabled}>
-            {(props.data||[]).map((c, i)=>
-              <option key={i} value={c.value !== undefined ? c.value : c}>
-                {t(c.key||c)}
-              </option>
+            {props.with_categories && props.data.map(i=>
+              <Section key={i.category} name={i.category} data={i.data} t={t}/>
             )}
+            {!props.with_categories &&
+              <Section data={props.data||[]} t={t}/>
+            }
           </select>}</T>
         </Tooltip>;
+};
+
+const Section = props=>{
+    const options = props.data.map((c, i)=>
+      <option key={i} value={c.value !== undefined ? c.value : c}>
+        {props.t(c.key||c)}
+      </option>);
+    return props.name ?
+        <optgroup key={props.name} label={props.name}>
+          {options}
+        </optgroup>
+        : options;
 };
 
 export const Input = props=>{
@@ -596,11 +610,19 @@ class Select_zone extends Pure_component {
     render(){
         const {val, on_change_wrapper, disabled, preview} = this.props;
         const tooltip = preview ? '' : this.props.tooltip;
-        const zone_opt = this.state.zones.zones.map(z=>{
+        const format = z=>{
             if (z.name==this.state.zones.def)
                 return {key: `${z.name} (default)`, value: z.name};
             return {key: z.name, value: z.name};
-        });
+        };
+        const items = [];
+        for (let n in network_types)
+        {
+            const data = this.state.zones.zones.filter(z=>z.plan.type==n)
+                .map(format);
+            if (data.length)
+                items.push({category: network_types[n].label, data});
+        }
         const selected = val || this.state.zones.def;
         return <div className="select_zone">
               <Tooltip title={tooltip}>
@@ -617,7 +639,7 @@ class Select_zone extends Pure_component {
                   }
                   <Select val={selected} type="select"
                     on_change_wrapper={on_change_wrapper} label="Default zone"
-                    data={zone_opt} disabled={disabled}/>
+                    with_categories data={items} disabled={disabled}/>
                 </span>
               </Tooltip>
               <T>{t=><Tooltip title={t('Refresh zones')}>

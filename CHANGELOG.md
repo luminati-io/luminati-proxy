@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.314 Stable
+- :sparkles: Added categories to dropdown UI
+
 ## 1.194.195 Stable
 - :bug: Fixed keeping the same IP over the longer time
 - :bug: Fixed refreshing sessions

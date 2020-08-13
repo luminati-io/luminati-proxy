@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.194.314",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added categories to dropdown UI"
+            }
+        ]
+    },
+    {
         "ver": "1.194.195",
         "type": "stable",
         "changes": [
