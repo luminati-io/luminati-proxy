@@ -1,11 +1,29 @@
 [
     {
+        "ver": "1.194.438",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix crashing UI when choosing Static Residential zone"
+            },
+            {
+                "type": "star",
+                "text": "Improved keeping the same IP over time"
+            }
+        ]
+    },
+    {
         "ver": "1.194.365",
         "type": "stable",
         "changes": [
             {
                 "type": "star",
                 "text": "Added support for the authorization per request"
+            },
+            {
+                "type": "sparkles",
+                "text": "Fixed categories in the dropdown UI"
             }
         ]
     },

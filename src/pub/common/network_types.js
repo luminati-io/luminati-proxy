@@ -5,11 +5,13 @@
 // and import it as a whole module
 export const get_plan_product = plan=>{
     if (plan.type=='static')
-        return plan.pool_ip_type=='static_res'&&'res_static' || 'dc';
+        return plan.pool_ip_type=='static_res' && 'res_static' || 'dc';
     if ((plan.type=='resident' || plan.type=='unblocker') && plan.serp)
         return 'serp';
     if (!plan.type || plan.type=='resident')
-        return plan.mobile&&'mobile' || 'res_rotating';
+        return plan.mobile && 'mobile' || 'res_rotating';
+    if (plan.type=='static_res')
+        return 'res_static';
     return plan.type;
 };
 

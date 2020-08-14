@@ -1,7 +1,12 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.438 Stable
+- :bug: Fix crashing UI when choosing Static Residential zone
+- :star: Improved keeping the same IP over time
+
 ## 1.194.365 Stable
 - :star: Added support for the authorization per request
+- :sparkles: Fixed categories in the dropdown UI
 
 ## 1.194.314 Stable
 - :bug: Fixed x-lpm-port response headers for debugging
