@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import {withRouter} from 'react-router-dom';
+import classNames from 'classnames';
 import Proxies from './proxies.js';
 import Stats from './stats.js';
 import Har_viewer from './har_viewer.js';
@@ -118,6 +119,10 @@ class Overview extends Pure_component {
 
 const Toolbar = ()=>
   <div className="toolbar">
+    <Nav_icon id='how_to' link_to='/howto'
+      tooltip='How to use the Proxy Manager'/>
+    <Nav_icon id='general_settings' link_to='/settings'
+      tooltip='General settings'/>
     <Add_proxy_btn/>
   </div>;
 
@@ -125,12 +130,30 @@ const Add_proxy_btn = ()=>{
   const open_modal = ()=>$('#add_new_proxy_modal').modal('show');
   return <T>{t=>
       <Tooltip title={t('Add new port')}>
-        <button onClick={open_modal} className="btn btn_lpm btn_lpm_primary">
+        <button onClick={open_modal}
+          className="btn btn_lpm btn_lpm_primary toolbar_item">
           Add new port
         </button>
       </Tooltip>
     }</T>;
 };
+
+const Nav_icon = withRouter(props=>{
+  const classes = classNames('toolbar_icon', 'cp_icon ', props.id);
+  const navigate_to = path=>{
+      props.history.push({pathname: path});
+  };
+  return <T>{t=>
+      <Tooltip title={t(props.tooltip)}>
+          <div className="toolbar_item">
+            <div className='toolbar_icon_bg'>
+            <div className={classes}
+              onClick={()=>navigate_to(props.link_to)}/>
+            </div>
+          </div>
+      </Tooltip>
+    }</T>;
+});
 
 const Logs_off_btn = props=>
   <Tooltip title="Logs are disabled. Click here to turn it on again">

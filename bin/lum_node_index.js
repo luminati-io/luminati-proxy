@@ -167,9 +167,13 @@ class Lum_node_index {
     }
     create_child(opt={}){
         process.env.LUM_MAIN_CHILD = true;
+        const exec_argv = process.execArgv;
+        if (!lpm_config.is_win)
+            exec_argv.push('--max-http-header-size=80000');
         const child_opt = {
             stdio: 'inherit',
             env: process.env,
+            execArgv: exec_argv,
         };
         this.child = child_process.fork(path.resolve(__dirname, 'lum_node.js'),
             process.argv.slice(2), child_opt);

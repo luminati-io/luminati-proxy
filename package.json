@@ -219,7 +219,9 @@
       "bin/pub/img/ic_faq.svg",
       "bin/pub/img/ic_filter.svg",
       "bin/pub/img/ic_firefox.jpg",
+      "bin/pub/img/ic_general_settings.svg",
       "bin/pub/img/ic_guest.svg",
+      "bin/pub/img/ic_how_to.svg",
       "bin/pub/img/ic_off.svg",
       "bin/pub/img/ic_refresh.svg",
       "bin/pub/img/ic_remove.svg",
@@ -395,7 +397,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "83983953c6c9a50e3c02857fad9f6091"
+    "md5": "2cb376d87f5aee29b0e24a64b71b9886"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -429,5 +431,5 @@
     "stress-test": "node scripts/stress_test.js",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.194.438"
+  "version": "1.194.462"
 }

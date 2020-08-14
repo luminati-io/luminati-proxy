@@ -790,6 +790,8 @@ span.icon_link {
     &.browser { background: url(/img/ic_browser_view.svg); }
     &.arrow_down { background: url(/img/ic_arrow_down.svg); }
     &.close_btn { background: url(/img/ic_arrow_down.svg); }
+    &.how_to { background: url(/img/ic_how_to.svg); }
+    &.general_settings { background: url(/img/ic_general_settings.svg); }
     &.back {
         background: url(/img/ic_back.svg);
         height: 20px;
@@ -1264,4 +1266,16 @@ span.icon_link {
 }
 .warnings_modal {
     .modal-body { padding: 10px 20px 0; }
+}
+.back_wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    opacity: 0.7;
+    cursor: pointer;
+    .cp_icon.back { margin-right: 4px; }
+    span { height: 17px; }
+    &:hover {
+        opacity: 1;
+    }
 }

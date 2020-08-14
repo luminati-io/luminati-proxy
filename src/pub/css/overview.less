@@ -106,4 +106,25 @@
     .main_panel { justify-content: center; }
     .loader_small { justify-content: center; }
     >.loader_small { margin-bottom: 10px; }
+    .toolbar_item {
+        height: 40px;
+        display: inline-block;
+        vertical-align: top;
+        .toolbar_icon_bg {
+            height: 40px;
+            width: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            border: solid 1px @cp_border;
+            margin-right: 5px;
+            background: white;
+            cursor: pointer;
+            .toolbar_icon {
+                height: 24px;
+                width: 24px;
+            }
+        }
+    }
 }

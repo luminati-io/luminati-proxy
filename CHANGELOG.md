@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.462 Stable
+- :star: Increased the max size of http headers
+- :sparkles: Added icons to navigate and back button
+
 ## 1.194.438 Stable
 - :bug: Fix crashing UI when choosing Static Residential zone
 - :star: Improved keeping the same IP over time

@@ -10,12 +10,15 @@ import _ from 'lodash';
 import $ from 'jquery';
 import {Select_zone, Pins} from './common/controls.js';
 import Warnings_modal from './common/warnings_modal.js';
+import {Back_btn} from './proxy_edit/index.js';
 import './css/settings.less';
 
-export default function Settings(){
+export default function Settings(props){
+    const btn_click = ()=>props.history.push({pathname: 'overview'});
     return <div className="settings">
           <div className="cp_panel">
             <div className="cp_panel_header">
+              <Back_btn click={btn_click}/>
               <h2>General settings</h2>
             </div>
             <Form/>

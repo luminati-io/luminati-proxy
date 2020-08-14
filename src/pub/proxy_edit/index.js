@@ -404,7 +404,7 @@ const Header = props=>
     </div>
   }</T>;
 
-const Back_btn = props=>
+export const Back_btn = props=>
   <div className="back_wrapper" onClick={props.click}>
     <div className="cp_icon back"/>
     <span>Back to overview</span>

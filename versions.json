@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.194.462",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Increased the max size of http headers"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added icons to navigate and back button"
+            }
+        ]
+    },
+    {
         "ver": "1.194.438",
         "type": "stable",
         "changes": [
