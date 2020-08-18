@@ -19,18 +19,7 @@ import {Language} from './common/i18n.js';
 import {with_www_api} from './common.js';
 import './css/nav.less';
 
-const Nav = ()=>
-    <div className="nav">
-      <Nav_top/>
-      <Nav_left/>
-      <Report_bug_modal/>
-      <Upgrade_downgrade_modal action='upgrade'/>
-      <Upgrade_downgrade_modal action='downgrade'/>
-      <Shutdown_modal/>
-    </div>;
-
-const Nav_left = with_www_api(withRouter(
-class Nav_left extends Pure_component {
+class Nav extends Pure_component {
     state = {lock: false};
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>
@@ -40,29 +29,43 @@ class Nav_left extends Pure_component {
     render(){
         if (!this.state.settings)
             return null;
-        const zagent = this.state.settings.zagent;
-        const faq_url = this.props.www_api+'/faq#proxy';
-        const api_url = this.props.www_api+'/doc/api#lpm_endpoints';
-        return <div className="nav_left">
-              <div className={classnames('menu', {lock: this.state.lock})}>
-                <Nav_link to="/overview" name="overview" label="Overview"/>
-                <Nav_link to="/howto" name="howto" label="How to use LPM"/>
-                <Nav_link to="/logs" name="logs" label="Request logs"/>
-                <Nav_link to="/settings" name="general_config"
-                  label="General settings"/>
-                {!zagent &&
-                  <Nav_link to="/config" name="config"
-                    label="Manual configuration"/>
-                }
-                <Nav_link ext to={api_url} name="api"
-                  label="API documentation"/>
-                {!zagent &&
-                   <Nav_link ext to={faq_url} name="faq" label="FAQ"/>
-                }
-              </div>
-              <div className="menu_filler"/>
-            </div>;
+        return <div className="nav">
+          <Nav_top/>
+          <Nav_left zagent={this.state.settings.zagent}
+            lock={this.state.lock}/>
+          <Report_bug_modal/>
+          <Upgrade_downgrade_modal action='upgrade'/>
+          <Upgrade_downgrade_modal action='downgrade'/>
+          <Shutdown_modal/>
+        </div>;
     }
+}
+
+const Nav_left = with_www_api(withRouter(props=>{
+    const zagent = props.zagent;
+    if (zagent)
+        return null;
+    const faq_url = props.www_api+'/faq#proxy';
+    const api_url = props.www_api+'/doc/api#lpm_endpoints';
+    return <div className="nav_left">
+          <div className={classnames('menu', {lock: props.lock})}>
+            <Nav_link to="/overview" name="overview" label="Overview"/>
+            <Nav_link to="/howto" name="howto" label="How to use LPM"/>
+            <Nav_link to="/logs" name="logs" label="Request logs"/>
+            <Nav_link to="/settings" name="general_config"
+              label="General settings"/>
+            {!zagent &&
+              <Nav_link to="/config" name="config"
+                label="Manual configuration"/>
+            }
+            <Nav_link ext to={api_url} name="api"
+              label="API documentation"/>
+            {!zagent &&
+               <Nav_link ext to={faq_url} name="faq" label="FAQ"/>
+            }
+          </div>
+          <div className="menu_filler"/>
+        </div>;
 }));
 
 const Nav_link = ({label, to, name, ext})=>

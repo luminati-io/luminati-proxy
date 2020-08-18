@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.798 Stable
+- :star: Performance optimizations
+
 ## 1.194.462 Stable
 - :star: Increased the max size of http headers
 - :sparkles: Added icons to navigate and back button

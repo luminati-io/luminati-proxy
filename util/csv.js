@@ -7,7 +7,7 @@ if (!is_node)
     define = self.define;
 else
     define = require('./require_node.js').define(module, '../');
-define(['/util/array.js'], function(zarray){
+define(['/util/util.js', '/util/array.js'], function(zutil, zarray){
 var E = {};
 var assign = Object.assign;
 
@@ -60,7 +60,11 @@ E.to_arr = function(data, opt){
             }
         }
         if (opt.trim)
+        {
             value = value.trim();
+            if (c=='\r')
+                c = data[++i];
+        }
         // add the value to the array
         if (array.length<=row)
             array.push([]);
@@ -140,6 +144,8 @@ function _get_flatenned_keys(obj, opt, keys){
         var key_set = [];
         for (var i = 0; i < obj.length; i++)
         {
+            if (!zutil.is_object(obj[i]))
+                continue;
             flatten(obj[i], opt, Object.keys(obj[i])).forEach(
                 function(el){ key_set.push(el); });
         }

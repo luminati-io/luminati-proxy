@@ -126,7 +126,7 @@ const Proxy_port_layer = ({proxies, form})=>{
         label = ' '+proxies[0].port;
     else
         label = ' '+proxies[0].port+' - '+proxies[proxies.length-1].port;
-    return <Layer no_btn id="port_numbers"><T>Proxy port</T>{label}</Layer>;
+    return <Layer no_btn id="port_numbers"><T>Port</T>{label}</Layer>;
 };
 
 const Layer = ({id, no_btn, no_arr, class_names, children})=>{

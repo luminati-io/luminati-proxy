@@ -3,6 +3,7 @@
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -227,25 +228,35 @@ const Old_modals = ()=>
       </Modal>
     </div>;
 
-const Page = ()=>
-    <div>
-      <Nav/>
-      <Proxy_add/>
-      <div className="page_body vbox">
-        <Error_boundry>
-          <Switch>
-            <Route path="/overview" exact component={Overview}/>
-            <Route path="/overview/:master_port" exact component={Overview}/>
-            <Route path="/proxy/:port" component={Proxy_edit}/>
-            <Route path="/howto/:option?/:suboption?" exact component={Howto}/>
-            <Route path="/logs" exact component={Logs}/>
-            <Route path="/config" exact component={Config}/>
-            <Route path="/settings" exact component={Settings}/>
-            <Route path="/" component={Overview}/>
-          </Switch>
-        </Error_boundry>
-      </div>
-    </div>;
+class Page extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.settings', settings=>this.setState({settings}));
+    }
+    render(){
+        const zagent = this.state.settings && this.state.settings.zagent;
+        return <div>
+          <Nav/>
+          <Proxy_add/>
+          <div className={classnames('page_body vbox', {zagent})}>
+            <Error_boundry>
+              <Switch>
+                <Route path="/overview" exact component={Overview}/>
+                <Route path="/overview/:master_port" exact
+                  component={Overview}/>
+                <Route path="/proxy/:port" component={Proxy_edit}/>
+                <Route path="/howto/:option?/:suboption?" exact
+                  component={Howto}/>
+                <Route path="/logs" exact component={Logs}/>
+                <Route path="/config" exact component={Config}/>
+                <Route path="/settings" exact component={Settings}/>
+                <Route path="/" component={Overview}/>
+              </Switch>
+            </Error_boundry>
+          </div>
+        </div>;
+    }
+}
 
 const Root = ()=>
     <BrowserRouter>

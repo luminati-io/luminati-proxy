@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.194.798",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Performance optimizations"
+            }
+        ]
+    },
+    {
         "ver": "1.194.462",
         "type": "stable",
         "changes": [
