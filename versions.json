@@ -1,6 +1,6 @@
 [
     {
-        "ver": "1.195.37",
+        "ver": "1.195.51",
         "type": "stable",
         "changes": [
             {
@@ -10,6 +10,10 @@
             {
                 "type": "star",
                 "text": "Added more logging to worker.js crashes"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed the endpoint for banning IPs globally"
             }
         ]
     },

@@ -1,8 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.195.37 Stable
+## 1.195.51 Stable
 - :sparkles: UI improvement: changed multiplied ports to collapsible/expandable
 - :star: Added more logging to worker.js crashes
+- :bug: Fixed the endpoint for banning IPs globally
 
 ## 1.194.952 Stable
 - :star: Improved logging and performance on multi CPUs machines

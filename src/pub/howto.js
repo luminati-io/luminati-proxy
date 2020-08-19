@@ -23,7 +23,7 @@ const Howto = withRouter(class Howto extends Pure_component {
         browser: 'using browser',
         proxy_tester: 'instantly from here',
     };
-    back_btn_click = ()=>this.props.history.push({pathname: 'overview'});
+    back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];
