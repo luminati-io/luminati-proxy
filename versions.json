@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.195.37",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvement: changed multiplied ports to collapsible/expandable"
+            },
+            {
+                "type": "star",
+                "text": "Added more logging to worker.js crashes"
+            }
+        ]
+    },
+    {
         "ver": "1.194.952",
         "type": "stable",
         "changes": [

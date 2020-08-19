@@ -242,8 +242,6 @@ class Page extends Pure_component {
             <Error_boundry>
               <Switch>
                 <Route path="/overview" exact component={Overview}/>
-                <Route path="/overview/:master_port" exact
-                  component={Overview}/>
                 <Route path="/proxy/:port" component={Proxy_edit}/>
                 <Route path="/howto/:option?/:suboption?" exact
                   component={Howto}/>

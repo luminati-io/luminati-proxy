@@ -62,12 +62,8 @@ class Overview extends Pure_component {
     };
     render(){
         const {show_logs} = this.state;
-        const master_port = this.props.match.params.master_port;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
-        const title = master_port ?
-            <span>
-              <T>Overview of multiplied proxy port</T> - {master_port}
-            </span> : <T>Overview</T>;
+        const title = <T>Overview</T>;
         return <div className="overview_page">
               <div className="warnings">
                 {!this.state.embedded &&
@@ -86,7 +82,7 @@ class Overview extends Pure_component {
               </div>
               <div className="panels" style={panels_style}>
                 <div className="proxies proxies_wrapper">
-                  <Proxies master_port={master_port}/>
+                  <Proxies/>
                 </div>
                 <Stats/>
               </div>
@@ -94,7 +90,7 @@ class Overview extends Pure_component {
                 <Loader_small show loading_msg="Loading..."/>}
               {show_logs &&
                 <div className="logs_wrapper">
-                  <Har_viewer master_port={master_port}/>
+                  <Har_viewer/>
                 </div>}
               {show_logs===false &&
                 <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>}

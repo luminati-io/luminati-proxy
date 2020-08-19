@@ -124,19 +124,49 @@ class Type_cell extends React.Component {
     }
 }
 
-const Port_cell = ({proxy, mgr, scrolling})=>{
-    if (scrolling)
-        return proxy.port;
-    let val;
-    if (!mgr.props.master_port && proxy.multiply && proxy.multiply>1)
-        val = proxy.port+':1..'+proxy.multiply;
-    else
-        val = proxy.port;
-    const title = `${proxy.port} is a proxy port that refers to a specific
+class Port_cell extends Pure_component {
+    state = {expanded: this.props.proxy.expanded};
+    toggle = e=>{
+        e.stopPropagation();
+        const _this = this.props.mgr;
+        const proxies = _this.state.proxies.slice();
+        let master_proxy = proxies.find(p=>p.port==this.props.proxy.port);
+        master_proxy.expanded = !master_proxy.expanded;
+        const visible_proxies = _this.get_visible_proxies(proxies);
+        _this.setState({proxies, visible_proxies});
+        this.setState(prev=>({open: !prev.open}));
+    };
+    componentDidUpdate(){
+        this.setState({expanded: this.props.proxy.expanded});
+    }
+    render(){
+        const {proxy, scrolling} = this.props;
+        if (scrolling)
+            return proxy.port;
+        const is_multiplied_port = !proxy.master_port && proxy.multiply &&
+            proxy.multiply>1;
+        const val = is_multiplied_port ? proxy.port+':1..'+proxy.multiply :
+            proxy.port;
+        const title = `${proxy.port} is a proxy port that refers to a specific
         virtual location on a computer. You can use it as a virtual proxy to
         send requests`;
-    return <Tooltip title={title}>{val}</Tooltip>;
-};
+        if (is_multiplied_port)
+        {
+            const c = this.state.expanded ? 'open' : 'before';
+            const classes = classnames('expandable', c);
+            return <Tooltip title={title}>
+                  <div className='port_cell master'>
+                    <div onClick={this.toggle} className={classes}/>
+                    <div>{val}</div>
+                  </div>
+                </Tooltip>;
+        }
+        const c = proxy.master_port ? 'port_cell multiplied' : null;
+        return <Tooltip title={title}>
+              <div className={c}>{val}</div>
+            </Tooltip>;
+    }
+}
 
 const Success_rate_cell = ({proxy})=>{
     const val = !proxy.reqs ? '—' :
@@ -310,8 +340,7 @@ const columns = [
         key: 'ip',
         title: 'Static IPs',
         type: 'text',
-        calc_show: (proxies, master)=>
-            master && proxies.some(p=>p.multiply_ips),
+        calc_show: proxies=>proxies.some(p=>p.multiply_ips),
         render: Static_ip_cell,
     },
     {
@@ -319,8 +348,7 @@ const columns = [
         title: 'User',
         type: 'text',
         ext: true,
-        calc_show: (proxies, master)=>
-            master && proxies.some(p=>p.multiply_users),
+        calc_show: proxies=>proxies.some(p=>p.multiply_users),
     },
     {
         key: 'vip',
@@ -487,8 +515,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             let proxy_filter = proxies.length ? this.state.proxy_filter : '';
             proxies = this.prepare_proxies(proxies);
-            const visible_proxies = this.get_visible_proxies(
-                proxies, this.props.master_port, proxy_filter);
+            const visible_proxies = this.get_visible_proxies(proxies,
+                proxy_filter);
             this.setState(
                 {proxies, visible_proxies, proxy_filter, loaded: true});
         });
@@ -508,22 +536,15 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.update_window_dimensions();
         window.addEventListener('resize', this.update_window_dimensions);
     }
-    componentDidUpdate(prev_props){
-        if (prev_props.master_port!=this.props.master_port)
-        {
-            const visible_proxies = this.get_visible_proxies(
-                this.state.proxies, this.props.master_port);
-            this.setState({visible_proxies});
-        }
-    }
     willUnmount(){
         window.clearTimeout(this.timeout_id);
         window.removeEventListener('resize', this.update_window_dimensions);
     }
-    get_visible_proxies = (proxies, mp, proxy_filter, sort)=>{
+    get_visible_proxies = (proxies, proxy_filter, sort)=>{
         if (proxy_filter===undefined)
             proxy_filter = this.state.proxy_filter;
         sort = sort||this.state.sort;
+        const is_master_proxy = port=>proxy=>proxy.port==port;
         proxies = proxies.filter(p=>{
             if (proxy_filter &&
                 !(p.internal_name||'').includes(proxy_filter) &&
@@ -532,9 +553,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             {
                 return false;
             }
-            if (mp)
-                return ''+p.port==mp||''+p.master_port==mp;
-            return p.proxy_type!='duplicate';
+            if (p.proxy_type=='duplicate')
+            {
+                return proxies.filter(is_master_proxy(p.master_port))[0]
+                    .expanded;
+            }
+            return true;
         });
         let {zones} = this.state;
         const res = [...proxies].sort((p1, p2)=>{
@@ -567,8 +591,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 yield report_exception(e, 'proxies.Proxies.req_status');
             }));
             const params = {};
-            if (_this.props.master_port)
-                params.master_port = _this.props.master_port;
             const url = zescape.uri('/api/recent_stats', params);
             const stats = yield ajax.json({url});
             setdb.set('head.recent_stats', stats);
@@ -591,34 +613,33 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                     p.reqs = stat.reqs;
                     p.success = stat.success;
                     p.last_req = {url: stat.url, ts: stat.timestamp};
+                    if (p.proxy_type!='duplicate')
+                        p.expanded = !!p.expanded;
                     return p;
                 });
                 const new_proxies = {};
                 for (let p of new_proxies_a)
                     new_proxies[p.port] = p;
-                if (!_this.props.master_port)
+                for (let p of Object.values(new_proxies))
                 {
-                    for (let p of Object.values(new_proxies))
+                    if (p.proxy_type=='duplicate')
                     {
-                        if (p.proxy_type=='duplicate')
+                        const master_port = new_proxies[p.master_port];
+                        master_port.in_bw += p.in_bw;
+                        master_port.out_bw += p.out_bw;
+                        master_port.bw += p.bw;
+                        master_port.reqs += p.reqs;
+                        master_port.success += p.success;
+                        if (!master_port.last_req.ts ||
+                            p.last_req.ts &&
+                            p.last_req.ts>master_port.last_req.ts)
                         {
-                            const master_port = new_proxies[p.master_port];
-                            master_port.in_bw += p.in_bw;
-                            master_port.out_bw += p.out_bw;
-                            master_port.bw += p.bw;
-                            master_port.reqs += p.reqs;
-                            master_port.success += p.success;
-                            if (!master_port.last_req.ts ||
-                                p.last_req.ts &&
-                                p.last_req.ts>master_port.last_req.ts)
-                            {
-                                master_port.last_req = p.last_req;
-                            }
+                            master_port.last_req = p.last_req;
                         }
                     }
                 }
                 const visible_proxies = _this.get_visible_proxies(
-                    Object.values(new_proxies), _this.props.master_port);
+                    Object.values(new_proxies));
                 return {proxies: Object.values(new_proxies), visible_proxies,
                     stats};
             });
@@ -686,10 +707,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         const proxy = e.rowData;
         if (proxy.proxy_type!='persist')
             return;
-        if (!this.props.master_port && proxy.multiply && proxy.multiply>1)
-            this.props.history.push(`/overview/${proxy.port}`);
-        else
-            this.props.history.push(`/proxy/${proxy.port}`);
+        if (proxy.master_port)
+            return;
+        this.props.history.push(`/proxy/${proxy.port}`);
     };
     get_cols = ()=>{
         if (!is_local())
@@ -699,7 +719,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         }
         return columns.filter(col=>this.state.selected_cols.includes(col.key)
             || col.sticky || col.calc_show && col.calc_show(
-                this.state.visible_proxies||[], this.props.master_port));
+                this.state.visible_proxies||[]));
     };
     open_delete_dialog = proxies=>{
         this.setState({delete_proxies: proxies, open_delete_dialog: true});
@@ -710,7 +730,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     set_proxy_filter(e){
         let proxy_filter = e.target.value;
         const visible_proxies = this.get_visible_proxies(this.state.proxies,
-            this.props.master_port, proxy_filter);
+            proxy_filter);
         this.setState({proxy_filter, visible_proxies, selected_proxies: {}});
     }
     set_sort({sortBy: sort_by, sortDirection: sort_direction}){
@@ -719,7 +739,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         sort_direction = sort_direction.toLowerCase();
         let sort = {sort_by, sort_direction};
         const visible_proxies = this.get_visible_proxies(this.state.proxies,
-            this.props.master_port, undefined, sort);
+            undefined, sort);
         this.setState({sort, visible_proxies, selected_proxies: {}});
     }
     render(){
@@ -759,7 +779,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                           this.all_rows_select()}
                         headerHeight={30}
                         headerClassName="cp_th"
-                        rowClassName="cp_tr"
+                        rowClassName={({index})=>
+                            visible_proxies[index] &&
+                            visible_proxies[index].master_port ?
+                            'cp_tr disabled filler' : 'cp_tr'}
                         rowHeight={40}
                         sort={sort=>this.set_sort(sort)}
                         sortBy={sort_by}
@@ -887,7 +910,7 @@ class Cell extends React.Component {
     }
     cell_clicked = e=>{
         const p = this.props.rowData;
-        if (!p.master_port && p.multiply && p.multiply>1)
+        if (p.master_port)
             return;
         e.stopPropagation();
         this.props.history.push({

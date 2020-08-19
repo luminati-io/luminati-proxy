@@ -160,7 +160,6 @@ class Har_viewer extends Pure_component {
                   <Toolbar
                     undock={this.undock}
                     dock_mode={this.props.dock_mode}
-                    master_port={this.props.master_port}
                     filters={this.state.filters}
                     set_filter={this.set_filter}
                     proxies={this.state.proxies}
@@ -171,8 +170,6 @@ class Har_viewer extends Pure_component {
                     search_val={this.state.search}/>
                   <div className="split_widget vbox flex_auto">
                     <Tables_container
-                      key={''+this.props.master_port}
-                      master_port={this.props.master_port}
                       main_panel_moving={this.main_panel_moving}
                       main_panel_stopped_moving=
                         {this.main_panel_stopped_moving}
@@ -229,7 +226,7 @@ class Toolbar extends Pure_component {
     };
     render(){
         const {clear, search_val, on_change_search, type_filter,
-            set_type_filter, filters, set_filter, master_port, undock,
+            set_type_filter, filters, set_filter, undock,
             dock_mode} = this.props;
         return <Toolbar_container>
               <T>{t=><Toolbar_row>
@@ -260,8 +257,7 @@ class Toolbar extends Pure_component {
                   <Search_box val={search_val} on_change={on_change_search}/>
                   <Type_filters filter={type_filter} set={set_type_filter}/>
                   <Devider/>
-                  <Filters set_filter={set_filter} filters={filters}
-                    master_port={master_port}/>
+                  <Filters set_filter={set_filter} filters={filters}/>
                 </Toolbar_row>
               }
             </Toolbar_container>;
@@ -322,8 +318,7 @@ class Filters extends Pure_component {
         const filters = [
             {
                 name: 'port',
-                default_value: this.props.master_port ?
-                    `Multiplied ${this.props.master_port}` : 'All proxy ports',
+                default_value: 'All proxy ports',
                 tooltip: 'Filter requests by ports',
             },
             {
@@ -490,14 +485,6 @@ class Tables_container extends Pure_component {
         params.skip = opt.skip||0;
         if (this.props.match.params.port)
             params.port = this.props.match.params.port;
-        if (this.props.master_port)
-        {
-            const proxies = setdb.get('head.proxies_running');
-            const mp = proxies.find(p=>p.port==this.props.master_port);
-            this.port_range = {from: mp.port, to: mp.port+mp.multiply-1};
-            params.port_from = this.port_range.from;
-            params.port_to = this.port_range.to;
-        }
         if (this.props.search&&this.props.search.trim())
             params.search = this.props.search;
         if (this.state.sorted)
