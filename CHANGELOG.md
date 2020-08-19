@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.194.952 Stable
+- :star: Improved logging and performance on multi CPUs machines
+
 ## 1.194.798 Stable
 - :star: Performance optimizations
 
