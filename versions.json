@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.195.277",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Performance optimizations: fixed crashing workers"
+            }
+        ]
+    },
+    {
         "ver": "1.195.206",
         "type": "stable",
         "changes": [

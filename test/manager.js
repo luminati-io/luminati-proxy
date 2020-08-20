@@ -403,10 +403,28 @@ describe('manager', ()=>{
             });
             describe('delete', ()=>{
                 it('normal', etask._fn(function*(_this){
-                    app = yield app_with_args([]);
-                    let res = yield api_json('api/proxies/24000',
+                    const proxies = [{port: 24000}];
+                    app = yield app_with_proxies(proxies, {});
+                    const res = yield api_json('api/proxies/24000',
                         {method: 'delete'});
                     assert.equal(res.statusCode, 204);
+                }));
+                it('cannot delete not existing', etask._fn(function*(_this){
+                    app = yield app_with_args();
+                    const res = yield api_json('api/proxies/24001',
+                        {method: 'delete'});
+                    assert.equal(res.statusCode, 500);
+                    assert.equal(res.body,
+                        'Server error: this proxy does not exist');
+                }));
+                it('cannot delete duplicated', etask._fn(function*(_this){
+                    const proxies = [{port: 24000, multiply: 2}];
+                    app = yield app_with_proxies(proxies, {});
+                    const res = yield api_json('api/proxies/24001',
+                        {method: 'delete'});
+                    assert.equal(res.statusCode, 500);
+                    assert.equal(res.body,
+                        'Server error: cannot delete this port');
                 }));
             });
             describe('banip', ()=>{

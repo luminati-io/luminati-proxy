@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.195.277 Stable
+- :sparkles: Performance optimizations: fixed crashing workers
+
 ## 1.195.206 Stable
 - :star: Accepting --insecure-http-parser to ignore HTTP parsing errors
 
