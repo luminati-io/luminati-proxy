@@ -39,6 +39,7 @@ const conf = {
             'auto-upgrade': 'Enable auto upgrade',
             'start-upgrader': 'Install CRON process that checks upgrades',
             'stop-upgrader': 'Removes CRON process that checks upgrades',
+            'insecure-http-parser': 'Disables the strict checks',
         },
         alias: {
             help: ['h', '?'],

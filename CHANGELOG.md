@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.195.206 Stable
+- :star: Accepting --insecure-http-parser to ignore HTTP parsing errors
+
 ## 1.195.51 Stable
 - :sparkles: UI improvement: changed multiplied ports to collapsible/expandable
 - :star: Added more logging to worker.js crashes

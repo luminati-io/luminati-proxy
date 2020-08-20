@@ -170,6 +170,8 @@ class Lum_node_index {
         const exec_argv = process.execArgv;
         if (!lpm_config.is_win)
             exec_argv.push('--max-http-header-size=80000');
+        if (this.argv.insecureHttpParser)
+            exec_argv.push('--insecure-http-parser');
         const child_opt = {
             stdio: 'inherit',
             env: process.env,

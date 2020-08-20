@@ -13,7 +13,9 @@ import {Sort_icon} from './chrome_widgets.js';
 import {T} from './common/i18n.js';
 import React_tooltip from 'react-tooltip';
 
-class Stats extends Pure_component {
+export const Logs_context = React.createContext(true);
+
+export class Stats extends Pure_component {
     state = {stats: {}, toggling: false};
     componentDidMount(){
         this.setdb_on('head.recent_stats', stats=>{
@@ -249,7 +251,8 @@ const Row = withRouter(class Row extends Pure_component {
     };
     render(){
         const {stat, row_key, warning} = this.props;
-        return <tr onClick={this.click}>
+        return <tr className={!this.context ? 'disabled' : ''}
+                onClick={this.context ? this.click : null}>
               <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
               <td>
                 <Tooltip_bytes
@@ -265,6 +268,7 @@ const Row = withRouter(class Row extends Pure_component {
             </tr>;
     }
 });
+Row.WrappedComponent.contextType = Logs_context;
 
 class Toolbar extends Pure_component {
     clear = ()=>{
@@ -308,5 +312,3 @@ const Success_ratio = ({total=0, success=0})=>{
           </div>
         </div>;
 };
-
-export default Stats;

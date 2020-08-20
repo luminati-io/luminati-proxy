@@ -4,7 +4,7 @@ import React from 'react';
 import {withRouter} from 'react-router-dom';
 import classNames from 'classnames';
 import Proxies from './proxies.js';
-import Stats from './stats.js';
+import {Logs_context, Stats} from './stats.js';
 import Har_viewer from './har_viewer.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
@@ -84,7 +84,9 @@ class Overview extends Pure_component {
                 <div className="proxies proxies_wrapper">
                   <Proxies/>
                 </div>
-                <Stats/>
+                <Logs_context.Provider value={!!show_logs}>
+                  <Stats/>
+                </Logs_context.Provider>
               </div>
               {show_logs===null &&
                 <Loader_small show loading_msg="Loading..."/>}
