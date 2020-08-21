@@ -159,10 +159,15 @@ function _get_flatenned_keys(obj, opt, keys){
 }
 
 function get_flatenned_keys(dataset, opt, keys){
-    var key_set = [], i;
-    for (i = 0; i < dataset.length; i++)
-        key_set = key_set.concat(_get_flatenned_keys(dataset[i], opt, keys));
-    var arr = zarray.unique(key_set);
+    var keymap = {}, i;
+    for (i = 0; i<dataset.length; i++)
+    {
+        var _keys = _get_flatenned_keys(dataset[i], opt, keys);
+        for (var j = 0; j<_keys.length; j++)
+            keymap[_keys[j]] = true;
+    }
+    var arr = Object.keys(keymap);
+    // XXX josh/gabriel: this should be grouping same prefix keys, not sorting
     arr.sort();
     // Removes keys where value is considered non-complex due to being an empty
     // array but, in reality, it is complex in other entries
@@ -188,10 +193,16 @@ function generate_keys(dataset, opt){
         keys = Object.keys(dataset[0]);
     else if (opt.keys=='auto')
     {
-        var arr = [];
-        for (var i = 0; i < dataset.length; i++)
-            arr = arr.concat(Object.keys(dataset[i]));
-        keys = zarray.unique(arr);
+        var keymap = {};
+        for (var i = 0; i<dataset.length; i++)
+        {
+            for (var j = 0, fields = Object.keys(dataset[i]); j<fields.length;
+                j++)
+            {
+                keymap[fields[j]] = true;
+            }
+        }
+        keys = Object.keys(keymap);
     }
     else
         keys = opt.keys;

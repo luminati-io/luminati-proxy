@@ -9,13 +9,15 @@ const ssl = require('../lib/ssl.js');
 const lpm_config = require('../util/lpm_config.js');
 const lpm_file = require('../util/lpm_file.js');
 const file = require('../util/file.js');
-const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
 const util_lib = require('../lib/util.js');
 const upgrader = require('./upgrader.js');
 const string = require('../util/string.js');
 const qw = string.qw;
+let pm2;
+try { pm2 = require('pm2'); }
+catch(e){ logger.warn('could not load pm2: daemon mode not supported'); }
 
 class Lum_node_index {
     constructor(argv){

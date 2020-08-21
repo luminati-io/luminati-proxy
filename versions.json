@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.195.444",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Stability improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.195.277",
         "type": "stable",
         "changes": [

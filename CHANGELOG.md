@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.195.444 Stable
+- :sparkles: Stability improvements
+
 ## 1.195.277 Stable
 - :sparkles: Performance optimizations: fixed crashing workers
 

@@ -460,6 +460,8 @@ E.like_browser_case_and_order_http2 = function(headers, browser, opt){
     if (Object.keys(headers).find(h=>h.toLowerCase()=='x-requested-with'))
         opt = assign({req_type: 'ajax'}, opt);
     let header_keys = E.browser_default_header_order_http2(browser, opt);
+    if (!header_keys)
+        console.log('debug_header_keys_typeerror', browser, opt);
     let req_headers = {};
     for (let h in headers)
         req_headers[h.toLowerCase()] = headers[h];
