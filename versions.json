@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.195.934",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed unbanning IPs API"
+            }
+        ]
+    },
+    {
         "ver": "1.195.444",
         "type": "stable",
         "changes": [
