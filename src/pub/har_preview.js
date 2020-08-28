@@ -408,6 +408,7 @@ class Single_timeline extends Pure_component {
         const perc = [
             {label: 'Queueing', id: 'blocked', section: 0},
             {label: 'Connected', id: 'wait', section: 1},
+            {label: 'Time to first byte', id: 'ttfb', section: 1},
             {label: 'Response', id: 'receive', section: 1},
         ].reduce((acc, el)=>{
             const cur_time = this.props.timeline[el.id];

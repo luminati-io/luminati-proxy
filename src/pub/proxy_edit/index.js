@@ -4,6 +4,7 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import _ from 'lodash';
+import classnames from 'classnames';
 import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
@@ -404,11 +405,21 @@ const Header = props=>
     </div>
   }</T>;
 
-export const Back_btn = props=>
-  <div className="back_wrapper" onClick={props.click}>
-    <div className="cp_icon back"/>
-    <span>Back to overview</span>
-  </div>;
+export class Back_btn extends Pure_component {
+    state = {lock: false};
+    componentDidMount(){
+        this.setdb_on('head.lock_navigation', lock=>
+            lock!==undefined && this.setState({lock}));
+    }
+    render(){
+        const {lock} = this.state;
+        return <div className={classnames('back_wrapper', {lock})}
+              onClick={this.props.click}>
+              <div className="cp_icon back"/>
+              <span>Back to overview</span>
+            </div>;
+    }
+}
 
 const Port_title = ({port, name, t})=>{
     if (name)

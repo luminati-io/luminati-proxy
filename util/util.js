@@ -533,4 +533,23 @@ E.reduce_obj = function(coll, key_cb, val_cb){
     return obj;
 };
 
+E.flatten_obj = function(obj){
+    if (!E.is_object(obj) && !Array.isArray(obj))
+        return obj;
+    var res = {}, k, keys = Object.keys(obj);
+    for (var i = 0; i < keys.length; i++)
+    {
+        k = keys[i];
+        if (!E.is_object(obj[k]) && !Array.isArray(obj[k]))
+            res[k] = obj[k];
+        else
+        {
+            var o = E.flatten_obj(obj[keys[i]]), _keys = Object.keys(o);
+            for (var j = 0; j < _keys.length; j++)
+                res[k+'_'+_keys[j]] = o[_keys[j]];
+        }
+    }
+    return res;
+};
+
 return E; }); }());

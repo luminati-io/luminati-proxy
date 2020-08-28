@@ -860,10 +860,10 @@ describe('proxy', ()=>{
                     assert.ok(add_stub.called);
                     assert.ok(refresh_stub.called);
                 }));
-                let t = (name, req, fake, is_ssl)=>it(name, ()=>etask(
+                const t = (name, req)=>it(name, ()=>etask(
                     function*()
                 {
-                    proxy.fake = !!fake;
+                    proxy.fake = true;
                     sandbox.stub(Server, 'get_random_ip', ()=>'1.1.1.1');
                     sandbox.stub(common, 'get_random_ip', ()=>'1.1.1.1');
                     l = yield lum({rules: [{
@@ -871,7 +871,7 @@ describe('proxy', ()=>{
                         action_type: 'ban_ip',
                         status: '200',
                         trigger_type: 'status',
-                    }], ssl: is_ssl});
+                    }]});
                     l.on('retry', opt=>{
                         l.lpm_request(opt.req, opt.res, opt.head, opt.post);
                     });
@@ -879,7 +879,7 @@ describe('proxy', ()=>{
                     {
                         let w = etask.wait();
                         l.on('usage', data=>w.return(data));
-                        let res = yield l.test(req());
+                        let res = yield l.test(req);
                         let usage = yield w;
                         assert.equal(res.statusCode, 200);
                         assert.deepStrictEqual(usage.rules, [{
@@ -888,10 +888,8 @@ describe('proxy', ()=>{
                             type: 'after_hdr'}]);
                     }
                 }));
-                t('ban_ip fake', ()=>({fake: 1}), false, true);
-                t('ban_ip http', ()=>({url: ping.http.url}), false, true);
-                t('ban_ip https', ()=>({url: ping.https.url}), true, false);
-                t('ban_ip https ssl', ()=>({url: ping.https.url}), true, true);
+                t('ban_ip http', {url: test_url.http});
+                t('ban_ip https', {url: test_url.https});
             });
             describe('request_url', ()=>{
                 let req, req_stub;

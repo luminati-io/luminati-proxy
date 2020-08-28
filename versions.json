@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.196.424",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed crashing on Windows"
+            },
+            {
+                "type": "star",
+                "text": "Request is canceled if all the IPs LPM is getting are banned"
+            }
+        ]
+    },
+    {
         "ver": "1.195.934",
         "type": "stable",
         "changes": [
