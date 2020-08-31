@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
+const semver = require('semver');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
@@ -13,7 +14,8 @@ const child_process = require('child_process');
 const path = require('path');
 const util_lib = require('../lib/util.js');
 const upgrader = require('./upgrader.js');
-const string = require('../util/string.js');
+const string = require('../util/string.js'), {nl2sp} = string;
+const pkg = require('../package.json');
 const qw = string.qw;
 let pm2;
 try { pm2 = require('pm2'); }
@@ -170,7 +172,7 @@ class Lum_node_index {
     create_child(opt={}){
         process.env.LUM_MAIN_CHILD = true;
         const exec_argv = process.execArgv;
-        if (!lpm_config.is_win)
+        if (!lpm_config.is_win && this.is_node_compatible('>10.15.0'))
             exec_argv.push('--max-http-header-size=80000');
         if (this.argv.insecureHttpParser)
             exec_argv.push('--insecure-http-parser');
@@ -232,6 +234,19 @@ class Lum_node_index {
             this.restart_daemon();
         });
     }
+    is_node_compatible(compare_ver){
+        const node_ver = process.versions.node;
+        return semver.satisfies(node_ver, compare_ver);
+    }
+    check_node_ver(){
+        const recommended_ver = pkg.recommendedNode;
+        const node_ver = process.versions.node;
+        if (!this.is_node_compatible(recommended_ver))
+        {
+            logger.warn(nl2sp`Node version is too old (${node_ver}). LPM
+                requires at least ${recommended_ver} to run correctly.`);
+        }
+    }
     run(){
         if (this.argv.startUpgrader)
             return upgrader.start_upgrader();
@@ -249,6 +264,7 @@ class Lum_node_index {
             return this.upgrade();
         if (this.argv.downgrade)
             return this.downgrade();
+        this.check_node_ver();
         this.init_traps();
         this.create_child();
     }

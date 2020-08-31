@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.196.634 Stable
+- :bug: Added node version compatiblity check on startup
+
 ## 1.196.424 Stable
 - :bug: Fixed crashing on Windows
 - :star: Request is canceled if all the IPs LPM is getting are banned

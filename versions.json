@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.196.634",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Added node version compatiblity check on startup"
+            }
+        ]
+    },
+    {
         "ver": "1.196.424",
         "type": "stable",
         "changes": [
