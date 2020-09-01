@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.196.832",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Waterfall rule, skip refreshing the session"
+            },
+            {
+                "type": "star",
+                "text": "Performance improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.196.634",
         "type": "stable",
         "changes": [

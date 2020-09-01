@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.196.832 Stable
+- :bug: Fixed Waterfall rule, skip refreshing the session
+- :star: Performance improvements
+
 ## 1.196.634 Stable
 - :bug: Added node version compatiblity check on startup
 

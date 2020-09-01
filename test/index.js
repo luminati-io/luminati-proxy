@@ -846,19 +846,15 @@ describe('proxy', ()=>{
             describe('ban_ip', ()=>{
                 it('ban_ip', ()=>etask(function*(){
                     l = yield lum({rules: []});
-                    sinon.stub(l.rules, 'can_retry').returns(true);
-                    sinon.stub(l.rules, 'retry');
-                    const refresh_stub = sinon.stub(l.session_mgr,
-                        'refresh_sessions');
+                    sinon.stub(l.rules, 'can_retry').returns(false);
                     const add_stub = sinon.stub(l, 'banip');
                     const req = {ctx: {}};
                     const opt = {_res: {
                         hola_headers: {'x-luminati-ip': '1.2.3.4'}}};
-                    const r = l.rules.action(req, {}, {},
+                    const retried = l.rules.action(req, {}, {},
                         {action: {ban_ip: 1000}}, opt);
-                    assert.ok(r);
+                    assert.ok(!retried);
                     assert.ok(add_stub.called);
-                    assert.ok(refresh_stub.called);
                 }));
                 const t = (name, req)=>it(name, ()=>etask(
                     function*()
