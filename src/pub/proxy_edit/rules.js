@@ -297,7 +297,8 @@ class Rule_config extends Pure_component {
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}
               label={tabs[tab_id].fields[id].label}
-              tooltip={tabs[tab_id].fields[id].tooltip}/>;
+              tooltip={tabs[tab_id].fields[id].tooltip}
+              class_name={this.props.class_name}/>;
     }
 }
 
@@ -505,6 +506,14 @@ class Action extends Pure_component {
         ports.unshift({key: '--Select--', value: ''});
         const ban_action = ['ban_ip', 'ban_ip_domain', 'ban_ip_global']
             .includes(rule.action);
+        const ban_opt = [
+            {value: 0, label: 'Until LPM restarts'},
+            {value: 1, label: '1 minute'},
+            {value: 5, label: '5 minutes'},
+            {value: 10, label: '10 minutes'},
+            {value: 30, label: '30 minutes'},
+            {value: 60, label: '60 minutes'},
+        ];
         return <React.Fragment>
               <div className="action ui">
                 {rule.trigger_type &&
@@ -525,8 +534,8 @@ class Action extends Pure_component {
                 }
                 {ban_action &&
                   <Rule_config id="ban_ip_duration" type="select_number"
-                    data={[0, 1, 5, 10, 30, 60]} sufix="minutes" rule={rule}
-                    note={<Ban_ips_note/>}/>
+                    data={ban_opt} rule={rule} note={<Ban_ips_note/>}
+                    class_name="ban_action"/>
                 }
                 {rule.action=='request_url' &&
                   <div>

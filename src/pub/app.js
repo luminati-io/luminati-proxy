@@ -162,64 +162,55 @@ const App = withRouter(class App extends Pure_component {
     }
 });
 
+const general_modals_info = [
+    {
+        id: 'restarting',
+        title: 'Restarting...',
+        body: 'Please wait. The page will be reloaded automatically once the '
+            +'application has restarted.',
+    },
+    {
+        id: 'missing_root_perm',
+        title: 'LPM process is not running with root permissions',
+        body: "You can't upgrade LPM from the UI because it's not running "
+            +'with root permission. You have to close the process in the '
+            +'terminal and run <code>sudo luminati --upgrade</code>',
+    },
+    {
+        id: 'upgrading',
+        title: 'Luminati Proxy Manager is upgrading',
+        body: 'Please wait...',
+    },
+    {
+        id: 'downgrading',
+        title: 'Luminati Proxy Manager is downgrading',
+        body: 'Please wait...',
+    },
+    {
+        id: 'shutdown',
+        title: 'Shutdown',
+        body: 'The application has been shut down. To restart, please run it '
+            +'manually and reload this page.',
+    },
+];
+
+const General_old_modals = ()=>
+    general_modals_info.map(({id, title, body: __html})=>
+        <div key={id} id={id} className="modal fade" role="dialog">
+          <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">{title}</h4>
+            </div>
+            <div className="modal-body" dangerouslySetInnerHTML={{__html}}/>
+            <div className="modal-footer"/>
+          </div>
+          </div>
+        </div>);
+
 const Old_modals = ()=>
     <div className="old_modals">
-      <div id="restarting" className="modal fade" role="dialog">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Restarting...</h4>
-            </div>
-            <div className="modal-body">
-              Please wait. The page will be reloaded automatically
-              once the application has restarted.
-            </div>
-            <div className="modal-footer"/>
-          </div>
-        </div>
-      </div>
-      <div id="upgrading" className="modal fade" role="dialog">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">
-                Luminati Proxy Manager is upgrading</h4>
-            </div>
-            <div className="modal-body">
-              Please wait...
-            </div>
-            <div className="modal-footer"/>
-          </div>
-        </div>
-      </div>
-      <div id="downgrading" className="modal fade" role="dialog">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">
-                Luminati Proxy Manager is downgrading</h4>
-            </div>
-            <div className="modal-body">
-              Please wait...
-            </div>
-            <div className="modal-footer"/>
-          </div>
-        </div>
-      </div>
-      <div id="shutdown" className="modal fade" role="dialog">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Shutdown</h4>
-            </div>
-            <div className="modal-body">
-              The application has been shut down. To restart,
-              please run it manually and reload this page.
-            </div>
-            <div className="modal-footer"/>
-          </div>
-        </div>
-      </div>
+      <General_old_modals/>
       <Modal id="fetching_chrome_modal"
         title="Downloading Chromium. Please wait..." no_cancel_btn>
       </Modal>

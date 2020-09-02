@@ -12,8 +12,8 @@ define([], function(){
 var E = date_get;
 
 E.sec = {
-    NANO: 1/1e9,
-    MS: 0.001,
+    NANO: 1e-9,
+    MS: 1e-3,
     SEC: 1,
     MIN: 60,
     HOUR: 60*60,
@@ -265,9 +265,9 @@ E.add = function(d, dur){
         d.setUTCFullYear(d.getUTCFullYear()+dur.year);
     if (dur.month)
         d.setUTCMonth(d.getUTCMonth()+dur.month);
-    ['day', 'hour', 'min', 'sec', 'ms'].forEach(function(key){
-        if (dur[key])
-            d.setTime(+d+dur[key]*ms[key.toUpperCase()]);
+    ['day', 'hour', 'min', 'sec', 'ms'].forEach(function(k){
+        if (dur[k])
+            d.setTime(+d+dur[k]*ms[k.toUpperCase()]);
     });
     return d;
 };
@@ -493,13 +493,13 @@ E.strftime = function(fmt, d, opt){
         case 3: return 'rd';
         }
     }
-    function week_num(l, d, first_weekday){
+    function week_num(l, _d, first_weekday){
         // This works by shifting the weekday back by one day if we
         // are treating Monday as the first day of the week.
-        var wday = l.getDay(d);
+        var wday = l.getDay(_d);
         if (first_weekday=='monday')
             wday = wday==0 /* Sunday */ ? wday = 6 : wday-1;
-        var yday = (d-l.getYearBegin(d))/ms.DAY;
+        var yday = (_d-l.getYearBegin(_d))/ms.DAY;
         return Math.floor((yday + 7 - wday)/7);
     }
     // Default padding is '0' and default length is 2, both are optional.
@@ -548,7 +548,7 @@ E.strftime = function(fmt, d, opt){
     // Most of the specifiers supported by C's strftime, and some from Ruby.
     // Some other syntax extensions from Ruby are supported: %-, %_, and %0
     // to pad with nothing, space, or zero (respectively).
-    function replace(fmt){ return fmt.replace(/%([-_0]?.)/g, function(_, c){
+    function replace(_fmt){ return _fmt.replace(/%([-_0]?.)/g, function(_, c){
         var mod, padding, day;
         if (c.length==2)
         {
@@ -660,9 +660,9 @@ E.compile_schedule = function(expr){
     }
     return function(d){
         var t = E.get(d) % ms.DAY;
-        for (var i = 0; i<intervals.length; i++)
+        for (var j = 0; j<intervals.length; j++)
         {
-            var interval = intervals[i];
+            var interval = intervals[j];
             if (interval.from<interval.to)
             {
                 if (t>=interval.from && t<interval.to)

@@ -258,7 +258,7 @@ export class Select_number extends Pure_component {
     _get_data = ()=>{
         if (!this.props.data)
             return this.opt_from_range();
-        if (this.props.data[0] && this.props.data[0].value)
+        if (this.props.data[0] && this.props.data[0].value!==undefined)
             return this.props.data.map(d=>d.value);
         return this.props.data;
     };

@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.197.33 Stable
+- :bug: Fixed double vertical scrollbars in proxy edit page
+- :star: Display modal when upgrading LPM from UI without root permissions
+- :star: UI improvements for Ban IP durations in Rules tab
+
 ## 1.196.832 Stable
 - :bug: Fixed Waterfall rule, skip refreshing the session
 - :star: Performance improvements

@@ -185,8 +185,8 @@ E.swap_usage = function(){
         return ret;
     let data = swaps.reduce((p, line)=>{
         let splitted = line.split('\t');
-        p.total += +splitted[2];
-        p.used += +splitted[3];
+        p.total += +splitted[splitted.length-3];
+        p.used += +splitted[splitted.length-2];
         return p;
     }, {total: 0, used: 0});
     ret.usage = data.total ? data.used/data.total*100 : 0;

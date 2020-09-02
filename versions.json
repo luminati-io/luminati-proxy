@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.197.33",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed double vertical scrollbars in proxy edit page"
+            },
+            {
+                "type": "star",
+                "text": "Display modal when upgrading LPM from UI without root permissions"
+            },
+            {
+                "type": "star",
+                "text": "UI improvements for Ban IP durations in Rules tab"
+            }
+        ]
+    },
+    {
         "ver": "1.196.832",
         "type": "stable",
         "changes": [

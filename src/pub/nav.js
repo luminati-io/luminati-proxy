@@ -162,6 +162,7 @@ const show_reload = function(){
 };
 
 class Upgrade_downgrade_modal extends Pure_component {
+    missing_root_perm_err(e){ return (e.hola_info.data||{}).code==126; }
     confirm(){
         const loading_modal = this.props.action=='upgrade' ?
             '#upgrading' : '#downgrading';
@@ -172,6 +173,8 @@ class Upgrade_downgrade_modal extends Pure_component {
                 $(loading_modal).modal('hide');
                 if (_this.props.action=='upgrade')
                 {
+                    if (_this.missing_root_perm_err(e))
+                        $('#missing_root_perm').modal();
                     setdb.set('head.upgrade_error', e.message);
                     setdb.set('head.upgrading', false);
                 }
