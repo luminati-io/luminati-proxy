@@ -651,6 +651,51 @@ describe('manager', ()=>{
             yield this.wait();
         }));
     });
+    describe('banlist propagation on proxy changes', ()=>{
+        let port, to_date, new_banlist;
+        beforeEach(()=>etask(function*(){
+            app = yield app_with_proxies([{port: 24000}]);
+            port = app.manager.proxy_ports[24000];
+            const {banlist} = port;
+            const now_stub = sinon.stub(Date, 'now').returns(5000);
+            const ms_left = 100;
+            to_date = Date.now()+ms_left;
+            const new_proxy = Object.assign({}, {port: 24000}, {});
+            banlist.add('1.1.1.1', ms_left);
+            banlist.add('1.1.1.1', ms_left, 'lumtest.com');
+            new_banlist = (yield app.manager.proxy_update({port: 24000},
+                new_proxy)).banlist.cache;
+            now_stub.restore();
+        }));
+        it('sends updated banlist instance to workers via ipc', ()=>{
+            assert.equal(new_banlist.size, 2);
+            assert.equal(new_banlist.get('1.1.1.1').to_date, to_date);
+            const stub_worker = {on: ()=>null, send: sinon.spy()};
+            port.setup_worker(stub_worker);
+            const worker_send_spy = stub_worker.send;
+            const serialized_banlist = Object.keys(
+                worker_send_spy.args[0][0].opt.banlist);
+            assert.ok(worker_send_spy.called);
+            assert.equal(serialized_banlist.length, 2);
+        });
+        it('deletes expired banned ips using timeouts', ()=>etask(function*(){
+            const timeouts_exist = [...new_banlist.values()].every(({to={}})=>
+                to._destroyed===false);
+            assert.ok(timeouts_exist);
+            yield etask.sleep(500);
+            assert.ok(!new_banlist.size);
+        }));
+        it('doesnt delete indefinitely banned ips', ()=>etask(function*(){
+            const {banlist} = port;
+            const new_proxy = Object.assign({}, {port: 24000}, {});
+            banlist.clear();
+            banlist.add('1.2.3.4', 0);
+            banlist.add('1.2.3.4', 0, 'lumtest.com');
+            const {banlist: {cache}} = yield app.manager.proxy_update(
+                {port: 24000}, new_proxy);
+            assert.ok(cache.size==2);
+        }));
+    });
     describe('whitelisting', ()=>{
         let t = (name, proxies, default_calls, wh, cli, www_whitelist)=>
         it(name, etask._fn(function*(_this){

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.198.94 Stable
+- :bug: Fixed banned ips being used for new requests
+
 ## 1.197.33 Stable
 - :bug: Fixed double vertical scrollbars in proxy edit page
 - :star: Display modal when upgrading LPM from UI without root permissions

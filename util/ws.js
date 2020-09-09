@@ -1017,13 +1017,10 @@ class Mux {
         });
         stream.allow = (bytes=Infinity)=>{
             bytes_allowed = bytes;
-            if (bytes_allowed>0 && suspended)
-            {
-                suspended();
-                suspended = undefined;
-            }
-            if (_this.ws.zc)
-                zcounter.inc('mux_write_'+(bytes>0 ? 'allow' : 'disallow'));
+            if (bytes_allowed<=0 || !suspended)
+                return;
+            suspended();
+            suspended = undefined;
         };
         // XXX vladimir: rm custom '_close' event
         // not using 'close' event due to confusion with socket close event
@@ -1237,8 +1234,9 @@ class Mux {
                 stream.once('end', this.continue_fn());
                 try {
                     stream.push(null);
+                    const state = stream._readableState;
                     // XXX vladislavl: use readableEnded from node v12
-                    if (stream._readableState && stream._readableState.ended)
+                    if (!stream.readableLength || state && state.endEmitted)
                         return fn();
                     yield this.wait(opt.fin_timeout);
                 } catch(e){ w_log(e, 'ending'); }

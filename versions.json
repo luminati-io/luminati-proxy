@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.198.94",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed banned ips being used for new requests"
+            }
+        ]
+    },
+    {
         "ver": "1.197.33",
         "type": "stable",
         "changes": [

@@ -21,13 +21,14 @@ describe('config', ()=>{
             request_stats: true,
             stats: false,
             customer: 'wrong_cust',
+            banlist: {cache: {}},
         }];
         const conf_mgr = new Config(new Manager({}), Manager.default);
         const s = conf_mgr._serialize(proxies, {});
         const config = JSON.parse(s);
         const proxy = config.proxies[0];
         qw`stats proxy_type zones www_whitelist_ips request_stats logs conflict
-        version customer`.forEach(field=>
+        version customer banlist`.forEach(field=>
             assert.equal(proxy[field], undefined));
         assert.equal(proxy.port, 24000);
     });

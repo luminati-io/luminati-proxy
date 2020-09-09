@@ -18,7 +18,6 @@ const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
 const requester = require('../lib/requester.js');
 const Timeline = require('../lib/timeline.js');
-const Ip_cache = require('../lib/ip_cache.js');
 const Config = require('../lib/config.js');
 const lutil = require('../lib/util.js');
 const consts = require('../lib/consts.js');
@@ -1103,26 +1102,6 @@ describe('proxy', ()=>{
                 t('does not trigger on diff domains',
                     'http://lumtest.com/test');
                 t('triggers', `http://${domain}/test`, 1);
-            });
-            describe('ip_cache', ()=>{
-                let ip_cache;
-                beforeEach(()=>ip_cache = new Ip_cache());
-                afterEach(()=>ip_cache.clear_timeouts());
-                it('has added entries', ()=>{
-                    ip_cache.add('10.0.0.1', 1000);
-                    ip_cache.add('10.0.0.2', 1000, 'lumtest.com');
-                    assert.ok(ip_cache.has('10.0.0.1'));
-                    assert.ok(ip_cache.has('10.0.0.2', 'lumtest.com'));
-                    assert.ok(!ip_cache.has('10.0.0.3'));
-                });
-                it('has IP/domain entry when IP entry exists', ()=>{
-                    ip_cache.add('10.0.0.2', 1000);
-                    assert.ok(ip_cache.has('10.0.0.2', 'lumtest.com'));
-                });
-                it('does not have IP entry when IP/domain entry exists', ()=>{
-                    ip_cache.add('10.0.0.2', 1000, 'lumtest.com');
-                    assert.ok(!ip_cache.has('10.0.0.2'));
-                });
             });
             it('refresh_ip', ()=>etask(function*(){
                 l = yield lum({rules: []});
