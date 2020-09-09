@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.198.139 Stable
+- :bug: Fixed TypeError causing initalization of a proxy port to fail
+
 ## 1.198.94 Stable
 - :bug: Fixed banned ips being used for new requests
 
