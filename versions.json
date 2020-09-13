@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.198.629",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed restarting Cloud LPM button from luminati.io/cp/lpm"
+            },
+            {
+                "type": "star",
+                "text": "UI improvement: added Rules column option in proxy ports list"
+            }
+        ]
+    },
+    {
         "ver": "1.198.139",
         "type": "stable",
         "changes": [

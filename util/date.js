@@ -50,7 +50,7 @@ E.ms_to_dur = function(_ms){
 E.dur_to_str = function(dur, opt){
     opt = opt||{};
     var parts = [];
-    dur = +dur;
+    dur = Math.round(+dur);
     function chop(period, name){
         if (dur<period)
             return;

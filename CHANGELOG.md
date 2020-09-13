@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.198.629 Stable
+- :bug: Fixed restarting Cloud LPM button from luminati.io/cp/lpm
+- :star: UI improvement: added Rules column option in proxy ports list
+
 ## 1.198.139 Stable
 - :bug: Fixed TypeError causing initalization of a proxy port to fail
 

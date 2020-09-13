@@ -203,6 +203,12 @@ const Zone_cell = ({proxy, mgr, scrolling})=>{
         </div>;
 };
 
+const Rule_cell = ({proxy: {rules=[]}})=>{
+    const tip = 'Number of defined rules for this proxy port';
+    const val = rules.length;
+    return !!val && <T>{t=><Tooltip title={t(tip)}>{t(val)}</Tooltip>}</T>;
+};
+
 const columns = [
     {
         key: 'actions',
@@ -329,6 +335,12 @@ const columns = [
         key: 'sticky_ip',
         title: 'Sticky IP',
         render: Boolean_cell,
+        ext: true,
+    },
+    {
+        key: 'rules',
+        title: 'Rules',
+        render: Rule_cell,
         ext: true,
     },
     {
