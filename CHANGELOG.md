@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.198.827 Stable
+- :bug: Fixed inconsistency with updating banlist on Windows
+- :sparkles: Upgraded electron version to support recommended node version
+
 ## 1.198.629 Stable
 - :bug: Fixed restarting Cloud LPM button from luminati.io/cp/lpm
 - :star: UI improvement: added Rules column option in proxy ports list

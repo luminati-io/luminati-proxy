@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.198.827",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed inconsistency with updating banlist on Windows"
+            },
+            {
+                "type": "sparkles",
+                "text": "Upgraded electron version to support recommended node version"
+            }
+        ]
+    },
+    {
         "ver": "1.198.629",
         "type": "stable",
         "changes": [

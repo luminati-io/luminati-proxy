@@ -203,7 +203,7 @@ const Zone_cell = ({proxy, mgr, scrolling})=>{
         </div>;
 };
 
-const Rule_cell = ({proxy: {rules=[]}})=>{
+const Rules_cell = ({proxy: {rules=[]}})=>{
     const tip = 'Number of defined rules for this proxy port';
     const val = rules.length;
     return !!val && <T>{t=><Tooltip title={t(tip)}>{t(val)}</Tooltip>}</T>;
@@ -340,7 +340,7 @@ const columns = [
     {
         key: 'rules',
         title: 'Rules',
-        render: Rule_cell,
+        render: Rules_cell,
         ext: true,
     },
     {
