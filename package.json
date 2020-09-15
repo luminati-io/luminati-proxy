@@ -80,7 +80,7 @@
     "http-shutdown": "1.2.1",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.15",
-    "node-forge": "0.6.46",
+    "node-forge": "0.10.0",
     "pm2": "4.1.2",
     "request": "2.88.0",
     "request-stats": "3.0.0",
