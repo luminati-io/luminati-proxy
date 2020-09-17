@@ -1272,6 +1272,13 @@ E.is_allowed = function(code){
     return E.list[code] && !E.unallowed_list[code];
 };
 
+E.is_hidden = function(code){
+    return !!{
+        EU: 1,
+        PS: 1,
+    }[code];
+};
+
 E.lum_easy_pass = {
     AR: 1,
     AT: 1,

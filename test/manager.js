@@ -77,8 +77,11 @@ describe('manager', ()=>{
         Manager.prototype.lpm_users_get = ()=>null;
         Manager.prototype.init_lpm_f_ws = ()=>null;
         Manager.prototype.get_lpm_conf = function(){
-            this.lum_conf = {};
-            return {};
+            this.lum_conf = {_defaults: {zones: {
+                static: {},
+                foo: {},
+            }}};
+            return this.lum_conf;
         };
         manager = new Manager(lpm_util.init_args(args));
         yield manager.start();
@@ -208,36 +211,42 @@ describe('manager', ()=>{
             _this.timeout(6000);
             app = yield app_with_config(config);
             const proxies = yield json('api/proxies_running');
+            assert.equal(proxies.length, expected.length);
             assert_has(proxies, expected, 'proxies');
         }));
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
-            [Object.assign({}, simple_proxy, {proxy_type: 'persist'})]);
+            [Object.assign({proxy_type: 'persist'}, simple_proxy)]);
         t('main config only', {config: {proxies: [simple_proxy]}},
-            [Object.assign({}, simple_proxy, {proxy_type: 'persist'})]);
+            [Object.assign({proxy_type: 'persist'}, simple_proxy)]);
         t('config file', {config: {proxies: [simple_proxy]}}, [simple_proxy]);
         describe('default zone', ()=>{
             const zone_static = {password: ['pass1']};
-            const zone_gen = {password: ['pass2']};
-            const zones = {static: Object.assign({}, zone_static),
-                gen: Object.assign({}, zone_gen)};
+            const zone_foo = {password: ['pass2']};
+            const zones = {
+                static: Object.assign({}, zone_static),
+                foo: Object.assign({}, zone_foo),
+            };
             const t2 = (name, config, expected, _defaults={zone: 'static'})=>{
-                nock(api_base).get('/cp/lum_local_conf')
-                    .query({customer: 'testc1', proxy: pkg.version})
-                    .reply(200, {_defaults});
                 t(name, zutil.set(config, 'cli.customer', 'testc1'), expected);
             };
-            t2('from defaults', {
-                config: {_defaults: {zone: 'foo'}, proxies: [simple_proxy]},
-            }, [Object.assign({zone: 'foo'}, simple_proxy)],
+            t2('from defaults', {config: {
+                _defaults: {
+                    zone: 'foo',
+                    customer: 'testc1',
+                    lpm_token: 'token',
+                },
+                proxies: [simple_proxy],
+            }}, [Object.assign({zone: 'foo'}, simple_proxy)],
                 {zone: 'static', zones});
-            t2('keep default', {
-                config: {_defaults: {zone: 'gen'}, proxies: [simple_proxy]},
-            }, [Object.assign({zone: 'gen'}, simple_proxy)]);
-            /* t2('empty zone should be overriden by default', {config: {
-                _defaults: {},
-                proxies: [Object.assign({zone: ''}, simple_proxy)],
-            }}, [{zone: 'static'}]);*/
+            t2('keep default', {config: {
+                _defaults: {
+                    zone: 'foo',
+                    customer: 'testc1',
+                    lpm_token: 'token',
+                },
+                proxies: [simple_proxy]},
+            }, [Object.assign({zone: 'foo'}, simple_proxy)]);
         });
         describe('args as default params for proxy ports', ()=>{
             it('should use proxy from args', etask._fn(function*(_this){
@@ -440,30 +449,6 @@ describe('manager', ()=>{
                 t('no ip', {ip: 'r0123456789abcdef0123456789ABCDEF'}, 204);
             });
         });
-        xdescribe('user credentials', ()=>{
-            it('success', etask._fn(function*(_this){
-                nock(api_base).get('/cp/lum_local_conf').query(true)
-                    .reply(200, {mock_result: true, _defaults: true});
-                app = yield app_with_args(['--customer', 'mock_user']);
-                const res = yield app.manager.get_lpm_conf(null, '123');
-                assert_has(res, {mock_result: true});
-            }));
-            it('login required', etask._fn(function*(_this){
-                nock(api_base).get('/cp/lum_local_conf')
-                    .query(true)
-                    .reply(403, 'login_required');
-                nock(api_base).get('/cp/lum_local_conf')
-                    .query(true)
-                    .reply(403, 'login_required');
-                app = yield app_with_args(['--customer', 'mock_user']);
-                try {
-                    yield app.manager.get_lpm_conf(null, '123');
-                    assert.fail('should have thrown exception');
-                } catch(e){
-                    assert_has(e, {status: 403, message: 'login_required'});
-                }
-            }));
-        });
         describe('har logs', function(){
             this.timeout(6000);
             beforeEach(()=>etask(function*(){
@@ -561,85 +546,6 @@ describe('manager', ()=>{
                     '1.1.0.0/20');
             }));
         });
-    });
-    xdescribe('crash on load error', ()=>{
-        beforeEach(()=>{
-            logger_stub.reset();
-        });
-        const t = (name, proxies, msg)=>it(name, etask._fn(function*(_this){
-            const err_matcher = sinon.match(msg);
-            app = yield app_with_proxies(proxies);
-            sinon.assert.calledWith(logger_stub, err_matcher);
-        }));
-        t('conflict proxy port', [{port: 24024}, {port: 24024}],
-            'Port %s is already in use by #%s - skipped');
-        const www_port = Manager.default.www;
-        t('conflict with www', [{port: www_port}],
-            `Port %s is already in use by %s - skipped`);
-    });
-    xdescribe('using passwords', ()=>{
-        it('take password from provided zone', etask._fn(function*(_this){
-            const config = {proxies: []};
-            const _defaults = {zone: 'static', password: 'xyz',
-                zones: {zone1: {password: ['zone1_pass']}}};
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {_defaults});
-            app = yield app_with_config({config});
-            const res = yield json('api/proxies', 'post',
-                {proxy: {port: 24000, zone: 'zone1'}});
-            assert.equal(res.data.password, 'zone1_pass');
-        }));
-        it('uses password from default zone', etask._fn(function*(_this){
-            const config = {proxies: []};
-            const _defaults = {zone: 'static', password: 'xyz',
-                zones: {static: {password: ['static_pass']}}};
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {_defaults});
-            app = yield app_with_config({config});
-            const res = yield json('api/proxies', 'post',
-                {proxy: {port: 24000, zone: 'static'}});
-            assert.equal(res.data.password, 'static_pass');
-        }));
-        it('uses new proxy custom password', etask._fn(function*(_this){
-            const config = {proxies: []};
-            const _defaults = {zone: 'static', password: 'xyz',
-                zones: {static: {password: ['static_pass']}}};
-            app = yield app_with_config({config});
-            nock(api_base).get('/cp/lum_local_conf')
-            .query({customer: 'abc', proxy: pkg.version})
-            .reply(200, {_defaults});
-            const res = yield json('api/proxies', 'post',
-                {proxy: {port: 24000, zone: 'static', password: 'p1_pass'}});
-            assert.equal(res.data.password, 'p1_pass');
-        }));
-        it('uses existing proxy custom password', etask._fn(function*(_this){
-            const _defaults = {
-                zone: 'static',
-                password: 'xyz',
-                zones: {
-                    static: {password: ['static_pass']},
-                    zone2: {password: ['zone2_pass']},
-                },
-            };
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {_defaults});
-            const config = {proxies: [
-                {port: 24000, zone: 'static', password: 'p1_pass'},
-                {port: 24001, zone: 'zone2', password: 'p2_pass'},
-                {port: 24002, zone: 'static'},
-                {port: 24003, zone: 'zone2'},
-                {port: 24004},
-                {port: 24005, zone: 'unknown', password: 'p3_pass'},
-            ]};
-            app = yield app_with_config({config});
-            const res = yield json('api/proxies_running');
-            assert.equal(res.find(p=>p.port==24000).password, 'static_pass');
-            assert.equal(res.find(p=>p.port==24001).password, 'zone2_pass');
-            assert.equal(res.find(p=>p.port==24002).password, 'static_pass');
-            assert.equal(res.find(p=>p.port==24003).password, 'zone2_pass');
-            assert.equal(res.find(p=>p.port==24004).password, 'static_pass');
-            assert.equal(res.find(p=>p.port==24005).password, 'p3_pass');
-        }));
     });
     describe('flags', ()=>{
         it('exits immediately with version on -v', etask._fn(function*(_this){

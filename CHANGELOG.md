@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.199.160 Stable
+- :bug: Fixed logout: stop authenticating requests after logging out
+
 ## 1.198.827 Stable
 - :bug: Fixed inconsistency with updating banlist on Windows
 - :sparkles: Upgraded electron version to support recommended node version
