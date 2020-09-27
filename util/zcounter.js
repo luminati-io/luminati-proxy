@@ -41,9 +41,10 @@ let to_valid_ids = {};
 E.to_valid_id = id=>to_valid_ids[id]||
     (to_valid_ids[id]=id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
 
-let type = {sum: {}, avg: {}, sum_mono: {}, avg_level: {}, sum_level: {},
-    max_level: {}, min_level: {}, avg_level_eco: {}, sum_level_eco: {},
-    sum_mono_eco: {}};
+// XXX vladislavl: convert to Map all structure
+let type = {sum: new Map(), avg: {}, sum_mono: {}, avg_level: {},
+    sum_level: {}, max_level: {}, min_level: {}, avg_level_eco: {},
+    sum_level_eco: {}, sum_mono_eco: {}};
 
 let reported_names = {};
 function report_invalid_val(name, value){
@@ -59,9 +60,9 @@ function report_invalid_val(name, value){
 E.inc = (name, inc=1, agg_srv='sum')=>{
     if (!Number.isFinite(inc))
         return void report_invalid_val(name, inc);
-    let _type = type.sum, entry = _type[name];
+    let _type = type.sum, entry = _type.get(name);
     if (!entry)
-        entry = _type[name] = {v: 0, agg_srv, agg_tm: 'avg0'};
+        _type.set(name, entry = {v: 0, agg_srv, agg_tm: 'avg0'});
     entry.v += inc;
 };
 
@@ -167,7 +168,8 @@ E.min = (name, value, agg_srv='min')=>{
 };
 
 function _get(_type, n){
-    let c = _type.avg_level[n]||_type.sum_level[n]||_type.avg[n]||_type.sum[n]
+    let c = _type.avg_level[n]||_type.sum_level[n]||_type.avg[n]
+        ||(_type.sum instanceof Map ? _type.sum.get(n) : _type.sum[n])
         ||_type.sum_mono[n]||_type.max_level[n]||_type.min_level[n]
         ||_type.avg_level_eco[n]||_type.sum_level_eco[n]
         ||_type.sum_mono_eco[n];
@@ -232,7 +234,9 @@ E.del = name=>{
     for (let agg_type in type)
     {
         let _type = type[agg_type];
-        if (_type[name])
+        if (_type instanceof Map)
+            _type.delete(name);
+        else if (_type[name])
             delete _type[name];
     }
 };
@@ -283,7 +287,7 @@ E.on_send = [];
 const eco_ts = {};
 
 let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
-    let ret = type;
+    let ret = Object.assign({}, type);
     if (update_prev)
     {
         for (let fn of E.on_send)
@@ -301,13 +305,16 @@ let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
                     agg_tm: cur.agg_tm};
             }
         });
-        type = {sum: {}, avg: {}, sum_mono: mono.sum_mono,
+        type = {sum: new Map(), avg: {}, sum_mono: mono.sum_mono,
             avg_level: type.avg_level, sum_level: type.sum_level,
             max_level: {}, min_level: {}, avg_level_eco: type.avg_level_eco,
             sum_level_eco: type.sum_level_eco,
             sum_mono_eco: mono.sum_mono_eco};
     }
-    let now = Date.now();
+    let now = Date.now(), sum = ret.sum;
+    ret.sum = {};
+    for (let [k, v] of sum)
+        ret.sum[k] = v;
     [ret.avg_level_eco, ret.sum_level_eco].forEach(eco=>{
         for (let t in eco)
         {
@@ -352,7 +359,8 @@ let mas_get_counters = update_prev=>etask(function*zcounter_mas_get_counters(){
     return mas_agg_counters(counters.filter(v=>v && !etask.is_err(v)));
 });
 
-E.get_names = _type=>Object.keys(type[_type]);
+E.get_names = _type=>type[_type] instanceof Map ?
+    [...type[_type].keys()] : Object.keys(type[_type]);
 
 function ws_format(metrics){
     let res = [], last = '';
