@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.200.411",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed out of memory crashes on Cloud LPM servers"
+            }
+        ]
+    },
+    {
         "ver": "1.199.160",
         "type": "stable",
         "changes": [

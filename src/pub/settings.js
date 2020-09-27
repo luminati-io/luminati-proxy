@@ -155,6 +155,7 @@ class Form extends Pure_component {
         if (!s)
             return null;
         const wl = s.fixed_whitelist_ips.concat(s.whitelist_ips);
+        const logs_data = s.zagent ? [0, 1000] : [0, 100, 1000, 10000];
         return <div className="settings_form">
               <Warnings_modal id='upd_settings_error'
                 warnings={this.state.api_error}/>
@@ -180,7 +181,7 @@ class Form extends Pure_component {
                 tooltip={tooltips.request_stats}/>
               <Labeled_controller val={s.logs} type="select_number"
                 on_change_wrapper={this.on_change_handler('logs', {number: 1})}
-                data={[0, 100, 1000, 10000]} label="Limit for request logs"
+                data={logs_data} label="Limit for request logs"
                 default tooltip={tooltips.logs}/>
               <Labeled_controller val={s.har_limit} type="select_number"
                 on_change_wrapper={this.on_change_handler('har_limit',
