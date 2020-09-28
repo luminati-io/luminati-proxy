@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.200.411 Stable
+- :bug: Fixed out of memory crashes on Cloud LPM servers
+
 ## 1.199.160 Stable
 - :bug: Fixed logout: stop authenticating requests after logging out
 
