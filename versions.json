@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.200.588",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed broken IPC causing crashes whole instance"
+            }
+        ]
+    },
+    {
         "ver": "1.200.411",
         "type": "stable",
         "changes": [

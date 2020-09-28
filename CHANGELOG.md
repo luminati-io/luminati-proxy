@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.200.588 Stable
+- :bug: Fixed broken IPC causing crashes whole instance
+
 ## 1.200.411 Stable
 - :bug: Fixed out of memory crashes on Cloud LPM servers
 
