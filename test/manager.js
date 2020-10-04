@@ -264,6 +264,15 @@ describe('manager', ()=>{
             app = yield app_with_args(['--port', '24000']);
             assert.equal(app.manager.proxy_ports[24000].opt.har_limit, 1024);
         }));
+        it('applies explicit mgr argv to defaults', ()=>etask(function*(){
+            app = yield app_with_args(['--port', '24000', '--har_limit',
+                '1337', '--api_domain', 'invalid_domain']);
+            const {opt} = app.manager.proxy_ports[24000];
+            assert.equal(app.manager._defaults.api_domain,
+                pkg.api_domain_fallback);
+            assert.equal(opt.har_limit, 1337);
+            assert.equal(opt.api_domain, pkg.api_domain_fallback);
+        }));
     });
     describe('report_bug', ()=>{
         // XXX krzysztof: get rid of this
@@ -311,6 +320,11 @@ describe('manager', ()=>{
         it('on', etask._fn(function*(_this){
             app = yield app_with_args(['--dropin']);
             assert.ok(!!app.manager.proxy_ports[22225]);
+        }));
+        it('dropin_port', etask._fn(function*(_this){
+            app = yield app_with_args(['--dropin', '--dropin_port', '25000']);
+            assert.ok(!!app.manager.proxy_ports[25000]);
+            assert.ok(!app.manager.proxy_ports[22225]);
         }));
     });
     describe('api', ()=>{

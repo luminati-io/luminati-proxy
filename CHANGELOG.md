@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.201.332 Stable
+- :bug: Fixed certain CLI flags not being utilized
+
 ## 1.200.588 Stable
 - :bug: Fixed broken IPC causing crashes whole instance
 

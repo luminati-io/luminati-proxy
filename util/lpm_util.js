@@ -46,6 +46,15 @@ const parse_env_params = (env, fields)=>{
 };
 E.t = {parse_env_params};
 
+const explicit_mgr_opt = (argv, native_args=[])=>{
+    const mgr_opts = zutil.pick(argv, ...lpm_config.mgr_fields);
+    return native_args.reduce((obj, arg)=>{
+        let k = arg.replace(/^--/, ''), v = mgr_opts[k];
+        return Object.assign(obj,
+            arg.startsWith('--') && v!==undefined && {[k]: v});
+    }, {});
+};
+
 E.init_args = args=>{
     const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
     if (process.env.DOCKER)
@@ -71,10 +80,11 @@ E.init_args = args=>{
     argv.log = argv.log.toLowerCase();
     if (argv.session=='true')
         argv.session = true;
-    argv.explicit_opt = zutil.pick(argv, ...[...lpm_config.proxy_params,
+    argv.explicit_proxy_opt = zutil.pick(argv, ...[...lpm_config.proxy_params,
         'test_url'].filter(p=>args.includes(`--${p}`)));
+    argv.explicit_mgr_opt = explicit_mgr_opt(argv, args);
     if (args.includes('-p'))
-        argv.explicit_opt.port = argv.port;
+        argv.explicit_proxy_opt.port = argv.port;
     argv.daemon_opt = args.filter(arg=>arg.includes('daemon')||arg=='-d')
     .map(arg=>{
         let match;

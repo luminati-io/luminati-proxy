@@ -111,7 +111,7 @@ E.manager_fields = {
     request_stats: {type: 'boolean', desc: 'Enable requests statistics'},
     test_url: {type: 'string', desc: 'Url for testing proxy'},
     log: {type: 'string', desc: 'Log level'},
-    logs: {type: 'boolean', desc: 'Enable logs for all proxies'},
+    logs: {type: 'number', desc: 'Number of request logs to store'},
     har_limit: {type: 'number', desc: 'Number of bytes to store'},
     ports_limit: {type: 'integer', desc: 'Limit the numer of open proxy ports '
         +'at the same time'},

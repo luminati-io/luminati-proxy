@@ -50,6 +50,10 @@ class Request extends Pure_component {
         const port = this.props.port||params.port;
         this.setState({params: {url, port}});
         this.setdb_on('head.lock_navigation', lock=>this.setState({lock}));
+        this.setdb_on('head.settings', ({test_url})=>{
+            this.setState(prev=>(
+                {params: {...prev.params, url: test_url||url}}));
+        });
         this.setdb_on('ws.zones', zones=>{
             if (!zones)
                 return;

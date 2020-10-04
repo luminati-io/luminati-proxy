@@ -15,6 +15,11 @@ const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
 
+let hosts = ['zs-graphite.luminati.io'];
+
+if (!+env.LXC)
+    hosts.push('zs-graphite-log.luminati.io');
+
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
         if (process.env.IS_MOCHA)
@@ -492,9 +497,13 @@ function run(){
     init();
     if (cluster.isWorker)
         return;
-    const port = env.ZCOUNTER_PORT||3374;
-    ws_client(env.NODE_ENV=='production' ? env.ZCOUNTER_URL
-        || `ws://zs-graphite.luminati.io:${port}` : `ws://localhost:${port}`);
+    let port = env.ZCOUNTER_PORT||3374;
+    if (env.NODE_ENV!='production')
+        ws_client(`ws://localhost:${port}`);
+    else if (env.ZCOUNTER_URL)
+        env.ZCOUNTER_URL.split(';').forEach(ws_client);
+    else
+        hosts.forEach(h=>ws_client(`ws://${h}:${port}`));
     etask.interval({ms: interval, mode: 'smart'}, function*zcounter_run(){
         let metrics = yield prepare();
         if (metrics.length)

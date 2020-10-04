@@ -15,6 +15,8 @@ var assign = Object.assign;
 // [['field1', 'field2', 'field3'], ['1','2','3'], [..], ..]
 E.to_arr = function(data, opt){
     opt = assign({field: ',', quote: '"', line: '\n'}, opt);
+    if (opt.cr_as_new_line)
+        data = data.replace(/\r([^\n])/g, '\n$1');
     var line = opt.line, field = opt.field, quote = opt.quote;
     var i = 0, c = data[i], row = 0, array = [];
     while (c)

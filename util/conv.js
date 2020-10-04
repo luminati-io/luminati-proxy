@@ -224,7 +224,8 @@ E.scaled_number = function(num, opt){
         return '0'+_per();
     if (num>=base-1)
         num = Math.trunc(num);
-    var str = num.toFixed(num<1 ? 3 : num<10 ? 2 : num<100 ? 1 : 0);
+    var str = num.toFixed(opt.decimals!=null ? opt.decimals
+        : num<1 ? 3 : num<10 ? 2 : num<100 ? 1 : 0);
     return sign+str.replace(/((\.\d*[1-9])|\.)0*$/, '$2')
         +(units ? (opt.space ? ' ' : '')+scale.s : '')+_per();
 };

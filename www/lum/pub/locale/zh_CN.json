@@ -4780,5 +4780,7 @@
   "The first 5,000 characters of response shown." : "显示前5000个响应的字节",
   "Click `copy` to get all of the response data." : "点击“复制”获取所有响应的数据",
   "Disable the collector now" : "现在禁用收集器",
-  "It might take up to 10 minutes until the balance is updated." : "最多10分钟您的账户余额会更新"
+  "It might take up to 10 minutes until the balance is updated." : "最多10分钟您的账户余额会更新",
+  "Not use the System or the Services in violation of applicable law or regulations or any third party rights (including intellectual property rights), or for governmental uses. Not use the System in any manner or for any purpose other than as stated in the intended use case provided to Luminati." : "不得违反适用法律法规或损害任何第三方权益（包括知识产权）使用本系统和服务， 或用于政府用途。 除了用户提供给Luminati|路觅预期用例使用范围之外，不得以任何方式或处于任何目的使用本系统。",
+  "The Client is responsible for protecting its personal username and/or password to the System. The Client may not share its account privileges with anyone or knowingly permit any unauthorized access to the System. The accounts of those involved will be disabled if sharing is detected." : "客户有责任保密其个人系统中的用户名和/或密码。客户不得向任何人共享账户特权，或允许任何未经授权的人员进入系统。一旦检测到共享，将禁用相关人员的账户。"
 }

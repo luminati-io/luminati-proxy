@@ -10,13 +10,10 @@ else
 define(['jquery', '/util/etask.js', '/util/date.js', '/util/escape.js',
     '/util/zerr.js', 'events'],
     function($, etask, date, zescape, zerr, events){
-var E = ajax;
 var assign = Object.assign;
-E.events = new events.EventEmitter();
-E.json = function(opt){ return ajax(assign({}, opt, {json: 1})); };
-E.abort = function(aj){ aj.goto('abort'); };
-// XXX arik: need test
-function ajax(opt){
+var E = function(){ return E.send.apply(this, arguments); };
+
+E.send = function(opt){
     var timeout = opt.timeout||20*date.ms.SEC, slow = opt.slow||2*date.ms.SEC;
     var retry = opt.retry, data = opt.data, qs = zescape.qs(opt.qs);
     var url = zescape.uri(opt.url, qs), perr = opt.perr;
@@ -27,10 +24,8 @@ function ajax(opt){
     var ajopt, xhr;
     zerr.debug('ajax('+data_type+') url '+url+' retry '+retry);
     return etask([function(){
-        ajopt = {dataType: data_type, type: method, url: url,
-            data: data, timeout: timeout, xhrFields: {}};
-        if (opt.headers)
-            ajopt.headers = opt.headers;
+        ajopt = {type: method, url: url, headers: assign({}, opt.headers),
+            dataType: data_type, data: data, timeout: timeout, xhrFields: {}};
         if (opt.content_type)
             ajopt.contentType = opt.content_type;
         if (opt.with_credentials)
@@ -53,6 +48,8 @@ function ajax(opt){
         }
         if (opt.async!==undefined)
             ajopt.async = opt.async;
+        E.ajopt_modifiers.forEach(function(modifier){
+            modifier(ajopt); });
         xhr = $.ajax(ajopt);
         var _this = this;
         xhr.done(function(v){
@@ -76,7 +73,7 @@ function ajax(opt){
             xhr.statusText+'\nresponseText: '+
             (xhr.responseText||'').substr(0, 200));
         if (retry && (!opt.should_retry||opt.should_retry(err, xhr, ajopt)))
-            return this.return(ajax(assign({}, opt, {retry: retry-1})));
+            return this.return(E.send(assign({}, opt, {retry: retry-1})));
         if (xhr.statusText=='timeout')
             E.events.emit('timeout', this);
         if (xhr.status==403)
@@ -115,7 +112,9 @@ function ajax(opt){
         // reachable only via E.abort
         xhr.abort();
     }]);
-}
+};
+
+E.abort = function(aj){ aj.goto('abort'); };
 
 ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(m){
     E[m.toLowerCase()] = function(url, opt){
@@ -128,9 +127,17 @@ function ajax(opt){
             if (opt.content_type.startsWith('application/json'))
                 opt.data = JSON.stringify(opt.data);
         }
-        return ajax(opt);
+        return E.send(opt);
     };
 });
+
+E.json = function(opt){ return E.send(assign({}, opt, {json: 1})); };
+
+E.events = new events.EventEmitter();
+
+E.ajopt_modifiers = [];
+
+// -- internal utils ---
 
 function get_res_data(xhr){
     if (xhr.responseJSON!=null && xhr.responseJSON!=='')
@@ -144,7 +151,6 @@ function get_res_data(xhr){
     return xhr.responseText||'';
 }
 
-var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;
 function restore_dates(data){
     if (!data || typeof data!='object')
         return;
@@ -159,5 +165,6 @@ function restore_dates(data){
             restore_dates(val);
     }
 }
+var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;
 
 return E; }); }());

@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.200.588/luminati-proxy-manager-v1.200.588-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.201.332/luminati-proxy-manager-v1.201.332-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -234,8 +234,8 @@ Options:
   --test_url                    Url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
   --log                         Log level           [string] [default: "notice"]
-  --logs                        Enable logs for all proxies
-                                                       [boolean] [default: 1000]
+  --logs                        Number of request logs to store
+                                                        [number] [default: 1000]
   --har_limit                   Number of bytes to store[number] [default: 1024]
   --ports_limit                 Limit the numer of open proxy ports at the same
                                 time                            [default: 10000]

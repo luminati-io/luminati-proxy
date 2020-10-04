@@ -376,7 +376,7 @@ function set_net_dev(){
 }
 set_net_dev();
 
-E.net_dev_stats = function(net_dev){
+E.net_dev_stats = function(net_dev, opt={}){
     var o = {};
     net_dev = array.to_array(net_dev||E.net_dev);
     if (!net_dev.length)
@@ -384,6 +384,12 @@ E.net_dev_stats = function(net_dev){
     net_dev.forEach((dev, index)=>{
         var ifname = index ? '_'+dev : '';
         var stats = ['rx_bytes', 'tx_bytes'];
+        if (opt.err_stat)
+        {
+            stats.push('rx_packets', 'tx_packets', 'rx_errors', 'rx_dropped',
+                'rx_fifo_errors', 'rx_frame_errors', 'tx_errors', 'tx_dropped',
+                'tx_fifo_errors', 'tx_carrier_errors', 'collisions');
+        }
         for (var i in stats)
         {
             try {
@@ -451,6 +457,17 @@ E.sockets_count = proto=>etask(function*(){
     });
     return v;
 });
+
+E.tcp_stats = ()=>{
+    let ll = file.read_lines_e('/proc/net/snmp'), i = 0;
+    for (; i<ll.length && !ll[i].startsWith('Tcp'); i++);
+    if (i<ll.length-1)
+    {
+        let l = ll[i+1].split(/\s+/);
+        return {in_segs: +l[10], out_segs: +l[11], retrans_segs: +l[12],
+            in_errs: +l[13], in_csum_errs: +l[15]};
+    }
+};
 
 E.udp_stats = ()=>{
     let ll = file.read_lines_e('/proc/net/snmp'), i = 0;
