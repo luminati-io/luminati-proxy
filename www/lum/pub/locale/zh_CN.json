@@ -2008,6 +2008,7 @@
   "Country that will be detected if target site is using google for IP detection": "如果目标网站正在使用google来进行IP检测，那么所属国家就会被检测出来",
   "Add Payment Method": "添加支付方式",
   "Add payment method": "添加支付方式",
+  "Other payment methods" : "其他支付方式",
   "Dashboard": "总览",
   "Tools": "工具",
   "Chrome extension": "Chrome扩展程序",

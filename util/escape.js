@@ -252,4 +252,20 @@ E.parse.http_words = function(val){
     return res;
 };
 
+E.markdown2 = function(val, type){
+    var re;
+    switch (type)
+    {
+    case 'code':
+    case 'pre':
+        re = /[`\\]/g;
+        break;
+    case 'link': re = /[)\\]/g; break;
+    case 'no_text':
+        re = /[[\]()`>#+=|{}.-]/g; break;
+    default: re = /[_*~[\]()`>#+=|{}.-]/g;
+    }
+    return val.replace(re, '\\$&');
+};
+
 return E; }); }());

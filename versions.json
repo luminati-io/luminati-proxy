@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.201.722",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed workers crashing in certain Windows versions"
+            }
+        ]
+    },
+    {
         "ver": "1.201.332",
         "type": "stable",
         "changes": [

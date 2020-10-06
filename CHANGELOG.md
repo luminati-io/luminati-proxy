@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.201.722 Stable
+- :bug: Fixed workers crashing in certain Windows versions
+
 ## 1.201.332 Stable
 - :bug: Fixed certain CLI flags not being utilized
 
