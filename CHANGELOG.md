@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.201.857 Stable
+- :bug: Fixed API endpoint for banning multiple IPs
+
 ## 1.201.722 Stable
 - :bug: Fixed workers crashing in certain Windows versions
 

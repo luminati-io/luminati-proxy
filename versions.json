@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.201.857",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed API endpoint for banning multiple IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.201.722",
         "type": "stable",
         "changes": [
