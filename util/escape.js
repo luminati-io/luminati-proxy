@@ -265,7 +265,7 @@ E.markdown2 = function(val, type){
         re = /[[\]()`>#+=|{}.-]/g; break;
     default: re = /[_*~[\]()`>#+=|{}.-]/g;
     }
-    return val.replace(re, '\\$&');
+    return (''+val).replace(re, '\\$&');
 };
 
 return E; }); }());

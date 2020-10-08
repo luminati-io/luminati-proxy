@@ -14,7 +14,12 @@ E.get_perm = zone=>{
     };
     let res = 'country vip';
     if (plan.type=='static')
-        return perm.static;
+    {
+        let static_res = perm.static;
+        if (plan.city)
+            static_res += ' city';
+        return static_res;
+    }
     if (plan.mobile)
         res = perm.mobile;
     else if (plan.city && plan.asn)

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.202.64",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed city targeting being locked in UI despite allowing city targeting in zone plan"
+            }
+        ]
+    },
+    {
         "ver": "1.201.857",
         "type": "stable",
         "changes": [

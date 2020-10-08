@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.202.64 Stable
+- :bug: Fixed city targeting being locked in UI despite allowing city targeting in zone plan
+
 ## 1.201.857 Stable
 - :bug: Fixed API endpoint for banning multiple IPs
 
