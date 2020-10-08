@@ -53,4 +53,19 @@ describe('username', ()=>{
             assert.equal(res.username, 'lum-country-us-route_err-block');
         });
     });
+    describe('ua mobile', ()=>{
+        const t = (name, opt, expected)=>it(name, ()=>{
+            const res = username.calculate_username(opt);
+            assert.equal(res.username, expected);
+        });
+        t('should skip when plan is not unblocker',
+            {country: 'us', preset: 'unblocker', ua: true}, 'lum-country-us');
+        t('should skip when preset is not unblocker',
+            {country: 'us', unblock: true, ua: true}, 'lum-country-us');
+        t('should set only if plan & preset are unblocker',
+            {country: 'us', ua: true, preset: 'unblocker', unblock: true},
+            'lum-country-us-ua-mobile');
+        t('should not be set by default', {country: 'us', unblock: true,
+             preset: 'unblocker'}, 'lum-country-us');
+    });
 });

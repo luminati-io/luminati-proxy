@@ -510,10 +510,12 @@ class Nav extends Pure_component {
                 this.set_field(field, '');
         }
     };
-    is_unblocker(zone_name){
-        const get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
-        return get_curr_plan && get_curr_plan().type=='unblocker';
-    }
+    is_unblocker = zone_name=>{
+        if (!this.state.zones)
+            return;
+        const {plan} = this.state.zones.zones.find(z=>z.name==zone_name)||{};
+        return (plan||{}).type=='unblocker';
+    };
     confirm_update(cb){
         let no_confirm = localStorage.getItem('no-confirm-zone-preset');
         if (no_confirm && JSON.parse(no_confirm))

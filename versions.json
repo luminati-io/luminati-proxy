@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.202.232",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add option to add Unblocker Mobile UA flag to request username in unblocker zone"
+            }
+        ]
+    },
+    {
         "ver": "1.202.64",
         "type": "stable",
         "changes": [

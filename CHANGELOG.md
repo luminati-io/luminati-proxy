@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.202.232 Stable
+- :star: Add option to add Unblocker Mobile UA flag to request username in unblocker zone
+
 ## 1.202.64 Stable
 - :bug: Fixed city targeting being locked in UI despite allowing city targeting in zone plan
 

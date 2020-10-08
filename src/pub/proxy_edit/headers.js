@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Tab_context} from './common.js';
+import {Config, Tab_context} from './common.js';
 import {Remove_icon, Field_row_raw, Warning} from '../common.js';
 import * as util from '../util.js';
 import Tooltip from '../common/tooltip.js';
@@ -15,6 +15,7 @@ export default class Headers extends Pure_component {
     state = {headers: [this.first_header], disabled_fields: {}, defaults: {}};
     goto_field = setdb.get('head.proxy_edit.goto_field');
     set_field = setdb.get('head.proxy_edit.set_field');
+    get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
         this.setdb_on('head.proxy_edit.form.headers', headers=>{
             if (!headers)
@@ -58,8 +59,10 @@ export default class Headers extends Pure_component {
     render(){
         if (!this.state.form)
             return null;
-        let {ssl} = this.state.form, def_ssl = this.state.defaults.ssl;
+        let {ssl, preset} = this.state.form, def_ssl = this.state.defaults.ssl;
         let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
+        let {type: plan_type} = this.get_curr_plan();
+        let is_unblocker = plan_type=='unblocker' && preset=='unblocker';
         return <div className="headers">
             {!ssl_analyzing_enabled &&
               <Warning text={
@@ -89,6 +92,7 @@ export default class Headers extends Pure_component {
                     )}
                   </div>
                 </Field_row_raw>
+                {is_unblocker && <Config id="ua" type="yes_no"/>}
               </Tab_context.Provider>
             }
           </div>;

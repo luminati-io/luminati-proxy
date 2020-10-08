@@ -204,7 +204,13 @@ export const tabs = {
         label: 'Headers',
         tooltip: `Set default headers that are sent with each request from this
             proxy port`,
-        fields: {},
+        fields: {
+            ua: {
+                label: 'Unblocker Mobile UA',
+                tooltip: `Let Unblocker set a random User-Agent from a mobile
+                    browser automatically`,
+            },
+        },
     },
     general: {
         label: 'General',
