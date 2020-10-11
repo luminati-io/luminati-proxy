@@ -1,38 +1,33 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const E = module.exports;
+const {qw} = require('../util/string.js');
+const zutil = require('../util/util.js');
 
 E.get_perm = zone=>{
     const plan = zone.plan;
     if (!plan || !plan.type)
         return zone.perm;
     const perm = {
-        city: 'country state city vip',
-        asn: 'country state asn carrier vip',
-        static: 'country ip route_all route_dedicated',
-        mobile: 'country mobile asn carrier state city vip',
+        city: qw`city`,
+        asn: qw`asn carrier state`,
+        static: qw`ip route_all route_dedicated`,
+        mobile: qw`mobile asn carrier state city`,
+        state: qw`state`,
     };
-    let res = 'country vip';
     if (plan.type=='static')
     {
-        let static_res = perm.static;
+        let static_res = ['country', ...perm.static];
         if (plan.city)
-            static_res += ' city';
-        return static_res;
+            static_res.push(...perm.city);
+        return static_res.join(' ');
     }
-    if (plan.mobile)
-        res = perm.mobile;
-    else if (plan.city && plan.asn)
-        res = perm.city+' asn carrier';
-    else if (plan.city)
-        res = perm.city;
-    else if (plan.asn)
-        res = perm.asn;
+    const plan_types = Object.keys(zutil.omit(perm, 'static'));
+    const res = ['country', 'vip', ...plan_types.flatMap(t=>
+        plan[t] ? perm[t] : [])];
     if (plan.vips_type=='domain_p')
-        res += ' vip_all';
-    if (plan.state)
-        res += ' state';
-    return res;
+        res.push('vip_all');
+    return [...new Set(res)].join(' ');
 };
 
 E.get_password = (proxy, zone_name, zones)=>{

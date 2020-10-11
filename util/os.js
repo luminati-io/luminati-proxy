@@ -15,9 +15,9 @@ const exec = require('./exec.js');
 const os = require('os');
 const E = exports;
 const env = process.env, qw = string.qw, KB = 1024, MB = KB*KB;
-var ffi;
-try { ffi = require('ffi'); } catch(e){}
-const libc = ffi && !file.is_darwin ? ffi.Library('libc',
+var ffi_napi;
+try { ffi_napi = require('ffi-napi'); } catch(e){}
+const libc = ffi_napi && !file.is_darwin ? ffi_napi.Library('libc',
     {fallocate: ['int', ['int', 'int', 'long', 'long']]}) : undefined;
 const bin_ip = exec.which('ip');
 
@@ -154,7 +154,7 @@ E.is_release = function(releases, no_cache){
 E.fallocate = function(fd, len, offset, mode){
     if (libc.fallocate(fd, mode||0, offset||0, len)!=0)
     {
-        let errno = ffi.errno();
+        let errno = ffi_napi.errno();
         if (errno==95) // EOPNOTSUPP
             fs.ftruncateSync(fd, len);
         else

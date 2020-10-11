@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.202.485 Stable
+- :bug: UI fixes in zone preset description
+
 ## 1.202.410 Stable
 - :sparkles: Unlocked the option to set rules for unblocker zone preset
 

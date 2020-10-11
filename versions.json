@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.202.485",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "UI fixes in zone preset description"
+            }
+        ]
+    },
+    {
         "ver": "1.202.410",
         "type": "stable",
         "changes": [
