@@ -65,7 +65,7 @@ describe('username', ()=>{
         t('should set only if plan & preset are unblocker',
             {country: 'us', ua: true, preset: 'unblocker', unblock: true},
             'lum-country-us-ua-mobile');
-        t('should not be set by default', {country: 'us', unblock: true,
-             preset: 'unblocker'}, 'lum-country-us');
+        t('should not set anything if ua is not strictly true', {country: 'us',
+            ua: false, unblock: true, preset: 'unblocker'}, 'lum-country-us');
     });
 });

@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.202.232/luminati-proxy-manager-v1.202.232-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.202.410/luminati-proxy-manager-v1.202.410-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -205,6 +205,7 @@ Options:
   --multiply_vips                                     [boolean] [default: false]
   --max_ban_retries                                       [number] [default: 10]
   --preset                                    [string] [default: "session_long"]
+  --ua                          Unblocker Mobile UA   [boolean] [default: false]
   --whitelist_ips               Default for all proxies whitelist ip list for
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser

@@ -1007,6 +1007,56 @@ describe('proxy', ()=>{
                     assert.notEqual(session_a, session_b);
                 }));
             });
+            describe('retry_port combined with unblocker', ()=>{
+                const make_cred_spy = _l=>sinon.spy(_l, 'get_req_cred');
+                const has_unblocker_flag = u=>u.endsWith('-unblocker');
+                const get_username = spy=>spy.returnValues[0].username;
+                const get_retry_rule = (retry_port=24001)=>({
+                    action: {retry: true, retry_port},
+                    action_type: 'retry_port',
+                    status: '200',
+                });
+                const sessions_are_unique = (...users)=>{
+                    const sess_id = u=>u.match(/(?<=session-)(.*?)(?=$|-)/)[1];
+                    return new Set(users.map(sess_id)).size==users.length;
+                };
+                it('waterfall to & from ub adjusts unblocker flag correctly',
+                ()=>etask(function*(){
+                    l = yield lum({rules: [get_retry_rule()], unblock: true});
+                    const l2 = yield lum({port: 24001,
+                        rules: [get_retry_rule(24002)]});
+                    const l3 = yield lum({port: 24002, unblock: true});
+                    l.on('retry', opt=>{
+                        l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    });
+                    l2.on('retry', opt=>{
+                        l3.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    });
+                    const cred_spies = [l, l2, l3].map(make_cred_spy);
+                    yield l.test({fake: 1, no_usage: true});
+                    const [u1, u2, u3] = cred_spies.map(get_username);
+                    assert.ok(has_unblocker_flag(u1));
+                    assert.ok(!has_unblocker_flag(u2));
+                    assert.ok(has_unblocker_flag(u3));
+                    assert.ok(sessions_are_unique(u1, u2, u3));
+                    l2.stop(true);
+                    l3.stop(true);
+                }));
+                it('waterfall from ub to ub keeps unblocker flag intact',
+                ()=>etask(function*(){
+                    l = yield lum({rules: [get_retry_rule()], unblock: true});
+                    const l2 = yield lum({port: 24001, unblock: true});
+                    l.on('retry', opt=>{
+                        l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    });
+                    const cred_spies = [l, l2].map(make_cred_spy);
+                    yield l.test({fake: 1, no_usage: true});
+                    const [u1, u2] = cred_spies.map(get_username);
+                    assert.ok(has_unblocker_flag(u1));
+                    assert.ok(has_unblocker_flag(u2));
+                    l2.stop(true);
+                }));
+            });
             it('retry_port should update context port', ()=>etask(function*(){
                 l = yield lum({
                     rules: [{action: {retry_port: 24001}, status: '200'}],

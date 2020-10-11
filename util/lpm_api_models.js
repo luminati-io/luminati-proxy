@@ -81,6 +81,7 @@ E.proxy_fields = {
     multiply_vips: {type: 'boolean'},
     max_ban_retries: {type: 'integer'},
     preset: {type: 'string'},
+    ua: {type: 'boolean', desc: 'Unblocker Mobile UA'},
 };
 
 E.manager_fields = {

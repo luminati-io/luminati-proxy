@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.202.410 Stable
+- :sparkles: Unlocked the option to set rules for unblocker zone preset
+
 ## 1.202.232 Stable
 - :star: Add option to add Unblocker Mobile UA flag to request username in unblocker zone
 

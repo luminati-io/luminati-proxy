@@ -58,6 +58,7 @@ const presets = {
         },
         clean: opt=>{
             opt.rotate_session = false;
+            opt.ua = false;
         },
         disabled: {
             pool_size: true,
@@ -66,12 +67,10 @@ const presets = {
             session: true,
             session_termination: true,
             headers: true,
-            rules: true,
             proxy: true,
             dns: true,
             reverse_lookup: true,
             smtp: true,
-            trigger_type: true,
         },
         hidden: true,
     },
