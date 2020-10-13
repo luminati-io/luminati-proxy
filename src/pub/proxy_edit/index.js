@@ -307,9 +307,21 @@ const Index = withRouter(class Index extends Pure_component {
                 if (save_form[field]=='values')
                 {
                     save_form.reverse_lookup_values =
-                        save_form.reverse_lookup_values.split('\n');
+                        (save_form.reverse_lookup_values||'').split(' ');
                 }
                 delete save_form.reverse_lookup;
+            }
+            if (field=='reverse_lookup_values')
+            {
+                let values;
+                if (Array.isArray(values = save_form.reverse_lookup_values) &&
+                    !values.length)
+                {
+                    save_form.reverse_lookup = '';
+                    delete save_form.reverse_lookup_values;
+                }
+                else if (values && !Array.isArray(values))
+                    save_form.reverse_lookup_values = values.split(' ');
             }
             if (field=='smtp' && save_form[field])
             {

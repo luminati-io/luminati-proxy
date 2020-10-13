@@ -258,6 +258,28 @@ describe('manager', ()=>{
                 assert.equal(dropin.opt.proxy_port, 3939);
             }));
         });
+        it('invalid reverse_lookup_values doesnt break running proxies',
+        etask._fn(function*(_this){
+            _this.timeout(6000);
+            app = yield app_with_proxies([
+                {
+                    port: 24000,
+                    har_limit: 9999,
+                    reverse_lookup_values: ['1.1.1.1'],
+                },
+                {
+                    port: 24001,
+                    har_limit: 9999,
+                    reverse_lookup_values: 'invalid_not_array',
+                },
+            ]);
+            const proxies = yield json('api/proxies_running');
+            const proxy = port=>proxies.find(p=>p.port==port);
+            assert.equal(proxies.length, 2);
+            assert.ok(proxy(24000).reverse_lookup_values);
+            assert.deepEqual(proxy(24000).reverse_lookup_values, ['1.1.1.1']);
+            assert.ok(!proxy(24001).reverse_lookup_values);
+        }));
     });
     describe('default values', ()=>{
         it('default har_limit is 1024', ()=>etask(function*(){

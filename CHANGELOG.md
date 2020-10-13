@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.202.863 Stable
+- :sparkles: Existing proxy ports whose zone was disabled will not automatically switch to default zone
+- :bug: Fix reverse lookup configuration bug causing inifite loading in proxy view
+
 ## 1.202.485 Stable
 - :bug: UI fixes in zone preset description
 

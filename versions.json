@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.202.863",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Existing proxy ports whose zone was disabled will not automatically switch to default zone"
+            },
+            {
+                "type": "bug",
+                "text": "Fix reverse lookup configuration bug causing inifite loading in proxy view"
+            }
+        ]
+    },
+    {
         "ver": "1.202.485",
         "type": "stable",
         "changes": [
