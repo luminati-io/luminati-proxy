@@ -49,6 +49,10 @@ export const tabs = {
                 label: 'Operating System',
                 tooltip: 'Operating System',
             },
+            timezone: {
+                label: 'Timezone',
+                tooltip: 'Select a timezone to be used by the browser',
+            },
         },
     },
     rules: {

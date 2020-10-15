@@ -82,6 +82,7 @@ E.proxy_fields = {
     max_ban_retries: {type: 'integer'},
     preset: {type: 'string'},
     ua: {type: 'boolean', desc: 'Unblocker Mobile UA'},
+    timezone: {type: 'string', desc: 'Timezone ID to be used by the browser'},
 };
 
 E.manager_fields = {

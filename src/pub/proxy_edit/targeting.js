@@ -1,8 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import moment from 'moment-timezone';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
+import zcountry from '../../../util/country.js';
 import {Note, Ext_tooltip, with_www_api} from '../common.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
@@ -25,6 +27,15 @@ export default with_www_api(class Targeting extends Pure_component {
         {key: 'Windows', value: 'win'},
         {key: 'MacOS', value: 'mac'},
         {key: 'Android', value: 'android'},
+    ];
+    timezones_opt = [
+        {key: 'Disabled (default)', value: ''},
+        {key: 'Automatic', value: 'auto'},
+        ...Object.entries(zcountry.timezone||{}).map(([code, timezone])=>({
+            key: `${zcountry.list[code]||timezone} `
+                +`(GMT${moment.tz(timezone).format('Z')})`,
+            value: timezone,
+        })).sort((a, b)=>a.key.localeCompare(b.key)),
     ];
     set_field = setdb.get('head.proxy_edit.set_field');
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
@@ -201,6 +212,7 @@ export default with_www_api(class Targeting extends Pure_component {
                   note={carriers_note} disabled={carrier_disabled}/>
                 <Config type="select" id="os" data={this.os_opt}
                   disabled={is_static}/>
+                <Config type="select" id="timezone" data={this.timezones_opt}/>
               </Tab_context.Provider>
             </div>;
     }

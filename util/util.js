@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*zlint node, br*/
 (function(){
-var define, node_util;
+var define, node_util, node_path;
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = typeof global=='object' && !!global.nativeRequire
     || typeof navigator=='object' && navigator.product=='ReactNative';
@@ -15,6 +15,7 @@ else if (!is_node)
 else
 {
     node_util = require('util');
+    node_path = require('path');
     define = require('./require_node.js').define(module, '../');
 }
 define(['/util/array.js'], function(array){
@@ -550,6 +551,17 @@ E.flatten_obj = function(obj){
         }
     }
     return res;
+};
+
+E.node_module_version = function(mod){
+    var pkg_json;
+    if (!node_path)
+        return;
+    try {
+        var dir_path = node_path.dirname(require.resolve(mod));
+        pkg_json = require(dir_path+'/package.json');
+    } catch(e){ return; }
+    return pkg_json.version;
 };
 
 return E; }); }());

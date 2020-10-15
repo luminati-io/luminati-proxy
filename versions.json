@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.203.284",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvements in proxies view: open browser button moved to a dedicated column"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added a targeting option to select a timezone to be used by the LPM browser"
+            }
+        ]
+    },
+    {
         "ver": "1.202.863",
         "type": "stable",
         "changes": [

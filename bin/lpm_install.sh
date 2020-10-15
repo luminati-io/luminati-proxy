@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.202.863"
+VERSION="1.203.284"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.203.284 Stable
+- :sparkles: UI improvements in proxies view: open browser button moved to a dedicated column
+- :sparkles: Added a targeting option to select a timezone to be used by the LPM browser
+
 ## 1.202.863 Stable
 - :sparkles: Existing proxy ports whose zone was disabled will not automatically switch to default zone
 - :bug: Fix reverse lookup configuration bug causing inifite loading in proxy view

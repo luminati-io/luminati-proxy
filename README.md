@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.202.863/luminati-proxy-manager-v1.202.863-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.203.284/luminati-proxy-manager-v1.203.284-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -206,6 +206,7 @@ Options:
   --max_ban_retries                                       [number] [default: 10]
   --preset                                    [string] [default: "session_long"]
   --ua                          Unblocker Mobile UA   [boolean] [default: false]
+  --timezone                    Timezone ID to be used by the browser   [string]
   --whitelist_ips               Default for all proxies whitelist ip list for
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser
@@ -290,7 +291,7 @@ docker run luminati/luminati-proxy luminati
 docker run luminati/luminati-proxy luminati --version
 ```
 Make sure to forward appropriate ports. Proxy manager uses by default 22999
-for the web console and the api, 22555 for dropin and 24000 for first
+for the web console and the api, 22225 for dropin and 24000 for first
 configurable proxy.
 
 - To run docker with cli option see the below example:

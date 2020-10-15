@@ -22,6 +22,7 @@ const qw = require('../util/string.js').qw;
 const user_agent = require('../util/user_agent.js');
 const lpm_util = require('../util/lpm_util.js');
 const util_lib = require('../lib/util.js');
+const puppeteer = require('../lib/puppeteer.js');
 const customer = 'abc';
 const password = 'xyz';
 const {assert_has} = require('./common.js');
@@ -581,6 +582,31 @@ describe('manager', ()=>{
                 assert.equal(app.manager._defaults.whitelist_ips[0],
                     '1.1.0.0/20');
             }));
+        });
+        describe('open browser with timezones', ()=>{
+            let launch_stub, open_stub;
+            beforeEach(()=>{
+                launch_stub = sinon.stub(puppeteer, 'launch', ()=>null);
+                open_stub = sinon.stub(puppeteer, 'open_page', ()=>null);
+            });
+            afterEach(()=>{
+                [launch_stub, open_stub].forEach(stub=>sinon.restore(stub));
+            });
+            const t = (name, opt, expected)=>it(name, etask._fn(function*(){
+                app = yield app_with_proxies([Object.assign({port: 24000},
+                    opt)]);
+                yield api_json('api/browser/24000');
+                const [[, , {timezone}]] = open_stub.args;
+                assert.equal(timezone, expected);
+            }));
+            t('country is defined and timezone is auto',
+                {country: 'as', timezone: 'auto'}, 'Pacific/Pago_Pago');
+            t('country is defined and timezone is defined',
+                {country: 'us', timezone: 'Asia/Tokyo'}, 'Asia/Tokyo');
+            t('country is defined and timezone is disabled',
+                {country: 'ca'}, undefined);
+            t('country is any and timezone is defined',
+                {timezone: 'America/Sao_Paulo'}, 'America/Sao_Paulo');
         });
     });
     describe('flags', ()=>{
