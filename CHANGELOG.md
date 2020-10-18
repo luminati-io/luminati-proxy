@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.203.697 Stable
+- :bug: Fixed LPM installation script for Mac OS
+
 ## 1.203.627 Stable
 - :bug: Fixed a Firefox UI bug in Windows Server 2012 when targeting amazon
 

@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.203.627"
+VERSION="1.203.697"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -532,7 +532,6 @@ update_npm()
 reinstall_node_mac()
 {
     update_npm
-    NODE_VER='10.15.3'
     install_nave_node
 }
 
