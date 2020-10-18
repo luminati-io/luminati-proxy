@@ -47,10 +47,14 @@ E.ms_to_dur = function(_ms){
     return s+pad(hours, 2)+':'+pad(mins, 2)+':'+pad(sec, 2);
 };
 
+E.round_dur = function(dur, precision){
+    return !precision ? Math.round(dur) : precision*Math.round(dur/precision);
+};
+
 E.dur_to_str = function(dur, opt){
     opt = opt||{};
     var parts = [];
-    dur = Math.round(+dur);
+    dur = E.round_dur(+dur, opt.precision);
     function chop(period, name){
         if (dur<period)
             return;

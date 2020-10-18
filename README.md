@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.203.284/luminati-proxy-manager-v1.203.284-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.203.627/luminati-proxy-manager-v1.203.627-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -48,10 +48,10 @@ Or
 curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
 ### Linux/MacOS - Manual install
-- Install Node.js 10 ([nodejs.org](https://nodejs.org/en/download/))
-  Node.js version for the proxy manager should be any at least 10.15.3
-- Make sure npm version is 6.4.1 or higher
-  - if not, run: `sudo npm install -g npm@6.4.1`
+- Install Node.js 12 ([nodejs.org](https://nodejs.org/en/download/))
+  Node.js version for the proxy manager should be any at least 12.18.3
+- Make sure npm version is 6.14.6 or higher
+  - if not, run: `sudo npm install -g npm@6.14.6`
 - Install Luminati Proxy from the terminal prompt:
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy

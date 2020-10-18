@@ -104,8 +104,7 @@ class WS extends events.EventEmitter {
         this.idle_timeout = opt.idle_timeout;
         this.idle_timer = undefined;
         this.ipc = opt.ipc_client
-            ? new IPC_client(this, opt.ipc_client, {zjson: opt.ipc_zjson,
-                fail_on_disconnect: opt.fail_ipc_on_disconnect})
+            ? new IPC_client(this, opt.ipc_client, {zjson: opt.ipc_zjson})
             : undefined;
         this.time_parse = opt.time_parse;
         if (opt.ipc_server)
@@ -728,7 +727,6 @@ class Server {
 class IPC_client {
     constructor(zws, names, opt={}){
         this._ws = zws;
-        this._fail_on_disconnect = !!opt.fail_on_disconnect;
         this._pending = new Map();
         this._ws.addListener(opt.zjson ? 'zjson' : 'json',
             this._on_resp.bind(this));
@@ -835,13 +833,6 @@ class IPC_client {
         task.throw(err);
     }
     _on_status(status){
-        if (this._fail_on_disconnect
-            &&(status=='disconnected'||status=='destroyed'))
-        {
-            for (let task of this._pending.values())
-                task.throw(`${this._ws}: Connection closed`);
-            return;
-        }
         for (let task of this._pending.values())
             task.continue({status});
     }

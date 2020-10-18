@@ -197,11 +197,6 @@ E.is_valid_url = function(url){
 E.is_valid_domain = function(domain){
     return /^([a-z0-9]([a-z0-9-_]*[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain); };
 
-E.is_hola_domain = function(domain){
-    return E.is_valid_domain(domain) &&
-        domain.search(/^(.*\.)?(hola\.org|holacdn\.com|h-cdn\.com)$/)!=-1;
-};
-
 // XXX josh: move to email.js:is_valid
 E.is_valid_email = function(email, is_signup){
     if (!email)

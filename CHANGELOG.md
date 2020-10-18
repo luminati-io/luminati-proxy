@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.203.627 Stable
+- :bug: Fixed a Firefox UI bug in Windows Server 2012 when targeting amazon
+
 ## 1.203.284 Stable
 - :sparkles: UI improvements in proxies view: open browser button moved to a dedicated column
 - :sparkles: Added a targeting option to select a timezone to be used by the LPM browser
