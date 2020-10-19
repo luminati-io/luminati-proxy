@@ -173,7 +173,7 @@ export const tabs = {
                     unavailable and redirect to confirmation page before new IP
                     is taken`,
             },
-            proxy: {
+            proxy_country: {
                 label: `Super Proxy location`,
                 tooltip: `Location of Super Proxy is chosen automatically.
                     Sometimes choosing Chinese Super Proxy works better when

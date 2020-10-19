@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.203.897 Stable
+- :star: Use Chinese Super Proxies when needed
+
 ## 1.203.800 Stable
 - :bug: Fixed support for resolving Chinese Super Proxies
 

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.203.897",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Use Chinese Super Proxies when needed"
+            }
+        ]
+    },
+    {
         "ver": "1.203.800",
         "type": "stable",
         "changes": [

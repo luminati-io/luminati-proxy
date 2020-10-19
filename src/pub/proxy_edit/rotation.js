@@ -22,7 +22,7 @@ const dns_opt = [
 
 const proxy_opt = [
     {key: 'Automatic (default)', value: ''},
-    {key: 'China', value: `servercountry-cn.zproxy.lum-superproxy.io`},
+    {key: 'China', value: 'cn'},
 ];
 
 export default class Rotation extends Pure_component {
@@ -86,7 +86,7 @@ export default class Rotation extends Pure_component {
                 <Config type="yes_no" id="session_termination"
                   note={!this.state.form.ssl && sess_note || ''}
                   disabled={!this.state.form.ssl}/>
-                <Config type="select" id="proxy" data={proxy_opt}/>
+                <Config type="select" id="proxy_country" data={proxy_opt}/>
                 <Config type="select" id="dns" data={dns_opt}/>
                 <Config type="select" id="reverse_lookup"
                   data={reverse_lookup_opt}/>

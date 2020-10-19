@@ -65,6 +65,7 @@ conf.server_default = {
     proxy: 'zproxy.lum-superproxy.io',
     proxy_port: 22225,
     proxy_retry: 2,
+    proxy_country: '',
     socket_inactivity_timeout: 120000,
     preset: 'session_long',
     route_err: 'pass_dyn',
