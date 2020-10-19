@@ -53,6 +53,10 @@ export const tabs = {
                 label: 'Timezone',
                 tooltip: 'Select a timezone to be used by the browser',
             },
+            resolution: {
+                label: 'Resolution',
+                tooltip: 'Window resolution to be used by the browser',
+            },
         },
     },
     rules: {

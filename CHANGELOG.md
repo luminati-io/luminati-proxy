@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.203.920 Stable
+- :sparkles: Added a targeting option to select a custom resolution to be used by the browser
+
 ## 1.203.897 Stable
 - :star: Use Chinese Super Proxies when needed
 

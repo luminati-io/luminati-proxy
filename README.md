@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.203.897/luminati-proxy-manager-v1.203.897-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.203.920/luminati-proxy-manager-v1.203.920-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -207,6 +207,7 @@ Options:
   --preset                                    [string] [default: "session_long"]
   --ua                          Unblocker Mobile UA   [boolean] [default: false]
   --timezone                    Timezone ID to be used by the browser   [string]
+  --resolution                  Browser screen size                     [string]
   --whitelist_ips               Default for all proxies whitelist ip list for
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser

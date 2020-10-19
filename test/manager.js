@@ -583,7 +583,7 @@ describe('manager', ()=>{
                     '1.1.0.0/20');
             }));
         });
-        describe('open browser with timezones', ()=>{
+        describe('open browser with custom opts', ()=>{
             let launch_stub, open_stub;
             beforeEach(()=>{
                 launch_stub = sinon.stub(puppeteer, 'launch', ()=>null);
@@ -592,21 +592,27 @@ describe('manager', ()=>{
             afterEach(()=>{
                 [launch_stub, open_stub].forEach(stub=>sinon.restore(stub));
             });
-            const t = (name, opt, expected)=>it(name, etask._fn(function*(){
+            const t = (name, opt, arg, expected)=>it(name, etask._fn(
+            function*(){
                 app = yield app_with_proxies([Object.assign({port: 24000},
                     opt)]);
                 yield api_json('api/browser/24000');
-                const [[, , {timezone}]] = open_stub.args;
-                assert.equal(timezone, expected);
+                const [[, , {[arg]: target_arg}]] = open_stub.args;
+                assert.deepEqual(target_arg, expected);
             }));
             t('country is defined and timezone is auto',
-                {country: 'as', timezone: 'auto'}, 'Pacific/Pago_Pago');
+                {country: 'as', timezone: 'auto'}, 'timezone',
+                'Pacific/Pago_Pago');
             t('country is defined and timezone is defined',
-                {country: 'us', timezone: 'Asia/Tokyo'}, 'Asia/Tokyo');
+                {country: 'us', timezone: 'Asia/Tokyo'}, 'timezone',
+                'Asia/Tokyo');
             t('country is defined and timezone is disabled',
-                {country: 'ca'}, undefined);
+                {country: 'ca'}, 'timezone', undefined);
             t('country is any and timezone is defined',
-                {timezone: 'America/Sao_Paulo'}, 'America/Sao_Paulo');
+                {timezone: 'America/Sao_Paulo'}, 'timezone',
+                'America/Sao_Paulo');
+            t('with custom resolution', {resolution: '800x600'},
+                'resolution', {width: 800, height: 600});
         });
     });
     describe('flags', ()=>{

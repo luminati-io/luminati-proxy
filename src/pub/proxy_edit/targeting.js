@@ -5,6 +5,7 @@ import moment from 'moment-timezone';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import zcountry from '../../../util/country.js';
+import {qw} from '../../../util/string.js';
 import {Note, Ext_tooltip, with_www_api} from '../common.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
@@ -19,6 +20,11 @@ const carriers_note = (()=>{
     const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
     return <a className="link" href={mailto}><T>More carriers</T></a>;
 })();
+
+const browser_resolutions = qw`1024x600 1024x768 1280x720 1280x800 1280x1024
+    1360x768 1366x768 1440x900 1536x864 1600x900 1680x1050 1920x1080
+    1920x1200 2304x1440 2560x1440 2560x1600 2880x1800 4096x2304
+    5120x2880`;
 
 export default with_www_api(class Targeting extends Pure_component {
     state = {};
@@ -36,6 +42,10 @@ export default with_www_api(class Targeting extends Pure_component {
                 +`(GMT${moment.tz(timezone).format('Z')})`,
             value: timezone,
         })).sort((a, b)=>a.key.localeCompare(b.key)),
+    ];
+    resolutions_opt = [
+        {key: 'Automatic (default)', value: ''},
+        ...browser_resolutions.map(r=>({key: r, value: r})),
     ];
     set_field = setdb.get('head.proxy_edit.set_field');
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
@@ -213,6 +223,8 @@ export default with_www_api(class Targeting extends Pure_component {
                 <Config type="select" id="os" data={this.os_opt}
                   disabled={is_static}/>
                 <Config type="select" id="timezone" data={this.timezones_opt}/>
+                <Config type="select" id="resolution"
+                  data={this.resolutions_opt}/>
               </Tab_context.Provider>
             </div>;
     }
