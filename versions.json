@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.203.800",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed support for resolving Chinese Super Proxies"
+            }
+        ]
+    },
+    {
         "ver": "1.203.697",
         "type": "stable",
         "changes": [

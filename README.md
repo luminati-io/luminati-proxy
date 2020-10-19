@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.203.697/luminati-proxy-manager-v1.203.697-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.203.800/luminati-proxy-manager-v1.203.800-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -276,6 +276,7 @@ Options:
   --insecure-http-parser        Disables the strict checks
   --bw_limit                                                        [default: 0]
   --flex_tls                                                    [default: false]
+  --cn                                                          [default: false]
   --api_domain_fallback                                   [default: "l-lpm.com"]
 ```
 

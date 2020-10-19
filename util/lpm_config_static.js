@@ -104,6 +104,7 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     sync_config: false,
     sync_zones: true,
     sync_stats: true,
+    cn: false,
 });
 delete conf.manager_default.port;
 conf.log_levels = {

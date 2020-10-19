@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.203.800 Stable
+- :bug: Fixed support for resolving Chinese Super Proxies
+
 ## 1.203.697 Stable
 - :bug: Fixed LPM installation script for Mac OS
 
