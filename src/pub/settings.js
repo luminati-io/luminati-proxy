@@ -156,6 +156,8 @@ class Form extends Pure_component {
             return null;
         const wl = s.fixed_whitelist_ips.concat(s.whitelist_ips);
         const logs_data = s.zagent ? [0, 1000] : [0, 100, 1000, 10000];
+        const har_limit_data = s.zagent ? har_limit_options.filter(({value})=>
+            [-1, 1024].includes(value)) : har_limit_options;
         return <div className="settings_form">
               <Warnings_modal id='upd_settings_error'
                 warnings={this.state.api_error}/>
@@ -185,7 +187,7 @@ class Form extends Pure_component {
                 default tooltip={tooltips.logs}/>
               <Labeled_controller val={s.har_limit} type="select_number"
                 on_change_wrapper={this.on_change_handler('har_limit',
-                    {number: 1})} data={har_limit_options} disabled={s.zagent}
+                    {number: 1})} data={har_limit_data}
                 label="Response limit to save" default={1024}
                 tooltip={tooltips.har_limit}/>
               <Labeled_controller val={s.log} type="select"

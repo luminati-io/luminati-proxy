@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.204.226 Stable
+- :bug: Fixed inconsistency with Ban IP rules when sending requests in short intervals
+
 ## 1.203.920 Stable
 - :sparkles: Added a targeting option to select a custom resolution to be used by the browser
 

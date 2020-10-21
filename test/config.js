@@ -44,6 +44,21 @@ describe('config', ()=>{
         write_sync_stub.restore();
         write_e_sync.restore();
     });
+    describe('limiting specific manager _defaults in cloud zagents', ()=>{
+        let notice_stub;
+        before(()=>{ notice_stub = sinon.stub(logger, 'notice'); });
+        after(()=>{ notice_stub.restore(); });
+        const t = (name, _defaults, arg, expected)=>it(name, ()=>{
+            const conf = new Config(new Manager({zagent: true}),
+                Manager.default, {cloud_config: {_defaults}});
+            const {_defaults: {[arg]: target}} = conf.get_proxy_configs();
+            assert.equal(target, expected);
+        });
+        t('logs is limited to 1000', {logs: 9999}, 'logs', 1000);
+        t('logs is repsected when below the limit', {logs: 500}, 'logs', 500);
+        t('har_limit max is 1KB', {har_limit: 100*1024}, 'har_limit', 1024);
+        t('har_limit cant be unlimited', {har_limit: 0}, 'har_limit', 1024);
+    });
     describe('_prepare_proxy', ()=>{
         let warn_stub;
         beforeEach(()=>{
