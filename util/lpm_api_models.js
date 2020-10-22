@@ -84,6 +84,7 @@ E.proxy_fields = {
     ua: {type: 'boolean', desc: 'Unblocker Mobile UA'},
     timezone: {type: 'string', desc: 'Timezone ID to be used by the browser'},
     resolution: {type: 'string', desc: 'Browser screen size'},
+    webrtc: {type: 'string', desc: 'WebRTC plugin behavior in the browser'},
 };
 
 E.manager_fields = {

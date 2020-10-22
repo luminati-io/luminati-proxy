@@ -611,14 +611,16 @@ class Server {
         this.opt = opt;
         this.label = opt.label;
         this.connections = new Set();
-        this.zc = opt.label ? `${opt.label}_ws` : 'ws';
+        if (opt.zcounter!=false)
+            this.zc = opt.label ? `${opt.label}_ws` : 'ws';
         this.ws_server.addListener('connection', this.accept.bind(this));
         if (opt.port)
             zerr.notice(`${this}: listening on port ${opt.port}`);
         if (!zcounter)
             zcounter = require('./zcounter.js');
         // ensure the metric exists, even if 0
-        zcounter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
+        if (this.zc)
+            zcounter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
     }
     toString(){ return this.label ? `${this.label} WS server` : 'WS server'; }
     upgrade(req, socket, head){
@@ -670,11 +672,15 @@ class Server {
         zws._assign(ws);
         zws._on_open();
         this.connections.add(zws);
-        zcounter.inc(`${this.zc}_conn`);
-        zcounter.inc_level(`level_${this.zc}_conn`, 1, 'sum');
+        if (this.zc)
+        {
+            zcounter.inc(`${this.zc}_conn`);
+            zcounter.inc_level(`level_${this.zc}_conn`, 1, 'sum');
+        }
         zws.addListener('disconnected', ()=>{
             this.connections.delete(zws);
-            zcounter.inc_level(`level_${this.zc}_conn`, -1, 'sum');
+            if (this.zc)
+                zcounter.inc_level(`level_${this.zc}_conn`, -1, 'sum');
         });
         if (this.handler)
         {

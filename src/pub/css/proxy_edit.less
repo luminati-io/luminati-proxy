@@ -71,7 +71,7 @@
         }
         .target .desc { width: 110px; }
         .rotation .desc { width: 125px; }
-        .headers .desc { width: 145px; }
+        .browser .desc { width: 145px; }
         .general .desc { width: 195px; }
         .rules {
             max-width: 100%;
@@ -161,7 +161,7 @@
                 .panel { padding: 0; }
             }
         }
-        .headers {
+        .browser {
             .field_row_inner.headers {
                 align-items: baseline;
                 input[type=text] {
@@ -188,6 +188,13 @@
                         }
                     }
                 }
+                .note { margin-bottom: 10px; }
+            }
+            &_warning {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
             .desc { padding-right: 0; }
             .action_icons {

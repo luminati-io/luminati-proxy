@@ -462,9 +462,9 @@ const columns = [
         render: Browser_cell,
         default: true,
         tooltip: 'Open browser configured with this port',
-        dynamic: true,
         width: 80,
         grow: 0,
+        shrink: 0,
         hide_col_title: true,
     },
 ];

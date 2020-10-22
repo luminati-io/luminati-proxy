@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.204.545 Stable
+- :sparkles: Added a targeting option to select WebRTC behavior in the browser
+- :star: UI improvements: browser related configuration moved to a dedicated tab
+
 ## 1.204.226 Stable
 - :bug: Fixed inconsistency with Ban IP rules when sending requests in short intervals
 

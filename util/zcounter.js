@@ -545,7 +545,7 @@ E.is_debug = title=>{
     let v = debug && debug[title];
     if (typeof v=='object')
         return v.includes(+env.AGENT_NUM);
-    return v;
+    return !!v;
 };
 
 E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client};

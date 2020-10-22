@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.204.226/luminati-proxy-manager-v1.204.226-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.204.545/luminati-proxy-manager-v1.204.545-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -109,7 +109,7 @@ luminati --daemon
 
 Luminati Proxy comes with a "dropin mode" which behaves exactly like the
 existing super-proxies. When running a proxy in dropin mode, you do not need to
-log in via the administrative UI in order to make requests through your
+sign in via the administrative UI in order to make requests through your
 proxies. Rather, the proxy username and password are provided with each request
 to the proxy server. This mode is enabled by default, and you can use this mode
 as an easy replacement when migrating from the regular super-proxy to the
@@ -208,6 +208,7 @@ Options:
   --ua                          Unblocker Mobile UA   [boolean] [default: false]
   --timezone                    Timezone ID to be used by the browser   [string]
   --resolution                  Browser screen size                     [string]
+  --webrtc                      WebRTC plugin behavior in the browser   [string]
   --whitelist_ips               Default for all proxies whitelist ip list for
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser

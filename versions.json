@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.204.545",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added a targeting option to select WebRTC behavior in the browser"
+            },
+            {
+                "type": "star",
+                "text": "UI improvements: browser related configuration moved to a dedicated tab"
+            }
+        ]
+    },
+    {
         "ver": "1.204.226",
         "type": "stable",
         "changes": [

@@ -123,7 +123,7 @@ const Login = withRouter(class Login extends Pure_component {
         const _this = this;
         return this.etask(function*(){
             this.on('uncaught', e=>{
-                _this.setState({error_message: 'Cannot log in: '+e.message});
+                _this.setState({error_message: 'Cannot sign in: '+e.message});
             });
             const ets = [];
             ets.push(etask(function*_get_settings(){
@@ -295,7 +295,7 @@ class Customers_form extends Pure_component {
                 onClick={this.props.select_final_customer}
                 className="btn btn_lpm btn_login"
                 disabled={this.props.saving_user}>
-                {this.props.saving_user ? 'Logging in' : 'Log in'}
+                {this.props.saving_user ? 'Logging in' : 'Sign in'}
               </button>
             </div>;
     }
@@ -352,7 +352,7 @@ const First_form = with_www_api(class First_form extends Pure_component {
                       <a className="btn btn_lpm btn_google"
                         onClick={google_click}>
                         <div className="img"/>
-                        {t('Log in with Google')}
+                        {t('Sign in with Google')}
                       </a>
                     </div>
                   </div>
@@ -376,7 +376,7 @@ const First_form = with_www_api(class First_form extends Pure_component {
                     <button type="submit"
                       className="btn btn_lpm btn_login"
                       onClick={this.props.save_user}>
-                      {saving_user ? t('Logging in...') : t('Log in')}
+                      {saving_user ? t('Logging in...') : t('Sign in')}
                     </button>
                   </div>
                   <div className="or_circle">Or</div>

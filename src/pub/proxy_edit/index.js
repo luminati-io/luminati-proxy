@@ -20,7 +20,7 @@ import Rules from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
 import Rotation from './rotation.js';
-import Headers from './headers.js';
+import Browser from './browser.js';
 import Logs from './logs.js';
 import Alloc_modal from './alloc_modal.js';
 import {map_rule_to_form} from './rules.js';
@@ -390,7 +390,7 @@ const Index = withRouter(class Index extends Pure_component {
 
 const Nav_tabs_wrapper = withRouter(
 class Nav_tabs_wrapper extends Pure_component {
-    tabs = ['logs', 'target', 'rotation', 'rules', 'headers', 'general'];
+    tabs = ['logs', 'target', 'rotation', 'rules', 'browser', 'general'];
     set_tab = id=>{
         const port = this.props.match.params.port;
         const pathname = `/proxy/${port}/${id}`;
@@ -469,7 +469,7 @@ const Main_window = withRouter(({match})=>
         <Route path={`${match.path}/target`} component={Targeting}/>
         <Route path={`${match.path}/rules`} component={Rules}/>
         <Route path={`${match.path}/rotation`} component={Rotation}/>
-        <Route path={`${match.path}/headers`} component={Headers}/>
+        <Route path={`${match.path}/browser`} component={Browser}/>
         <Route path={`${match.path}/general`} component={General}/>
         <Route path={`${match.path}/logs`} component={Logs}/>
         <Route exact path={match.path} component={({location})=>
