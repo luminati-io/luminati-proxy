@@ -111,7 +111,7 @@ export default class Browser extends Pure_component {
             !_.isEqual(h, this.first_header));
         return <div className="browser">
           <Warning text={
-            <div className="browser warning">
+            <div className="browser">
               <span>
                 These options are applied <strong>ONLY</strong> when using a
                 browser from the LPM.

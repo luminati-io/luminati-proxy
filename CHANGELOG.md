@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.205.64 Stable
+- :bug: Fixed a bug causing requests to duplicate proxy API to hang
+
 ## 1.205.22 Stable
 - :sparkles: Allow traffic from not whitelisted IPs when zone's credential is passed
 - :bug: Fixed saving city targeting

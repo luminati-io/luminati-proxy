@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.205.64",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed a bug causing requests to duplicate proxy API to hang"
+            }
+        ]
+    },
+    {
         "ver": "1.205.22",
         "type": "stable",
         "changes": [

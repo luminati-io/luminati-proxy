@@ -485,6 +485,27 @@ describe('manager', ()=>{
                 t('ip', {ip: '1.1.1.1'}, 204);
                 t('no ip', {ip: 'r0123456789abcdef0123456789ABCDEF'}, 204);
             });
+            describe('duplicate port', ()=>{
+                it('works after updating port', etask._fn(function*(_this){
+                    app = yield app_with_proxies([{port: 24000}], {});
+                    const put_proxy = {port: 24001};
+                    yield json('api/proxies/24000', 'put', {proxy: put_proxy});
+                    const res = yield api_json('api/proxy_dup',
+                        {method: 'post', body: {port: 24001}});
+                    assert.equal(res.statusCode, 200);
+                }));
+                it('does not hang on errors', etask._fn(function*(_this){
+                    app = yield app_with_proxies([{port: 24000}], {});
+                    const stub = sinon.stub(app.manager, 'create_new_proxy',
+                        ()=>{ throw new Error('error creating proxy'); });
+                    const res = yield api_json('api/proxy_dup',
+                        {method: 'post', body: {port: 24000}});
+                    assert.equal(res.statusCode, 500);
+                    assert.equal(res.body,
+                        'Server error: error creating proxy');
+                    stub.restore();
+                }));
+            });
         });
         describe('har logs', function(){
             this.timeout(6000);

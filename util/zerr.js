@@ -29,6 +29,7 @@ else
         process = global.process||require('_process');
         require('./config.js');
         var cluster = require('cluster');
+        var worker_threads = require('worker_threads');
         var version = require('./version.js').version;
     }
 }
@@ -236,9 +237,12 @@ E.set_log_buffer = function(on){
 };
 var node_init = function(){
     if (zutil.is_mocha())
+    {
         E.level = L.WARN;
-    else
-        E.prefix = !cluster.isMaster ? 'C'+cluster.worker.id+' ' : '';
+        return;
+    }
+    E.prefix = (!cluster.isMaster ? 'C'+cluster.worker.id+' ' : '')
+    +(!worker_threads.isMainThread ? 'T'+worker_threads.threadId+' ': '');
 };
 
 var init = function(){
