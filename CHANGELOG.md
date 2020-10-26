@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.205.22 Stable
+- :sparkles: Allow traffic from not whitelisted IPs when zone's credential is passed
+- :bug: Fixed saving city targeting
+
 ## 1.204.545 Stable
 - :sparkles: Added a targeting option to select WebRTC behavior in the browser
 - :star: UI improvements: browser related configuration moved to a dedicated tab

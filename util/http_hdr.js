@@ -162,6 +162,14 @@ const rules_headers = [
             'accept-language': 'en-US',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763',
         }},
+    {match: {browser: 'edge', version_min: 80},
+        rules: {
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-user': '?1',
+            'sec-fetch-dest': 'document',
+            'sec-fetch-site': 'none',
+        }},
     {match: {browser: 'safari'},
         rules: {
             connection: 'keep-alive',

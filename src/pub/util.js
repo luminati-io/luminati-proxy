@@ -302,3 +302,8 @@ export const get_changes_tooltip = changes=>{
 export const bind_all = (_this, methods)=>{
     methods.forEach(m=>_this[m] = _this[m].bind(_this));
 };
+
+export const is_local = ()=>{
+    const {href} = window.location;
+    return href.includes('localhost') || href.includes('127.0.0.1');
+};

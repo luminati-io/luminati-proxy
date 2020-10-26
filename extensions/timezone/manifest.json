@@ -1,0 +1,17 @@
+{
+    "background": {
+        "persistent": false,
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "manifest_version": 2,
+    "name": "Luminati Proxy Manager Timezone",
+    "permissions": [
+        "<all_urls>",
+        "tabs",
+        "privacy",
+        "webNavigation"
+    ],
+    "version": "1.205.22"
+}

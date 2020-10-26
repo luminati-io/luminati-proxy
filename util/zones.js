@@ -9,10 +9,10 @@ E.get_perm = zone=>{
     if (!plan || !plan.type)
         return zone.perm;
     const perm = {
-        city: qw`city`,
+        city: qw`state city`,
         asn: qw`asn carrier state`,
         static: qw`ip route_all route_dedicated`,
-        mobile: qw`mobile asn carrier state city`,
+        mobile: qw`mobile asn carrier state state city`,
         state: qw`state`,
     };
     if (plan.type=='static')

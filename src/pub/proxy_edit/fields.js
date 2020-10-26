@@ -220,7 +220,8 @@ export const tabs = {
             },
             webrtc: {
                 label: 'WebRTC',
-                tooltip: 'Choose how WebRTC plugin behaves in the browser',
+                tooltip: `Select between disabling WebRTC APIs in the browser
+                    and prevent a potential IP leakage, and keeping it enabled`
             },
         },
     },

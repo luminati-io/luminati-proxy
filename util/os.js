@@ -19,7 +19,7 @@ var ffi_napi;
 try { ffi_napi = require('ffi-napi'); } catch(e){}
 const libc = ffi_napi && !file.is_darwin ? ffi_napi.Library('libc',
     {fallocate: ['int', ['int', 'int', 'long', 'long']]}) : undefined;
-const bin_ip = exec.which('ip');
+const BIN_IP = '/bin/ip';
 
 var distro_release;
 var procfs_fmt = {
@@ -317,7 +317,7 @@ E.iface_list = ()=>{
     if (file.is_win || file.is_darwin)
         return Object.keys(os.networkInterfaces());
     // https://github.com/nodejs/node/issues/498
-    let ifaces = cli.exec_get_lines(`${bin_ip} link show`);
+    let ifaces = cli.exec_get_lines(`${BIN_IP} link show`);
     return ifaces.map(str=>{
         const match = /^\d+:\s([\w@]+):.*/.exec(str);
         return match && match[1].replace(/@\w+$/, '');
@@ -327,14 +327,12 @@ E.iface_list = ()=>{
 E.eth_dev = ()=>{
     let is_ether = ifname=>/^(bond|en|wl|eth)/.test(ifname);
     let ifaces = E.iface_list().filter(is_ether);
-    if (E.is_release(['c:trusty']))
-        return {eth_dev: 'eth0', udptunnel_dev: 'eth1', ifaces};
     // https://cgit.freedesktop.org/systemd/systemd/tree/src/udev/udev-builtin-net_id.c#n20
     if (!ifaces.length)
         throw new Error('No ethernet interfaces found');
     if (ifaces.length==1)
         return {eth_dev: ifaces[0], ifaces};
-    let routes = cli.exec_get_lines(`${bin_ip} -4 route`);
+    let routes = cli.exec_get_lines(`${BIN_IP} -4 route`);
     let default_route = array.grep(routes, /^default/)[0];
     if (!default_route)
         throw new Error('Default route not found');
@@ -374,10 +372,11 @@ function set_net_dev(){
             return void(E.net_dev = [search[i]]);
     }
 }
-set_net_dev();
 
 E.net_dev_stats = function(net_dev, opt={}){
     var o = {};
+    if (!E.net_dev)
+        set_net_dev();
     net_dev = array.to_array(net_dev||E.net_dev);
     if (!net_dev.length)
         return;
@@ -671,8 +670,6 @@ E.fd_use = opt=>etask(function*(){
 
 E.systemd_analyze = (type, args=[])=>{
     args = [].concat(args);
-    if (E.is_release(['c:trusty']))
-        return 'No systemd info for trusty';
     return exec.get(`systemd-analyze ${type} ${args.join(' ')}`,
         {out: 'stdout', stdio: 'pipe'});
 };

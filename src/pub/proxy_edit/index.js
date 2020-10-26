@@ -28,7 +28,7 @@ import Tooltip from '../common/tooltip.js';
 import {Modal} from '../common/modals.js';
 import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
-import {report_exception, bind_all} from '../util.js';
+import {report_exception, bind_all, is_local} from '../util.js';
 import Warnings_modal from '../common/warnings_modal.js';
 import '../css/proxy_edit.less';
 
@@ -329,7 +329,12 @@ const Index = withRouter(class Index extends Pure_component {
                     save_form.smtp.filter(Boolean) : [];
             }
             if (field=='city' && save_form[field])
-                save_form.city = save_form.city.split('|')[0];
+            {
+                const [city, state] = save_form.city.split('|');
+                save_form.city = city;
+                if (state)
+                    save_form.state = state;
+            }
             if (field=='asn' && save_form[field])
                 save_form.asn = Number(save_form.asn);
             if (field=='headers' && save_form[field])
@@ -539,9 +544,6 @@ class Nav extends Pure_component {
         const preset = this.props.form.preset;
         const is_unblocker = this.props.plan.type=='unblocker';
         const preset_disabled = this.props.disabled || is_unblocker;
-        const href = window.location.href;
-        const is_local = href.includes('localhost')||
-            href.includes('127.0.0.1');
         return <div className="nav">
               <Select_zone val={this.props.form.zone} on_change_wrapper={val=>
                   this.confirm_update(()=>this.update_zone(val))}
@@ -554,7 +556,7 @@ class Nav extends Pure_component {
                 tooltip={
                   <Preset_description preset={preset} rule_clicked={()=>0}/>
                 }/>
-              {is_local &&
+              {is_local() &&
                 <Open_browser_btn port={this.props.form.port}/>
               }
               <Confirmation_modal on_ok={this.state.confirm_action}/>

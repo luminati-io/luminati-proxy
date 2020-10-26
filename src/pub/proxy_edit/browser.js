@@ -10,7 +10,7 @@ import zcountry from '../../../util/country.js';
 import {qw} from '../../../util/string.js';
 import {Config, Tab_context} from './common.js';
 import {Remove_icon, Field_row_raw, Warning, Note} from '../common.js';
-import * as util from '../util.js';
+import {formatted_user_agents, is_local} from '../util.js';
 import Tooltip from '../common/tooltip.js';
 import {Select_multiple} from '../common/controls.js';
 import {T} from '../common/i18n.js';
@@ -35,8 +35,8 @@ const resolution_opt = [
 ];
 
 const webrtc_opt = [
-    {key: 'Enabled (default)', value: ''},
-    {key: 'Disabled', value: 'disabled'},
+    {key: 'Disabled (default)', value: ''},
+    {key: 'Enabled', value: true},
 ];
 
 export default class Browser extends Pure_component {
@@ -48,6 +48,7 @@ export default class Browser extends Pure_component {
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>this.setState({lock}));
+        this.setdb_on('head.settings', settings=>this.setState({settings}));
         this.setdb_on('head.proxy_edit.form.headers', headers=>{
             if (!headers)
                 return;
@@ -98,18 +99,19 @@ export default class Browser extends Pure_component {
         });
     };
     render(){
-        if (!this.state.form)
+        if (!this.state.form || !this.state.settings)
             return null;
         const {ssl, preset} = this.state.form;
+        const {zagent} = this.state.settings;
         const def_ssl = this.state.defaults.ssl;
         const ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
         const {type: plan_type} = this.get_curr_plan();
         const is_unblocker = plan_type=='unblocker' && preset=='unblocker';
-        const headers_are_set = !!this.state.headers.filter(h=>
-          !_.isEqual(h, this.first_header)).length;
+        const headers_are_set = this.state.headers.some(h=>
+            !_.isEqual(h, this.first_header));
         return <div className="browser">
           <Warning text={
-            <div className="browser_warning">
+            <div className="browser warning">
               <span>
                 These options are applied <strong>ONLY</strong> when using a
                 browser from the LPM.
@@ -117,18 +119,20 @@ export default class Browser extends Pure_component {
                 These settings alter the default behavior of the browser, such
                 as proxy configuration and JavaScript environment.
               </span>
-              <T>{t=>
-                <Tooltip title={t('Open a browser configured with these '
-                  +'settings')}>
-                  <button
-                    onClick={this.open_browser}
-                    disabled={this.state.lock}
-                    className="btn btn_lpm btn_lpm_primary">
-                    {t(this.state.lock ? 'Saving settings' :
-                      'Open a browser')}
-                  </button>
-                </Tooltip>
-              }</T>
+              {is_local() &&
+                <T>{t=>
+                  <Tooltip title={t('Open a browser configured with these '
+                    +'settings')}>
+                    <button
+                      onClick={this.open_browser}
+                      disabled={this.state.lock}
+                      className="btn btn_lpm btn_lpm_primary">
+                      {t(this.state.lock ? 'Saving settings' :
+                        'Open a browser')}
+                    </button>
+                  </Tooltip>
+                }</T>
+              }
             </div>
           }/>
           <Tab_context.Provider value="browser">
@@ -159,9 +163,12 @@ export default class Browser extends Pure_component {
                 }
               </div>
             </Field_row_raw>
-            <Config type="select" id="timezone" data={timezone_opt}/>
-            <Config type="select" id="resolution" data={resolution_opt}/>
-            <Config type="select" id="webrtc" data={webrtc_opt}/>
+            <Config type="select" id="timezone" data={timezone_opt}
+              disabled={zagent}/>
+            <Config type="select" id="resolution" data={resolution_opt}
+              disabled={zagent}/>
+            <Config type="select" id="webrtc" data={webrtc_opt}
+              disabled={zagent}/>
             {is_unblocker && <Config id="ua" type="yes_no"/>}
           </Tab_context.Provider>
         </div>;
@@ -216,7 +223,7 @@ const headers = {
     'user-agent': [
         {label: 'Random (desktop)', value: 'random_desktop'},
         {label: 'Random (mobile)', value: 'random_mobile'},
-        ...util.formatted_user_agents,
+        ...formatted_user_agents,
     ],
     'accept': [
         '*/*',

@@ -12,7 +12,7 @@ import etask from '../../util/etask.js';
 import zutil from '../../util/util.js';
 import classnames from 'classnames';
 import filesaver from 'file-saver';
-import {get_static_country, report_exception} from './util.js';
+import {get_static_country, report_exception, is_local} from './util.js';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title, No_zones,
@@ -26,11 +26,6 @@ import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
 import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
 import './css/proxies.less';
-
-const is_local = ()=>{
-    const href = window.location.href;
-    return href.includes('localhost') || href.includes('127.0.0.1');
-};
 
 const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog})=>{
     return <Actions proxy={proxy} get_status={mgr.get_status}

@@ -613,8 +613,7 @@ describe('manager', ()=>{
                 'America/Sao_Paulo');
             t('with custom resolution', {resolution: '800x600'},
                 'resolution', {width: 800, height: 600});
-            t('webrtc is disabled', {webrtc: 'disabled'}, 'webrtc',
-                'disabled');
+            t('webrtc is enabled', {webrtc: true}, 'webrtc', true);
         });
     });
     describe('flags', ()=>{

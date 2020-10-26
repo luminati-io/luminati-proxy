@@ -554,14 +554,14 @@ E.flatten_obj = function(obj){
 };
 
 E.node_module_version = function(mod){
-    var pkg_json;
     if (!node_path)
         return;
     try {
+        var pkg_json;
         var dir_path = node_path.dirname(require.resolve(mod));
         pkg_json = require(dir_path+'/package.json');
-    } catch(e){ return; }
-    return pkg_json.version;
+        return pkg_json.version;
+    } catch(e){}
 };
 
 return E; }); }());

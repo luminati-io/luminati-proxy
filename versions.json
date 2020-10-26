@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.205.22",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Allow traffic from not whitelisted IPs when zone's credential is passed"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed saving city targeting"
+            }
+        ]
+    },
+    {
         "ver": "1.204.545",
         "type": "stable",
         "changes": [
