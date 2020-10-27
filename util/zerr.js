@@ -29,7 +29,11 @@ else
         process = global.process||require('_process');
         require('./config.js');
         var cluster = require('cluster');
-        var worker_threads = require('worker_threads');
+        // XXX stanislav/sergeyp: remove try/catch wrap after node on
+        // app_win64_jse is updated
+        var worker_threads = {isMainThread: true};
+        try { worker_threads = require('worker_threads'); }
+        catch(e){}
         var version = require('./version.js').version;
     }
 }
