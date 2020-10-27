@@ -93,7 +93,6 @@ E.send = function(opt){
         }
         err.xhr_info = {url: url, method: method, status: xhr.status,
             data: get_res_data(xhr), response_text: xhr.responseText};
-        err.hola_info = err.xhr_info; // legacy
         err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
         throw err;

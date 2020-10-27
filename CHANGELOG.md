@@ -1,7 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.205.266 Stable
+- :bug: Fixed a bug with the waterfall rule incorrectly attaching username flags
+
 ## 1.205.228 Stable
-- :undefined: Fix timezone feature inconsistency on Windows
+- :bug: Fix timezone feature inconsistency on Windows
 
 ## 1.205.64 Stable
 - :bug: Fixed a bug causing requests to duplicate proxy API to hang

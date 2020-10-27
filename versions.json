@@ -1,10 +1,20 @@
 [
     {
+        "ver": "1.205.266",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed a bug with the waterfall rule incorrectly attaching username flags"
+            }
+        ]
+    },
+    {
         "ver": "1.205.228",
         "type": "stable",
         "changes": [
             {
-                "text": "bug",
+                "type": "bug",
                 "text": "Fix timezone feature inconsistency on Windows"
             }
         ]

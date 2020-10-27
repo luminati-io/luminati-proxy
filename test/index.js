@@ -1042,6 +1042,46 @@ describe('proxy', ()=>{
                     l2.stop(true);
                     l3.stop(true);
                 }));
+                it('ub to non-ub, followed by no retry', ()=>etask(function*(){
+                    l = yield lum({rules: [get_retry_rule()]});
+                    const l2 = yield lum({port: 24001, unblock: true});
+                    l.on('retry', opt=>{
+                        l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    });
+                    let non_retry_u;
+                    l.on('usage', ({username})=>{ non_retry_u = username; });
+                    const cred_spies = [l, l2].map(make_cred_spy);
+                    yield l.test({fake: 1, no_usage: true});
+                    const [u1, u2] = cred_spies.map(get_username);
+                    assert.ok(!has_unblocker_flag(u1));
+                    assert.ok(has_unblocker_flag(u2));
+                    l.rules.rules.pop();
+                    l.session_mgr.refresh_sessions();
+                    yield l.test({fake: 1});
+                    assert.ok(!has_unblocker_flag(non_retry_u));
+                    assert.ok(sessions_are_unique(u1, non_retry_u));
+                    l2.stop(true);
+                }));
+                it('non-ub to ub, followed by no retry', ()=>etask(function*(){
+                    l = yield lum({rules: [get_retry_rule()], unblock: true});
+                    const l2 = yield lum({port: 24001});
+                    l.on('retry', opt=>{
+                        l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    });
+                    let non_retry_u;
+                    l.on('usage', ({username})=>{ non_retry_u = username; });
+                    const cred_spies = [l, l2].map(make_cred_spy);
+                    yield l.test({fake: 1, no_usage: true});
+                    const [u1, u2] = cred_spies.map(get_username);
+                    assert.ok(has_unblocker_flag(u1));
+                    assert.ok(!has_unblocker_flag(u2));
+                    l.rules.rules.pop();
+                    l.session_mgr.refresh_sessions();
+                    yield l.test({fake: 1});
+                    assert.ok(has_unblocker_flag(non_retry_u));
+                    assert.ok(sessions_are_unique(u1, non_retry_u));
+                    l2.stop(true);
+                }));
                 it('waterfall from ub to ub keeps unblocker flag intact',
                 ()=>etask(function*(){
                     l = yield lum({rules: [get_retry_rule()], unblock: true});

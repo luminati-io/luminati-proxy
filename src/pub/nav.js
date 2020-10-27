@@ -162,7 +162,7 @@ const show_reload = function(){
 };
 
 class Upgrade_downgrade_modal extends Pure_component {
-    missing_root_perm_err(e){ return (e.hola_info.data||{}).code==126; }
+    missing_root_perm_err(e){ return (e.xhr_info.data||{}).code==126; }
     confirm(){
         const loading_modal = this.props.action=='upgrade' ?
             '#upgrading' : '#downgrading';
