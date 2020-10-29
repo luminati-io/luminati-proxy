@@ -1,80 +1,17 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
-const webpack = require('webpack');
-const html_webpack_plugin = require('html-webpack-plugin');
-const mk_url_loader = mimetype=>[{
-    loader: 'url-loader',
-    options: {limit: '100000', fallback: 'file-loader', mimetype},
-}];
-module.exports = {
-    context: `${__dirname}/src/pub`,
-    entry: {
-        app: './app.js',
-        vendor: ['jquery', 'lodash', 'moment',
-            'bootstrap', 'bootstrap/dist/css/bootstrap.css',
-            'codemirror/lib/codemirror', 'codemirror/lib/codemirror.css',
-            'codemirror/mode/javascript/javascript',
-            'react', 'react-dom', 'react-bootstrap',
-            'regenerator-runtime', 'es6-shim', 'animate.css']
-    },
-    output: {
-        path: `${__dirname}/bin/pub`,
-        publicPath: '/',
-        filename: '[chunkhash].[name].js',
-    },
-    plugins: [
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        new webpack.optimize.CommonsChunkPlugin({
-            names: ['vendor', 'runtime'],
-            minChunks: Infinity,
-        }),
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-        }),
-        new html_webpack_plugin({inject: true, template: 'index.html'}),
-    ],
-    module: {
-        rules: [
-            {
-                test: /src[\\/]pub[\\/].+\.js$/,
-                exclude: /node_modules/,
-                use: ['babel-loader'],
-            },
-            {
-                test: /www[\\/].+\.js$/,
-                exclude: /node_modules/,
-                use: ['hutil-loader', 'babel-loader'],
-            },
-            {
-                test: /util[\\/].+\.js$/,
-                parser: {node: false, commonjs: false},
-                exclude: [/www[\\/].+\.js$/, /node_modules/],
-                use: ['hutil-loader'],
-            },
-            {test: /\.css$/, use: ['style-loader', 'css-loader']},
-            {test: /\.less$/, use: ['style-loader', 'css-loader?-url',
-                'less-loader']},
-            {test: /\.eot(\?v=\d+.\d+.\d+)?$/, use: mk_url_loader()},
-            {test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                use: mk_url_loader('application/font-woff')},
-            {test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/,
-                use: mk_url_loader('application/octet-stream')},
-            {test: /\.svg(\?v=\d+.\d+.\d+)?$/,
-                use: mk_url_loader('image/svg+xml')},
-            {test: /\.(jpe?g|png|ico|gif)$/, use: mk_url_loader()},
-        ],
-    },
-    resolve: {
-        modules: [__dirname, 'node_modules'],
-        alias: {
-            '/util': 'util/',
-            jquery: 'jquery/src/jquery.js',
-            virt_jquery_all: 'jquery/src/jquery.js',
-            '/www': 'www/',
-        },
-    },
-    resolveLoader: {
-        alias: {'hutil-loader': `${__dirname}/lib/hutil_loader.js`},
-    },
+const {merge} = require('webpack-merge');
+const common_config = require('./webpack.common.js');
+const prod_config = require('./webpack.prod.js');
+const dev_config = require('./webpack.dev.js');
+
+const merged = conf=>merge(common_config, conf);
+module.exports = env=>{
+    switch (env)
+    {
+    case 'production': return merged(prod_config);
+    case 'development': return merged(dev_config);
+    default:
+        throw new Error(`Webpack configuration for ${env} was not found!`);
+    }
 };

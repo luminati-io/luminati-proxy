@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.205.973",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Upgraded webpack version"
+            }
+        ]
+    },
+    {
         "ver": "1.205.266",
         "type": "stable",
         "changes": [

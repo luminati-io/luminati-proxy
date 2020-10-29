@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.205.973 Stable
+- :sparkles: Upgraded webpack version
+
 ## 1.205.266 Stable
 - :bug: Fixed a bug with the waterfall rule incorrectly attaching username flags
 

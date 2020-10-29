@@ -238,8 +238,10 @@ export default class Rules extends Pure_component {
                 <Rule key={r.id}
                   rule={r}
                   rule_del={this.rule_del}
-                  www={www} ssl={ssl_analyzing_enabled}
-                  disabled={disabled_fields.rules}/>
+                  www={www}
+                  ssl={ssl_analyzing_enabled}
+                  disabled={disabled_fields.rules}
+                />
               )}
               <Tester_wrapper/>
             </div>;
@@ -446,6 +448,8 @@ class Action extends Pure_component {
         }
         else
             set_rule_field('ban_ip_duration', '');
+        if (val=='retry')
+           set_rule_field('retry_number', 3);
     };
     request_method_changed = val=>{
         if (val=='GET')
@@ -601,8 +605,8 @@ class Trigger extends Pure_component {
                 {rule.trigger_type=='body' &&
                   <Rule_config id="body_regex" type="regex_text" rule={rule}
                     field_row_inner_style={{paddingBottom: '1em'}}
-                    style={{borderRadius: '4px'}}
-                    />}
+                    style={{borderRadius: '4px'}}/>
+                }
                 {rule.trigger_type=='min_req_time' &&
                   <Rule_config id="min_req_time" type="select_number"
                     range="ms" sufix="milliseconds" rule={rule}/>
