@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.206.232",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI improvements in zone description"
+            }
+        ]
+    },
+    {
         "ver": "1.205.973",
         "type": "stable",
         "changes": [

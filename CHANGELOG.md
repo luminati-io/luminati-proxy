@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.206.232 Stable
+- :star: UI improvements in zone description
+
 ## 1.205.973 Stable
 - :sparkles: Upgraded webpack version
 

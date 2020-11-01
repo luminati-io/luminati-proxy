@@ -10,16 +10,16 @@
         .val {
             display: flex;
             align-items: center;
-            .lit {
-                line-height: 1.9;
-                padding: 0 6px;
-                margin-right: 3px;
-                background-color: #e1e9ed;
-                color: inherit;
-                font-size: 11px;
-                border-radius: 3px;
-            }
         }
+    }
+    .lit {
+        line-height: 1.9;
+        padding: 0 6px;
+        margin-right: 3px;
+        background-color: #e1e9ed;
+        color: inherit;
+        font-size: 11px;
+        border-radius: 3px;
     }
     .perm_icon {
         width: 18px;
@@ -39,6 +39,15 @@
         &.mobile {
             width: 14px;
             background-image: url(/img/mobile.svg);
+        }
+    }
+    .domains_list {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: 13px;
+        .domain {
+            .lit();
+            margin-bottom: 3px;
         }
     }
 }

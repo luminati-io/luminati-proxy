@@ -18,11 +18,6 @@ export default class Zone_description extends Pure_component {
             this.setState({zones, zone: zones.def});
         });
     }
-    ips_types = {
-        shared: 'Shared',
-        dedicated: 'Exclusive / Unlimited domains',
-        selective: 'Exclusive domains',
-    };
     render(){
         // XXX krzysztof: fix this, zones description should be generated once
         // and reused in proxies table
@@ -49,10 +44,8 @@ export default class Zone_description extends Pure_component {
                     {t(network_types[plan_type].label)}
                   </Tooltip>
                 </Zone_bullet>
-                <Zone_bullet show={plan.ips_type!==undefined}
-                  atr="IP exclusivity">
-                  {t(this.ips_types[plan.ips_type])}
-                </Zone_bullet>
+                <Zone_domains_bullet atr="IP exclusivity" plan={plan}
+                  show={plan.ips_type!==undefined} t={t}/>
                 <Zone_bullet atr="Country" tip="Allowed country">
                   {t(c)}</Zone_bullet>
                 <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
@@ -62,6 +55,30 @@ export default class Zone_description extends Pure_component {
                 </Zone_bullet>
               </ul>
             </div>}</T>;
+    }
+}
+
+class Zone_domains_bullet extends Pure_component {
+    ips_types = {
+        shared: 'Shared',
+        dedicated: 'Exclusive / Unlimited domains',
+        selective: 'Exclusive domains',
+    };
+    render(){
+        const {atr, show, plan, t} = this.props;
+        const domains = (plan.domain_whitelist||'').split(' ').filter(Boolean);
+        return <React.Fragment>
+              <Zone_bullet atr={atr} show={show}>
+                {t(this.ips_types[plan.ips_type])}
+              </Zone_bullet>
+              {!!domains.length &&
+                <div className="domains_list">{domains.map(d=>
+                  <Tooltip key={d} title={d}>
+                    <span className="domain">{d}</span>
+                  </Tooltip>)}
+                </div>
+              }
+            </React.Fragment>;
     }
 }
 
