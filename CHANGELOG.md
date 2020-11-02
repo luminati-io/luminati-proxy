@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.206.425 Stable
+- :bug: Consistency improvements with LPM browser timezone emulation
+
 ## 1.206.232 Stable
 - :star: UI improvements in zone description
 

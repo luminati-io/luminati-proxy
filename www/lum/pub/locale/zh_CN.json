@@ -5037,5 +5037,6 @@
   "Zones (Proxy setup)":"通道（代理设置）",
   "Install on your server (Free)":"在服务器安装（免费）",
   "We just sent you a verification email to [%email] (check your spam folder as well)":"我们刚刚向您发送了一封验证电子邮件至[％email]（也请检查您的垃圾邮件文件夹）",
-  "Luminati's proxy and data collection infrastructure including the Luminati proxy management tools and load balancing servers.":"路觅的代理和数据收集基础结构，包括Luminati代理管理工具和负载平衡服务器。"
+  "Luminati's proxy and data collection infrastructure including the Luminati proxy management tools and load balancing servers.":"路觅的代理和数据收集基础结构，包括Luminati代理管理工具和负载平衡服务器。",
+  "You are using google for authentication, 2-step verification for your user is apply via google services" : "您正在使用google帐户进行身份验证，您的用户的两步验证是通过google服务申请的"
 }

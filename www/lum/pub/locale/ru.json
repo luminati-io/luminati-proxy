@@ -3410,5 +3410,6 @@
   "Token" : "Токен",
   "Expiration date" : "Срок годности",
   "Add API token" : "Добавить маркер API",
-  "Edit API token" : "Редактирование токен API"
+  "Edit API token" : "Редактирование токен API",
+  "You are using google for authentication, 2-step verification for your user is apply via google services" : "Вы используете учетную запись google для аутентификации, 2-факторная проверка для вашего пользователя происходит через сервисы google"
 }

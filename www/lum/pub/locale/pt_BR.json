@@ -3664,5 +3664,6 @@
   "Token" : "Token",
   "Expiration date" : "Data de validade",
   "Add API token" : "Adicionar um token API",
-  "Edit API token" : "Editar o token da API"
+  "Edit API token" : "Editar o token da API",
+  "You are using google for authentication, 2-step verification for your user is apply via google services" : "Você está usando a Conta google para autenticação, verificação de 2 passos para o seu usuário é aplicada através dos serviços do google"
 }
