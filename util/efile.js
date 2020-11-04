@@ -317,8 +317,8 @@ E.append_e = (file, data, opt)=>etask(function*append_e(){
     return true;
 });
 E.rm_rf_e = path=>etask.nfn_apply(rimraf, [path]);
-E.touch_e = path=>E.open_cb_e(path, 'a', null, function*touch_e(fd){
-    let tm = Date.now()/1000;
+E.touch_e = (path, d)=>E.open_cb_e(path, 'a', null, function*touch_e(fd){
+    let tm = (d||Date.now())/1000;
     yield etask.nfn_apply(fs.futimes, [fd, tm, tm]);
     return true;
 });

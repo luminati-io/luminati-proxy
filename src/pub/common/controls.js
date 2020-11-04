@@ -515,15 +515,25 @@ export const Typeahead_wrapper = props=>{
         const _val = props.data.find(d=>(d.id||d)==val);
         if (!_val)
             return [];
-        return translate(t, typeof _val == 'string' ? _val : [_val]);
+        return translate(t, typeof _val=='string' ? _val : [_val]);
     };
-    return <T>{t=><Typeahead id={props.id} options={translate(t, props.data)}
-          maxResults={10} disabled={props.disabled} selectHintOnEnter
-          onChange={on_change_wrapper} selected={get_selected(t, props.val)}
-          onInputChange={props.on_input_change} filterBy={props.filter_by}
-          clearButton placeholder={t(props.placeholder)}
-          emptyLabel={t('No matched found.')}
-          paginationText={t('Display additional results...')}/>}</T>;
+    return <T>{t=>
+      <Typeahead
+        id={props.id}
+        options={translate(t, props.data)}
+        maxResults={10}
+        disabled={props.disabled}
+        selectHintOnEnter
+        onChange={on_change_wrapper}
+        selected={get_selected(t, props.val)}
+        onInputChange={props.on_input_change}
+        filterBy={props.filter_by}
+        clearButton
+        placeholder={t(props.placeholder)}
+        emptyLabel={t('No matched found.')}
+        paginationText={t('Display additional results...')}
+      />
+    }</T>;
 };
 
 export const Select = props=>{

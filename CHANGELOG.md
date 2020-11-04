@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.206.755 Stable
+- :bug: Fixed LPM upgrade on Windows
+
 ## 1.206.425 Stable
 - :bug: Consistency improvements with LPM browser timezone emulation
 

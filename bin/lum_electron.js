@@ -25,9 +25,8 @@ const E = module.exports;
 let manager, upgrade_available, can_upgrade, is_upgrading, upgrade_cb;
 
 const show_message = opt=>etask(function*(){
-    let [res] = yield etask.cb_apply({ret_a: true}, dialog, '.showMessageBox',
-        [opt]);
-    return res;
+    const {response} = yield dialog.showMessageBox(opt);
+    return !!response;
 });
 
 // XXX vladislavl: need refactor restart themself - electron does not support
@@ -126,7 +125,7 @@ const check_conflicts = ()=>etask(function*(){
         t.pid!=process.pid);
     if (tasks.length<=2)
         return;
-    const res = dialog.showMessageBox({
+    const res = yield show_message({
         type: 'warning',
         title: 'Address in use',
         message: `LPM is already running (${tasks[0].pid})\n`
@@ -143,7 +142,7 @@ const check_conflicts = ()=>etask(function*(){
     try {
         yield taskkill(tasks.map(t=>t.pid), {tree: true, force: true});
     } catch(e){
-        dialog.showMessageBox({
+        yield show_message({
             type: 'warning',
             title: 'Failed stopping processes',
             message: 'Failed stopping processes. Restart Luminati Proxy '

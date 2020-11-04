@@ -190,8 +190,8 @@ E.rmdir_e = dir=>{
     fs.rmdirSync(dir);
     return true;
 };
-E.touch_e = src=>{
-    let tm = Date.now()/1000;
+E.touch_e = (src, d)=>{
+    let tm = (d||Date.now())/1000;
     let h = fs.openSync(src, 'a');
     fs.futimesSync(h, tm, tm);
     fs.closeSync(h);
