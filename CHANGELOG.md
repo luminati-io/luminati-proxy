@@ -1,6 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.206.755 Stable
+## 1.207.58 Stable
+- :bug: Fixed banning IPs API when the list of IPs contains duplicates
+
+## 1.206.760 Stable
 - :bug: Fixed LPM upgrade on Windows
 
 ## 1.206.425 Stable

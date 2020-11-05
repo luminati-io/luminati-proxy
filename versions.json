@@ -1,6 +1,16 @@
 [
     {
-        "ver": "1.206.755",
+        "ver": "1.207.58",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed banning IPs API when the list of IPs contains duplicates"
+            }
+        ]
+    },
+    {
+        "ver": "1.206.760",
         "type": "stable",
         "changes": [
             {
