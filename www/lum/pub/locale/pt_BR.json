@@ -3056,7 +3056,7 @@
   "Upload Payment Proof": "Fazer upload da prova de pagamento",
   "Bank details:": "Detalhes bancários:",
   "Insufficient funds, add funds to reactivate account": "saldo negativo, adicionar fundos para reativar conta",
-  "Automatically tops up your account with setup amount when your balance falls under $100 or if the consumed balance reaches 85% of current balance. This ensures that you never run out of credit and prevents unexpected service interruption.": "Adicione fundos por meio da recarga automatica, selecionando o valor mais adequado, para quando o seu saldo atingir um valor abaixo de $ 100 ou 85% do saldo atual. Isso garante que você nunca fique sem créditos e dessa forma evite a suspensão da sua conta.",
+  "Automatically tops up your account with setup amount when your balance falls under $100 or if the consumed balance reaches 85% of current balance. This ensures you never run out of credit and prevents unexpected service interruption.": "Adicione fundos por meio da recarga automatica, selecionando o valor mais adequado, para quando o seu saldo atingir um valor abaixo de $ 100 ou 85% do saldo atual. Isso garante que você nunca fique sem créditos e dessa forma evite a suspensão da sua conta.",
   "Click for details": "Clique para detalhes",
   "Done": "Feito",
   "Consumed balance": "Fundos utilizados",

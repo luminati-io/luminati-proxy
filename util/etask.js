@@ -48,8 +48,12 @@ if (typeof assert!='function')
     assert = function(){}; // XXX romank: add proper assert
 // XXX yuval: /util/events.js -> events when node 6 (support prependListener)
 // is here
-define(['/util/events.js', '/util/array.js', '/util/util.js'],
-    function(events, array, zutil){
+if (is_node && +process.env.ETASK_NODE==1)
+    define(['/util/etask_node.js'], function(et_node){ return et_node; });
+else
+    // eslint-disable-next-line
+    define(['/util/events.js', '/util/array.js', '/util/util.js'],
+function(events, array, zutil){
 var E = Etask;
 var etask = Etask;
 var env = process.env, assign = Object.assign;

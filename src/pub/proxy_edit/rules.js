@@ -403,6 +403,10 @@ const Action = with_proxy_ports(withRouter(
 class Action extends Pure_component {
     state = {ports: []};
     componentDidMount(){
+        this.setdb_on('head.proxy_edit.form', form=>{
+            if (form)
+                this.setState({form});
+        });
         this.setdb_on('head.defaults', defaults=>{
             if (defaults)
                 this.setState({defaults});
@@ -449,7 +453,7 @@ class Action extends Pure_component {
         else
             set_rule_field('ban_ip_duration', '');
         if (val=='retry')
-           set_rule_field('retry_number', 3);
+            set_rule_field('retry_number', 3);
     };
     request_method_changed = val=>{
         if (val=='GET')
@@ -481,9 +485,9 @@ class Action extends Pure_component {
     };
     render(){
         const {rule, match, ports_opt} = this.props;
-        const {defaults, settings, zones, curr_zone,
-            refresh_cost} = this.state;
-        if (!rule.trigger_type || !settings || !defaults)
+        const {defaults, settings, zones, curr_zone, refresh_cost, form} =
+            this.state;
+        if (!rule.trigger_type || !settings || !defaults || !form)
             return null;
         if (!zones || !curr_zone)
             return null;
@@ -504,6 +508,11 @@ class Action extends Pure_component {
         }
         else
             _action_types = _action_types.filter(at=>at.value!='refresh_ip');
+        if (form.pool_size==1)
+        {
+            _action_types = _action_types.filter(({value: v})=>
+                !v.startsWith('ban_ip'));
+        }
         _action_types = [default_action].concat(_action_types);
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);

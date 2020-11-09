@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.207.390",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Auth Error when targeting city without plan state permissions"
+            }
+        ]
+    },
+    {
         "ver": "1.207.58",
         "type": "stable",
         "changes": [

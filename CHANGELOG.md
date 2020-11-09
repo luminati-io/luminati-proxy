@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.207.390 Stable
+- :bug: Fixed Auth Error when targeting city without plan state permissions
+
 ## 1.207.58 Stable
 - :bug: Fixed banning IPs API when the list of IPs contains duplicates
 

@@ -2611,7 +2611,7 @@
   "Yes (default)": "Sí (por defecto)",
   "Minimum monthly payment": "Pago mínimo mensual",
   "Method": "Método",
-  "Automatically tops up your account with setup amount when your balance falls under $100 or if the consumed balance reaches 85% of current balance. This ensures that you never run out of credit and prevents unexpected service interruption.": "Recarga automáticamente tu cuenta con el monto establecido cuando el saldo está por debajo de $100 o si el saldo consumido alcanza el 85% del saldo actual. Esto asegura que la cuenta nunca se quede sin crédito y evita la interrupción inesperada del servicio.",
+  "Automatically tops up your account with setup amount when your balance falls under $100 or if the consumed balance reaches 85% of current balance. This ensures you never run out of credit and prevents unexpected service interruption.": "Recarga automáticamente tu cuenta con el monto establecido cuando el saldo está por debajo de $100 o si el saldo consumido alcanza el 85% del saldo actual. Esto asegura que la cuenta nunca se quede sin crédito y evita la interrupción inesperada del servicio.",
   "Add funds": "Añadir fondos",
   "Pay": "Pagar",
   "Security code (CVV)": "Código de seguridad (CVV)",

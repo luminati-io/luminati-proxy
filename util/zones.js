@@ -12,14 +12,14 @@ E.get_perm = zone=>{
         city: qw`state city`,
         asn: qw`asn carrier state`,
         static: qw`ip route_all route_dedicated`,
-        mobile: qw`mobile asn carrier state state city`,
+        mobile: qw`mobile asn carrier state city`,
         state: qw`state`,
     };
     if (plan.type=='static')
     {
         let static_res = ['country', ...perm.static];
         if (plan.city)
-            static_res.push(...perm.city);
+            static_res.push(...perm.city.filter(p=>p!='state'));
         return static_res.join(' ');
     }
     const plan_types = Object.keys(zutil.omit(perm, 'static'));

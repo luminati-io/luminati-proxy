@@ -68,4 +68,16 @@ describe('username', ()=>{
         t('should not set anything if ua is not strictly true', {country: 'us',
             ua: false, unblock: true, preset: 'unblocker'}, 'lum-country-us');
     });
+    describe('state', ()=>{
+        const t = (name, opt, expected)=>it(name, ()=>{
+            const res = username.calculate_username(opt);
+            assert.equal(res.username, expected);
+        });
+        t('should skip state if permission is not granted',
+            {country: 'us', city: 'california', state: 'md'},
+            'lum-country-us-city-california');
+        t('attach state if state permission is granted',
+            {country: 'us', city: 'california', state: 'md', state_perm: true},
+            'lum-country-us-state-md-city-california');
+    });
 });

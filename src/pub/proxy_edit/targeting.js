@@ -27,6 +27,7 @@ export default with_www_api(class Targeting extends Pure_component {
         {key: 'Android', value: 'android'},
     ];
     set_field = setdb.get('head.proxy_edit.set_field');
+    is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
         this.setdb_on('head.locations', locations=>{
@@ -132,7 +133,9 @@ export default with_www_api(class Targeting extends Pure_component {
         ];
     };
     city_changed = e=>{
-        if (e)
+        if (!e)
+            this.set_field('state', '');
+        else if (this.is_valid_field('state'))
             this.set_field('state', e.split('|')[1]);
     };
     render(){

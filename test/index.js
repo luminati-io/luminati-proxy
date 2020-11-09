@@ -347,7 +347,9 @@ describe('proxy', ()=>{
             t('auth', {customer: 'a', password: 'p'});
             t('zone', {zone: 'abc'});
             t('country', {country: 'il'});
-            t('city', {country: 'us', state: 'ny', city: 'newyork'});
+            t('city', {country: 'us', city: 'newyork'});
+            t('state', {state_perm: true, country: 'us', city: 'newyork',
+                state: 'ny'}, {country: 'us', city: 'newyork', state: 'ny'});
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
             t('mobile', {zone: 'mobile', mobile: 'true'});
@@ -356,10 +358,10 @@ describe('proxy', ()=>{
             t('direct', pre_rule('direct'), {direct: true});
             t('session explicit', {session: 'test_session'});
             describe('lower case and spaces', ()=>{
-                t('long', {state: 'NY', city: 'New York'},
+                t('long', {state_perm: true, state: 'NY', city: 'New York'},
                     {state: 'ny', city: 'newyork'});
                 t('short',
-                    {state: 'NY', city: 'New York'},
+                    {state_perm: true, state: 'NY', city: 'New York'},
                     {state: 'ny', city: 'newyork'});
             });
             it('explicit any', ()=>etask(function*(){
@@ -616,7 +618,7 @@ describe('proxy', ()=>{
         describe('request state choice', ()=>{
             it('should use state sent in x-lpm-state header',
                 ()=>etask(function*(){
-                    l = yield lum();
+                    l = yield lum({state_perm: true});
                     const state = 'us';
                     const r = yield l.test({headers: {'x-lpm-state': state}});
                     assert.ok(r.headers['x-lpm-authorization']

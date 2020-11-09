@@ -1616,7 +1616,7 @@
   "Pay": "Оплатить",
   "Security code (CVV)": "Код безопасности (CVV)",
   "Payment successful": "Оплата прошла успешно",
-  "Automatically tops up your account with setup amount when your balance falls under $100 or if the consumed balance reaches 85% of current balance. This ensures that you never run out of credit and prevents unexpected service interruption.": "Автоматически пополняет ваш счет на установленную сумму, в случае, если баланс опускается ниже $100 или если израсходованный баланс достигает 85% от текущего баланса. Это гарантирует постоянное пополнение счета и предотвращает неожиданную остановку работы аккаунта.",
+  "Automatically tops up your account with setup amount when your balance falls under $100 or if the consumed balance reaches 85% of current balance. This ensures you never run out of credit and prevents unexpected service interruption.": "Автоматически пополняет ваш счет на установленную сумму, в случае, если баланс опускается ниже $100 или если израсходованный баланс достигает 85% от текущего баланса. Это гарантирует постоянное пополнение счета и предотвращает неожиданную остановку работы аккаунта.",
   "Insufficient funds, add funds to reactivate account": "Недостаточно средств, пополните счет ",
   "Add payment method": "Добавить способ оплаты",
   "Done": "Готово",
