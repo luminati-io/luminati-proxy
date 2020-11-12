@@ -4328,7 +4328,7 @@
   "Make sure the LPM is activated": "确保已激活LPM",
   "Open Terminal on your Mac": "在Mac上打开终端",
   "Run “luminati” command and wait until it boots": "运行“luminati”指令并等待其启动",
-  "Open the following URL 127.0.0.1:22299 in your browser": "在浏览器中打开以下URL 127.0.0.1:22299",
+  "Open the following URL 127.0.0.1:22999 in your browser": "在浏览器中打开以下URL 127.0.0.1:22999",
   "Referral": "个推荐",
   "Referrals revenue": "推荐收入",
   "New referrals": "新的推荐",
@@ -5038,5 +5038,6 @@
   "Install on your server (Free)":"在服务器安装（免费）",
   "We just sent you a verification email to [%email] (check your spam folder as well)":"我们刚刚向您发送了一封验证电子邮件至[％email]（也请检查您的垃圾邮件文件夹）",
   "Luminati's proxy and data collection infrastructure including the Luminati proxy management tools and load balancing servers.":"路觅的代理和数据收集基础结构，包括Luminati代理管理工具和负载平衡服务器。",
-  "You are using google for authentication, 2-step verification for your user is apply via google services" : "您正在使用google帐户进行身份验证，您的用户的两步验证是通过google服务申请的"
+  "You are using google for authentication, 2-step verification for your user is apply via google services" : "您正在使用google帐户进行身份验证，您的用户的两步验证是通过google服务申请的",
+  "Set your password":"设置您的密码"
 }

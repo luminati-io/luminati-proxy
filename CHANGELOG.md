@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.207.977 Stable
+- :star: Unlock option to select any preset when using a port with unblocker zone
+
 ## 1.207.390 Stable
 - :bug: Fixed Auth Error when targeting city without plan state permissions
 

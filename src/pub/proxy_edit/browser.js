@@ -101,12 +101,11 @@ export default class Browser extends Pure_component {
     render(){
         if (!this.state.form || !this.state.settings)
             return null;
-        const {ssl, preset} = this.state.form;
+        const {ssl} = this.state.form;
         const {zagent} = this.state.settings;
         const def_ssl = this.state.defaults.ssl;
         const ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
-        const {type: plan_type} = this.get_curr_plan();
-        const is_unblocker = plan_type=='unblocker' && preset=='unblocker';
+        const is_unblocker = this.get_curr_plan().type=='unblocker';
         const headers_are_set = this.state.headers.some(h=>
             !_.isEqual(h, this.first_header));
         return <div className="browser">

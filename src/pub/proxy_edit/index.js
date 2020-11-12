@@ -543,7 +543,7 @@ class Nav extends Pure_component {
         const opts = presets.opts(this.is_unblocker(this.props.form.zone));
         const preset = this.props.form.preset;
         const is_unblocker = this.props.plan.type=='unblocker';
-        const preset_disabled = this.props.disabled || is_unblocker;
+        const preset_disabled = this.props.disabled;
         return <div className="nav">
               <Select_zone val={this.props.form.zone} on_change_wrapper={val=>
                   this.confirm_update(()=>this.update_zone(val))}
