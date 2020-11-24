@@ -75,6 +75,7 @@ describe('proxy', ()=>{
             let w = etask.wait();
             l.on('usage', ()=>w.continue());
             l.on('usage_abort', ()=>w.continue());
+            l.on('switched', ()=>w.continue());
             let res = yield etask.nfn_apply(_this, '.request', [req_opt]);
             yield w;
             return res;
@@ -741,6 +742,13 @@ describe('proxy', ()=>{
         }));
     });
     describe('rules', ()=>{
+        const get_retry_rule = (retry_port=24001)=>({
+            action: {retry: true, retry_port},
+            action_type: 'retry_port',
+            status: '200',
+        });
+        const make_cred_spy = _l=>sinon.spy(_l, 'get_req_cred');
+        const get_username = spy=>spy.returnValues[0].username;
         const inject_headers = (li, ip, ip_alt)=>{
             ip = ip||'ip';
             let call_count = 0;
@@ -844,6 +852,34 @@ describe('proxy', ()=>{
             t({ctx: {url: 'test'}}, {}, undefined);
         }));
         describe('action', ()=>{
+            it('retry_port should update context port', ()=>etask(function*(){
+                l = yield lum({
+                    rules: [{action: {retry_port: 24001}, status: '200'}],
+                });
+                const l2 = yield lum({port: 24001});
+                let p1, p2;
+                l.on('retry', opt=>{
+                    p1 = opt.req.ctx.port;
+                    l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    p2 = opt.req.ctx.port;
+                });
+                yield l.test({fake: 1, no_usage: true});
+                assert.notEqual(p1, p2);
+                l2.stop(true);
+            }));
+            it('refresh_ip', ()=>etask(function*(){
+                l = yield lum({rules: []});
+                sinon.stub(l.rules, 'can_retry').returns(true);
+                sinon.stub(l.rules, 'retry');
+                const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
+                const req = {ctx: {}};
+                const opt = {_res: {hola_headers: {'x-luminati-ip': 'ip'}}};
+                const r = l.rules.action(req, {}, {},
+                    {action: {refresh_ip: true}}, opt);
+                assert.ok(r);
+                assert.ok(ref_stub.called);
+                assert.equal(l.refresh_task, 'test');
+            }));
             describe('ban_ip', ()=>{
                 it('ban_ip', ()=>etask(function*(){
                     l = yield lum({rules: []});
@@ -1009,15 +1045,56 @@ describe('proxy', ()=>{
                     assert.notEqual(session_a, session_b);
                 }));
             });
+            describe('waterfall', ()=>{
+                it('emits usage events once', ()=>etask(function*(){
+                    l = yield lum({rules: [get_retry_rule()]});
+                    const l2 = yield lum({port: 24001});
+                    let usage_start_counter = 0;
+                    let usage_counter = 0;
+                    let usage_abort_counter = 0;
+                    l.on('usage_start', ()=>usage_start_counter++);
+                    l.on('usage', ()=>usage_counter++);
+                    l.on('usage_abort', ()=>usage_abort_counter++);
+                    l2.on('usage_start', ()=>usage_start_counter++);
+                    l2.on('usage', ()=>usage_counter++);
+                    l2.on('usage_abort', ()=>usage_abort_counter++);
+                    l.on('retry', opt=>{
+                        l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    });
+                    const w = etask.wait();
+                    l2.on('usage', ()=>w.continue());
+                    yield l.test({fake: 1, no_usage: 1});
+                    yield w;
+                    l2.stop(true);
+                    assert.equal(usage_start_counter, 1);
+                    assert.equal(usage_counter, 1);
+                    assert.equal(usage_abort_counter, 0);
+                }));
+                it('should not use auth headers after retrying',
+                ()=>etask(function*(){
+                    l = yield lum({rules: [get_retry_rule()]});
+                    const l2 = yield lum({port: 24001});
+                    l.on('retry', opt=>{
+                        l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
+                    });
+                    const cred_spies = [l, l2].map(make_cred_spy);
+                    const proxy_auth_hdr = 'Basic '+
+                        Buffer.from('lum-customer-user-zone-zzz:pass')
+                        .toString('base64');
+                    yield l.test({
+                        no_usage: 1,
+                        headers: {'proxy-authorization': proxy_auth_hdr},
+                    });
+                    l2.stop(true);
+                    const [u1, u2] = cred_spies.map(get_username);
+                    assert.equal(u1,
+                        'lum-customer-user-zone-zzz-session-24000_0');
+                    assert.equal(u2,
+                        'lum-customer-abc-zone-static-session-24001_0');
+                }));
+            });
             describe('retry_port combined with unblocker', ()=>{
-                const make_cred_spy = _l=>sinon.spy(_l, 'get_req_cred');
                 const has_unblocker_flag = u=>u.endsWith('-unblocker');
-                const get_username = spy=>spy.returnValues[0].username;
-                const get_retry_rule = (retry_port=24001)=>({
-                    action: {retry: true, retry_port},
-                    action_type: 'retry_port',
-                    status: '200',
-                });
                 const sessions_are_unique = (...users)=>{
                     const sess_id = u=>u.match(/(?<=session-)(.*?)(?=$|-)/)[1];
                     return new Set(users.map(sess_id)).size==users.length;
@@ -1099,21 +1176,6 @@ describe('proxy', ()=>{
                     l2.stop(true);
                 }));
             });
-            it('retry_port should update context port', ()=>etask(function*(){
-                l = yield lum({
-                    rules: [{action: {retry_port: 24001}, status: '200'}],
-                });
-                const l2 = yield lum({port: 24001});
-                let p1, p2;
-                l.on('retry', opt=>{
-                    p1 = opt.req.ctx.port;
-                    l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
-                    p2 = opt.req.ctx.port;
-                });
-                yield l.test({fake: 1, no_usage: true});
-                assert.notEqual(p1, p2);
-                l2.stop(true);
-            }));
             xdescribe('dc pool', ()=>{
                 it('adds to pool when prefill turned off and gathering',
                 ()=>etask(function*(){
@@ -1195,19 +1257,6 @@ describe('proxy', ()=>{
                     'http://lumtest.com/test');
                 t('triggers', `http://${domain}/test`, 1);
             });
-            it('refresh_ip', ()=>etask(function*(){
-                l = yield lum({rules: []});
-                sinon.stub(l.rules, 'can_retry').returns(true);
-                sinon.stub(l.rules, 'retry');
-                const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
-                const req = {ctx: {}};
-                const opt = {_res: {hola_headers: {'x-luminati-ip': 'ip'}}};
-                const r = l.rules.action(req, {}, {},
-                    {action: {refresh_ip: true}}, opt);
-                assert.ok(r);
-                assert.ok(ref_stub.called);
-                assert.equal(l.refresh_task, 'test');
-            }));
         });
         describe('pre', ()=>{
             it('action null_response', ()=>etask(function*(){
@@ -1283,11 +1332,6 @@ describe('proxy', ()=>{
             const get_banip_rule = (t=10)=>({
                 action: {ban_ip: t*ms.MIN},
                 action_type: 'ban_ip',
-                status: '200',
-            });
-            const get_retry_rule = (retry_port=24001)=>({
-                action: {retry: true, retry_port},
-                action_type: 'retry_port',
                 status: '200',
             });
             const t_pre = (action, ban)=>it(action, ()=>etask(function*(){

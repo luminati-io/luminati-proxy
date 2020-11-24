@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.209.645",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI improvement in targeting section"
+            }
+        ]
+    },
+    {
         "ver": "1.207.977",
         "type": "stable",
         "changes": [

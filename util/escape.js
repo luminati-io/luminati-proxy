@@ -17,6 +17,9 @@ E.html = function(html){
     return html.replace(/[&<>"']/g, function(m){
         return html_escape_table[m[0]]; });
 };
+E.has_html = function(str) {
+    return /[&<>"']/.test(str);
+};
 
 E.sh = function(s_or_a){
     function single(s){

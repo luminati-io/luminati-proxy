@@ -16,13 +16,13 @@
   "USA & Canada": "USA & Canada",
   "Europe": "Europe",
   "Asia - Pacific": "Asia - Pacific",
-  "Luminati proxy manager": "Luminati proxy manager",
-  "Luminati's proxy manager makes it easier to integrate Luminati as your proxy network. It enables more features than the standard Luminati API and helps achieve faster performance.": "Luminati's proxy manager makes it easier to integrate Luminati as your proxy network. It enables more features than the standard Luminati API and helps achieve faster performance.",
+  "Luminati Proxy Manager": "Luminati Proxy Manager",
+  "Luminati's Proxy Manager makes it easier to integrate Luminati as your proxy network. It enables more features than the standard Luminati API and helps achieve faster performance.": "Luminati's Proxy Manager makes it easier to integrate Luminati as your proxy network. It enables more features than the standard Luminati API and helps achieve faster performance.",
   "Install via NPM": "Install via NPM",
   "Run": "Run",
   "Use": "Use",
   "<i class=\"github\"></i>Get Source Code": "<i class=\"github\"></i>Get Source Code",
-  "Luminati proxy manager<br> features": "Luminati proxy manager<br> features",
+  "Luminati Proxy Manager<br> features": "Luminati Proxy Manager<br> features",
   "Sticky IP": "Sticky IP",
   "Keep sessions alive via the same IP, by automatically sending a ping every [60] seconds.": "Keep sessions alive via the same IP, by automatically sending a ping every [60] seconds.",
   "Pool size": "Pool size",
@@ -164,8 +164,8 @@
   "Start using Luminati — Install extension":
     "Start using Luminati — Install extension",
   "Scaling up - becoming a Pro": "Scaling up - becoming a Pro",
-  "Use Luminati's advanced proxy manager":
-    "Use Luminati's advanced proxy manager",
+  "Use Luminati's advanced Proxy Manager":
+    "Use Luminati's advanced Proxy Manager",
   "Luminati Proxy Manager - Learn more":
     "Luminati Proxy Manager - Learn more",
   "API is also avaliable in": "API is also avaliable in",
@@ -195,8 +195,8 @@
   "Use IPs exclusively for specific target websites. Own your IP":
     "Use IPs exclusively for specific target websites. Own your IP",
   "Quick integration": "Quick integration",
-  "Use our advanced free proxy manager for a fast, smooth start":
-    "Use our advanced free proxy manager for a fast, smooth start",
+  "Use our advanced free Proxy Manager for a fast, smooth start":
+    "Use our advanced free Proxy Manager for a fast, smooth start",
   "Check our pricing": "Check our pricing",
   "Start immediately, for free": "Start immediately, for free",
   "Sign up and get $5 to test": "Sign up and get $5 to test",

@@ -782,26 +782,35 @@ class IPC_client {
             this.info.cookie = req.cookie;
             _this._pending.set(req.cookie, this);
             this.finally(()=>_this._pending.delete(req.cookie));
-            this.alarm(timeout, ()=>this.throw(new Error(`${cmd} timeout`)));
+            this.alarm(timeout, ()=>{
+                let e = new Error(`${cmd} timeout`);
+                e.code = 'ipc_timeout';
+                this.throw(e);
+            });
             let res = {status: _this._ws.status}, prev;
             let send = _this._ws[opt.zjson ? 'zjson' : 'json'].bind(_this._ws);
             while (res.status)
             {
+                let conn_closed_error = _this._ws.reason||'Connection closed';
                 switch (res.status)
                 {
                 case 'disconnected':
                     if (opt.retry==false || !_this._ws.reconnect_timer)
-                        throw new Error(_this._ws.reason||'Connection closed');
+                        throw new Error(conn_closed_error);
                     break;
                 case 'connecting':
                     if (opt.retry==false)
                         throw new Error('Connection not ready');
                     break;
                 case 'destroyed':
-                    throw new Error(_this._ws.reason||'Connection closed');
+                    throw new Error(conn_closed_error);
                 case 'connected':
                     while (!send(req))
+                    {
+                        if (opt.retry==false)
+                            throw new Error(conn_closed_error);
                         yield etask.sleep(send_retry_timeout);
+                    }
                     break;
                 }
                 do {
@@ -835,12 +844,16 @@ class IPC_client {
         if (msg.type=='ipc_result')
             return void task.continue({value: msg.msg});
         let err = new Error(msg.msg);
+        err.code = msg.err_code;
         err._ws = ''+this._ws;
         task.throw(err);
     }
     _on_status(status){
         for (let task of this._pending.values())
             task.continue({status});
+    }
+    pending_count(){
+        return this._pending.size;
     }
 }
 IPC_client._cookie = 0;
@@ -926,6 +939,7 @@ class IPC_server {
                     cmd: cmd,
                     cookie: msg.cookie,
                     msg: e.message || String(e),
+                    err_code: e.code,
                 });
             }
         });

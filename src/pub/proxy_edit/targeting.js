@@ -43,7 +43,7 @@ export default with_www_api(class Targeting extends Pure_component {
         this.setdb_on('head.carriers', carriers=>{
             if (!carriers)
                 return;
-            carriers = carriers.map(c=>({value: c.value, key: c.label}));
+            carriers = carriers.map(c=>({id: c.value, label: c.label}));
             this.setState({carriers});
         });
         this.setdb_on('head.proxy_edit.form', form=>{
@@ -72,6 +72,7 @@ export default with_www_api(class Targeting extends Pure_component {
     country_changed = ()=>{
         this.set_field('city', '');
         this.set_field('state', '');
+        this.set_field('carrier', '');
     };
     states = ()=>{
         const {country} = this.state.form;
@@ -117,20 +118,10 @@ export default with_www_api(class Targeting extends Pure_component {
         return Object.keys(asns).map(a=>({id: Number(a), label: a}));
     };
     carriers = ()=>{
-        const {country} = this.state.form;
-        const {locations, carriers} = this.state;
-        let res;
-        if (!country)
-        {
-            res = Object.values(locations.carriers).reduce(
-                (acc, el)=>[...acc, ...el], []);
-        }
-        else
-            res = locations.carriers[country];
-        return [
-            {value: '', key: 'None'},
-            ...carriers.filter(c=>(res||[]).includes(c.value)),
-        ];
+        const {locations, carriers, form: {country}} = this.state;
+        const res = new Set(country && locations.carriers[country] ||
+            Object.values(locations.carriers).flat());
+        return carriers.filter(c=>res.has(c.label));
     };
     city_changed = e=>{
         if (!e)
@@ -200,7 +191,7 @@ export default with_www_api(class Targeting extends Pure_component {
                 <Config type="typeahead" id="asn" data={this.asns()}
                   disabled={!!this.state.form.carrier} update_on_input
                   filter_by={filter_by_asns}/>
-                <Config type="select" id="carrier" data={this.carriers()}
+                <Config type="typeahead" id="carrier" data={this.carriers()}
                   note={carriers_note} disabled={carrier_disabled}/>
                 <Config type="select" id="os" data={this.os_opt}
                   disabled={is_static}/>

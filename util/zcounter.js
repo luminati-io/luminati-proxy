@@ -548,4 +548,11 @@ E.is_debug = title=>{
     return !!v;
 };
 
-E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client};
+function test_reset(){
+    type = {sum: new Map(), avg: {}, sum_mono: {}, avg_level: {},
+        sum_level: {}, max_level: {}, min_level: {}, avg_level_eco: {},
+        sum_level_eco: {}, sum_mono_eco: {}};
+}
+
+E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client,
+    test_reset};

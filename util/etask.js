@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, browser:true*/
+'use strict'; /*jslint node:true, browser:true, es6: true*/
 (function(){
 var define, process, zerr, assert;
 var is_node = typeof module=='object' && module.exports && module.children;
@@ -48,17 +48,13 @@ if (typeof assert!='function')
     assert = function(){}; // XXX romank: add proper assert
 // XXX yuval: /util/events.js -> events when node 6 (support prependListener)
 // is here
-if (is_node && +process.env.ETASK_NODE==1)
-    define(['/util/etask_node.js'], function(et_node){ return et_node; });
-else
-    // eslint-disable-next-line
-    define(['/util/events.js', '/util/array.js', '/util/util.js'],
-function(events, array, zutil){
+define(['/util/events.js', '/util/array.js', '/util/util.js'],
+    function(events, array, zutil){
 var E = Etask;
 var etask = Etask;
 var env = process.env, assign = Object.assign;
 E.use_bt = +env.ETASK_BT;
-E.root = [];
+E.root = new Set();
 E.assert_extra = +env.ETASK_ASSERT_EXTRA; // to debug internal etask bugs
 E.nextTick = process.nextTick;
 // XXX arik/romank: hack, rm set_zerr, get zerzerrusing require
@@ -155,9 +151,9 @@ function Etask(opt, states){
     this.name = opt.name;
     this._name = this.name===undefined ? 'noname' : this.name;
     this.cancelable = opt.cancel;
-    this.then_waiting = [];
-    this.child = [];
-    this.child_guess = [];
+    this.then_waiting = new Set();
+    this.child = new Set();
+    this.child_guess = new Set();
     this.cur_state = -1;
     this.states = [];
     this._stack = Etask.use_bt ? stack_get() : undefined;
@@ -197,7 +193,7 @@ function Etask(opt, states){
         this.states[i] = state;
     }
     var _this = this;
-    E.root.push(this);
+    E.root.add(this);
     var in_run = E.in_run_top();
     if (opt.spawn_parent)
         this.spawn_parent(opt.spawn_parent);
@@ -224,7 +220,7 @@ zutil.inherits(Etask, events.EventEmitter);
 
 E.prototype._root_remove = function(){
     assert(!this.parent, 'cannot remove from root when has parent');
-    if (!array.rm_elm_tail(E.root, this))
+    if (!E.root.delete(this))
         assert(0, 'etask not in root\n'+E.ps({MARK: this}));
 };
 
@@ -241,7 +237,7 @@ E.prototype._parent_remove = function(){
         this._parent_guess_remove();
     if (!this.parent)
         return this._root_remove();
-    if (!array.rm_elm_tail(this.parent.child, this))
+    if (!this.parent.child.delete(this))
     {
         assert(0, 'etask child not in parent\n'
             +E.ps({MARK: [['child', this], ['parent', this.parent]]}));
@@ -252,7 +248,7 @@ E.prototype._parent_remove = function(){
 };
 
 E.prototype._check_free = function(){
-    if (this.down || this.child.length)
+    if (this.down || this.child.size)
         return;
     this._parent_remove();
     this.free = true;
@@ -289,20 +285,23 @@ E.prototype._complete = function(){
         E.events.emit('uncaught', this);
     if (this.parent)
         this.parent.emit('child', this);
-    if (this.up && (this.down || this.child.length))
+    if (this.up && (this.down || this.child.size))
     {
         var up = this.up;
         this.up = this.up.down = undefined;
         this.parent = up;
-        up.child.push(this);
+        up.child.add(this);
     }
     this._check_free();
     this._del_wait_timer();
     this.del_alarm();
     this._ecancel_child();
     this.emit_safe('finally1');
-    while (this.then_waiting.length)
-        this.then_waiting.shift()();
+    for (let v of this.then_waiting.values())
+    {
+        this.then_waiting.delete(v);
+        v();
+    }
 };
 E.prototype._next = function(rv){
     if (this.tm_completed)
@@ -328,8 +327,10 @@ E.prototype._next = function(rv){
     }
     else
     {
-        for (; state<states.length &&
-            (states[state].sig || states[state].catch); state++);
+        for (; state<states.length && (states[state].sig || states[state]
+            .catch); state++)
+        {
+        }
     }
     this.cur_state = state;
     this.run_state = states[state];
@@ -355,7 +356,7 @@ E.prototype._handle_rv = function(rv){
         {
             this._set_down(ret);
             wait_retval = this._set_wait_retval();
-            ret.then_waiting.push(function(){
+            ret.then_waiting.add(function(){
                 _this._got_retval(wait_retval, E.err_res(ret.error,
                     ret.retval));
             });
@@ -372,7 +373,7 @@ E.prototype._handle_rv = function(rv){
     else if (typeof ret.then=='function') // promise
     {
         wait_retval = this._set_wait_retval();
-        ret.then(function(ret){ _this._got_retval(wait_retval, ret); },
+        ret.then(function(_ret){ _this._got_retval(wait_retval, _ret); },
             function(err){ _this._got_retval(wait_retval, E.err(err)); });
         return true;
     }
@@ -423,7 +424,7 @@ E.prototype._run = function(){
     var rv = {ret: undefined, err: undefined};
     while (1)
     {
-        var cb_ctx;
+        var _cb_ctx;
         var arg = this.error && !this.use_retval ? this.error : this.retval;
         this.use_retval = false;
         this.running = true;
@@ -432,7 +433,7 @@ E.prototype._run = function(){
         if (zerr.is(zerr.L.DEBUG))
             zerr.debug(this._name+':S'+this.cur_state+': running');
         if (cb_pre)
-            cb_ctx = cb_pre(this);
+            _cb_ctx = cb_pre(this);
         try { rv.ret = this.run_state.f.call(this, arg); }
         catch(e){
             rv.err = e;
@@ -440,11 +441,14 @@ E.prototype._run = function(){
                 rv.err.etask = this;
         }
         if (cb_post)
-            cb_post(this, cb_ctx);
+            cb_post(this, _cb_ctx);
         this.running = false;
         E.in_run.pop();
-        for (; this.child_guess.length;
-            this.child_guess.pop().parent_guess = undefined);
+        for (let vv of this.child_guess.values())
+        {
+            this.child_guess.delete(vv);
+            vv.parent_guess = undefined;
+        }
         if (rv.ret instanceof Etask_wait)
         {
             var wait_completed = false, wait = rv.ret;
@@ -548,10 +552,10 @@ E.prototype.spawn = function(child, replace){
 
 E.prototype._spawn_parent_guess = function(parent){
     this.parent_guess = parent;
-    parent.child_guess.push(this);
+    parent.child_guess.add(this);
 };
 E.prototype._parent_guess_remove = function(){
-    if (!array.rm_elm_tail(this.parent_guess.child_guess, this))
+    if (!this.parent_guess.child_guess.delete(this))
         assert(0, 'etask not in parent_guess\n'+E.ps({MARK: this}));
     this.parent_guess = undefined;
 };
@@ -564,8 +568,8 @@ E.prototype.spawn_parent = function(parent){
     if (parent && parent.free)
         parent = undefined;
     if (!parent)
-        return void E.root.push(this);
-    parent.child.push(this);
+        return void E.root.add(this);
+    parent.child.add(this);
     this.parent = parent;
 };
 
@@ -603,25 +607,28 @@ E.prototype._del_wait_timer = function(){
         this.wait_timer = clearTimeout(this.wait_timer);
     this.wait_retval = undefined;
 };
-E.prototype._get_child_running = function(from){
-    var i, child = this.child;
-    for (i=from||0; i<child.length && child[i].tm_completed; i++);
-    return i>=child.length ? -1 : i;
+
+E.prototype._get_child_running = function(){
+    for (let v of this.child.values())
+    {
+        if (!v.tm_completed)
+            return v;
+    }
 };
 E.prototype._set_wait_child = function(wait_retval){
-    var i, _this = this, child = wait_retval.child;
+    var _this = this, child = wait_retval.child;
     var cond = wait_retval.cond, wait_on;
     assert(!cond || child=='any', 'condition supported only for "any" '+
         'option, you can add support if needed');
     if (child=='any')
     {
-        if (this._get_child_running()<0)
+        if (!this._get_child_running())
             return true;
         wait_on = function(){
-            _this.once('child', function(child){
-                if (!cond || cond.call(child, child.retval))
-                    return _this._got_retval(wait_retval, {child: child});
-                if (_this._get_child_running()<0)
+            _this.once('child', function(_child){
+                if (!cond || cond.call(_child, _child.retval))
+                    return _this._got_retval(wait_retval, {child: _child});
+                if (!_this._get_child_running())
                     return _this._got_retval(wait_retval);
                 wait_on();
             });
@@ -630,17 +637,18 @@ E.prototype._set_wait_child = function(wait_retval){
     }
     else if (child=='all')
     {
-        if ((i = this._get_child_running())<0)
+        let child_et = this._get_child_running();
+        if (!child_et)
             return true;
-        wait_on = function(child){
-            _this.once('child', function(child){
-                var i;
-                if ((i = _this._get_child_running())<0)
+        wait_on = function(){
+            _this.once('child', function(){
+                let ch_child_et = _this._get_child_running();
+                if (!ch_child_et)
                     return _this._got_retval(wait_retval);
-                wait_on(_this.child[i]);
+                wait_on(ch_child_et);
             });
         };
-        wait_on(this.child[i]);
+        wait_on(child_et);
     }
     else
     {
@@ -705,10 +713,10 @@ E.prototype._ecancel = function(){
 };
 
 E.prototype._ecancel_child = function(){
-    if (!this.child.length)
+    if (!this.child.size)
         return;
     // copy array, since ecancel has side affects and can modify array
-    var child = Array.from(this.child);
+    var child = Array.from(this.child.values());
     for (var i=0; i<child.length; i++)
         child[i]._ecancel();
 };
@@ -824,7 +832,7 @@ E.prototype.get_name = function(flags){
     flags = flags||{};
     if (stack)
     {
-        caller = /^    at (.*)$/.exec(stack[4]);
+        caller = /^ {4}at (.*)$/.exec(stack[4]);
         caller = caller ? caller[1] : undefined;
     }
     var names = [];
@@ -909,7 +917,7 @@ E.prototype.then = function(on_res, on_err){
     if (this.tm_completed)
         return etask('then_completed', [function(){ return on_done(); }]);
     var then_wait = etask('then_wait', [function(){ return this.wait(); }]);
-    this.then_waiting.push(function(){
+    this.then_waiting.add(function(){
         try { then_wait.continue(on_done()); }
         catch(e){ then_wait.throw(e); }
     });
@@ -1005,14 +1013,16 @@ E.prototype._ps = function(pre_first, pre_next, flags){
             var stack_trail = et.down ? '.' : ' ';
             var child = et.child;
             if (flags.GUESS)
-                child = child.concat(et.child_guess);
-            for (i = 0; i<child.length; i++)
+                child = new Set([...child, ...et.child_guess]);
+            i = 0;
+            for (let child_i of child.values())
             {
-                task_trail = i<child.length-1 ? '|' : stack_trail;
-                child_guess = child[i].parent_guess ? '\\? ' :
-                    child[i].parent_type=='call' ? '\\> ' : '\\_ ';
-                s += child[i]._ps(pre_next+task_trail+child_guess,
+                task_trail = i<child.size-1 ? '|' : stack_trail;
+                child_guess = child_i.parent_guess ? '\\? ' :
+                    child_i.parent_type=='call' ? '\\> ' : '\\_ ';
+                s += child_i._ps(pre_next+task_trail+child_guess,
                     pre_next+task_trail+'   ', flags);
+                i++;
             }
         }
     }
@@ -1047,26 +1057,24 @@ E.prototype.ps = function(flags){
 E._longname_root = function(){
     return (zerr.prefix ? zerr.prefix+'pid '+process.pid+' ' : '')+'root'; };
 E.ps = function(flags){
-    var i, s = '', task_trail;
+    var s = '', task_trail;
     flags = assign({STACK: 1, RECURSIVE: 1, LIMIT: 10000000, TIME: 1,
         GUESS: 1}, flags, {limit_n: 0});
     ps_flags(flags);
     s += E._longname_root()+'\n';
-    var child = E.root;
+    var child = Array.from(E.root.values());
     if (flags.GUESS)
     {
         child = [];
-        for (i=0; i<E.root.length; i++)
-        {
-            if (!E.root[i].parent_guess)
-                child.push(E.root[i]);
-        }
+        E.root.forEach(root_i=>{
+            if (!root_i.parent_guess)
+                child.push(root_i);
+        });
     }
-    for (i=0; i<child.length; i++)
-    {
+    child.forEach((child_i, i)=>{
         task_trail = i<child.length-1 ? '|' : ' ';
-        s += child[i]._ps(task_trail+'\\_ ', task_trail+'   ', flags);
-    }
+        s += child_i._ps(task_trail+'\\_ ', task_trail+'   ', flags);
+    });
     return s;
 };
 
@@ -1076,7 +1084,7 @@ function assert_tree_unique(a){
         assert(!a.includes(a[i], i+1));
 }
 E.prototype._assert_tree = function(opt){
-    var i, et;
+    var et;
     opt = opt||{};
     assert_tree_unique(this.child);
     assert(this.parent);
@@ -1088,31 +1096,27 @@ E.prototype._assert_tree = function(opt){
         assert(!et.parent_guess);
         this.down._assert_tree(opt);
     }
-    for (i=0; i<this.child.length; i++)
+    for (let _et of this.child.values())
     {
-        et = this.child[i];
-        assert(et.parent===this);
-        assert(!et.parent_guess);
-        assert(!et.up);
-        et._assert_tree(opt);
+        assert(_et.parent===this);
+        assert(!_et.parent_guess);
+        assert(!_et.up);
+        _et._assert_tree(opt);
     }
-    if (this.child_guess.length)
+    if (this.child_guess.size)
         assert(E.in_run.includes(this));
-    for (i=0; i<this.child_guess.length; i++)
+    for (let _et of this.child_guess.values())
     {
-        et = this.child_guess[i];
-        assert(et.parent_guess===this);
-        assert(!et.parent);
-        assert(!et.up);
+        assert(_et.parent_guess===this);
+        assert(!_et.parent);
+        assert(!_et.up);
     }
 };
 E._assert_tree = function(opt){
-    var i, et, child = E.root;
     opt = opt||{};
     assert_tree_unique(E.root);
-    for (i=0; i<child.length; i++)
+    for (let et of this.child.values())
     {
-        et = child[i];
         assert(!et.parent);
         assert(!et.up);
         et._assert_tree(opt);
@@ -1126,12 +1130,12 @@ E.prototype._assert_parent = function(){
     if (this.parent)
     {
         var child = this.parent ? this.parent.child : E.root;
-        assert(child.includes(this),
+        assert(child.has(this),
             'cannot find in parent '+(this.parent ? '' : 'root'));
     }
     else if (this.parent_guess)
     {
-        assert(this.parent_guess.child_guess.includes(this),
+        assert(this.parent_guess.child_guess.has(this),
             'cannot find in parent_guess');
         assert(E.in_run.includes(this.parent_guess));
     }
@@ -1139,7 +1143,7 @@ E.prototype._assert_parent = function(){
 
 E.prototype.return_child = function(){
     // copy array, since return() has side affects and can modify array
-    var child = Array.from(this.child);
+    var child = Array.from(this.child.values());
     for (var i=0; i<child.length; i++)
         child[i].return();
 };
@@ -1281,7 +1285,7 @@ E.all_limit = function(limit, arr_iter, cb){
             return this.goto('done');
         this.spawn(next);
         this.loop();
-        if (this.child.length>=limit)
+        if (this.child.size>=limit)
             return this.wait_child('any');
     }, function done(){
         return this.wait_child('all');
@@ -1544,9 +1548,9 @@ E._class = function(cls){
 };
 E.shutdown = function(){
     var prev;
-    while (E.root.length)
+    while (E.root.size)
     {
-        var e = E.root[0];
+        var e = E.root.values().next().value;
         if (e==prev)
         {
             assert(e.tm_completed);

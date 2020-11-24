@@ -12,8 +12,14 @@ import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Back_btn} from './proxy_edit/index.js';
+import {cloud_url_address} from './util.js';
 
 const Howto = withRouter(class Howto extends Pure_component {
+    state = {settings: {}};
+    componentDidMount(){
+        this.setdb_on('head.settings', settings=>
+            settings && this.setState({settings}));
+    }
     choose_click = option=>{
         const pathname = `/howto/${option}`;
         this.props.history.push({pathname});
@@ -25,8 +31,10 @@ const Howto = withRouter(class Howto extends Pure_component {
     };
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
+        const {zagent, customer} = this.state.settings;
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];
+        const hostname = zagent ? cloud_url_address(customer) : undefined;
         let Instructions = ()=>null;
         if (option=='browser')
             Instructions = Browser_instructions;
@@ -50,7 +58,9 @@ const Howto = withRouter(class Howto extends Pure_component {
                   <Nav_tab id="proxy_tester" title="Web tester"
                     tooltip="Send example requests from here"/>
                 </Nav_tabs>
-                <Instructions>{this.props.children}</Instructions>
+                <Instructions hostname={hostname}>
+                  {this.props.children}
+                </Instructions>
               </div>
               {false && <Animated_instructions/>}
             </div></div>}</T>;
@@ -87,7 +97,8 @@ class Code_instructions extends Pure_component {
             </span>;
         const tutorial_port = window.localStorage.getItem(
             'quickstart-first-proxy')||24000;
-        const to_copy = instructions.code(tutorial_port)[lang];
+        const to_copy = instructions.code(tutorial_port,
+            this.props.hostname)[lang];
         const code = prism.highlight(to_copy, prism.languages.clike);
         const api_url = this.props.www_api+'/doc/api#lpm_endpoints';
         return <div className="code_instructions">
@@ -144,7 +155,7 @@ class Browser_instructions extends Pure_component {
                 </select>
               </div>
               <div className="instructions_well">
-                {instructions.browser(this.port)[browser]}
+                {instructions.browser(this.port, this.props.hostname)[browser]}
               </div>
             </div>;
     }

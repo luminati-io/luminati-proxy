@@ -44,6 +44,7 @@ export const tabs = {
             carrier: {
                 label: 'Carrier',
                 tooltip: 'Network provider company name',
+                placeholder: 'Type in carrier name',
             },
             os: {
                 label: 'Operating System',

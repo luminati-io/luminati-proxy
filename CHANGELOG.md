@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.209.645 Stable
+- :star: UI improvement in targeting section
+
 ## 1.207.977 Stable
 - :star: Unlock option to select any preset when using a port with unblocker zone
 

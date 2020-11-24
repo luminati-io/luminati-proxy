@@ -80,7 +80,9 @@
     "extract-zip": "1.6.7",
     "cookie": "0.4.0",
     "winston": "3.2.1",
+    "winston-transport": "4.3.0",
     "winston-daily-rotate-file": "4.2.1",
+    "winston-syslog": "2.4.4",
     "bootstrap": "3.4.1",
     "codemirror": "5.49.2",
     "es6-shim": "0.35.5",
@@ -136,7 +138,7 @@
   "homepage": "https://luminati.io/",
   "api_domain": "lum-lpm.com",
   "api_domain_fallback": "l-lpm.com",
-  "mail_domain": "luminati-china-mail.co",
+  "mail_domain": "lumidaili.cn",
   "keywords": [
     "luminati",
     "proxy",
@@ -381,7 +383,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "04cb94ba40237fbbf937dc9e8f113572"
+    "md5": "15685f2c14ea5e69c20d34e6b7f17581"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -416,5 +418,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.207.977"
+  "version": "1.209.645"
 }
