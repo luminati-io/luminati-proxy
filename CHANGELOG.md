@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.210.535 Stable
+- :star: Added support for content-encoding: br
+- :bug: Fixed Rules and preview for mobile social media apps
+
 ## 1.209.645 Stable
 - :star: UI improvement in targeting section
 

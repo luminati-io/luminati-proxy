@@ -221,11 +221,8 @@ E.is_alias_email = function(email){
 
 // XXX vadimr: move to email.js:is_need_sanitize
 E.is_email_need_sanitize = function(email){
-    var valid_domains = ['gmail.com', 'googlemail.com', 'yahoo.com',
-        'yahoo.fr', 'yahoo.co.uk', 'yahoo.com.br', 'yahoo.co.in', 'yahoo.es',
-        'yahoo.it', 'yahoo.de', 'yahoo.in', 'yahoo.ca', 'yahoo.com.au',
-        'yahoo.co.jp', 'yahoo.com.ar', 'yahoo.com.mx', 'yahoo.co.id',
-        'yahoo.com.sg', 'protonmail.ch', 'protonmail.com'];
+    var valid_domains = ['gmail.com', 'googlemail.com', 'protonmail.ch',
+        'protonmail.com'];
     return valid_domains.indexOf(E.get_domain_email(email)) !== -1;
 };
 

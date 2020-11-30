@@ -531,6 +531,7 @@ E.win2cyg = src=>{
     src = src.replace(/^[c-z]:/i, s=>'/cygdrive/'+s[0].toLowerCase());
     return src;
 };
+E.is_dotfile = src=>src.split('/').pop().startsWith('.');
 E.is_absolute = src=>/^(\/|([c-z]:))/i.test(src);
 E.absolutize = (p, d1, d2)=>{
     if (!p||E.is_absolute(p))

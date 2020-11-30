@@ -7,7 +7,7 @@ if (is_node)
     try {
         define = require('./require_node.js').define(module, '..');
     } catch(e){
-        define = require('../../../util/require_node.js').define(module, '..');
+        define = require('../../util/require_node.js').define(module, '..');
     }
 }
 else

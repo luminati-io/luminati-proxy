@@ -3,9 +3,9 @@
 'use strict'; /*jslint node:true*/
 if (!module.parent)
     global.zon_config_fallback = {};
-require('../../util/config.js');
-const etask = require('../../util/etask.js');
-const cli = require('../../util/cli.js');
+require('../util/config.js');
+const etask = require('../util/etask.js');
+const cli = require('../util/cli.js');
 const oss = require('ali-oss');
 const cli_opt = [
     ['', 'key-id=KEY_ID', 'Alibaba AccessKeyId'],

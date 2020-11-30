@@ -3,11 +3,11 @@
 'use strict'; /*jslint node:true*/
 if (!module.parent)
     global.zon_config_fallback = {};
-require('../../util/config.js');
-const etask = require('../../util/etask.js');
+require('../util/config.js');
+const etask = require('../util/etask.js');
 const request = require('request');
-const exec = require('../../util/exec.js');
-const cli = require('../../util/cli.js');
+const exec = require('../util/exec.js');
+const cli = require('../util/cli.js');
 const cli_opt = [
     ['', 'version=VERSION', 'Version being released'],
 ];

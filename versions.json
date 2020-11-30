@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.210.535",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support for content-encoding: br"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed Rules and preview for mobile social media apps"
+            }
+        ]
+    },
+    {
         "ver": "1.209.645",
         "type": "stable",
         "changes": [

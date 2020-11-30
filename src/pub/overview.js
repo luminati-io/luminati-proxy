@@ -33,7 +33,8 @@ class Overview extends Pure_component {
         this.setdb_on('head.settings', settings=>{
             if (!settings)
                 return;
-            this.setState({show_logs: settings.logs>0});
+            this.setState({show_logs: settings.logs>0,
+                zagent: settings.zagent});
             if (settings.ask_sync_config&&!settings.zagent)
                 $('#sync_config_modal').modal();
         });
@@ -61,7 +62,7 @@ class Overview extends Pure_component {
         });
     };
     render(){
-        const {show_logs} = this.state;
+        const {show_logs, zagent} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
         const title = <T>Overview</T>;
         return <div className="overview_page">
@@ -84,9 +85,11 @@ class Overview extends Pure_component {
                 <div className="proxies proxies_wrapper">
                   <Proxies/>
                 </div>
-                <Logs_context.Provider value={!!show_logs}>
-                  <Stats/>
-                </Logs_context.Provider>
+                {!zagent &&
+                  <Logs_context.Provider value={!!show_logs}>
+                    <Stats/>
+                  </Logs_context.Provider>
+                }
               </div>
               {show_logs===null &&
                 <Loader_small show loading_msg="Loading..."/>}
