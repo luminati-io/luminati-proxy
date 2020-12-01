@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.210.639 Stable
+- :bug: Limited the max number of external proxies allowed per port to improve memory usage
+
 ## 1.210.535 Stable
 - :star: Added support for content-encoding: br
 - :bug: Fixed Rules and preview for mobile social media apps

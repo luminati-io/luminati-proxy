@@ -869,6 +869,7 @@ class IPC_server {
         }
         else
             this.methods = methods;
+        Object.setPrototypeOf(this.methods, null);
         this.zjson = !!opt.zjson;
         this.sync = !!opt.sync;
         this.call_zerr = !!opt.call_zerr;
@@ -887,7 +888,7 @@ class IPC_server {
         let type = msg.type||'ipc_call', cmd = msg.cmd;
         if (type!='ipc_call' && type!='ipc_post')
             return;
-        let method = this.methods.hasOwnProperty(cmd) && this.methods[cmd];
+        let method = this.methods[cmd];
         if (method==true)
             method = this.ws.data[cmd];
         if (!method)

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.210.639",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Limited the max number of external proxies allowed per port to improve memory usage"
+            }
+        ]
+    },
+    {
         "ver": "1.210.535",
         "type": "stable",
         "changes": [

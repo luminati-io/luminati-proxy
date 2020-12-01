@@ -8,6 +8,7 @@ const file = require('../util/file.js');
 const Manager = require('../lib/manager.js');
 const Config = require('../lib/config.js');
 const logger = require('../lib/logger.js');
+const consts = require('../lib/consts.js');
 
 describe('config', ()=>{
     it('should not include mgr fields', ()=>{
@@ -60,29 +61,40 @@ describe('config', ()=>{
         t('har_limit cant be unlimited', {har_limit: 0}, 'har_limit', 1024);
     });
     describe('_prepare_proxy', ()=>{
-        let warn_stub;
+        let warn_stub, conf_mgr;
         beforeEach(()=>{
             warn_stub = sinon.stub(logger, 'warn');
+            conf_mgr = new Config(new Manager({}), Manager.default);
         });
         afterEach(()=>{
             warn_stub.restore();
+            conf_mgr = null;
         });
         it('should remove rules and warn if it exists and not an array', ()=>{
-            const conf_mgr = new Config(new Manager({}), Manager.default);
             const res = conf_mgr._prepare_proxy({rules: {}});
             sinon.assert.called(logger.warn);
             assert.ok(!res.rules);
         });
         it('should not warn if rules do not exist', ()=>{
-            const conf_mgr = new Config(new Manager({}), Manager.default);
             conf_mgr._prepare_proxy({});
             sinon.assert.notCalled(logger.warn);
         });
         it('should leave rules without warning if an array', ()=>{
-            const conf_mgr = new Config(new Manager({}), Manager.default);
             const res = conf_mgr._prepare_proxy({rules: [1, 2]});
             sinon.assert.notCalled(logger.warn);
             assert.deepEqual(res.rules, [1, 2]);
+        });
+        it('should remove ext proxies when exceeding the limit', ()=>{
+            const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
+                .map((_, i)=>`${++i}`);
+            const res = conf_mgr._prepare_proxy({ext_proxies});
+            sinon.assert.called(logger.warn);
+            assert.ok(!res.ext_proxies);
+        });
+        it('should not touch ext proxies if within the limit', ()=>{
+            const res = conf_mgr._prepare_proxy({ext_proxies: ['1.2.3.4']});
+            sinon.assert.notCalled(logger.warn);
+            assert.deepEqual(res.ext_proxies, ['1.2.3.4']);
         });
     });
 });

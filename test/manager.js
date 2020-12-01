@@ -23,6 +23,7 @@ const user_agent = require('../util/user_agent.js');
 const lpm_util = require('../util/lpm_util.js');
 const util_lib = require('../lib/util.js');
 const puppeteer = require('../lib/puppeteer.js');
+const consts = require('../lib/consts.js');
 const customer = 'abc';
 const password = 'xyz';
 const {assert_has} = require('./common.js');
@@ -416,6 +417,15 @@ describe('manager', ()=>{
                 }));
                 t('external', 200);
                 t('external, backend is down', 500);
+                it('external over the limit', etask._fn(function*(_this){
+                    app = yield app_with_proxies([{port: 24000}]);
+                    const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
+                        .map((_, i)=>`${++i}`);
+                    let res = yield api_json('api/proxies', {method: 'post',
+                        body: {proxy: {port: 24001, ext_proxies}}});
+                    assert.equal(res.statusCode, 400);
+                    assert.ok(!!res.body.errors.length);
+                }));
             });
             describe('put', ()=>{
                 it('normal', etask._fn(function*(_this){

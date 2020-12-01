@@ -242,12 +242,18 @@ const Created_port = ({port, preset})=>{
         </div>;
 };
 
-const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
-    const json_example = '[\'1.1.1.2\', '
-        +'\'my_username:my_password@1.2.3.4:8888\']';
-    const placeholder = 'List of IPs to the external proxies in the following '
+class Ext_proxy extends Pure_component {
+    state = {consts: {}};
+    json_example = '[\'1.1.1.2\', \'my_username:my_password@1.2.3.4:8888\']';
+    placeholder = 'List of IPs to the external proxies in the following '
         +'format: [username:password@]ip[:port]';
-    const on_change_list = val=>{
+    componentDidMount(){
+        this.setdb_on('head.consts', ({consts})=>
+            consts && this.setState({consts}));
+    }
+    on_change_list = val=>{
+        const {on_field_change} = this.props;
+        const {consts: {MAX_EXT_PROXIES}} = this.state;
         on_field_change('ips_list')(val);
         try {
             const parsed = JSON.parse(val.replace(/'/g, '"'));
@@ -255,6 +261,11 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
                 throw {message: 'Proxies list has to be an array'};
             if (!parsed.length)
                 throw {message: 'Proxies list array can not be empty'};
+            if (MAX_EXT_PROXIES!==undefined && parsed.length>MAX_EXT_PROXIES)
+            {
+                throw {message: `Maximum external proxies size is `
+                    +MAX_EXT_PROXIES};
+            }
             parsed.forEach(ip=>{
                 if (typeof ip!='string')
                     throw {message: 'Wrong format of proxies list'};
@@ -269,16 +280,18 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
             on_field_change('valid_json')(false);
         }
     };
-    return <div className="ext_proxy">
-          <Textarea rows={6} val={ips_list}
-            placeholder={placeholder}
-            on_change_wrapper={on_change_list}/>
+    render(){
+        return <div className="ext_proxy">
+          <Textarea rows={6} val={this.props.ips_list}
+            placeholder={this.placeholder}
+            on_change_wrapper={this.on_change_list}/>
           <div className="json_example">
-              <strong>Example: </strong>{json_example}
+            <strong>Example: </strong>{this.json_example}
           </div>
-          <div className="json_error">{parse_error}</div>
+          <div className="json_error">{this.props.parse_error}</div>
         </div>;
-};
+    }
+}
 
 const Lum_proxy = with_www_api(props=>{
     const {zone, def_zone, on_field_change} = props;
