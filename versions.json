@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.211.502",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Proxies config improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.210.639",
         "type": "stable",
         "changes": [

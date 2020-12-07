@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.211.502 Stable
+- :sparkles: Proxies config improvements
+
 ## 1.210.639 Stable
 - :bug: Limited the max number of external proxies allowed per port to improve memory usage
 

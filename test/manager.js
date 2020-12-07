@@ -31,15 +31,6 @@ const api_base = 'https://'+pkg.api_domain;
 
 describe('manager', ()=>{
     let app, temp_files, logger_stub, sandbox;
-    // XXX krzysztof: make it configurable to show logs in tests
-    const stub_logger = ()=>{
-        logger.transports.forEach(t=>{ t.silent = true; });
-        logger_stub = sinon.stub(logger, 'notice');
-    };
-    const unstub_logger = ()=>{
-        logger_stub.restore();
-        logger.transports.forEach(t=>{ t.silent = false; });
-    };
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
         return i ? args[i] : null;
@@ -169,7 +160,6 @@ describe('manager', ()=>{
             },
         });
     };
-    before(stub_logger);
     afterEach('after manager', etask._fn(function*(_this){
         nock.cleanAll();
         if (!app)
@@ -206,6 +196,26 @@ describe('manager', ()=>{
                 '--zone', 'z'],
             ['--no-config', '--customer', 'usr', '--password', 'abc',
                 '--zone', 'z']);
+    });
+    describe('init proxy', ()=>{
+        it('proxy_port is returned in the correct format', etask._fn(
+        function*(_this){
+            app = yield app_with_proxies([{port: 24000}]);
+            const new_proxy = {port: 24001};
+            const res = yield app.manager.init_proxy(new_proxy);
+            assert.ok(Object.keys(res).length, 1);
+            assert_has(res.proxy_port.opt, new_proxy, 'proxy_port.opt');
+        }));
+        it('"error" should not be saved to the proxy', etask._fn(
+        function*(_this){
+            app = yield app_with_proxies([{port: 24000}]);
+            sinon.stub(app.manager, 'validate_proxy').returns('my_error');
+            const new_proxy = {port: 24001};
+            const res = yield app.manager.init_proxy(new_proxy);
+            assert_has(res, {proxy_port: new_proxy, proxy_err: 'my_error'});
+            assert.ok(!res.proxy_port.error);
+            app.manager.validate_proxy.restore();
+        }));
     });
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
@@ -284,11 +294,13 @@ describe('manager', ()=>{
         }));
     });
     describe('default values', ()=>{
-        it('default har_limit is 1024', ()=>etask(function*(){
+        it('default har_limit is 1024', etask._fn(function*(_this){
+            _this.timeout(6000);
             app = yield app_with_args(['--port', '24000']);
             assert.equal(app.manager.proxy_ports[24000].opt.har_limit, 1024);
         }));
-        it('applies explicit mgr argv to defaults', ()=>etask(function*(){
+        it('applies explicit mgr argv to defaults', etask._fn(function*(_this){
+            _this.timeout(6000);
             app = yield app_with_args(['--port', '24000', '--har_limit',
                 '1337', '--api_domain', 'invalid_domain']);
             const {opt} = app.manager.proxy_ports[24000];
@@ -301,12 +313,10 @@ describe('manager', ()=>{
     describe('report_bug', ()=>{
         // XXX krzysztof: get rid of this
         before(()=>{
-            unstub_logger();
             const console_t = logger.transports.find(
                 t=>t instanceof winston.transports.Console);
             console_t.silent = true;
         });
-        after(stub_logger);
         // can't rm current log file because transports rely on it
         beforeEach(()=>fs.truncateSync(logger.lpm_filename, 0));
         it('should send logs, har and config', etask._fn(function*(_this){
@@ -372,7 +382,7 @@ describe('manager', ()=>{
         describe('proxies', ()=>{
             describe('get', ()=>{
                 it('normal', etask._fn(function*(_this){
-                    const proxies = [{port: 24023}, {port: 24024}];
+                    const proxies = [{port: 24024}];
                     app = yield app_with_proxies(proxies);
                     let res = yield json('api/proxies');
                     assert_has(res, proxies, 'proxies');
@@ -421,7 +431,7 @@ describe('manager', ()=>{
                     app = yield app_with_proxies([{port: 24000}]);
                     const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
                         .map((_, i)=>`${++i}`);
-                    let res = yield api_json('api/proxies', {method: 'post',
+                    const res = yield api_json('api/proxies', {method: 'post',
                         body: {proxy: {port: 24001, ext_proxies}}});
                     assert.equal(res.statusCode, 400);
                     assert.ok(!!res.body.errors.length);
@@ -647,6 +657,19 @@ describe('manager', ()=>{
             t('webrtc is enabled', {webrtc: true}, 'webrtc', true);
         });
     });
+    describe('proxy_update', ()=>{
+        it('return value format is consistent', etask._fn(function*(_this){
+            const [p1, p2] = [{port: 24000}, {port: 24001}];
+            app = yield app_with_proxies([p1, p2]);
+            const recreate = yield app.manager.proxy_update(p1, {port: 24500});
+            const in_place = yield app.manager.proxy_update(p2,
+                {port: 24001, ssl: true});
+            [recreate, in_place].forEach(res=>{
+                assert.equal(Object.keys(res).length, 1);
+                assert.ok(res.proxy_port);
+            });
+        }));
+    });
     describe('flags', ()=>{
         it('exits immediately with version on -v', etask._fn(function*(_this){
             const exec = require('child_process').execFile;
@@ -660,17 +683,20 @@ describe('manager', ()=>{
     describe('banlist propagation on proxy changes', ()=>{
         let port, to_date, new_banlist;
         beforeEach(()=>etask(function*(){
+            const now_stub = sinon.stub(Date, 'now').returns(5000);
             app = yield app_with_proxies([{port: 24000}]);
             port = app.manager.proxy_ports[24000];
             const {banlist} = port;
-            const now_stub = sinon.stub(Date, 'now').returns(5000);
             const ms_left = 100;
             to_date = Date.now()+ms_left;
             const new_proxy = Object.assign({}, {port: 24000}, {});
             banlist.add('1.1.1.1', ms_left);
             banlist.add('1.1.1.1', ms_left, 'lumtest.com');
-            new_banlist = (yield app.manager.proxy_update({port: 24000},
-                new_proxy)).banlist.cache;
+            const update_spy = sinon.spy();
+            port.on('updated', update_spy);
+            yield app.manager.proxy_update({port: 24000}, new_proxy);
+            sinon.assert.calledOnce(update_spy);
+            new_banlist = app.manager.proxy_ports[24000].banlist.cache;
             now_stub.restore();
         }));
         it('sends updated banlist instance to workers via ipc', ()=>{
@@ -692,14 +718,14 @@ describe('manager', ()=>{
             assert.ok(!new_banlist.size);
         }));
         it('doesnt delete indefinitely banned ips', ()=>etask(function*(){
-            const {banlist} = port;
-            const new_proxy = Object.assign({}, {port: 24000}, {});
+            let {banlist} = port;
             banlist.clear();
             banlist.add('1.2.3.4', 0);
             banlist.add('1.2.3.4', 0, 'lumtest.com');
-            const {banlist: {cache}} = yield app.manager.proxy_update(
-                {port: 24000}, new_proxy);
-            assert.ok(cache.size==2);
+            const new_proxy = Object.assign({port: 24000});
+            yield app.manager.proxy_update({port: 24000}, new_proxy);
+            ({banlist} = app.manager.proxy_ports[24000]);
+            assert.ok(banlist.cache.size==2);
         }));
     });
     describe('whitelisting', ()=>{
@@ -750,8 +776,9 @@ describe('manager', ()=>{
             app = yield app_with_proxies(p);
             const whitelist_ips = ['1.1.1.1', '2.2.2.2', '3.0.0.0/8'];
             const new_proxy = Object.assign({}, p[0], {whitelist_ips});
-            const opt = yield app.manager.proxy_update(p[0], new_proxy);
-            assert.deepEqual(opt.whitelist_ips, whitelist_ips);
+            const {proxy_port} = yield app.manager.proxy_update(p[0],
+                new_proxy);
+            assert.deepEqual(proxy_port.whitelist_ips, whitelist_ips);
         }));
         t = (name, def, default_calls, expected)=>
         it(name, etask._fn(function*(_this){

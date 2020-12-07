@@ -11,7 +11,7 @@ const logger = require('../lib/logger.js');
 const consts = require('../lib/consts.js');
 
 describe('config', ()=>{
-    it('should not include mgr fields', ()=>{
+    it('proxies should not include unwanted fields', ()=>{
         const proxies = [{
             port: 24000,
             www_whitelist_ips: ['1.2.3.4'],
@@ -23,13 +23,14 @@ describe('config', ()=>{
             stats: false,
             customer: 'wrong_cust',
             banlist: {cache: {}},
+            error: 'my_error',
         }];
         const conf_mgr = new Config(new Manager({}), Manager.default);
         const s = conf_mgr._serialize(proxies, {});
         const config = JSON.parse(s);
         const proxy = config.proxies[0];
         qw`stats proxy_type zones www_whitelist_ips request_stats logs conflict
-        version customer banlist`.forEach(field=>
+        version customer banlist error`.forEach(field=>
             assert.equal(proxy[field], undefined));
         assert.equal(proxy.port, 24000);
     });
