@@ -55,23 +55,6 @@
         border: 1px solid white;
     }
 }
-.panel_container() {
-    .tables_container, .header_container {
-        table td, table th, div.chrome_table div.chrome_td,
-        div.chrome_table div.chrome_th {
-            &:nth-child(2) { border-left: none; }
-            label { margin: 0; }
-            .form-check { text-align: center; }
-            input[type=checkbox] {
-                margin: 0;
-                top: 2px;
-            }
-        }
-        table th, div.chrome_table div.chrome_th {
-            &:first-child { text-align: center };
-        }
-    }
-}
 a.link, button.link {
     cursor: pointer;
     color: @link;

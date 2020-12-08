@@ -308,9 +308,6 @@
       "src/pub/css/chrome_widgets.less",
       "src/pub/css/common.less",
       "src/pub/css/config.less",
-      "src/pub/css/har_preview.less",
-      "src/pub/css/har_viewer.less",
-      "src/pub/css/json_viewer.less",
       "src/pub/css/login.less",
       "src/pub/css/logs.less",
       "src/pub/css/nav.less",
@@ -327,12 +324,15 @@
       "src/pub/css/tooltip.less",
       "src/pub/css/whitelist_ips.less",
       "src/pub/css/zone_desc.less",
-      "src/pub/har_preview.js",
-      "src/pub/har_viewer.js",
+      "src/pub/har/css/json_viewer.less",
+      "src/pub/har/css/req_preview.less",
+      "src/pub/har/css/viewer.less",
+      "src/pub/har/json_viewer.js",
+      "src/pub/har/req_preview.js",
+      "src/pub/har/viewer.js",
       "src/pub/howto.js",
       "src/pub/index.html",
       "src/pub/instructions.js",
-      "src/pub/json_viewer.js",
       "src/pub/login.js",
       "src/pub/logs.js",
       "src/pub/nav.js",
@@ -383,7 +383,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "9a06da5153cff8290120789441bb0527"
+    "md5": "e23c595086b5373bce302c08720d315b"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -418,5 +418,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.211.502"
+  "version": "1.211.793"
 }

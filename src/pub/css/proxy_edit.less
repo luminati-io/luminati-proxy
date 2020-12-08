@@ -280,7 +280,23 @@
     &.vbox { overflow-y: hidden; }
 }
 .banned_ips_panel {
-    .panel_container();
+    // XXX krzysztof: banned ips panel should be redesigned and not follow
+    // chrome styling
+    .tables_container, .header_container {
+        table td, table th, div.chrome_table div.chrome_td,
+        div.chrome_table div.chrome_th {
+            &:nth-child(2) { border-left: none; }
+            label { margin: 0; }
+            .form-check { text-align: center; }
+            input[type=checkbox] {
+                margin: 0;
+                top: 2px;
+            }
+        }
+        table th, div.chrome_table div.chrome_th {
+            &:first-child { text-align: center };
+        }
+    }
 }
 .btn_unban {
     border: none;

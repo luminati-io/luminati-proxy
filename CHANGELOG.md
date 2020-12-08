@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.211.793 Stable
+- :sparkles: Optimization in proxy ports updates
+
 ## 1.211.502 Stable
 - :sparkles: Proxies config improvements
 

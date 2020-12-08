@@ -1,0 +1,63 @@
+.json_viewer {
+    color: #303942;
+    cursor: default;
+    width: 100%;
+    font-family: dejavu sans mono, monospace;
+    font-size: 11px !important;
+    padding: 4px 6px;
+    overflow: auto;
+    ol.tree_root { padding: 0; }
+    ol.tree_children { padding-left: 12px; }
+    li.tree_item {
+        &:before {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-mask-image: url(/img/treeoutline_triangles.png);
+            -webkit-mask-size: 32px 24px;
+            content: "aa";
+            color: transparent;
+            text-shadow: none;
+            margin-right: -2px;
+            height: 12px;
+            -webkit-mask-position: 0 0;
+            background-color: #727272;
+        }
+        &:not(.parent):before {
+            background-color: transparent;
+        }
+        &.expanded:before {
+            -webkit-mask-position: -16px 0;
+        }
+    }
+    li.tree_item {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-height: 16px;
+        height: 12px;
+        span { line-height: 13px; }
+        .name {
+            color: rgb(136, 19, 145);
+            flex-shrink: 0;
+        }
+        .separator {
+            flex-shrink: 0;
+            padding-right: 5px;
+        }
+        .value {
+            &.number {
+                color: rgb(28, 0, 207);
+            }
+            &.boolean {
+                color: rgb(13, 34, 170);
+            }
+            &.string {
+                white-space: pre;
+                unicode-bidi: -webkit-isolate;
+                color: rgb(196, 26, 22);
+            }
+        }
+    }
+}

@@ -903,10 +903,43 @@ class IPC_server {
                 msg: err,
             });
         }
-        let arg = msg.arg || [msg.msg];
-        let _this = this;
+        const res_process = rv=>{
+            if (type=='ipc_post')
+                return;
+            const res = {
+                type: 'ipc_result',
+                cmd: cmd,
+                cookie: msg.cookie,
+                msg: rv,
+            };
+            if (this.zjson)
+                this.ws.zjson(res);
+            else
+                this.ws.json(res);
+        };
+        const err_process = e=>{
+            if (type=='ipc_call' && this.call_zerr)
+                zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
+            if (type=='ipc_post')
+                return zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
+            this.ws.json({
+                type: 'ipc_error',
+                cmd: cmd,
+                cookie: msg.cookie,
+                msg: e.message || String(e),
+                err_code: e.code,
+            });
+        };
+        const arg = msg.arg || [msg.msg], ctx = this.ws.data||this.ws;
+        if (this.sync)
+        {
+            try { res_process(method.apply(ctx, arg)); }
+            catch(e){ err_process(e); }
+            return;
+        }
+        const _this = this;
         etask(function*IPC_server_on_call(){
-            if (!_this.sync && type=='ipc_post')
+            if (type=='ipc_post')
             {
                 _this.pending.add(this);
                 this.finally(()=>_this.pending.delete(this));
@@ -914,35 +947,8 @@ class IPC_server {
             this.info.label = ()=>_this.ws.toString();
             this.info.cmd = cmd;
             this.info.cookie = msg.cookie;
-            try {
-                let rv = method.apply(_this.ws.data||_this.ws, arg);
-                if (!_this.sync)
-                    rv = yield rv;
-                if (type=='ipc_post')
-                    return;
-                let res = {
-                    type: 'ipc_result',
-                    cmd: cmd,
-                    cookie: msg.cookie,
-                    msg: rv,
-                };
-                if (_this.zjson)
-                    _this.ws.zjson(res);
-                else
-                    _this.ws.json(res);
-            } catch(e){
-                if (type=='ipc_call' && _this.call_zerr)
-                    zerr(`${_this.ws}: ${cmd}: ${zerr.e2s(e)}`);
-                if (type=='ipc_post')
-                    return zerr(`${_this.ws}: ${cmd}: ${zerr.e2s(e)}`);
-                _this.ws.json({
-                    type: 'ipc_error',
-                    cmd: cmd,
-                    cookie: msg.cookie,
-                    msg: e.message || String(e),
-                    err_code: e.code,
-                });
-            }
+            try { res_process(yield method.apply(ctx, arg)); }
+            catch(e){ err_process(e); }
         });
     }
     _on_disconnected(){

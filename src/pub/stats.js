@@ -9,7 +9,6 @@ import {Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
 import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
-import {Sort_icon} from './chrome_widgets.js';
 import {T} from './common/i18n.js';
 import React_tooltip from 'react-tooltip';
 
@@ -99,7 +98,7 @@ const Empty_row = ()=>
       <td>—</td><td>—</td><td>—</td><td>—</td>
     </tr>;
 
-// XXX krzysztof: merge with enable_ssl in har_viewer.js
+// XXX krzysztof: merge with enable_ssl in har/viewer.js
 const enable_ssl_click = port=>etask(function*(){
     yield window.fetch('/api/enable_ssl', {
         method: 'POST',
@@ -203,7 +202,6 @@ const Header = ({sort, sorting, id, label, tooltip})=>
       <Tooltip title={t(tooltip)}>
         <th onClick={()=>sort(id)}>
           <div>{t(label)}</div>
-          <Sort_icon show={sorting.col==id} dir={sorting.dir}/>
         </th>
       </Tooltip>
     }</T>;

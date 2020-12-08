@@ -265,14 +265,16 @@ class Copy_btn extends Pure_component {
     };
     render(){
         return <div className="copy_btn" style={this.props.style}>
-              <button onClick={this.copy} data-container="body"
-                style={this.props.inner_style}
-                ref={this.btn} className="btn btn_lpm btn_lpm_small btn_copy">
-                <T>{this.props.title||'Copy'}</T>
-              </button>
-              <textarea ref={this.textarea}
-                style={{position: 'fixed', top: '-1000px'}}/>
-            </div>;
+          <button onClick={this.copy}
+            data-container="body"
+            style={this.props.inner_style}
+            ref={this.btn}
+            className="btn btn_lpm btn_lpm_small btn_copy">
+            <T>{this.props.title||'Copy'}</T>
+          </button>
+          <textarea ref={this.textarea}
+            style={{position: 'fixed', top: '-1000px'}}/>
+        </div>;
     }
 });
 

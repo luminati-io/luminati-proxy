@@ -3,17 +3,17 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
+import classnames from 'classnames';
+import {withRouter} from 'react-router-dom';
+import ajax from '../../util/ajax.js';
+import date from '../../util/date.js';
 import {Loader, Warnings, with_proxy_ports, Add_icon, No_zones,
     Remove_icon} from './common.js';
 import {Input} from './common/controls.js';
-import classnames from 'classnames';
-import ajax from '../../util/ajax.js';
-import Preview from './har_preview.js';
+import Preview from './har/req_preview.js';
 import Proxy_blank from './proxy_blank.js';
-import {withRouter} from 'react-router-dom';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
-import date from '../../util/date.js';
 import {T} from './common/i18n.js';
 import {report_exception} from './util.js';
 import './css/proxy_tester.less';

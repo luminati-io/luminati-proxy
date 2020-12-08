@@ -18,7 +18,7 @@ const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
 let hosts = ['zs-graphite.luminati.io'];
 
 if (!+env.LXC)
-    hosts.push('zs-graphite-log.luminati.io');
+    hosts.push('zs-graphite-log.luminati.io', 'zs-graphite2.luminati.io');
 
 E.enable_submit = when=>{
     E.enable_submit = ()=>{

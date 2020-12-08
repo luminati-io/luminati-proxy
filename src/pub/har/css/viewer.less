@@ -1,0 +1,37 @@
+.split_widget {
+    flex-direction: row !important;
+    position: relative;
+}
+.har_viewer_off { padding-bottom: 15px; }
+.har_viewer {
+    &.waiting * { cursor: wait !important; }
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    .toolbar {
+        input[type=checkbox] {
+            margin-top: 0;
+            top: 0;
+            margin-left: 7px;
+        }
+        .actions { display: flex; }
+    }
+    .tables_container .data_container table td .disp_value { display: block; }
+}
+.har_viewer {
+    .tables_container, .header_container {
+        table td, table th, div.chrome_table div.chrome_td,
+        div.chrome_table div.chrome_th {
+            &:nth-child(2) { border-left: none; }
+            label { margin: 0; }
+            .form-check { text-align: center; }
+            input[type=checkbox] {
+                margin: 0;
+                top: 2px;
+            }
+        }
+        table th, div.chrome_table div.chrome_th {
+            &:first-child { text-align: center };
+        }
+    }
+}

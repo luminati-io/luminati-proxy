@@ -2197,6 +2197,11 @@ E.code2www = function(code){
 
 E.gl2uule = function(gl){
     gl = E.www2code(gl.toUpperCase());
+    // Google doesn't recognize uule="North Macedonia". This name is kept in
+    // E.google_list though to be equal to official label in Google settings
+    // (https://www.google.com/preferences).
+    if (gl=='MK')
+        return 'Macedonia';
     return E.google_list[gl] || gl;
 };
 

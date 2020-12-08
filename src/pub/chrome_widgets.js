@@ -19,8 +19,6 @@ export const Toolbar_button = ({id, tooltip, active, href, placement,
       </a>
     </Tooltip>;
 
-export const Devider = ()=><div className="devider"/>;
-
 export const with_resizable_cols = (cols, Table)=>{
     class Resizable extends Pure_component {
         state = {};
@@ -40,14 +38,6 @@ export const with_resizable_cols = (cols, Table)=>{
             window.document.removeEventListener('mouseup', this.on_mouse_up);
         }
         set_ref = ref=>{ this.ref = ref; };
-        show_column = idx=>{
-            this.cols[idx].hidden = false;
-            this.resize_columns();
-        };
-        hide_column = idx=>{
-            this.cols[idx].hidden = true;
-            this.resize_columns();
-        };
         resize_columns = ()=>{
             const total_width = this.ref.offsetWidth;
             const resizable_cols = this.cols.filter(c=>!c.hidden&&!c.fixed);
@@ -118,15 +108,16 @@ export const with_resizable_cols = (cols, Table)=>{
         render(){
             const style = Object.assign({}, this.style, this.props.style||{});
             return <div style={style} ref={this.set_ref}
-                  className={classnames({moving: this.state.moving})}>
-                  <Table {...this.props} cols={this.state.cols}
-                    resize_columns={this.resize_columns}
-                    show_column={this.show_column}
-                    hide_column={this.hide_column}/>
-                  <Grid_resizers show={!this.props.cur_preview}
-                    start_moving={this.start_moving}
-                    cols={this.state.cols}/>
-                </div>;
+              className={classnames({moving: this.state.moving})}>
+              <Table {...this.props}
+                cols={this.state.cols}
+                resize_columns={this.resize_columns}
+              />
+              <Grid_resizers show={!this.props.cur_preview}
+                start_moving={this.start_moving}
+                cols={this.state.cols}
+              />
+            </div>;
         }
     }
     return Resizable;
@@ -136,23 +127,14 @@ const Grid_resizers = ({cols, start_moving, show})=>{
     if (!show||!cols)
         return null;
     return <div>
-          {cols.slice(0, -1).map((c, idx)=>
-            !c.fixed &&
-              <div key={c.title||idx} style={{left: c.width+c.offset-2}}
-                onMouseDown={e=>start_moving(e, idx)}
-                className="data_grid_resizer"/>
-          )}
-        </div>;
+      {cols.slice(0, -1).map((c, idx)=>
+        !c.fixed &&
+          <div key={c.title||idx} style={{left: c.width+c.offset-2}}
+            onMouseDown={e=>start_moving(e, idx)}
+            className="data_grid_resizer"/>
+      )}
+    </div>;
 };
-
-export const Sort_icon = ({show, dir})=>{
-    if (!show)
-        return null;
-    const classes = classnames('small_icon_mask', {sort_asc: dir==-1,
-        sort_desc: dir==1});
-    return <div className="sort_icon"><span className={classes}/></div>;
-};
-
 
 import {AutoSizer, Table, Column} from 'react-virtualized';
 export class Infinite_chrome_table extends Pure_component {
@@ -167,7 +149,8 @@ export class Infinite_chrome_table extends Pure_component {
             return <div className="chrome_td"></div>;
         return <Checkbox
           checked={this.props.selected_list.includes(props.rowData)}
-          on_change={()=>null}/>;
+          on_change={()=>null}
+        />;
     };
     toggle_all = ()=>{
         if (this.props.selected_all)
@@ -179,60 +162,63 @@ export class Infinite_chrome_table extends Pure_component {
         const rows = this.props.rows||[];
         const {class_name, toolbar} = this.props;
         return <div className="chrome">
-            <div className="main_panel vbox">
-              <Toolbar_container>
-                <Toolbar_row>
-                  <div className="title_wrapper">{this.props.title}</div>
-                </Toolbar_row>
-                {toolbar && <Toolbar_row>{toolbar}</Toolbar_row>}
-              </Toolbar_container>
-              <React.Fragment>
-                <div className={classnames('chrome_table vbox', class_name)}>
-                  <div className="tables_container header_container hack">
-                    <div className="chrome_table">
-                      <AutoSizer>
-                        {({height, width})=>
-                          <Table width={width}
-                            height={height}
-                            onRowClick={this.props.toggle}
-                            onHeaderClick={({dataKey})=>dataKey=='select' &&
-                              this.toggle_all()}
-                            gridClassName="chrome_grid"
-                            headerHeight={27}
-                            headerClassName="chrome_th"
-                            rowClassName="chrome_tr"
-                            rowHeight={22}
-                            rowCount={rows.length+1}
-                            rowGetter={({index})=>rows[index]||'filler'}>
-                            <Column key="select"
-                              cellRenderer={this.select_renderer.bind(this)}
-                              label={
-                                <Checkbox checked={this.props.selected_all}
-                                  on_change={()=>null}/>
-                              }
-                              dataKey="select"
+          <div className="main_panel vbox">
+            <Toolbar_container>
+              <Toolbar_row>
+                <div className="title_wrapper">{this.props.title}</div>
+              </Toolbar_row>
+              {toolbar && <Toolbar_row>{toolbar}</Toolbar_row>}
+            </Toolbar_container>
+            <React.Fragment>
+              <div className={classnames('chrome_table vbox', class_name)}>
+                <div className="tables_container header_container hack">
+                  <div className="chrome_table">
+                    <AutoSizer>
+                      {({height, width})=>
+                        <Table width={width}
+                          height={height}
+                          onRowClick={this.props.toggle}
+                          onHeaderClick={({dataKey})=>dataKey=='select' &&
+                            this.toggle_all()}
+                          gridClassName="chrome_grid"
+                          headerHeight={27}
+                          headerClassName="chrome_th"
+                          rowClassName="chrome_tr"
+                          rowHeight={22}
+                          rowCount={rows.length+1}
+                          rowGetter={({index})=>rows[index]||'filler'}>
+                          <Column key="select"
+                            cellRenderer={this.select_renderer.bind(this)}
+                            label={
+                              <Checkbox checked={this.props.selected_all}
+                                on_change={()=>null}
+                              />
+                            }
+                            dataKey="select"
+                            className="chrome_td"
+                            flexGrow={0}
+                            flexShrink={1}
+                            width={20}
+                          />
+                          {this.props.cols.map(col=>
+                            <Column key={col.id}
+                              cellRenderer={this.cell_renderer}
+                              label={col.title}
                               className="chrome_td"
-                              flexGrow={0}
-                              flexShrink={1}
-                              width={20}/>
-                            {this.props.cols.map(col=>
-                              <Column key={col.id}
-                                cellRenderer={this.cell_renderer}
-                                label={col.title}
-                                className="chrome_td"
-                                dataKey={col.id}
-                                flexGrow={1}
-                                width={100}/>
-                            )}
-                          </Table>
-                        }
-                      </AutoSizer>
-                    </div>
+                              dataKey={col.id}
+                              flexGrow={1}
+                              width={100}
+                            />
+                          )}
+                        </Table>
+                      }
+                    </AutoSizer>
                   </div>
                 </div>
-              </React.Fragment>
-            </div>
-          </div>;
+              </div>
+            </React.Fragment>
+          </div>
+        </div>;
     }
 }
 
@@ -242,45 +228,47 @@ export class Chrome_table extends Pure_component {
             selected_all, toggle_all} = this.props;
         const classes = classnames('chrome', 'chrome_table', class_name);
         return <div className={classes}>
-              <div className="main_panel vbox">
-                <Toolbar_container>
-                  <Toolbar_row>
-                    <div className="title_wrapper">{title}</div>
-                  </Toolbar_row>
-                </Toolbar_container>
-                <div className="tables_container vbox">
-                  <Header_container selectable={selectable}
-                    selected_all={selected_all} toggle_all={toggle_all}
-                    cols={cols}/>
-                  <Data_container selectable={selectable} cols={cols}>
-                    {children}
-                  </Data_container>
-                </div>
-              </div>
-            </div>;
+          <div className="main_panel vbox">
+            <Toolbar_container>
+              <Toolbar_row>
+                <div className="title_wrapper">{title}</div>
+              </Toolbar_row>
+            </Toolbar_container>
+            <div className="tables_container vbox">
+              <Header_container selectable={selectable}
+                selected_all={selected_all}
+                toggle_all={toggle_all}
+                cols={cols}
+              />
+              <Data_container selectable={selectable} cols={cols}>
+                {children}
+              </Data_container>
+            </div>
+          </div>
+        </div>;
     }
 }
 
 const Data_container = ({cols=[], children, selectable})=>{
     return <div className="data_container">
-          <table className="chrome_table">
-            <colgroup>
-              {selectable &&
-                <col key="select_all" style={{width: 20}}/>
-              }
-              {cols.map((c, idx)=>
-                <col key={idx} style={{width: c.width}}/>
-              )}
-            </colgroup>
-            <tbody>
-              {children}
-              <tr className="filler">
-                {selectable && <td key="select_filler"/>}
-                {cols.map(c=><td key={c.id}></td>)}
-              </tr>
-            </tbody>
-          </table>
-        </div>;
+      <table className="chrome_table">
+        <colgroup>
+          {selectable &&
+            <col key="select_all" style={{width: 20}}/>
+          }
+          {cols.map((c, idx)=>
+            <col key={idx} style={{width: c.width}}/>
+          )}
+        </colgroup>
+        <tbody>
+          {children}
+          <tr className="filler">
+            {selectable && <td key="select_filler"/>}
+            {cols.map(c=><td key={c.id}></td>)}
+          </tr>
+        </tbody>
+      </table>
+    </div>;
 };
 
 const Header_container = ({cols, selectable, selected_all, toggle_all})=>
@@ -318,5 +306,6 @@ export const Search_box = ({val, on_change})=>
       <input value={val}
         onChange={on_change}
         type="text"
-        placeholder="Filter"/>
+        placeholder="Filter"
+      />
     </div>;
