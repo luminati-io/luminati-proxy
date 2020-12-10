@@ -36,10 +36,10 @@ export const Tooltip_bytes = props=>{
         cost&&`(Estimated savings ${display_cost})` || '';
     const tooltip = `<div><strong>${bw}</strong> ${details}</div>`;
     return <Tooltip title={bytes ? tooltip : ''}>
-          <div className="disp_value">
-            {display_cost||bytes_format(bytes)||'—'}
-          </div>
-        </Tooltip>;
+      <div className="disp_value">
+        {display_cost||bytes_format(bytes)||'—'}
+      </div>
+    </Tooltip>;
 };
 
 export const Warnings = props=>
@@ -70,17 +70,18 @@ export class Warning extends Pure_component {
         if (this.state.dismissed)
             return null;
         const content = this.props.text||this.props.children;
-        return <Tooltip className="wide" title={this.props.tooltip}
-              placement="bottom">
-              <div className="warning">
-                <div className="warning_icon"/>
-                <div className="hbox">{content}</div>
-                {this.props.id &&
-                  <Toolbar_button tooltip="Dismiss" id="close_btn"
-                    placement="left" on_click={this.dismiss}/>
-                }
-              </div>
-            </Tooltip>;
+        return <Tooltip className="wide"
+          title={this.props.tooltip}
+          placement="bottom">
+          <div className="warning">
+            <div className="warning_icon"/>
+            <div className="hbox">{content}</div>
+            {this.props.id &&
+              <Toolbar_button tooltip="Dismiss" id="close_btn"
+                placement="left" on_click={this.dismiss}/>
+            }
+          </div>
+        </Tooltip>;
     }
 }
 
@@ -88,11 +89,11 @@ export const Loader = ({show})=>{
     if (!show)
         return null;
     return <div className="loader_wrapper">
-          <div className="mask"/>
-          <div className="loader">
-            <div className="spinner"/>
-          </div>
-        </div>;
+      <div className="mask"/>
+      <div className="loader">
+        <div className="spinner"/>
+      </div>
+    </div>;
 };
 
 export const Loader_small = props=>{
@@ -102,11 +103,11 @@ export const Loader_small = props=>{
     const msg = saving ? loading_msg : std_msg;
     const tooltip = saving ? '' : std_tooltip;
     return <div className="loader_small">
-          <div className={classnames('spinner', {show: saving})}/>
-          <div className={classnames('saving_label', {saving})}>
-            <Tooltip title={tooltip}>{msg}</Tooltip>
-          </div>
-        </div>;
+      <div className={classnames('spinner', {show: saving})}/>
+      <div className={classnames('saving_label', {saving})}>
+        <Tooltip title={tooltip}>{msg}</Tooltip>
+      </div>
+    </div>;
 };
 
 // XXX krzysztof: refactoring: reuse Copy_btn component
@@ -141,13 +142,13 @@ class Code extends Pure_component {
     render(){
         const {t} = this.props;
         return <code ref={this.set_ref.bind(this)}>
-              <span className="source">{this.props.children}</span>
-              <textarea style={{position: 'fixed', top: '-1000px'}}/>
-              <button onClick={this.copy.bind(this)} data-container="body"
-                className="btn btn_lpm btn_lpm_small btn_copy">
-                {t['Copy']}
-              </button>
-            </code>;
+          <span className="source">{this.props.children}</span>
+          <textarea style={{position: 'fixed', top: '-1000px'}}/>
+          <button onClick={this.copy.bind(this)} data-container="body"
+            className="btn btn_lpm btn_lpm_small btn_copy">
+            {t['Copy']}
+          </button>
+        </code>;
     }
 });
 
@@ -180,9 +181,12 @@ export const with_proxy_ports = Component=>{
         render(){
             if (!this.state.ports_loaded)
                 return <Loader show/>;
-            return <Component {...this.props} port_select={this.port_select}
-                  def_port={this.state.def_port} ports={this.state.ports}
-                  ports_opt={this.state.ports_opt}/>;
+            return <Component {...this.props}
+              port_select={this.port_select}
+              def_port={this.state.def_port}
+              ports={this.state.ports}
+              ports_opt={this.state.ports_opt}
+            />;
         }
     }
     return With_proxy_ports;
@@ -304,9 +308,9 @@ export class Cm_wrapper extends Pure_component {
     set_ref = ref=>{ this.textarea = ref; };
     render(){
         return <div className="code_mirror_wrapper">
-              <Copy_btn val={this.props.val}/>
-              <textarea ref={this.set_ref}/>
-            </div>;
+          <Copy_btn val={this.props.val}/>
+          <textarea ref={this.set_ref}/>
+        </div>;
     }
 }
 
@@ -320,12 +324,12 @@ export const Field_row_raw = ({disabled, note, animated, ...props})=>{
     const inner_classes = classnames('field_row_inner', props.inner_class_name,
         {animated});
     return <div className="field_row_wrapper">
-          <div className={classes}>
-            <div className={inner_classes} style={props.inner_style}>
-              {props.children}
-            </div>
-          </div>
-        </div>;
+      <div className={classes}>
+        <div className={inner_classes} style={props.inner_style}>
+          {props.children}
+        </div>
+      </div>
+    </div>;
 };
 
 export const Labeled_controller = props=>
@@ -356,9 +360,14 @@ export const Labeled_controller = props=>
 export const Checkbox = props=>
   <div className="form-check">
     <label className="form-check-label">
-      <input className="form-check-input" type="checkbox" value={props.value}
-        onChange={props.on_change} onClick={props.on_click}
-        checked={props.checked} readOnly={props.readonly}/>
+      <input className="form-check-input"
+        type="checkbox"
+        value={props.value}
+        onChange={props.on_change}
+        onClick={props.on_click}
+        checked={props.checked}
+        readOnly={props.readonly}
+      />
         {props.text}
     </label>
   </div>;
@@ -389,11 +398,11 @@ export const Link_icon = props=>{
             style={{backgroundImage: `url(${img})`}}></div>
         : <i className={classnames('glyphicon', 'glyphicon-'+id)}/>;
     return <T>{t=><Tooltip title={t(tooltip)} key={id}>
-          <span className={classnames('link', 'icon_link', classes)}
-            onClick={on_click}>
-            {icon}
-          </span>
-        </Tooltip>}</T>;
+      <span className={classnames('link', 'icon_link', classes)}
+        onClick={on_click}>
+        {icon}
+      </span>
+    </Tooltip>}</T>;
 };
 
 export const Add_icon = ({click, tooltip})=>
@@ -417,13 +426,13 @@ export const Logo = with_www_api(class Logo extends Pure_component {
     }
     render(){
         return <div className="nav_top">
-              <a href={`${this.props.www_api}/cp`} rel="noopener noreferrer"
-                target="_blank" className="logo_big"/>
-              <div className="version">V{this.state.ver}</div>
-              <div className="nav_top_right">
-                <Language/>
-              </div>
-            </div>;
+          <a href={`${this.props.www_api}/cp`} rel="noopener noreferrer"
+            target="_blank" className="logo_big"/>
+          <div className="version">V{this.state.ver}</div>
+          <div className="nav_top_right">
+            <Language/>
+          </div>
+        </div>;
     }
 });
 
@@ -438,11 +447,11 @@ export const any_flag = <T>{t=>
 
 export const flag_with_title = (country, title)=>{
     return <Tooltip title={country.toUpperCase()}>
-          <span>
-            <span className={'flag-icon flag-icon-'+country}/>
-            <span className="lit">{title}</span>
-          </span>
-        </Tooltip>;
+      <span>
+        <span className={'flag-icon flag-icon-'+country}/>
+        <span className="lit">{title}</span>
+      </span>
+    </Tooltip>;
 };
 
 export const Preset_description = ({preset, rule_clicked})=>{
@@ -456,7 +465,9 @@ export const Preset_description = ({preset, rule_clicked})=>{
 export const Ext_tooltip = with_www_api(props=>
     <div>
       This feature is only available when using{' '}
-        <a className="link" target="_blank" rel="noopener noreferrer"
+        <a className="link"
+          target="_blank"
+          rel="noopener noreferrer"
           href={`${props.www_api}/cp/zones`}>
             proxies by Luminati network
         </a>
@@ -484,11 +495,11 @@ export const No_zones = with_www_api(class No_zones extends Pure_component {
             {target: '_blank', rel: 'noopener noreferrer',
                 href: `${this.props.www_api}/cp/zones`};
         return <div>
-              <div className="no_zones">
-                <T>No active zones found. You can activate them</T>{' '}
-                <a className="link" {...link_props}><T>here</T></a>.
-              </div>
-            </div>;
+          <div className="no_zones">
+            <T>No active zones found. You can activate them</T>{' '}
+            <a className="link" {...link_props}><T>here</T></a>.
+          </div>
+        </div>;
     }
 });
 

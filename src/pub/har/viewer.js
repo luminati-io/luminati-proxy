@@ -8,21 +8,950 @@ import classnames from 'classnames';
 import {Route, withRouter, Link} from 'react-router-dom';
 import React_tooltip from 'react-tooltip';
 import {Waypoint} from 'react-waypoint';
+import codemirror from 'codemirror/lib/codemirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/htmlmixed/htmlmixed';
 import Pure_component from '/www/util/pub/pure_component.js';
 import etask from '../../../util/etask.js';
+import zutil from '../../../util/util.js';
 import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
 import zescape from '../../../util/escape.js';
-import zutil from '../../../util/util.js';
-import {status_codes, bytes_format, get_troubleshoot} from '../util.js';
-import {Toolbar_button, with_resizable_cols,
-    Toolbar_container, Toolbar_row, Search_box} from '../chrome_widgets.js';
-import {T} from '../common/i18n.js';
+import {bytes_format} from '../util.js';
+import {Toolbar_button} from '../chrome_widgets.js';
 import {Tooltip_bytes} from '../common.js';
 import Tooltip from '../common/tooltip.js';
 import ws from '../ws.js';
-import './css/viewer.less';
-import Preview from './req_preview.js';
+import {trigger_types, action_types} from '../../../util/rules_util.js';
+import {Copy_btn} from '../common.js';
+import './viewer.less';
+
+export class Preview extends Pure_component {
+    panes = [
+        {id: 'headers', width: 65, comp: Pane_headers},
+        {id: 'preview', width: 63, comp: Pane_preview},
+        {id: 'response', width: 72, comp: Pane_response},
+        {id: 'timing', width: 57, comp: Pane_timing},
+        {id: 'rules', width: 50, comp: Pane_rules},
+        {id: 'troubleshooting', width: 110, comp: Pane_troubleshoot},
+    ];
+    state = {cur_pane: 0};
+    select_pane = id=>{ this.setState({cur_pane: id}); };
+    componentDidMount(){
+        this.setdb_on('har_viewer.set_pane', pane=>{
+            if (pane===undefined)
+                return;
+            this.setState({cur_pane: pane});
+        });
+    }
+    render(){
+        if (!this.props.cur_preview)
+            return null;
+        const Pane_content = this.panes[this.state.cur_pane].comp;
+        const req = this.props.cur_preview;
+        return <div style={this.props.style} className="har_preview chrome">
+              <div className="tabbed_pane_header">
+                <div className="left_pane">
+                  <div onClick={this.props.close}
+                    className="close_btn_wrapper">
+                    <div className="small_icon close_btn"/>
+                    <div className="medium_icon close_btn_h"/>
+                  </div>
+                </div>
+                <div className="right_panes">
+                  {this.panes.map((p, idx)=>
+                    <Pane key={p.id}
+                      width={p.width}
+                      id={p.id}
+                      idx={idx}
+                      on_click={this.select_pane}
+                      active={this.state.cur_pane==idx}
+                    />
+                  )}
+                  <Pane_slider panes={this.panes}
+                    cur_pane={this.state.cur_pane}/>
+                </div>
+              </div>
+              <div className="tabbed_pane_content">
+                <Pane_content key={req.uuid} req={req}/>
+              </div>
+            </div>;
+    }
+}
+
+const Pane = ({id, idx, width, on_click, active})=>
+    <div onClick={()=>on_click(idx)} style={{width}}
+      className={classnames('pane', id, {active})}>
+      <span>{id}</span>
+    </div>;
+
+const Pane_slider = ({panes, cur_pane})=>{
+    const slider_class = classnames('pane_slider');
+    const offset = panes.slice(0, cur_pane).reduce((acc, e)=>acc+e.width, 0);
+    const slider_style = {
+        width: panes[cur_pane].width,
+        transform: `translateX(${offset+24}px)`,
+    };
+    return <div className={slider_class} style={slider_style}/>;
+};
+
+class Pane_headers extends Pure_component {
+    get_curl = ()=>{
+        const req = this.props.req;
+        const {username, password, super_proxy} = req.details;
+        const headers = req.request.headers.map(h=>`-H "${h.name}: `
+            +`${h.value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+        const proxy = super_proxy ?
+            '-x '+(username||'')+':'+(password||'')+'@'+super_proxy : '';
+        const url = '"'+req.request.url+'"';
+        return ['curl', proxy, '-X', req.request.method, url, ...headers]
+            .filter(Boolean).join(' ');
+    };
+    render(){
+        const req = this.props.req;
+        const general_entries = [
+            {name: 'Request URL', value: req.request.url},
+            {name: 'Request method', value: req.request.method},
+            {name: 'Status code', value: req.response.status},
+            {name: 'Super proxy IP', value: req.details.super_proxy},
+            {name: 'Peer proxy IP', value: req.details.proxy_peer},
+            {name: 'Username', value: req.details.username},
+            {name: 'Password', value: req.details.password},
+            {name: 'Sent from', value: req.details.remote_address},
+        ].filter(e=>e.value!==undefined);
+        return <React.Fragment>
+              <Copy_btn val={this.get_curl()}
+                title="Copy as cURL"
+                style={{position: 'absolute', right: 5, top: 5}}
+                inner_style={{width: 'auto'}}
+              />
+              <ol className="tree_outline">
+                <Preview_section title="General"
+                  pairs={general_entries}/>
+                <Preview_section title="Response headers"
+                  pairs={req.response.headers}/>
+                <Preview_section title="Request headers"
+                  pairs={req.request.headers}/>
+                <Body_section title="Request body"
+                  body={req.request.postData && req.request.postData.text}/>
+               </ol>
+             </React.Fragment>;
+    }
+}
+
+class Pane_response extends Pure_component {
+    render(){
+        const req = this.props.req;
+        const {port, content_type} = req.details;
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
+        if (!content_type||['xhr', 'css', 'js', 'font', 'html', 'other']
+            .includes(content_type))
+        {
+            return <Codemirror_wrapper req={req}/>;
+        }
+        return <No_response_data/>;
+    }
+}
+
+const Encrypted_response_data = withRouter(
+class Encrypted_response_data extends Pure_component {
+    goto_ssl = ()=>{
+        this.props.history.push({
+            pathname: `/proxy/${this.props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    render(){
+        return <Pane_info>
+          <div>This request is using SSL encryption.</div>
+          <div>
+            <span>You need to turn on </span>
+            <a className="link" onClick={this.goto_ssl}>
+              SSL analyzing</a>
+            <span> to read the response here.</span>
+          </div>
+        </Pane_info>;
+    }
+});
+
+const Pane_info = ({children})=>
+    <div className="empty_view">
+      <div className="block">{children}</div>
+    </div>;
+
+const No_response_data = ()=>
+    <div className="empty_view">
+      <div className="block">This request has no response data available.</div>
+    </div>;
+
+class Codemirror_wrapper extends Pure_component {
+    componentDidMount(){
+        this.cm = codemirror.fromTextArea(this.textarea, {
+            readOnly: true,
+            lineNumbers: true,
+        });
+        this.cm.setSize('100%', '100%');
+        let text = this.props.req.response.content.text||'';
+        try { text = JSON.stringify(JSON.parse(text), null, '\t'); }
+        catch(e){}
+        this.cm.doc.setValue(text);
+        this.set_ct();
+    }
+    componentDidUpdate(){
+        this.cm.doc.setValue(this.props.req.response.content.text||'');
+        this.set_ct();
+    }
+    set_ct(){
+        const content_type = this.props.req.details.content_type;
+        let mode;
+        if (!content_type||content_type=='xhr')
+            mode = 'javascript';
+        if (content_type=='html')
+            mode = 'htmlmixed';
+        this.cm.setOption('mode', mode);
+    }
+    set_textarea = ref=>{ this.textarea = ref; };
+    render(){
+        return <div className="codemirror_wrapper">
+          <textarea ref={this.set_textarea}/>
+        </div>;
+    }
+}
+
+class Body_section extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        if (!this.props.body)
+            return null;
+        let json;
+        let raw_body;
+        try { json = JSON.parse(this.props.body); }
+        catch(e){ raw_body = this.props.body; }
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {this.props.title}
+            </li>,
+            <ol key="ol"
+              className={classnames('children', {open: this.state.open})}>
+              {!!json && <JSON_viewer json={json}/>}
+              {!!raw_body && <Header_pair name="raw-data" value={raw_body}/>}
+            </ol>,
+        ];
+    }
+}
+
+class Preview_section extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        if (!this.props.pairs||!this.props.pairs.length)
+            return null;
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {this.props.title}
+              {!this.state.open ? ` (${this.props.pairs.length})` : ''}
+            </li>,
+            <ol key="ol"
+              className={classnames('children', {open: this.state.open})}>
+              {this.props.pairs.map(p=>
+                <Header_pair key={p.name} name={p.name} value={p.value}/>
+              )}
+            </ol>,
+        ];
+    }
+}
+
+const Header_pair = ({name, value})=>{
+    if (name=='Status code')
+        value = <Status_value value={value}/>;
+    return <li className="treeitem">
+      <div className="header_name">{name}: </div>
+      <div className="header_value">{value}</div>
+    </li>;
+};
+
+const Status_value = ({value})=>{
+    const info = value=='unknown';
+    const green = /2../.test(value);
+    const yellow = /3../.test(value);
+    const red = /(canceled)|([45]..)/.test(value);
+    const classes = classnames('small_icon', 'status', {
+        info, green, yellow, red});
+    return <div className="status_wrapper">
+      <div className={classes}/>{value}
+    </div>;
+};
+
+const Pane_rules = withRouter(class Pane_rules extends Pure_component {
+    goto_ssl = ()=>{
+        this.props.history.push({
+            pathname: `/proxy/${this.props.req.details.port}`,
+            state: {field: 'trigger_type'},
+        });
+    };
+    render(){
+        const {details: {rules}} = this.props.req;
+        if (!rules || !rules.length)
+        {
+            return <Pane_info>
+              <div>
+                <span>No rules have been triggered on this request. </span>
+                <a className="link" onClick={this.goto_ssl}>
+                  Configure Rules</a>
+              </div>
+            </Pane_info>;
+        }
+        return <div className="rules_view_wrapper">
+          <ol className="tree_outline">
+            {rules.map((r, idx)=>
+              <Rule_preview key={idx} rule={r} idx={idx+1}/>
+            )}
+          </ol>
+        </div>;
+    }
+});
+
+class Rule_preview extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        const {rule, idx} = this.props;
+        const children_classes = classnames('children', 'timeline',
+            {open: this.state.open});
+        const first_trigger = trigger_types.find(t=>rule[t.value])||{};
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {idx}. {first_trigger.key}
+            </li>,
+            <ol key="ol" className={children_classes}>
+              <Trigger_section rule={rule}/>
+              <Action_section actions={rule.action}/>
+            </ol>,
+        ];
+    }
+}
+
+const Trigger_section = ({rule})=>
+    <div className="trigger_section">
+      {trigger_types.map(t=><Trigger key={t.value} type={t} rule={rule}/>)}
+    </div>;
+
+const Trigger = ({type, rule})=>{
+    if (!rule[type.value])
+        return null;
+    return <div className="trigger">
+      {type.key}: {rule[type.value]}
+    </div>;
+};
+
+const Action_section = ({actions})=>
+    <div className="action_section">
+      {Object.keys(actions).map(a=>
+        <Action key={a} action={a} value={actions[a]}/>
+      )}
+    </div>;
+
+const Action = ({action, value})=>{
+    const key = (action_types.find(a=>a.value==action)||{}).key;
+    const val = action=='request_url' ? value&&value.url : value;
+    return <div className="action">
+      {key} {val ? `: ${val}` : ''}
+    </div>;
+};
+
+class Pane_troubleshoot extends Pure_component {
+    render(){
+        const response = this.props.req.response;
+        const troubleshoot = get_troubleshoot(response.content.text,
+            response.status, response.headers);
+        if (troubleshoot.title)
+        {
+            return <div className="timing_view_wrapper">
+              <ol className="tree_outline">
+                <li key="li" onClick={this.toggle}
+                  className="parent_title expandable open">
+                  {troubleshoot.title}
+                </li>
+                <ol>{troubleshoot.info}</ol>
+              </ol>
+            </div>;
+        }
+        return <Pane_info>
+          <div>There's not troubleshooting for this request.</div>
+        </Pane_info>;
+    }
+}
+
+class Pane_timing extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.recent_stats', stats=>this.setState({stats})); }
+    render(){
+        const {startedDateTime} = this.props.req;
+        const started_at = moment(new Date(startedDateTime)).format(
+            'YYYY-MM-DD HH:mm:ss');
+        return <div className="timing_view_wrapper">
+          <div className="timeline_info">Started at {started_at}</div>
+          <ol className="tree_outline">
+            {this.props.req.details.timeline.map((timeline, idx)=>
+              <Single_timeline key={idx} timeline={timeline}
+                time={this.props.req.time} req={this.props.req}/>
+            )}
+          </ol>
+          <div className="timeline_info total">
+            Total: {this.props.req.time} ms</div>
+          {this.props.req.request.url.endsWith('443') &&
+            this.state.stats && this.state.stats.ssl_enable &&
+            <Enable_https port={this.props.req.details.port}/>
+          }
+        </div>;
+    }
+}
+
+class Single_timeline extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        const sections = ['Resource Scheduling', 'Request/Response'];
+        const perc = [
+            {label: 'Queueing', id: 'blocked', section: 0},
+            {label: 'Connected', id: 'wait', section: 1},
+            {label: 'Time to first byte', id: 'ttfb', section: 1},
+            {label: 'Response', id: 'receive', section: 1},
+        ].reduce((acc, el)=>{
+            const cur_time = this.props.timeline[el.id];
+            const left = acc.offset;
+            const dur = Number((cur_time/this.props.time).toFixed(4));
+            const right = 1-acc.offset-dur;
+            return {offset: acc.offset+dur, data: [...acc.data,
+                {...el, left: `${left*100}%`, right: `${right*100}%`}]};
+        }, {offset: 0, data: []}).data
+        .reduce((acc, el)=>{
+            if (el.section!=acc.last_section)
+                return {last_section: el.section, data: [...acc.data, [el]]};
+            return {
+                last_section: el.section,
+                data: [
+                    ...acc.data.slice(0, -1),
+                    [...acc.data.slice(-1)[0], el],
+                ],
+            };
+        }, {last_section: -1, data: []}).data;
+        const children_classes = classnames('children', 'timeline',
+            {open: this.state.open});
+        const {timeline} = this.props;
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {timeline.port}
+            </li>,
+            <ol key="ol" className={children_classes}>
+              <table>
+                <colgroup>
+                  <col className="labels"/>
+                  <col className="bars"/>
+                  <col className="duration"/>
+                </colgroup>
+                <tbody>
+                  {perc.map((s, i)=>
+                    <Timing_header key={i} title={sections[s[0].section]}>
+                    {s.map(p=>
+                      <Timing_row title={p.label} id={p.id} left={p.left}
+                        key={p.id} right={p.right}
+                        time={this.props.timeline[p.id]}/>
+                      )}
+                    </Timing_header>
+                  )}
+                </tbody>
+              </table>
+            </ol>,
+        ];
+    }
+}
+
+const Timing_header = ({title, children})=>[
+    <tr key="timing_header" className="table_header">
+      <td>{title}</td>
+      <td></td>
+      <td>TIME</td>
+    </tr>,
+    ...children,
+];
+
+const Timing_row = ({title, id, left, right, time})=>
+    <tr className="timing_row">
+      <td>{title}</td>
+      <td>
+        <div className="timing_bar_wrapper">
+          <span className={classnames('timing_bar', id)} style={{left, right}}>
+            &#8203;</span>
+        </div>
+      </td>
+      <td><div className="timing_bar_title">{time} ms</div></td>
+    </tr>;
+
+const Enable_https = withRouter(props=>{
+    const click = ()=>{
+        props.history.push({
+            pathname: `/proxy/${props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    return <div className="footer_link">
+      <a className="devtools_link" role="link" tabIndex="0"
+        target="_blank" rel="noopener noreferrer"
+        onClick={click}
+        style={{display: 'inline', cursor: 'pointer'}}>
+        Enable HTTPS logging
+      </a> to view this timeline
+    </div>;
+});
+
+const is_json_str = str=>{
+    let resp;
+    try { resp = JSON.parse(str); }
+    catch(e){ return false; }
+    return resp;
+};
+
+class Pane_preview extends Pure_component {
+    render(){
+        const content_type = this.props.req.details.content_type;
+        const text = this.props.req.response.content.text;
+        const port = this.props.req.details.port;
+        let json;
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
+        if (content_type=='xhr' && (json = is_json_str(text)))
+            return <JSON_viewer json={json}/>;
+        if (content_type=='img')
+            return <Img_viewer img={this.props.req.request.url}/>;
+        if (content_type=='html')
+            return <Codemirror_wrapper req={this.props.req}/>;
+        return <div className="pane_preview"></div>;
+    }
+}
+
+const Img_viewer = ({img})=>
+    <div className="img_viewer">
+      <div className="image">
+        <img src={img}/>
+      </div>
+    </div>;
+
+const has_children = o=>!!o && typeof o=='object' && Object.keys(o).length;
+
+const JSON_viewer = ({json})=>
+    <div className="json_viewer">
+      <ol className="tree_root">
+        <Pair open val={json}/>
+      </ol>
+    </div>;
+
+const Children = ({val, expanded})=>{
+    if (has_children(val) && expanded)
+    {
+        return <ol className="tree_children">
+          {Object.entries(val).map(e=>
+            <Pair key={e[0]} label={e[0]} val={e[1]}/>
+          )}
+        </ol>;
+    }
+    return null;
+};
+
+class Pair extends React.PureComponent {
+    state = {expanded: this.props.open};
+    toggle = ()=>{ this.setState(prev=>({expanded: !prev.expanded})); };
+    render(){
+        const {label, val} = this.props;
+        return [
+            <Tree_item
+              expanded={this.state.expanded}
+              label={label}
+              val={val}
+              toggle={this.toggle}
+              key="tree_item"/>,
+            <Children val={val} expanded={this.state.expanded} key="val"/>,
+        ];
+    }
+}
+
+const Tree_item = ({label, val, expanded, toggle})=>{
+    const classes = classnames('tree_item', {
+        parent: has_children(val),
+        expanded,
+    });
+    return <li className={classes} onClick={toggle}>
+          {label ? [
+            <span key="name" className="name">{label}</span>,
+            <span key="separator" className="separator">: </span>
+          ] : null}
+          <Value val={val} expanded={expanded}/>
+        </li>;
+};
+
+const Value = ({val})=>{
+    if (typeof val=='object')
+        return <Value_object val={val}/>;
+    else if (typeof val=='number')
+        return <span className="value number">{val}</span>;
+    else if (typeof val=='boolean')
+        return <span className="value boolean">{val.toString()}</span>;
+    else if (typeof val=='string')
+        return <span className="value string">"{val}"</span>;
+    else if (typeof val=='undefined')
+        return <span className="value undefined">"{val}"</span>;
+    else if (typeof val=='function')
+        return null;
+};
+
+const Value_object = ({val})=>{
+    if (val===null)
+        return <span className="value null">null</span>;
+    if (Array.isArray(val))
+    {
+        if (!val.length)
+            return <span className="value array empty">[]</span>;
+        return <span className="value array long">[,...]</span>;
+    }
+    if (!Object.keys(val).length)
+        return <span className="value object empty">{'{}'}</span>;
+    return <span className="value object">{JSON.stringify(val)}</span>;
+};
+
+const error_desc = [
+    // proxy.js
+    {
+        regex: /Bad Port. Ports we support/,
+        description: <span/>,
+    },
+    {
+        regex: /We do not have IPs in the city you requested/,
+        description: <span/>,
+    },
+    {
+        regex: /Request is not allowed from peers and sent from super proxy/,
+        description: <span/>,
+    },
+    {
+        regex: /You tried to target .* but got blocked/,
+        description: <span/>,
+    },
+    {
+        regex: /request needs to be made using residential network/,
+        description: <span/>,
+    },
+    {
+        regex: /target site requires special permission/,
+        description: <span/>,
+    },
+    {
+        regex: /target site requires exclusive domains permission/,
+        description: <span/>,
+    },
+    {
+        regex: /Forbidden Host/,
+        description: <span/>,
+    },
+    {
+        regex: /Forbidden auth key ipv6/,
+        description: <span/>,
+    },
+    {
+        regex: /Zone has reached its usage limit/,
+        description: <span/>,
+    },
+    {
+        regex: /Request rate too high/,
+        description: <span/>,
+    },
+    {
+        regex: /Host is blocked in requested country/,
+        description: <span/>,
+    },
+    {
+        regex: /Zone has reached its usage limit/,
+        description: <span/>,
+    },
+    // agent_conn.js find_reasons
+    {
+        regex: /No peers available/,
+        description: <span/>,
+    },
+    {
+        regex: /not matching any of allocated gIPs/,
+        description: <span>This error means that the chosen targeting could
+            not be applied on any of the allocated gIPs. Go to the
+            <b>Targeting</b> tab and remove the selected criteria and try
+            again
+        </span>,
+    },
+    {
+        regex: /Zone wrong status/,
+        description: <span/>,
+    },
+    {
+        regex: /Internal server error/,
+        description: <span/>,
+    },
+    {
+        regex: /Wrong city/,
+        description: <span/>,
+    },
+    {
+        regex: /No matching fallback IP/,
+        description: <span/>,
+    },
+    // zone_util.js disabled_reasons_names
+    {
+        regex: /Wrong customer name/,
+        description: <span/>,
+    },
+    {
+        regex: /Customer suspended/,
+        description: <span/>,
+    },
+    {
+        regex: /Customer disabled/,
+        description: <span/>,
+    },
+    {
+        regex: /IP forbidden/,
+        description: <span/>,
+    },
+    {
+        regex: /Wrong password/,
+        description: <span/>,
+    },
+    {
+        regex: /Zone not found/,
+        description: <span/>,
+    },
+    {
+        regex: /No passwords/,
+        description: <span/>,
+    },
+    {
+        regex: /No IPs/,
+        description: <span/>,
+    },
+    {
+        regex: /Usage limit reached/,
+        description: <span/>,
+    },
+    {
+        regex: /No plan/,
+        description: <span/>,
+    },
+    {
+        regex: /Plan disabled/,
+        description: <span/>,
+    },
+    // other errors
+    {
+        regex: /socket hang up/,
+        description: <span/>,
+    },
+    {
+        regex: /Could not resolve host/,
+        description: <span/>,
+    },
+    {
+        regex: /ECONNREFUSED/,
+        description: <span/>,
+    },
+    {
+        regex: /EADDRINUSE/,
+        description: <span/>,
+    },
+    {
+        regex: /ENETUNREACH/,
+        description: <span/>,
+    }
+];
+
+const get_troubleshoot = (body, status_code, headers)=>{
+    let title;
+    let info;
+    headers = headers||[];
+    if (/([123]..|404)/.test(status_code))
+        return {title, info};
+    if (status_code=='canceled')
+    {
+        return {title: 'canceled by the sender', info: 'This request has been'
+            +' canceled by the sender (your browser or scraper).'};
+    }
+    title = (headers.find(h=>
+        h.name=='x-luminati-error'||h.name=='x-lpm-error')||{}).value||'';
+    for (let {regex, description} of error_desc)
+    {
+        if (regex.test(title))
+            return {title, info: description};
+    }
+    if (title)
+    {
+        let lpm = (headers.find(h=>h.name=='x-lpm-error')||{}).value||'';
+        let lum = (headers.find(h=>h.name=='x-luminati-error')||{}).value||'';
+        undescribed_error({status_code, title, lpm, lum});
+    }
+    return {title, info: ''};
+};
+
+const undescribed_error = (()=>{
+    let executed;
+    return message=>{
+        if (executed)
+            return;
+        executed = true;
+    };
+})();
+
+const with_resizable_cols = (cols, Table)=>{
+    class Resizable extends React.PureComponent {
+        state = {};
+        cols = zutil.clone_deep(cols);
+        min_width = 22;
+        moving_col = null;
+        style = {position: 'relative', display: 'flex', flex: 'auto',
+            width: '100%'};
+        componentDidMount(){
+            this.resize_columns();
+            window.document.addEventListener('mousemove', this.on_mouse_move);
+            window.document.addEventListener('mouseup', this.on_mouse_up);
+        }
+        componentWillUnmount(){
+            window.document.removeEventListener('mousemove',
+                this.on_mouse_move);
+            window.document.removeEventListener('mouseup', this.on_mouse_up);
+        }
+        set_ref = ref=>{ this.ref = ref; };
+        resize_columns = ()=>{
+            const total_width = this.ref.offsetWidth;
+            const resizable_cols = this.cols.filter(c=>!c.hidden&&!c.fixed);
+            const total_fixed = this.cols.reduce((acc, c)=>
+                acc+(!c.hidden&&c.fixed||0), 0);
+            const width = (total_width-total_fixed)/resizable_cols.length;
+            const next_cols = this.cols.reduce((acc, c, idx)=>{
+                const w = !c.fixed&&width||!c.hidden&&c.fixed||0;
+                return {
+                    cols: [...acc.cols, {
+                        ...c,
+                        width: w,
+                        offset: acc.offset,
+                        border: acc.border,
+                    }],
+                    offset: acc.offset+w,
+                    border: !!w,
+                };
+            }, {cols: [], offset: 0, border: true});
+            this.setState({cols: next_cols.cols});
+        };
+        start_moving = (e, idx)=>{
+            if (e.nativeEvent.which!=1)
+                return;
+            this.start_offset = e.pageX;
+            this.start_width = this.state.cols[idx].width;
+            this.start_width_last = this.state.cols.slice(-1)[0].width;
+            this.moving_col = idx;
+            this.setState({moving: true});
+        };
+        on_mouse_move = e=>{
+            if (this.moving_col===null)
+                return;
+            this.setState(prev=>{
+                let offset = e.pageX-this.start_offset;
+                if (this.start_width_last-offset<this.min_width)
+                    offset = this.start_width_last-this.min_width;
+                if (this.start_width+offset<this.min_width)
+                    offset = this.min_width-this.start_width;
+                let total_width = 0;
+                const next_cols = prev.cols.map((c, idx)=>{
+                    if (idx<this.moving_col)
+                    {
+                        total_width = total_width+c.width;
+                        return c;
+                    }
+                    else if (idx==this.moving_col)
+                    {
+                        const width = this.start_width+offset;
+                        total_width = total_width+width;
+                        return {...c, width, offset: total_width-width};
+                    }
+                    else if (idx==this.state.cols.length-1)
+                    {
+                        const width = this.start_width_last-offset;
+                        return {...c, width, offset: total_width};
+                    }
+                    total_width = total_width+c.width;
+                    return {...c, offset: total_width-c.width};
+                });
+                return {cols: next_cols};
+            });
+        };
+        on_mouse_up = ()=>{
+            this.moving_col = null;
+            this.setState({moving: false});
+        };
+        render(){
+            const style = Object.assign({}, this.style, this.props.style||{});
+            return <div style={style} ref={this.set_ref}
+              className={classnames({moving: this.state.moving})}>
+              <Table {...this.props}
+                cols={this.state.cols}
+                resize_columns={this.resize_columns}
+              />
+              <Grid_resizers show={!this.props.cur_preview}
+                start_moving={this.start_moving}
+                cols={this.state.cols}
+              />
+            </div>;
+        }
+    }
+    return Resizable;
+};
+
+const Grid_resizers = ({cols, start_moving, show})=>{
+    if (!show||!cols)
+        return null;
+    return <div>
+      {cols.slice(0, -1).map((c, idx)=>
+        !c.fixed &&
+          <div key={c.title||idx} style={{left: c.width+c.offset-2}}
+            onMouseDown={e=>start_moving(e, idx)}
+            className="data_grid_resizer"/>
+      )}
+    </div>;
+};
+
+const Search_box = ({val, on_change})=>
+    <div className="search_box">
+      <input value={val}
+        onChange={on_change}
+        type="text"
+        placeholder="Filter"
+      />
+    </div>;
+
+const Toolbar_row = ({children})=>
+    <div className="toolbar">
+      {children}
+    </div>;
+
+const Toolbar_container = ({children})=>
+    <div className="toolbar_container">
+      {children}
+    </div>;
 
 const Sort_icon = ({show, dir})=>{
     if (!show)
@@ -55,7 +984,7 @@ const enable_ssl_click = port=>etask(function*(){
     setdb.set('head.proxies_running', proxies);
 });
 
-class Har_viewer extends Pure_component {
+export class Har_viewer extends Pure_component {
     moving_width = false;
     min_width = 50;
     state = {
@@ -236,32 +1165,32 @@ class Toolbar extends Pure_component {
     };
     render(){
         return <Toolbar_container>
-          <T>{t=><Toolbar_row>
+          <Toolbar_row>
             <Toolbar_button id="clear"
-              tooltip={t('Clear')}
+              tooltip="Clear"
               on_click={this.props.clear}
             />
             {!this.props.dock_mode &&
               <Toolbar_button id="docker"
                 on_click={this.props.undock}
-                tooltip={t('Undock into separate window')}
+                tooltip="Undock into separate window"
               />
             }
             <Toolbar_button id="filters"
-              tooltip={t('Show/hide filters')}
+              tooltip="Show/hide filters"
               on_click={this.toggle_filters}
               active={this.state.filters_visible}
             />
             <Toolbar_button id="download"
-              tooltip={t('Export as HAR file')}
+              tooltip="Export as HAR file"
               href="/api/logs_har"
             />
             <Toolbar_button id="close_btn"
-              tooltip={t('Disable')}
+              tooltip="Disable"
               placement="left"
               on_click={this.disable_logs}
             />
-          </Toolbar_row>}</T>
+          </Toolbar_row>
           {this.state.filters_visible &&
             <Toolbar_row>
               <Search_box val={this.props.search_val}
@@ -667,11 +1596,11 @@ class Summary_bar extends Pure_component {
             {total: 0, sum_in: 0, sum_out: 0};
         sum_out = bytes_format(sum_out)||'0 B';
         sum_in = bytes_format(sum_in)||'0 B';
-        const txt = t=>`${total} ${t('requests')} | ${sum_out} ${t('sent')} `
-            +`| ${sum_in} ${t('received')}`;
+        const txt = `${total} requests | ${sum_out} sent `
+            +`| ${sum_in} received`;
         return <div className="summary_bar">
           <span>
-            <T>{t=><Tooltip title={txt(t)}>{txt(t)}</Tooltip>}</T>
+            <Tooltip title={txt}>{txt}</Tooltip>
           </span>
         </div>;
     }
@@ -699,16 +1628,14 @@ class Header_container extends Pure_component {
             <tbody>
               <tr>
                 {cols.map(c=>
-                  <T key={c.title}>{t=>
-                    <Tooltip title={t(c.tooltip||c.title)}>
-                      <th key={c.title} onClick={()=>this.click(c)}
-                        style={{textAlign: only_name ? 'left' : null}}>
-                        <div>{t(c.title)}</div>
-                        <Sort_icon show={c.sort_by==sorted.field}
-                          dir={sorted.dir}/>
-                      </th>
-                    </Tooltip>
-                  }</T>
+                  <Tooltip key={c.title} title={c.tooltip||c.title}>
+                    <th key={c.title} onClick={()=>this.click(c)}
+                      style={{textAlign: only_name ? 'left' : null}}>
+                      <div>{c.title}</div>
+                      <Sort_icon show={c.sort_by==sorted.field}
+                        dir={sorted.dir}/>
+                    </th>
+                  </Tooltip>
                 )}
               </tr>
             </tbody>
@@ -844,13 +1771,17 @@ class Cell_value extends React.Component {
             return <Name_cell req={req} timeline={timeline} rules={rules}/>;
         else if (col=='Status')
         {
-            return <Status_code_cell status={req.response.status}
-                  pending={!!req.pending} uuid={req.uuid} req={req}/>;
+            return <Status_code_cell req={req}
+              status={req.response.status}
+              status_text={req.response.statusText}
+              pending={!!req.pending}
+              uuid={req.uuid}
+            />;
         }
         else if (col=='Proxy port')
             return <Tooltip_and_value val={req.details.port}/>;
         else if (col=='Bandwidth')
-            return <Tooltip_bytes chrome_style bytes={req.details.bw}/>;
+            return <Tooltip_bytes bytes={req.details.bw}/>;
         else if (col=='Time')
         {
             return <Time_cell time={req.time} url={req.request.url}
@@ -921,13 +1852,13 @@ class Name_cell extends Pure_component {
 }
 
 const Status_code_cell = maybe_pending(props=>{
-    const {status, uuid, req} = props;
+    const {status, status_text, uuid, req} = props;
     const get_desc = ()=>{
         const err_header = req.response.headers.find(
             r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
         if (status==502 && err_header)
             return err_header.value;
-        return status=='canceled' ? '' : status_codes[status];
+        return status=='canceled' ? '' : status_text;
     };
     if (status=='unknown')
     {
@@ -946,7 +1877,7 @@ const Time_cell = maybe_pending(props=>{
     const {port, time, url, uuid} = props;
     if (!url.endsWith(':443') || !time)
         return <Tooltip_and_value val={time && time+' ms'}/>;
-    return <Encrypted_cell name="Timing" id={`t${uuid}`} port={port}/>;
+    return <Encrypted_cell name="Timing" id={uuid} port={port}/>;
 });
 
 class Encrypted_cell extends Pure_component {
@@ -1012,4 +1943,3 @@ const Tooltip_and_value = maybe_pending(({val, tip})=>
     </Tooltip>
 );
 
-export default Har_viewer;

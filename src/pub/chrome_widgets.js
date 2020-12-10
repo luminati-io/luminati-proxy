@@ -7,7 +7,6 @@ import Tooltip from './common/tooltip.js';
 import {Checkbox} from './common.js';
 import './css/chrome_widgets.less';
 import {T} from './common/i18n.js';
-import zutil from '../../util/util.js';
 
 export const Toolbar_button = ({id, tooltip, active, href, placement,
     ...props})=>
@@ -18,123 +17,6 @@ export const Toolbar_button = ({id, tooltip, active, href, placement,
         {props.children}
       </a>
     </Tooltip>;
-
-export const with_resizable_cols = (cols, Table)=>{
-    class Resizable extends Pure_component {
-        state = {};
-        cols = zutil.clone_deep(cols);
-        min_width = 22;
-        moving_col = null;
-        style = {position: 'relative', display: 'flex', flex: 'auto',
-            width: '100%'};
-        componentDidMount(){
-            this.resize_columns();
-            window.document.addEventListener('mousemove', this.on_mouse_move);
-            window.document.addEventListener('mouseup', this.on_mouse_up);
-        }
-        willUnmount(){
-            window.document.removeEventListener('mousemove',
-                this.on_mouse_move);
-            window.document.removeEventListener('mouseup', this.on_mouse_up);
-        }
-        set_ref = ref=>{ this.ref = ref; };
-        resize_columns = ()=>{
-            const total_width = this.ref.offsetWidth;
-            const resizable_cols = this.cols.filter(c=>!c.hidden&&!c.fixed);
-            const total_fixed = this.cols.reduce((acc, c)=>
-                acc+(!c.hidden&&c.fixed||0), 0);
-            const width = (total_width-total_fixed)/resizable_cols.length;
-            const next_cols = this.cols.reduce((acc, c, idx)=>{
-                const w = !c.fixed&&width||!c.hidden&&c.fixed||0;
-                return {
-                    cols: [...acc.cols, {
-                        ...c,
-                        width: w,
-                        offset: acc.offset,
-                        border: acc.border,
-                    }],
-                    offset: acc.offset+w,
-                    border: !!w,
-                };
-            }, {cols: [], offset: 0, border: true});
-            this.setState({cols: next_cols.cols});
-        };
-        start_moving = (e, idx)=>{
-            if (e.nativeEvent.which!=1)
-                return;
-            this.start_offset = e.pageX;
-            this.start_width = this.state.cols[idx].width;
-            this.start_width_last = this.state.cols.slice(-1)[0].width;
-            this.moving_col = idx;
-            this.setState({moving: true});
-        };
-        on_mouse_move = e=>{
-            if (this.moving_col===null)
-                return;
-            this.setState(prev=>{
-                let offset = e.pageX-this.start_offset;
-                if (this.start_width_last-offset<this.min_width)
-                    offset = this.start_width_last-this.min_width;
-                if (this.start_width+offset<this.min_width)
-                    offset = this.min_width-this.start_width;
-                let total_width = 0;
-                const next_cols = prev.cols.map((c, idx)=>{
-                    if (idx<this.moving_col)
-                    {
-                        total_width = total_width+c.width;
-                        return c;
-                    }
-                    else if (idx==this.moving_col)
-                    {
-                        const width = this.start_width+offset;
-                        total_width = total_width+width;
-                        return {...c, width, offset: total_width-width};
-                    }
-                    else if (idx==this.state.cols.length-1)
-                    {
-                        const width = this.start_width_last-offset;
-                        return {...c, width, offset: total_width};
-                    }
-                    total_width = total_width+c.width;
-                    return {...c, offset: total_width-c.width};
-                });
-                return {cols: next_cols};
-            });
-        };
-        on_mouse_up = ()=>{
-            this.moving_col = null;
-            this.setState({moving: false});
-        };
-        render(){
-            const style = Object.assign({}, this.style, this.props.style||{});
-            return <div style={style} ref={this.set_ref}
-              className={classnames({moving: this.state.moving})}>
-              <Table {...this.props}
-                cols={this.state.cols}
-                resize_columns={this.resize_columns}
-              />
-              <Grid_resizers show={!this.props.cur_preview}
-                start_moving={this.start_moving}
-                cols={this.state.cols}
-              />
-            </div>;
-        }
-    }
-    return Resizable;
-};
-
-const Grid_resizers = ({cols, start_moving, show})=>{
-    if (!show||!cols)
-        return null;
-    return <div>
-      {cols.slice(0, -1).map((c, idx)=>
-        !c.fixed &&
-          <div key={c.title||idx} style={{left: c.width+c.offset-2}}
-            onMouseDown={e=>start_moving(e, idx)}
-            className="data_grid_resizer"/>
-      )}
-    </div>;
-};
 
 import {AutoSizer, Table, Column} from 'react-virtualized';
 export class Infinite_chrome_table extends Pure_component {

@@ -11,6 +11,7 @@ import 'flag-icon-css/css/flag-icon.css';
 import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import etask from '../../util/etask.js';
 import zurl from '../../util/url.js';
 import './css/app.less';
 import Proxy_edit from './proxy_edit/index.js';
@@ -85,54 +86,64 @@ const App = withRouter(class App extends Pure_component {
             });
         });
     }
-    load_data = ()=>{
-        this.etask(function*(){
+    load_data = ()=>this.etask(function*(){
+        const errors = [];
+        const err_handler = msg=>etask.fn(function*(e){
+            errors.push(`${msg}: ${e.message}`);
+            yield report_exception(e, 'app.App.componentDidMount.load_data');
+        });
+        this.spawn(etask(function*(){
+            this.on('uncaught', err_handler('Error fetching locations'));
             const locations = yield ajax.json({url: '/api/all_locations'});
             locations.countries_by_code = locations.countries
             .reduce((acc, e)=>({...acc, [e.country_id]: e.country_name}), {});
             setdb.set('head.locations', locations);
-        });
-        this.etask(function*(){
+        }));
+        this.spawn(etask(function*(){
+            this.on('uncaught', err_handler('Error fetching carriers'));
             const carriers = yield ajax.json({url: '/api/all_carriers'});
             setdb.set('head.carriers', carriers);
-        });
-        this.etask(function*(){
+        }));
+        etask(function*(){
             const settings = yield ajax.json({url: '/api/settings'});
             setdb.set('head.settings', settings);
         });
-        this.etask(function*(){
+        etask(function*(){
             const conn = yield ajax.json({url: '/api/conn'});
             setdb.set('head.conn', conn);
         });
-        this.etask(function*(){
+        etask(function*(){
             const version = yield ajax.json({url: '/api/last_version'});
             setdb.set('head.ver_last', version);
         });
-        this.etask(function*(){
+        etask(function*(){
             const defaults = yield ajax.json({url: '/api/defaults'});
             setdb.set('head.defaults', defaults);
         });
-        this.etask(function*(){
+        etask(function*(){
             const node = yield ajax.json({url: '/api/node_version'});
             setdb.set('head.ver_node', node);
         });
-        this.etask(function*(){
+        etask(function*(){
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             setdb.set('head.proxies_running', proxies);
         });
-        this.etask(function*(){
+        etask(function*(){
             const consts = yield ajax.json({url: '/api/consts'});
             setdb.set('head.consts', consts);
         });
-        this.etask(function*(){
+        etask(function*(){
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('ws.zones', zones);
         });
-        this.etask(function*(){
+        etask(function*(){
             const w = yield ajax.json({url: '/api/tls_warning'});
             setdb.set('ws.tls_warning', w);
         });
-    };
+        yield this.wait_child('all');
+        if (errors.length)
+            setdb.set('head.app_errors', errors);
+    });
     save_settings = settings=>{
       return this.etask(function*(){
           const raw = yield window.fetch('/api/settings', {

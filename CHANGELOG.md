@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.212.90 Stable
+- :bug: Fixed UI bugs on failing API endpoints
+
 ## 1.211.793 Stable
 - :sparkles: Optimization in proxy ports updates
 

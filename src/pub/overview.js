@@ -5,7 +5,7 @@ import {withRouter} from 'react-router-dom';
 import classNames from 'classnames';
 import Proxies from './proxies.js';
 import {Logs_context, Stats} from './stats.js';
-import Har_viewer from './har/viewer.js';
+import {Har_viewer} from './har/viewer.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {T} from './common/i18n.js';

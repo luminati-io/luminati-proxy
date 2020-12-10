@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.212.90",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed UI bugs on failing API endpoints"
+            }
+        ]
+    },
+    {
         "ver": "1.211.793",
         "type": "stable",
         "changes": [

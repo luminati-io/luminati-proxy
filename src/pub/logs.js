@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Har_viewer from './har/viewer.js';
+import {Har_viewer} from './har/viewer.js';
 import {withRouter} from 'react-router-dom';
 import zurl from '../../util/url.js';
 import Pure_component from '/www/util/pub/pure_component.js';

@@ -324,12 +324,8 @@
       "src/pub/css/tooltip.less",
       "src/pub/css/whitelist_ips.less",
       "src/pub/css/zone_desc.less",
-      "src/pub/har/css/json_viewer.less",
-      "src/pub/har/css/req_preview.less",
-      "src/pub/har/css/viewer.less",
-      "src/pub/har/json_viewer.js",
-      "src/pub/har/req_preview.js",
       "src/pub/har/viewer.js",
+      "src/pub/har/viewer.less",
       "src/pub/howto.js",
       "src/pub/index.html",
       "src/pub/instructions.js",
@@ -383,7 +379,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "e23c595086b5373bce302c08720d315b"
+    "md5": "b6a093a03cbf13c93a334128a2305641"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -418,5 +414,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.211.793"
+  "version": "1.212.90"
 }

@@ -10,7 +10,7 @@ import date from '../../util/date.js';
 import {Loader, Warnings, with_proxy_ports, Add_icon, No_zones,
     Remove_icon} from './common.js';
 import {Input} from './common/controls.js';
-import Preview from './har/req_preview.js';
+import {Preview} from './har/viewer.js';
 import Proxy_blank from './proxy_blank.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';

@@ -544,6 +544,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             height: window.innerHeight,
             open_delete_dialog: false,
             delete_proxies: [],
+            errors: [],
         };
         setdb.set('head.proxies.update', this.update);
     }
@@ -569,6 +570,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             this.setState({zones});
             return this.update();
+        });
+        this.setdb_on('head.app_errors', errors=>{
+            if ((errors||[]).length)
+                this.setState({errors});
         });
         this.timeout_id = window.setTimeout(this.req_status);
         this.update_window_dimensions();
@@ -783,6 +788,13 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     render(){
         let {proxies, visible_proxies, proxy_filter} = this.state;
         const cols = this.get_cols();
+        if (this.state.errors.length)
+        {
+            return this.state.errors.map(e=>
+                <div key={e} className="warning error settings-alert">
+                  {e}
+                </div>);
+        }
         if (!this.state.zones || !this.state.countries || !visible_proxies)
         {
             return <div className="proxies_panel">
