@@ -68,7 +68,8 @@ describe('manager', ()=>{
         Manager.prototype.set_current_country = ()=>null;
         Manager.prototype.check_conn = ()=>null;
         Manager.prototype.lpm_users_get = ()=>null;
-        Manager.prototype.init_lpm_f_ws = ()=>null;
+        Manager.prototype.init_ws_lpm_f = ()=>null;
+        Manager.prototype.init_ws_lpm_conn = ()=>null;
         Manager.prototype.get_lpm_conf = function(){
             this.lum_conf = {_defaults: {zones: {
                 static: {},

@@ -258,6 +258,8 @@
       "lib/locations.js",
       "lib/logger.js",
       "lib/loki.js",
+      "lib/lpm_conn.js",
+      "lib/lpm_f.js",
       "lib/manager.js",
       "lib/md5_util.js",
       "lib/migration.js",
@@ -379,7 +381,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "b6a093a03cbf13c93a334128a2305641"
+    "md5": "1acfea06928a5b9b56f868f87953059e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -414,5 +416,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.212.90"
+  "version": "1.212.374"
 }

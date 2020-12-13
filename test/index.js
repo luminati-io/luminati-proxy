@@ -605,6 +605,19 @@ describe('proxy', ()=>{
                     r.headers['x-lpm-authorization'].includes(`ip-${ip}`));
             }));
         });
+        describe('request details', ()=>{
+            const debug_headers = ['x-lpm-authorization', 'x-lpm-port'];
+            it('includes debug response headers', ()=>etask(function*(){
+                l = yield lum({debug: 'full'});
+                const r = yield l.test();
+                debug_headers.forEach(hdr=>assert.ok(r.headers[hdr]));
+            }));
+            it('excludes debug response headers', ()=>etask(function*(){
+                l = yield lum({debug: 'none'});
+                const r = yield l.test();
+                debug_headers.forEach(hdr=>assert.ok(!r.headers[hdr]));
+            }));
+        });
         describe('request country choice', ()=>{
             it('should use country sent in x-lpm-country header',
                 ()=>etask(function*(){

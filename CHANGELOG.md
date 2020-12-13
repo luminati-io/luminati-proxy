@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.212.374 Stable
+- :undefined: Skip x-lpm-port and x-lpm-authorization response headers when Request details option is disabled
+
 ## 1.212.90 Stable
 - :bug: Fixed UI bugs on failing API endpoints
 
