@@ -304,6 +304,44 @@ docker run luminati/luminati-proxy luminati --www_whitelist_ips "172.17.0.1" --s
 ```
 You can add many more options to this run.
 
+
+- To run with docker-compose do the following
+
+1. Create a directory `mkdir conf` 
+
+2. Create the `luminati.json` conf with `conf` folder configure the values as required.
+```sh
+{
+  "_defaults": {
+    "customer": "customer_name",
+    "lpm_token": "LPM_TOKEN",
+    "password": "LPM_PASSWORD",
+    "token_auth": "",
+    "version": "1.212.374",
+    "www_whitelist_ips": [
+      "0.0.0.0/0"
+    ]
+  },
+  "proxies": [
+    {
+      "port": 24000, 
+      "zone": "static"
+    },
+    {
+      "password": "PASSWORD_AT_PROXY_LEVEL",
+      "port": 24002, 
+      "zone": "zone1"
+    }
+  ],
+  "ts": "2020-12-17T06:16:23.555Z"
+}
+```
+3. Run the container 
+
+```sh
+docker-compose up -d
+```
+
 #### Docker with predefined config file
 To use lpm's config file, docker volumes can be used:
 https://docs.docker.com/storage/volumes/
