@@ -309,7 +309,7 @@ You can add many more options to this run.
 
 1. Create a directory `mkdir conf` 
 
-2. Create the `luminati.json` conf with `conf` folder configure the values as required.
+2. Create the `.luminati-docker-conf.json` conf with `conf` folder configure the values as required.
 ```sh
 {
   "_defaults": {
