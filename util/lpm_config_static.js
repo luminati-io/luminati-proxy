@@ -19,8 +19,8 @@ const conf = {
         'integer'),
     boolean_fields: prop_by_type(lpm_api_models.proxy_fields,
         'boolean'),
-    credential_fields: ['customer', 'zone', 'password', 'token_auth',
-        'lpm_token'],
+    credential_fields: ['account_id', 'customer', 'zone', 'password',
+        'token_auth', 'lpm_token'],
     hola_agent: undefined,
     args: {
         added_descriptions: {

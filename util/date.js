@@ -681,4 +681,14 @@ E.compile_schedule = function(expr){
         return false;
     };
 };
+
+E.timezone_offset = function(tz, dt){
+    dt = dt || E.get();
+    tz = dt.toLocaleString('en', {timeZone: tz, timeStyle: 'long'})
+    .split(' ').slice(-1)[0];
+    var dt_str = dt.toString();
+    var offset = Date.parse(dt_str+' '+tz)-Date.parse(dt_str+' UTC');
+    return offset/ms.MIN;
+};
+
 return E; }); }());

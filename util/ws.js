@@ -290,6 +290,7 @@ class WS extends events.EventEmitter {
     }
     _on_unexpected_response(req, resp){
         this._on_error({message: 'unexpected response'});
+        this.emit('unexpected-response');
     }
     _on_upgrade(resp){
         zerr.notice(`${this}: upgrade conn`);

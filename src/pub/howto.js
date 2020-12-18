@@ -12,7 +12,9 @@ import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Back_btn} from './proxy_edit/index.js';
-import {cloud_url_address} from './util.js';
+
+const cloud_url_address = cname=>
+    `lpm-customer-${cname}.zproxy.lum-superproxy.io`;
 
 const Howto = withRouter(class Howto extends Pure_component {
     state = {settings: {}};

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.213.356 Stable
+- :star: Improved resolving superproxies periodically
+- :star: Speed optimization
+
 ## 1.212.374 Stable
 - :bug: Skip x-lpm-port and x-lpm-authorization response headers when Request details option is disabled
 

@@ -45,7 +45,7 @@ E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
 E.write_e = (path, data, opt)=>etask(function*write_e(){
     opt = opt||{};
     yield check_file(path, opt);
-    yield etask.nfn_apply(fs.writeFile, [path, data]);
+    yield etask.nfn_apply(fs.writeFile, [path, data, opt]);
 });
 E.tmp_path = file=>{
     let name = path.basename(file), dir = path.dirname(file);

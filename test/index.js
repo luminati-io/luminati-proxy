@@ -1543,8 +1543,12 @@ describe('proxy', ()=>{
                 expected_rules);
         }));
         let config = {smtp: ['127.0.0.1:'+TEST_SMTP_PORT]};
-        let rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
-            body: '220', trigger_type: 'body'}];
+        let rules = [{
+            action: {ban_ip: 0},
+            action_type: 'ban_ip',
+            body: '220',
+            trigger_type: 'body',
+        }];
         t('rules is triggered regular req',
             Object.assign({}, config, {rules}), 200, 1, {close: true});
         t('rules is triggered when server ends connection',

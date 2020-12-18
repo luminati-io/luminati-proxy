@@ -226,6 +226,8 @@ if (env.ZCOUNTER_GROUP!==undefined)
 }
 
 E.glob_inc = (name, inc, agg_srv)=>E.inc('glob/'+name, inc, agg_srv);
+E.glob_inc_level = (name, inc, agg_mas, agg_srv)=>
+    E.inc_level('glob/'+name, inc, agg_mas, agg_srv);
 E.glob_avg = (name, value, agg_srv)=>E.avg('glob/'+name, value, agg_srv);
 E.glob_max = (name, value, agg_srv)=>E.max('glob/'+name, value, agg_srv);
 E.glob_min = (name, value, agg_srv)=>E.min('glob/'+name, value, agg_srv);
