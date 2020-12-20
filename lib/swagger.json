@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.213.356",
+        "version": "1.213.501",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -971,7 +971,7 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "ips": {
+                                "vips": {
                                     "type": "array",
                                     "items": {"type": "string"},
                                     "example": ["gip1", "gip2"]

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.213.501",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix zone updates not being reflected when Sync configuration option is turned on"
+            }
+        ]
+    },
+    {
         "ver": "1.213.356",
         "type": "stable",
         "changes": [

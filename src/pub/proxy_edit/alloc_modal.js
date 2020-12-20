@@ -49,8 +49,7 @@ export default class Alloc_modal extends Pure_component {
     }
     close = ()=>$('#allocated_ips').modal('hide');
     load = ()=>{
-        const type = this.props.type;
-        const form = this.props.form;
+        const {type, form} = this.props;
         if (this.state.available_list.length)
             return;
         this.loading(true);
@@ -67,11 +66,7 @@ export default class Alloc_modal extends Pure_component {
                 _this.loading(false);
             }));
             const res = yield ajax.json({url});
-            let _available_list;
-            if (type=='ips')
-                _available_list = res.ips;
-            else
-                _available_list = res;
+            const _available_list = type=='ips' ? res.ips : res.vips;
             const available_set = new Set();
             _available_list.forEach(v=>available_set.add(v));
             const chosen_set = new Set();

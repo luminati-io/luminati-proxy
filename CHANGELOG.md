@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.213.501 Stable
+- :bug: Fix zone updates not being reflected when Sync configuration option is turned on
+
 ## 1.213.356 Stable
 - :star: Improved resolving superproxies periodically
 - :star: Speed optimization
