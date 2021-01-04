@@ -4856,7 +4856,7 @@
   "No statistics yet":"暂无数据",
   "Zones (Proxy setup)":"区域（代理设置）",
   "Data Center":"数据中心",
-  "Residential":"住宅",
+  "Residential":"住宅动态",
   "Custom range":"自定义范围",
   "Open the list of your recent IPs and whitelist them":"打开你最近使用的IP地址列表，进行白名单操作",
   "Open the log of your last event":"打开上一个事项的日志",
@@ -5063,5 +5063,14 @@
   "The account is disabled, {' '} please contact your Luminati representative":"该帐户已禁用，请联系您的Luminati代表。",
   "Residential proxy permission status:":"住宅动态活动状态",
   "Updated in real time":"实时更新",
-  "Are you experiencing any problem with the Proxy Manager?":"您是否在LPM中遇到任何问题？"
+  "Are you experiencing any problem with the Proxy Manager?":"您是否在LPM中遇到任何问题？",
+  "Use powerful unblocking technology to gain access to any target website - highest success rate guaranteed, only pay for successful requests, no experience necessary.":"使用强大的解锁技术来访问任何目标网站-保证最高成功率，只为成功的请求付费，无需任何经验。",
+  "Easily change your geolocation and perform manual data collection from across the globe from the comfort of your browser toolbar":"方便地使用浏览器工具栏，轻松更改地理位置并执行全球范围内的手动数据收集",
+  "Static Residential":"住宅静态",
+  "LPM on premise":"自己安装的LPM",
+  "Loading collectors...":"正在加载收集器，请稍等。。。",
+  "Last run (UTC)":"最后开始时间（UTC）",
+  "Collectors":"收集器",
+  "Next run (UTC)":"下次时间（UTC）",
+  "Collection status":"收集状态"
 }

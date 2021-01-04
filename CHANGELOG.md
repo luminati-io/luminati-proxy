@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.215.236 Stable
+- :bug: Fixed lpm_f communication in Cloud LPM servers after a new server assignment
+- :bug: Fixed a bug where some credential fields were not cleared from proxies memory on logout
+
 ## 1.213.501 Stable
 - :bug: Fix zone updates not being reflected when Sync configuration option is turned on
 

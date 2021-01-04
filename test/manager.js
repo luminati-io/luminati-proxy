@@ -635,7 +635,8 @@ describe('manager', ()=>{
                 [launch_stub, open_stub].forEach(stub=>sinon.restore(stub));
             });
             const t = (name, opt, arg, expected)=>it(name, etask._fn(
-            function*(){
+            function*(_this){
+                _this.timeout(6000);
                 app = yield app_with_proxies([Object.assign({port: 24000},
                     opt)]);
                 yield api_json('api/browser/24000');

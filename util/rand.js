@@ -38,11 +38,12 @@ E.rand_int32 = function(s){
     return Math.floor(Math.random()*(MAX_INT-MIN_INT+1))-MAX_INT;
 };
 
-E.rand_range = function(from, to, s){
+// return a rand number from "min" to "max-1"
+E.rand_range = function(min, max, s){
     var ret;
     if (is_jtest && (ret = jtest_pop(s))!==null)
         return ret;
-    return Math.floor(Math.random()*(to-from))+from;
+    return Math.floor(Math.random()*(max-min))+min;
 };
 
 E.rand_element = function(a, s){

@@ -7,7 +7,7 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import {Note, Ext_tooltip} from '../common.js';
 import moment from 'moment';
 import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
-import {Har_viewer} from '../har/viewer.js';
+import Har_viewer from '../har_viewer.js';
 import setdb from '../../../util/setdb.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import Tooltip from '../common/tooltip.js';

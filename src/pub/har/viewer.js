@@ -2,10 +2,9 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import $ from 'jquery';
-import _ from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
-import {Route, withRouter, Link} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 import React_tooltip from 'react-tooltip';
 import {Waypoint} from 'react-waypoint';
 import codemirror from 'codemirror/lib/codemirror';
@@ -13,19 +12,37 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import Pure_component from '/www/util/pub/pure_component.js';
-import etask from '../../../util/etask.js';
 import zutil from '../../../util/util.js';
 import setdb from '../../../util/setdb.js';
+import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
-import zescape from '../../../util/escape.js';
 import {bytes_format} from '../util.js';
 import {Toolbar_button} from '../chrome_widgets.js';
 import {Tooltip_bytes} from '../common.js';
 import Tooltip from '../common/tooltip.js';
-import ws from '../ws.js';
 import {trigger_types, action_types} from '../../../util/rules_util.js';
 import {Copy_btn} from '../common.js';
 import './viewer.less';
+
+const loader = {
+    start: ()=>$('#har_viewer').addClass('waiting'),
+    end: ()=>$('#har_viewer').removeClass('waiting'),
+};
+
+// XXX krzysztof: to move to Lpm_har_viewer
+const enable_ssl_click = port=>etask(function*(){
+    this.on('finally', ()=>{
+        loader.end();
+    });
+    loader.start();
+    yield window.fetch('/api/enable_ssl', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({port}),
+    });
+    const proxies = yield ajax.json({url: '/api/proxies_running'});
+    setdb.set('head.proxies_running', proxies);
+});
 
 export class Preview extends Pure_component {
     panes = [
@@ -51,32 +68,32 @@ export class Preview extends Pure_component {
         const Pane_content = this.panes[this.state.cur_pane].comp;
         const req = this.props.cur_preview;
         return <div style={this.props.style} className="har_preview chrome">
-              <div className="tabbed_pane_header">
-                <div className="left_pane">
-                  <div onClick={this.props.close}
-                    className="close_btn_wrapper">
-                    <div className="small_icon close_btn"/>
-                    <div className="medium_icon close_btn_h"/>
-                  </div>
-                </div>
-                <div className="right_panes">
-                  {this.panes.map((p, idx)=>
-                    <Pane key={p.id}
-                      width={p.width}
-                      id={p.id}
-                      idx={idx}
-                      on_click={this.select_pane}
-                      active={this.state.cur_pane==idx}
-                    />
-                  )}
-                  <Pane_slider panes={this.panes}
-                    cur_pane={this.state.cur_pane}/>
-                </div>
+          <div className="tabbed_pane_header">
+            <div className="left_pane">
+              <div onClick={this.props.close}
+                className="close_btn_wrapper">
+                <div className="small_icon close_btn"/>
+                <div className="medium_icon close_btn_h"/>
               </div>
-              <div className="tabbed_pane_content">
-                <Pane_content key={req.uuid} req={req}/>
-              </div>
-            </div>;
+            </div>
+            <div className="right_panes">
+              {this.panes.map((p, idx)=>
+                <Pane key={p.id}
+                  width={p.width}
+                  id={p.id}
+                  idx={idx}
+                  on_click={this.select_pane}
+                  active={this.state.cur_pane==idx}
+                />
+              )}
+              <Pane_slider panes={this.panes}
+                cur_pane={this.state.cur_pane}/>
+            </div>
+          </div>
+          <div className="tabbed_pane_content">
+            <Pane_content key={req.uuid} req={req}/>
+          </div>
+        </div>;
     }
 }
 
@@ -121,22 +138,22 @@ class Pane_headers extends Pure_component {
             {name: 'Sent from', value: req.details.remote_address},
         ].filter(e=>e.value!==undefined);
         return <React.Fragment>
-              <Copy_btn val={this.get_curl()}
-                title="Copy as cURL"
-                style={{position: 'absolute', right: 5, top: 5}}
-                inner_style={{width: 'auto'}}
-              />
-              <ol className="tree_outline">
-                <Preview_section title="General"
-                  pairs={general_entries}/>
-                <Preview_section title="Response headers"
-                  pairs={req.response.headers}/>
-                <Preview_section title="Request headers"
-                  pairs={req.request.headers}/>
-                <Body_section title="Request body"
-                  body={req.request.postData && req.request.postData.text}/>
-               </ol>
-             </React.Fragment>;
+         <Copy_btn val={this.get_curl()}
+           title="Copy as cURL"
+           style={{position: 'absolute', right: 5, top: 5}}
+           inner_style={{width: 'auto'}}
+         />
+         <ol className="tree_outline">
+           <Preview_section title="General"
+             pairs={general_entries}/>
+           <Preview_section title="Response headers"
+             pairs={req.response.headers}/>
+           <Preview_section title="Request headers"
+             pairs={req.request.headers}/>
+           <Body_section title="Request body"
+             body={req.request.postData && req.request.postData.text}/>
+          </ol>
+        </React.Fragment>;
     }
 }
 
@@ -508,10 +525,14 @@ const Enable_https = withRouter(props=>{
         });
     };
     return <div className="footer_link">
-      <a className="devtools_link" role="link" tabIndex="0"
-        target="_blank" rel="noopener noreferrer"
+      <a className="devtools_link"
+        role="link"
+        tabIndex="0"
+        target="_blank"
+        rel="noopener noreferrer"
         onClick={click}
-        style={{display: 'inline', cursor: 'pointer'}}>
+        style={{display: 'inline', cursor: 'pointer'}}
+      >
         Enable HTTPS logging
       </a> to view this timeline
     </div>;
@@ -817,14 +838,17 @@ const undescribed_error = (()=>{
     };
 })();
 
-const with_resizable_cols = (cols, Table)=>{
+const with_resizable_cols = Table=>{
     class Resizable extends React.PureComponent {
-        state = {};
-        cols = zutil.clone_deep(cols);
-        min_width = 22;
-        moving_col = null;
-        style = {position: 'relative', display: 'flex', flex: 'auto',
-            width: '100%'};
+        constructor(props){
+            super(props);
+            this.state = {};
+            this.cols = zutil.clone_deep(this.props.table_cols);
+            this.min_width = 22;
+            this.moving_col = null;
+            this.style = {position: 'relative', display: 'flex', flex: 'auto',
+                width: '100%'};
+        }
         componentDidMount(){
             this.resize_columns();
             window.document.addEventListener('mousemove', this.on_mouse_move);
@@ -838,12 +862,12 @@ const with_resizable_cols = (cols, Table)=>{
         set_ref = ref=>{ this.ref = ref; };
         resize_columns = ()=>{
             const total_width = this.ref.offsetWidth;
-            const resizable_cols = this.cols.filter(c=>!c.hidden&&!c.fixed);
+            const resizable_cols = this.cols.filter(c=>!c.hidden && !c.fixed);
             const total_fixed = this.cols.reduce((acc, c)=>
-                acc+(!c.hidden&&c.fixed||0), 0);
+                acc+(!c.hidden && c.fixed || 0), 0);
             const width = (total_width-total_fixed)/resizable_cols.length;
             const next_cols = this.cols.reduce((acc, c, idx)=>{
-                const w = !c.fixed&&width||!c.hidden&&c.fixed||0;
+                const w = !c.fixed && width||!c.hidden && c.fixed || 0;
                 return {
                     cols: [...acc.cols, {
                         ...c,
@@ -905,8 +929,11 @@ const with_resizable_cols = (cols, Table)=>{
         };
         render(){
             const style = Object.assign({}, this.style, this.props.style||{});
-            return <div style={style} ref={this.set_ref}
-              className={classnames({moving: this.state.moving})}>
+            return <div
+              style={style}
+              ref={this.set_ref}
+              className={classnames({moving: this.state.moving})}
+            >
               <Table {...this.props}
                 cols={this.state.cols}
                 resize_columns={this.resize_columns}
@@ -965,59 +992,18 @@ const Sort_icon = ({show, dir})=>{
 
 const Devider = ()=><div className="devider"/>;
 
-const loader = {
-    start: ()=>$('#har_viewer').addClass('waiting'),
-    end: ()=>$('#har_viewer').removeClass('waiting'),
-};
-
-const enable_ssl_click = port=>etask(function*(){
-    this.on('finally', ()=>{
-        loader.end();
-    });
-    loader.start();
-    yield window.fetch('/api/enable_ssl', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({port}),
-    });
-    const proxies = yield ajax.json({url: '/api/proxies_running'});
-    setdb.set('head.proxies_running', proxies);
-});
-
 export class Har_viewer extends Pure_component {
     moving_width = false;
     min_width = 50;
     state = {
         cur_preview: null,
         tables_width: 200,
-        search: this.props.domain||'',
-        type_filter: 'All',
-        filters: {
-            port: this.props.port||false,
-            status_code: this.props.code||false,
-            protocol: this.props.protocol||false,
-        },
     };
     componentDidMount(){
         window.document.addEventListener('mousemove', this.on_mouse_move);
         window.document.addEventListener('mouseup', this.on_mouse_up);
-        this.setdb_on('head.proxies_running', proxies=>{
-            if (proxies)
-                this.setState({proxies});
-        });
-        this.setdb_on('head.settings', settings=>{
-            if (settings)
-                this.setState({logs: settings.logs});
-        });
-        this.etask(function*(){
-            const suggestions = yield ajax.json(
-                {url: '/api/logs_suggestions'});
-            suggestions.status_codes.unshift(...[2, 3, 4, 5].map(v=>`${v}**`));
-            setdb.set('head.logs_suggestions', suggestions);
-        });
     }
     willUnmount(){
-        loader.end();
         window.document.removeEventListener('mousemove', this.on_mouse_move);
         window.document.removeEventListener('mouseup', this.on_mouse_up);
     }
@@ -1049,29 +1035,10 @@ export class Har_viewer extends Pure_component {
         this.moving_width = false;
         $(this.main_panel).removeClass('moving');
     };
-    clear = ()=>{
-        const params = {};
-        if (this.props.match && this.props.match.params.port)
-            params.port = this.props.match.params.port;
-        const url = zescape.uri('/api/logs_reset', params);
-        const _this = this;
-        this.etask(function*(){
-            loader.start();
-            yield ajax({url});
-            _this.close_preview();
-            setdb.emit_path('head.har_viewer.reset_reqs');
-            loader.end();
-        });
-    };
     set_main_panel_ref = ref=>{ this.main_panel = ref; };
     main_panel_moving = ()=>{ $(this.main_panel).addClass('moving'); };
     main_panel_stopped_moving = ()=>{
         $(this.main_panel).removeClass('moving'); };
-    on_change_search = e=>{ this.setState({search: e.target.value}); };
-    set_type_filter = name=>{ this.setState({type_filter: name}); };
-    set_filter = (name, {target: {value}})=>{
-        this.setState(prev=>({filters: {...prev.filters, [name]: value}}));
-    };
     undock = ()=>{
         if (this.props.dock_mode)
             return;
@@ -1083,86 +1050,65 @@ export class Har_viewer extends Pure_component {
         if (window.focus)
             har_window.focus();
     };
+    clear = ()=>{
+        this.props.clear_logs(()=>{
+            this.close_preview();
+            setdb.emit_path('head.har_viewer.reset_reqs');
+        });
+    };
     render(){
-        if (!this.state.proxies)
+        if (!this.props.proxies)
             return null;
         const width = `calc(100% - ${this.state.tables_width}px`;
         const preview_style = {maxWidth: width, minWidth: width};
-        const show = this.state.logs>0;
-        return <div id="har_viewer" className={(show ? 'har_viewer' :
-          'har_viewer_off')+' chrome'}>
-          {!show &&
-            <Route path={['/logs', '/proxy/:port/logs/har']}
-              component={Logs_off_notice}
+        return <div id="har_viewer" className="har_viewer chrome">
+          <div className="main_panel vbox" ref={this.set_main_panel_ref}>
+            <Toolbar
+              undock={this.undock}
+              clear={this.clear}
+              dock_mode={this.props.dock_mode}
+              filters={this.props.filters}
+              set_filter={this.props.set_filter}
+              proxies={this.props.proxies}
+              type_filter={this.props.type_filter}
+              set_type_filter={this.props.set_type_filter}
+              on_change_search={this.props.on_change_search}
+              search_val={this.props.search}
+              disable_logs={this.props.disable_logs}
             />
-          }
-          {show &&
-            <div className="main_panel vbox" ref={this.set_main_panel_ref}>
-              <Toolbar
-                undock={this.undock}
-                dock_mode={this.props.dock_mode}
-                filters={this.state.filters}
-                set_filter={this.set_filter}
-                proxies={this.state.proxies}
-                type_filter={this.state.type_filter}
-                set_type_filter={this.set_type_filter}
-                clear={this.clear}
-                on_change_search={this.on_change_search}
-                search_val={this.state.search}
+            <div className="split_widget vbox flex_auto">
+              <Tables_container
+                table_cols={this.props.table_cols}
+                main_panel_moving={this.main_panel_moving}
+                main_panel_stopped_moving=
+                  {this.main_panel_stopped_moving}
+                main_panel={this.main_panel}
+                open_preview={this.open_preview}
+                width={this.state.tables_width}
+                cur_preview={this.state.cur_preview}
+                set_sort={this.props.set_sort}
+                sorted={this.props.sorted}
+                reqs={this.props.reqs}
+                handle_viewpoint_enter={this.props.handle_viewpoint_enter}
               />
-              <div className="split_widget vbox flex_auto">
-                <Tables_container
-                  main_panel_moving={this.main_panel_moving}
-                  main_panel_stopped_moving=
-                    {this.main_panel_stopped_moving}
-                  main_panel={this.main_panel}
-                  open_preview={this.open_preview}
-                  width={this.state.tables_width}
-                  search={this.state.search}
-                  type_filter={this.state.type_filter}
-                  filters={this.state.filters}
-                  cur_preview={this.state.cur_preview}
-                />
-                <Preview cur_preview={this.state.cur_preview}
-                  style={preview_style}
-                  close={this.close_preview}
-                />
-                <Tables_resizer show={!!this.state.cur_preview}
-                  start_moving={this.start_moving_width}
-                  offset={this.state.tables_width}
-                />
-              </div>
+              <Preview cur_preview={this.state.cur_preview}
+                style={preview_style}
+                close={this.close_preview}
+              />
+              <Tables_resizer show={!!this.state.cur_preview}
+                start_moving={this.start_moving_width}
+                offset={this.state.tables_width}
+              />
             </div>
-          }
+          </div>
         </div>;
     }
 }
 
 class Toolbar extends Pure_component {
-    state = {select_visible: false, filters_visible: false};
-    componentDidMount(){
-        this.setdb_on('har_viewer.select_visible', visible=>
-            this.setState({select_visible: visible}));
-        this.setdb_on('head.save_settings', save_settings=>{
-            this.save_settings = save_settings;
-            if (this.disable)
-            {
-                this.disable_logs();
-                delete this.disable;
-            }
-        });
-    }
+    state = {filters_visible: false};
     toggle_filters = ()=>
         this.setState({filters_visible: !this.state.filters_visible});
-    disable_logs = ()=>{
-        if (!this.save_settings)
-        {
-            this.disable = true;
-            return;
-        }
-        const _this = this;
-        this.etask(function*(){ yield _this.save_settings({logs: 0}); });
-    };
     render(){
         return <Toolbar_container>
           <Toolbar_row>
@@ -1188,19 +1134,22 @@ class Toolbar extends Pure_component {
             <Toolbar_button id="close_btn"
               tooltip="Disable"
               placement="left"
-              on_click={this.disable_logs}
+              on_click={this.props.disable_logs}
             />
           </Toolbar_row>
           {this.state.filters_visible &&
             <Toolbar_row>
-              <Search_box val={this.props.search_val}
+              <Search_box
+                val={this.props.search_val}
                 on_change={this.props.on_change_search}
               />
-              <Type_filters filter={this.props.type_filter}
+              <Type_filters
+                filter={this.props.type_filter}
                 set={this.props.set_type_filter}
               />
               <Devider/>
-              <Filters set_filter={this.props.set_filter}
+              <Filters
+                set_filter={this.props.set_filter}
                 filters={this.props.filters}
               />
             </Toolbar_row>
@@ -1272,8 +1221,13 @@ const Type_filters = ({filter, set})=>
         tooltip="All types"/>
       <Devider/>
       {type_filters.map(f=>
-        <Type_filter on_click={set.bind(null, f.name)} key={f.name}
-          name={f.name} cur={filter} tooltip={f.tooltip}/>
+        <Type_filter
+          on_click={set.bind(null, f.name)}
+          key={f.name}
+          name={f.name}
+          cur={filter}
+          tooltip={f.tooltip}
+        />
       )}
     </div>;
 
@@ -1292,269 +1246,24 @@ const Tables_resizer = ({show, offset, start_moving})=>{
     />;
 };
 
-const Logs_off_notice = ()=>
-    <div>
-      <h4>
-        Request logs are disabled. You can enable it back in
-        &nbsp;
-        <Link to="/settings">General settings</Link>
-      </h4>
-    </div>;
-
-const table_cols = [
-    {title: 'select', hidden: true, fixed: 27, tooltip: 'Select/unselect all'},
-    {title: 'Name', sort_by: 'url', data: 'request.url',
-        tooltip: 'Request url'},
-    {title: 'Proxy port', sort_by: 'port', data: 'details.port'},
-    {title: 'Status', sort_by: 'status_code', data: 'response.status',
-        tooltip: 'Status code'},
-    {title: 'Bandwidth', sort_by: 'bw', data: 'details.bw'},
-    {title: 'Time', sort_by: 'elapsed', data: 'time'},
-    {title: 'Peer proxy', sort_by: 'proxy_peer',
-        data: 'details.proxy_peer'},
-    {title: 'Troubleshooting', data: 'details.troubleshoot'},
-    {title: 'Date', sort_by: 'timestamp', data: 'details.timestamp'},
-];
-const Tables_container = withRouter(with_resizable_cols(table_cols,
+const Tables_container = with_resizable_cols(
 class Tables_container extends Pure_component {
     constructor(props){
         super(props);
-        this.uri = '/api/logs';
-        this.batch_size = 30;
-        this.loaded = {from: 0, to: 0};
-        this.state = {
-            focused: false,
-            reqs: [],
-            sorted: {field: 'timestamp', dir: 1},
-        };
-        this.reqs_to_render = [];
-        this.temp_total = 0;
-        this.take_reqs_from_pool = _.throttle(this.take_reqs_from_pool, 100);
+        this.state = {focused: false};
     }
     componentDidUpdate(prev_props){
-        if (this.props.search!=prev_props.search)
-            this.set_new_params_debounced();
-        if (this.props.type_filter!=prev_props.type_filter||
-            this.props.filters!=prev_props.filters)
-        {
-            this.set_new_params();
-        }
         if (prev_props.cur_preview!=this.props.cur_preview)
             this.props.resize_columns();
     }
     componentDidMount(){
         window.addEventListener('resize', this.props.resize_columns);
-        this.setdb_on('head.har_viewer.reset_reqs', ()=>{
-            this.loaded.to = 0;
-            this.setState({
-                reqs: [],
-                stats: {total: 0, sum_out: 0, sum_in: 0},
-            });
-        }, {init: false});
-        this.setdb_on('head.har_viewer.reqs', reqs=>{
-            if (reqs)
-                this.setState({reqs});
-        });
-        this.setdb_on('head.har_viewer.stats', stats=>{
-            if (stats)
-                this.setState({stats});
-        });
-        ws.addEventListener('message', this.on_message);
     }
     willUnmount(){
         window.removeEventListener('resize', this.props.resize_columns);
-        ws.removeEventListener('message', this.on_message);
-        setdb.set('head.har_viewer.reqs', []);
-        setdb.set('head.har_viewer.stats', null);
-        setdb.set('har_viewer', null);
-        this.take_reqs_from_pool.cancel();
     }
-    fetch_missing_data = pos=>{
-        if (this.state.stats && this.state.stats.total &&
-            this.state.reqs.length==this.state.stats.total)
-        {
-            return;
-        }
-        if (pos=='bottom')
-            this.get_data({skip: this.loaded.to-this.temp_total});
-    };
-    get_params = opt=>{
-        const params = opt;
-        params.limit = opt.limit||this.batch_size;
-        params.skip = opt.skip||0;
-        if (this.props.match.params.port)
-            params.port = this.props.match.params.port;
-        if (this.props.search&&this.props.search.trim())
-            params.search = this.props.search;
-        if (this.state.sorted)
-        {
-            params.sort = this.state.sorted.field;
-            if (this.state.sorted.dir==1)
-                params.sort_desc = true;
-        }
-        if (this.props.type_filter&&this.props.type_filter!='All')
-            params.content_type = this.props.type_filter.toLowerCase();
-        for (let filter in this.props.filters)
-        {
-            let val;
-            if (val = this.props.filters[filter])
-                params[filter] = val;
-        }
-        return params;
-    };
-    get_data = (opt={})=>{
-        if (this.sql_loading)
-            return;
-        const params = this.get_params(opt);
-        const _this = this;
-        this.sql_loading = true;
-        this.etask(function*(){
-            this.on('finally', ()=>{
-                _this.sql_loading = false;
-                loader.end();
-            });
-            loader.start();
-            const url = zescape.uri(_this.uri, params);
-            const res = yield ajax.json({url});
-            const reqs = res.log.entries;
-            const new_reqs = [...opt.replace ? [] : _this.state.reqs, ...reqs];
-            const uuids = new Set();
-            const new_reqs_unique = new_reqs.filter(r=>{
-                if (uuids.has(r.uuid))
-                    return false;
-                uuids.add(r.uuid);
-                return true;
-            });
-            setdb.set('head.har_viewer.reqs', new_reqs_unique);
-            _this.loaded.to = opt.skip+reqs.length;
-            const stats = {
-                total: res.total+_this.temp_total,
-                sum_out: res.sum_out,
-                sum_in: res.sum_in,
-            };
-            _this.temp_total = 0;
-            if (!_this.state.stats)
-                setdb.set('head.har_viewer.stats', stats);
-        });
-    };
-    set_new_params = ()=>{
-        if (this.sql_loading)
-            return;
-        this.loaded.to = 0;
-        setdb.emit_path('head.har_viewer.dc_top');
-        this.get_data({replace: true});
-    };
-    set_new_params_debounced = _.debounce(this.set_new_params, 400);
-    set_sort = field=>{
-        if (this.sql_loading)
-            return;
-        let dir = 1;
-        if (this.state.sorted.field==field)
-            dir = -1*this.state.sorted.dir;
-        this.setState({sorted: {field, dir}}, this.set_new_params);
-    };
     on_focus = ()=>this.setState({focused: true});
     on_blur = ()=>this.setState({focused: false});
-    is_hidden = req=>{
-        const cur_port = req.details.port;
-        const port = this.props.match.params.port;
-        if (port && cur_port!=port)
-            return true;
-        if (this.port_range &&
-            (cur_port<this.port_range.from || cur_port>this.port_range.to))
-        {
-            return true;
-        }
-        if (this.props.search && !req.request.url.match(
-            new RegExp(this.props.search)))
-        {
-            return true;
-        }
-        if (this.props.type_filter && this.props.type_filter!='All' &&
-            req.details.content_type!=this.props.type_filter.toLowerCase())
-        {
-            return true;
-        }
-        if (this.props.filters.port &&
-            this.props.filters.port!=req.details.port)
-        {
-            return true;
-        }
-        if (this.props.filters.protocol &&
-            this.props.filters.protocol!=req.details.protocol)
-        {
-            return true;
-        }
-        if (this.props.filters.status_code &&
-            this.props.filters.status_code!=req.response.status)
-        {
-            return true;
-        }
-        return false;
-    };
-    is_visible = r=>!this.is_hidden(r);
-    on_message = event=>{
-        const json = JSON.parse(event.data);
-        if (json.type=='har_viewer')
-            this.on_request_message(json.data);
-        else if (json.type=='har_viewer_start')
-            this.on_request_started_message(json.data);
-    };
-    on_request_started_message = req=>{
-        req.pending = true;
-        this.on_request_message(req);
-    };
-    on_request_message = req=>{
-        this.reqs_to_render.push(req);
-        this.take_reqs_from_pool();
-    };
-    take_reqs_from_pool = ()=>{
-        if (!this.reqs_to_render.length)
-            return;
-        const reqs = this.reqs_to_render.filter(this.is_visible);
-        const all_reqs = this.reqs_to_render;
-        if (this.batch_size>this.state.reqs.length)
-        {
-            this.loaded.to = Math.min(this.batch_size,
-                this.state.reqs.length + reqs.length);
-        }
-        const new_reqs_set = {};
-        [...this.state.reqs, ...reqs].forEach(r=>{
-            if (!new_reqs_set[r.uuid])
-                return new_reqs_set[r.uuid] = r;
-            if (new_reqs_set[r.uuid].pending)
-                new_reqs_set[r.uuid] = r;
-        });
-        const sorted_field = this.props.cols.find(
-            c=>c.sort_by==this.state.sorted.field).data;
-        const dir = this.state.sorted.dir;
-        const new_reqs = Object.values(new_reqs_set)
-        .sort((a, b)=>{
-            const val_a = zutil.get(a, sorted_field);
-            const val_b = zutil.get(b, sorted_field);
-            if (val_a==val_b)
-                return a.uuid > b.uuid ? -1*dir : dir;
-            return val_a > val_b ? -1*dir : dir;
-        }).slice(0, Math.max(this.state.reqs.length, this.batch_size));
-        this.reqs_to_render = [];
-        this.setState(prev=>{
-            const new_state = {reqs: new_reqs};
-            if (prev.stats)
-            {
-                new_state.stats = {
-                    total: prev.stats.total+
-                        all_reqs.filter(r=>r.pending).length,
-                    sum_out: prev.stats.sum_out+all_reqs.reduce((acc, r)=>
-                        acc+(r.details.out_bw||0), 0),
-                    sum_in: prev.stats.sum_in+all_reqs.reduce((acc, r)=>
-                        acc+(r.details.in_bw||0), 0),
-                };
-            }
-            else
-                this.temp_total += all_reqs.filter(r=>r.pending).length;
-            return new_state;
-        });
-    };
     on_mouse_up = ()=>{
         this.moving_col = null;
         this.props.main_panel_stopped_moving();
@@ -1573,14 +1282,16 @@ class Tables_container extends Pure_component {
           onFocus={this.on_focus}
           onBlur={this.on_blur}>
           <div className="reqs_container">
-            <Header_container cols={this.props.cols}
-              reqs={this.state.reqs}
-              sort={this.set_sort}
-              sorted={this.state.sorted}
+            <Header_container
+              cols={this.props.cols}
+              reqs={this.props.reqs}
+              set_sort={this.props.set_sort}
+              sorted={this.props.sorted}
               only_name={!!this.props.cur_preview}/>
-            <Data_container cols={this.props.cols}
-              fetch_missing_data={this.fetch_missing_data}
-              reqs={this.state.reqs}
+            <Data_container
+              cols={this.props.cols}
+              reqs={this.props.reqs}
+              handle_viewpoint_enter={this.props.handle_viewpoint_enter}
               focused={this.state.focused}
               cur_preview={this.props.cur_preview}
               open_preview={this.props.open_preview}/>
@@ -1588,7 +1299,7 @@ class Tables_container extends Pure_component {
           <Summary_bar stats={this.state.stats}/>
         </div>;
     }
-}));
+});
 
 class Summary_bar extends Pure_component {
     render(){
@@ -1608,7 +1319,7 @@ class Summary_bar extends Pure_component {
 
 class Header_container extends Pure_component {
     click = col=>{
-        this.props.sort(col.sort_by);
+        this.props.set_sort(col.sort_by);
     };
     render(){
         let {cols, only_name, sorted} = this.props;
@@ -1651,9 +1362,6 @@ class Data_container extends Pure_component {
                 this.dc.current.scrollTop = 0;
         });
     }
-    handle_viewpoint_enter = ()=>{
-        this.props.fetch_missing_data('bottom');
-    };
     dc = React.createRef();
     render(){
         let {cols, open_preview, cur_preview, focused, reqs} = this.props;
@@ -1685,7 +1393,7 @@ class Data_container extends Pure_component {
           <Waypoint key={reqs.length}
             scrollableAncestor={this.dc.current}
             bottomOffset="-50px"
-            onEnter={this.handle_viewpoint_enter}
+            onEnter={this.props.handle_viewpoint_enter}
           />
         </div>;
     }
@@ -1724,15 +1432,10 @@ class Data_row extends React.Component {
         const selection_changed = selected!=will_selected;
         const focused_changed = this.props.focused!=next_props.focused;
         const pending_changed = this.props.req.pending!=next_props.req.pending;
-        return selection_changed||focused_changed&&selected||pending_changed;
+        return selection_changed || focused_changed && selected ||
+            pending_changed;
     }
-    cell_clicked = idx=>{
-        if (idx==0)
-            return;
-        if (this.props.cols[idx].title=='Time')
-            setdb.emit('har_viewer.set_pane', 3);
-        if (this.props.cols[idx].title=='Troubleshooting')
-            setdb.emit('har_viewer.set_pane', 5);
+    cell_clicked = ()=>{
         this.props.open_preview(this.props.req);
     };
     render(){
@@ -1740,13 +1443,13 @@ class Data_row extends React.Component {
         const selected = zutil.get(cur_preview, 'uuid')==req.uuid;
         const classes = classnames({
             selected,
-            focused: selected&&focused,
-            error: !req.details.success&&!req.pending,
+            focused: selected && focused,
+            error: !req.details.success && !req.pending,
             pending: !!req.pending,
         });
         return <tr className={classes}>
           {cols.map((c, idx)=>
-            <td key={c.title} onClick={()=>this.cell_clicked(idx)}>
+            <td key={c.title} onClick={this.cell_clicked}>
               <Cell_value col={c.title} req={req}/>
             </td>
           )}
@@ -1784,9 +1487,12 @@ class Cell_value extends React.Component {
             return <Tooltip_bytes bytes={req.details.bw}/>;
         else if (col=='Time')
         {
-            return <Time_cell time={req.time} url={req.request.url}
-                  pending={!!req.pending} uuid={req.uuid}
-                  port={req.details.port}/>;
+            return <Time_cell time={req.time}
+              url={req.request.url}
+              pending={!!req.pending}
+              uuid={req.uuid}
+              port={req.details.port}
+            />;
         }
         else if (col=='Peer proxy')
         {
@@ -1802,8 +1508,11 @@ class Cell_value extends React.Component {
                 val = '';
             const tip = ext_proxy ? 'This feature is only available when '
                 +'using proxies by Luminati network' : ip;
-            return <Tooltip_and_value val={val} tip={tip}
-                pending={!!req.pending}/>;
+            return <Tooltip_and_value
+              val={val}
+              tip={tip}
+              pending={!!req.pending}
+            />;
         }
         else if (col=='Date')
         {

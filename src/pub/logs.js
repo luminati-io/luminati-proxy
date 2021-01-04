@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {Har_viewer} from './har/viewer.js';
+import Har_viewer from './har_viewer.js';
 import {withRouter} from 'react-router-dom';
 import zurl from '../../util/url.js';
 import Pure_component from '/www/util/pub/pure_component.js';
@@ -14,9 +14,9 @@ export const Logs = withRouter(class Logs extends Pure_component {
         const {location} = this.props;
         const qs_o = zurl.qs_parse((location.search||'').substr(1));
         return <div className="logs vbox"
-                style={{height: '100%', width: '100%', padding: 15}}>
-                <Har_viewer {...qs_o}/>
-              </div>;
+          style={{height: '100%', width: '100%', padding: 15}}>
+          <Har_viewer {...qs_o}/>
+        </div>;
     }
 });
 

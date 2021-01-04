@@ -25,12 +25,15 @@ export default class Proxy_tester extends Pure_component {
     clear_response = ()=>this.setState({response: undefined});
     render(){
         return <div className="proxy_tester vbox">
-              <Request update_response={this.update_response}
-                no_labels={this.props.no_labels}
-                port={this.props.port} hide_port={!!this.props.port}/>
-              <Preview cur_preview={this.state.response}
-                close={this.clear_response}/>
-            </div>;
+          <Request update_response={this.update_response}
+            no_labels={this.props.no_labels}
+            port={this.props.port}
+            hide_port={!!this.props.port}
+          />
+          <Preview cur_preview={this.state.response}
+            close={this.clear_response}
+          />
+        </div>;
     }
 }
 
@@ -126,32 +129,34 @@ class Request extends Pure_component {
         if (!this.props.ports.length)
             return <Proxy_blank/>;
         return <T>{t=><div className="panel no_border request">
-              <Loader show={this.state.show_loader}/>
-              <Modal className="warnings_modal" id="warnings_modal"
-                title="Warnings:" no_cancel_btn>
-                <Warnings warnings={this.state.warnings}/>
-              </Modal>
-              <div>
-                <Request_params params={this.state.params}
-                  no_labels={this.props.no_labels}
-                  update={this.update_params}
-                  key_up={this.key_up}
-                  hide_port={this.props.hide_port}
-                  port_select={this.props.port_select}/>
-                <Headers headers={this.state.headers}
-                  clicked_remove={this.remove_header}
-                  clicked_add={this.add_header}
-                  update={this.update_header}/>
-                <div className="footer_buttons">
-                  <Tooltip title={t('Send a test request')}>
-                    <button onClick={this.go} disabled={this.state.lock}
-                      className="btn btn_lpm btn_lpm_primary">
-                      {this.state.lock ? t('Saving proxy') : t('Test')}
-                    </button>
-                  </Tooltip>
-                </div>
-              </div>
-            </div>}</T>;
+          <Loader show={this.state.show_loader}/>
+          <Modal className="warnings_modal" id="warnings_modal"
+            title="Warnings:" no_cancel_btn>
+            <Warnings warnings={this.state.warnings}/>
+          </Modal>
+          <div>
+            <Request_params params={this.state.params}
+              no_labels={this.props.no_labels}
+              update={this.update_params}
+              key_up={this.key_up}
+              hide_port={this.props.hide_port}
+              port_select={this.props.port_select}
+            />
+            <Headers headers={this.state.headers}
+              clicked_remove={this.remove_header}
+              clicked_add={this.add_header}
+              update={this.update_header}
+            />
+            <div className="footer_buttons">
+              <Tooltip title={t('Send a test request')}>
+                <button onClick={this.go} disabled={this.state.lock}
+                  className="btn btn_lpm btn_lpm_primary">
+                  {this.state.lock ? t('Saving proxy') : t('Test')}
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+        </div>}</T>;
     }
 }));
 
@@ -170,9 +175,14 @@ const Request_params = ({params, update, ...props})=>{
               </div>
             </Tooltip>
           }
-          <Url_input params={params} update={update} name="url" type="text"
+          <Url_input params={params}
+            update={update}
+            name="url"
+            type="text"
             tooltip="URL that Proxy Tester will use to send a test request"
-            on_key_up={props.key_up} no_labels={props.no_labels}/>
+            on_key_up={props.key_up}
+            no_labels={props.no_labels}
+          />
         </div>}</T>;
 };
 
@@ -182,12 +192,12 @@ const Url_input = ({name, ...props})=>{
         props.update(name, val);
     };
     return <T>{t=><Tooltip title={t(props.tooltip)}>
-          <div className={classnames('field', name)}>
-            {!props.no_labels && <div className="title">{t('URL')}</div>}
-            <Input on_change_wrapper={on_change_wrapper} type={props.type}
-              val={props.params[name]} {...props}/>
-          </div>
-        </Tooltip>}</T>;
+      <div className={classnames('field', name)}>
+        {!props.no_labels && <div className="title">{t('URL')}</div>}
+        <Input on_change_wrapper={on_change_wrapper} type={props.type}
+          val={props.params[name]} {...props}/>
+      </div>
+    </Tooltip>}</T>;
 };
 
 const Headers = ({headers, clicked_remove, clicked_add, update})=>
@@ -207,27 +217,29 @@ class New_header_params extends Pure_component {
     render(){
         const {clicked_add, clicked_remove, header, last} = this.props;
         return <T>{t=><div className="header_line">
-              <Tooltip title={t(this.header_tip)}>
-                <div className="header_input">
-                  <Input val={header.header} type="text"
-                    placeholder={t('Header')}
-                    on_change_wrapper={this.input_changed('header')}/>
-                </div>
-              </Tooltip>
-              <Tooltip title={t(this.value_tip)}>
-                <div className="value_input">
-                  <Input val={header.value} type="text"
-                    placeholder={t('Value')}
-                    on_change_wrapper={this.input_changed('value')}/>
-                </div>
-              </Tooltip>
-              <div className="action_icons">
-                <Remove_icon tooltip={t('Remove header')}
-                  click={()=>clicked_remove(header.idx)}/>
-                {last &&
-                  <Add_icon tooltip={t('Add header')} click={clicked_add}/>
-                }
-              </div>
-            </div>}</T>;
+          <Tooltip title={t(this.header_tip)}>
+            <div className="header_input">
+              <Input val={header.header} type="text"
+                placeholder={t('Header')}
+                on_change_wrapper={this.input_changed('header')}/>
+            </div>
+          </Tooltip>
+          <Tooltip title={t(this.value_tip)}>
+            <div className="value_input">
+              <Input val={header.value}
+                type="text"
+                placeholder={t('Value')}
+                on_change_wrapper={this.input_changed('value')}
+              />
+            </div>
+          </Tooltip>
+          <div className="action_icons">
+            <Remove_icon tooltip={t('Remove header')}
+              click={()=>clicked_remove(header.idx)}/>
+            {last &&
+              <Add_icon tooltip={t('Add header')} click={clicked_add}/>
+            }
+          </div>
+        </div>}</T>;
     }
 }

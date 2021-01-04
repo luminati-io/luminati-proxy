@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.215.236",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed lpm_f communication in Cloud LPM servers after a new server assignment"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed a bug where some credential fields were not cleared from proxies memory on logout"
+            }
+        ]
+    },
+    {
         "ver": "1.213.501",
         "type": "stable",
         "changes": [

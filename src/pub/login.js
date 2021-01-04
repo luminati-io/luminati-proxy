@@ -60,8 +60,9 @@ const Login = withRouter(class Login extends Pure_component {
             creds.username = this.state.username;
             creds.password = this.state.password;
         }
+        // XXX krzysztof: move to using customer.id once API is ready
         if (this.state.customer)
-            creds.customer = this.state.customer;
+            creds.customer = this.state.customer.cname;
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
@@ -77,21 +78,25 @@ const Login = withRouter(class Login extends Pure_component {
             });
             this.on('finally', ()=>_this.setState({loading: false}));
             _this.setState({loading: true});
-            const res = yield ajax.json({url: '/api/creds_user',
-                method: 'POST', data: creds, timeout: 60000});
+            const res = yield ajax.json({
+                url: '/api/creds_user',
+                method: 'POST',
+                data: creds,
+                timeout: 60000,
+            });
             if (res.error)
             {
                 _this.setState({
                     customer: null,
-                    user_customers: null,
+                    user_account_ids: null,
                     customer_selected: false,
                     error_message: res.error.message||'Something went wrong',
                 });
             }
-            else if (res.customers || res.ask_two_step)
+            else if (res.account_ids || res.ask_two_step)
             {
                 _this.setState({
-                    user_customers: res.customers,
+                    user_account_ids: res.account_ids,
                     error_message: '',
                     two_step: res.ask_two_step,
                 });
@@ -159,26 +164,30 @@ const Login = withRouter(class Login extends Pure_component {
     };
     render(){
         return <div className="lum_login">
-              <Logo/>
-              <Loader show={this.state.loading}/>
-              <Messages error_message={this.state.error_message}
-                argv={this.state.argv}
-                ver_node={this.state.ver_node}/>
-              <Header/>
-              <Form save_user={this.save_user}
-                user_customers={this.state.user_customers}
-                customer_selected={this.state.customer_selected}
-                two_step={this.state.two_step}
-                password={this.state.password}
-                username={this.state.username}
-                loading={this.state.loading}
-                sending_email={this.state.sending_email}
-                update_password={this.update_password}
-                update_username={this.update_username}
-                select_customer={this.select_customer}
-                select_final_customer={this.select_final_customer}
-                verify_two_step={this.verify_two_step}/>
-            </div>;
+          <Logo/>
+          <Loader show={this.state.loading}/>
+          <Messages
+            error_message={this.state.error_message}
+            argv={this.state.argv}
+            ver_node={this.state.ver_node}
+          />
+          <Header/>
+          <Form
+            save_user={this.save_user}
+            user_account_ids={this.state.user_account_ids}
+            customer_selected={this.state.customer_selected}
+            two_step={this.state.two_step}
+            password={this.state.password}
+            username={this.state.username}
+            loading={this.state.loading}
+            sending_email={this.state.sending_email}
+            update_password={this.update_password}
+            update_username={this.update_username}
+            select_customer={this.select_customer}
+            select_final_customer={this.select_final_customer}
+            verify_two_step={this.verify_two_step}
+          />
+        </div>;
     }
 });
 
@@ -206,29 +215,29 @@ const Node_message = ({ver_node})=>{
     if (!ver_node || ver_node.is_electron || ver_node.satisfied)
         return null;
     return <div className="warning settings-alert">
-          <div className="warning_icon"/>
-          <div>
-            <div>
-              <span>The recommended version of node.js is </span>
-              <strong>{ver_node.recommended}</strong>.
-              <span>You are using version </span>
-              <strong>{ver_node.current && ver_node.current.raw}</strong>.
-            </div>
-            <div>
-              Please upgrade your node using nvm, nave or visit
-              <a href="https://nodejs.org">node.js</a>and download a newer
-              version.
-            </div>
-            <div>
-              After node upgrade you should uninstall and then reinstall this
-              tool using:
-            </div>
-            <pre className="top-margin">
-              npm uninstall -g @luminati-io/luminati-proxy</pre>
-            <pre className="top-margin">
-              npm install -g @luminati-io/luminati-proxy</pre>
-          </div>
-        </div>;
+      <div className="warning_icon"/>
+      <div>
+        <div>
+          <span>The recommended version of node.js is </span>
+          <strong>{ver_node.recommended}</strong>.
+          <span>You are using version </span>
+          <strong>{ver_node.current && ver_node.current.raw}</strong>.
+        </div>
+        <div>
+          Please upgrade your node using nvm, nave or visit
+          <a href="https://nodejs.org">node.js</a>and download a newer
+          version.
+        </div>
+        <div>
+          After node upgrade you should uninstall and then reinstall this
+          tool using:
+        </div>
+        <pre className="top-margin">
+          npm uninstall -g @luminati-io/luminati-proxy</pre>
+        <pre className="top-margin">
+          npm install -g @luminati-io/luminati-proxy</pre>
+      </div>
+    </div>;
 };
 
 const Header = ()=>
@@ -248,27 +257,36 @@ const Form = props=>{
             +'//'+l.hostname+':'+get_location_port()+'?api_version=3');
         window.location = href;
     };
-    if (props.user_customers && !props.customer_selected)
+    if (props.user_account_ids && !props.customer_selected)
     {
-        return <Customers_form user_customers={props.user_customers}
-              select_final_customer={props.select_final_customer}
-              select_customer={props.select_customer}/>;
+        return <Customers_form
+          user_account_ids={props.user_account_ids}
+          select_final_customer={props.select_final_customer}
+          select_customer={props.select_customer}
+        />;
     }
     if (props.two_step)
     {
-        return <Two_step_form verify_two_step={props.verify_two_step}
-              email={props.username} verifying_token={props.loading}
-              sending_email={props.sending_email}/>;
+        return <Two_step_form
+          verify_two_step={props.verify_two_step}
+          email={props.username}
+          verifying_token={props.loading}
+          sending_email={props.sending_email}
+        />;
     }
-    return <First_form password={props.password}
-          username={props.username}
-          google_click={google_click}
-          save_user={props.save_user}
-          update_password={props.update_password}
-          update_username={props.update_username}/>;
+    return <First_form
+      password={props.password}
+      username={props.username}
+      google_click={google_click}
+      save_user={props.save_user}
+      update_password={props.update_password}
+      update_username={props.update_username}
+    />;
 };
 
-const filter_by = (option, props)=>option.startsWith(props.text);
+const filter_by = (option, props)=>{
+    return option.id.includes(props.text)||option.cname.includes(props.text);
+};
 
 class Customers_form extends Pure_component {
     state = {cur_customer: []};
@@ -277,27 +295,32 @@ class Customers_form extends Pure_component {
         this.props.select_customer(e&&e[0]);
     };
     render(){
+        const opt = this.props.user_account_ids
+            .map(e=>({id: e[0], cname: e[1]}));
         return <div className="row customers_form">
-              <div className="warning choose_customer">
-                Please choose a customer</div>
-              <div className="form-group">
-                <label htmlFor="user_customer">Customer</label>
-                <Typeahead id="user_customer"
-                  options={this.props.user_customers}
-                  maxResults={10}
-                  minLength={0}
-                  selectHintOnEnter
-                  filterBy={filter_by}
-                  onChange={this.on_change}
-                  selected={this.state.cur_customer}/>
-              </div>
-              <button
-                onClick={this.props.select_final_customer}
-                className="btn btn_lpm btn_login"
-                disabled={this.props.saving_user}>
-                {this.props.saving_user ? 'Logging in' : 'Sign in'}
-              </button>
-            </div>;
+          <div className="warning choose_customer">
+            Please choose a customer</div>
+          <div className="form-group">
+            <label htmlFor="user_customer">Customer</label>
+            <Typeahead
+              id="user_customer"
+              options={opt}
+              labelKey="cname"
+              maxResults={10}
+              minLength={0}
+              selectHintOnEnter
+              filterBy={filter_by}
+              onChange={this.on_change}
+              selected={this.state.cur_customer}
+            />
+          </div>
+          <button
+            onClick={this.props.select_final_customer}
+            className="btn btn_lpm btn_login"
+            disabled={this.props.saving_user}>
+            {this.props.saving_user ? 'Logging in' : 'Sign in'}
+          </button>
+        </div>;
     }
 }
 
@@ -314,26 +337,29 @@ class Two_step_form extends Pure_component {
     render(){
         const {verifying_token} = this.props;
         return <T>{t=><div className="row customers_form">
-              <div className="warning choose_customer">
-                2-Step Verification
-              </div>
-              {t('A Luminati 2-Step Verification email containing a token '
-              +'was sent to ')}
-              {this.props.email}
-              {t('. The token is valid for ')+'15 '+ t('minutes.')}
-              <div className="form-group">
-                <input className="two_step_input" onKeyUp={this.on_key_up}
-                  onChange={this.on_token_change} placeholder={t('Token')}/>
-              </div>
-              {this.props.sending_email ?
-                  t('Sending email...') :
-                  t('Can’t find it? Check your spam folder')
-              }
-              <button onClick={this.submit} className="btn btn_lpm btn_login"
-                disabled={verifying_token}>
-                {verifying_token ? t('Verifying...') : t('Verify')}
-              </button>
-            </div>}</T>;
+          <div className="warning choose_customer">
+            2-Step Verification
+          </div>
+          {t('A Luminati 2-Step Verification email containing a token '
+          +'was sent to ')}
+          {this.props.email}
+          {t('. The token is valid for ')+'15 '+ t('minutes.')}
+          <div className="form-group">
+            <input className="two_step_input"
+              onKeyUp={this.on_key_up}
+              onChange={this.on_token_change}
+              placeholder={t('Token')}
+            />
+          </div>
+          {this.props.sending_email ?
+              t('Sending email...') :
+              t('Can’t find it? Check your spam folder')
+          }
+          <button onClick={this.submit} className="btn btn_lpm btn_login"
+            disabled={verifying_token}>
+            {verifying_token ? t('Verifying...') : t('Verify')}
+          </button>
+        </div>}</T>;
     }
 }
 
@@ -345,55 +371,57 @@ const First_form = with_www_api(class First_form extends Pure_component {
     render(){
         const {google_click, saving_user, password, username} = this.props;
         return <div className="login_form">
-              <T>{t=><div>
-                <div className="row">
-                  <div className="col col_google col-sm-6">
-                    <div className="btn_google_wrapper">
-                      <a className="btn btn_lpm btn_google"
-                        onClick={google_click}>
-                        <div className="img"/>
-                        {t('Sign in with Google')}
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col col_pass col-sm-6">
-                    <div className="form-group">
-                      <label htmlFor="username">{t('Email')}</label>
-                      <input type="email"
-                        name="username"
-                        onChange={this.props.update_username}
-                        onKeyUp={this.on_key_up}
-                        value={username}/>
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="user_password">{t('Password')}</label>
-                      <input type="password"
-                        name="password"
-                        onChange={this.props.update_password}
-                        onKeyUp={this.on_key_up}
-                        value={password}/>
-                    </div>
-                    <button type="submit"
-                      className="btn btn_lpm btn_login"
-                      onClick={this.props.save_user}>
-                      {saving_user ? t('Logging in...') : t('Sign in')}
-                    </button>
-                  </div>
-                  <div className="or_circle">Or</div>
-                </div>
-                <div className="row">
-                  <div className="signup">
-                    {t('Don\'t have a Luminati account?')}
-                    <a href={`${this.props.www_api}/?need_signup=1`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link">
-                      {t('Sign up')}
-                    </a>
-                  </div>
+          <T>{t=><div>
+            <div className="row">
+              <div className="col col_google col-sm-6">
+                <div className="btn_google_wrapper">
+                  <a className="btn btn_lpm btn_google"
+                    onClick={google_click}>
+                    <div className="img"/>
+                    {t('Sign in with Google')}
+                  </a>
                 </div>
               </div>
-            }</T></div>;
+              <div className="col col_pass col-sm-6">
+                <div className="form-group">
+                  <label htmlFor="username">{t('Email')}</label>
+                  <input type="email"
+                    name="username"
+                    onChange={this.props.update_username}
+                    onKeyUp={this.on_key_up}
+                    value={username}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="user_password">{t('Password')}</label>
+                  <input type="password"
+                    name="password"
+                    onChange={this.props.update_password}
+                    onKeyUp={this.on_key_up}
+                    value={password}
+                  />
+                </div>
+                <button type="submit"
+                  className="btn btn_lpm btn_login"
+                  onClick={this.props.save_user}>
+                  {saving_user ? t('Logging in...') : t('Sign in')}
+                </button>
+              </div>
+              <div className="or_circle">Or</div>
+            </div>
+            <div className="row">
+              <div className="signup">
+                {t('Don\'t have a Luminati account?')}
+                <a href={`${this.props.www_api}/?need_signup=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link">
+                  {t('Sign up')}
+                </a>
+              </div>
+            </div>
+          </div>
+        }</T></div>;
     }
 });
 
