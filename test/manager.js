@@ -71,11 +71,10 @@ describe('manager', ()=>{
         Manager.prototype.init_ws_lpm_f = ()=>null;
         Manager.prototype.init_ws_lpm_conn = ()=>null;
         Manager.prototype.get_lpm_conf = function(){
-            this.lum_conf = {_defaults: {zones: {
+            return {_defaults: {zones: {
                 static: {},
                 foo: {},
             }}};
-            return this.lum_conf;
         };
         manager = new Manager(lpm_util.init_args(args));
         yield manager.start();

@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ajax from '../../../util/ajax.js';
-import {Instructions, Li} from './bullets.js';
+import {Instructions, Li} from '/www/util/pub/bullets.js';
 import {Loader, with_www_api} from '../common.js';
 import {Modal} from './modals.js';
 import {report_exception} from '../util.js';

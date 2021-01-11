@@ -17,7 +17,6 @@ export default class Alloc_modal extends Pure_component {
         available_list: [],
         rendered_list: [],
         selected_all: false,
-        refresh_cost: 0,
         ip_filter: '',
     };
     constructor(props){
@@ -33,11 +32,6 @@ export default class Alloc_modal extends Pure_component {
         this.setdb_on('head.proxies_running', proxies=>
             proxies && this.setState({proxies}));
         $('#allocated_ips').on('show.bs.modal', this.load);
-        this.load_refresh_cost();
-    }
-    componentDidUpdate(prevProps){
-        if (prevProps.zone!=this.props.zone)
-            this.load_refresh_cost();
     }
     static getDerivedStateFromProps(props, state){
         if (!state.available_list.length)
@@ -237,16 +231,6 @@ export default class Alloc_modal extends Pure_component {
     cols = [
         {id: 'ip', title: 'IP'},
     ];
-    load_refresh_cost(){
-        if (!this.props.zone || !this.is_refresh_enabled())
-            return;
-        const _this = this;
-        this.etask(function*(){
-            const response = yield ajax.json({url: '/api/refresh_cost',
-                qs: {zone: _this.props.zone}});
-            _this.setState({refresh_cost: response.cost});
-        });
-    }
     on_filter_change(e){
         this.setState({ip_filter: e.target.value}, this.sync_rendered_list);
     }
@@ -261,38 +245,41 @@ export default class Alloc_modal extends Pure_component {
         const title = 'Select the '+type_label+' ('+this.props.zone+')';
         const refresh_enabled = this.is_refresh_enabled();
         const selected_list = this.props.form[this.props.type]||[];
-        const refresh_cost = selected_list.length*this.state.refresh_cost;
+        const zones = this.props.zones && this.props.zones.zones || [];
+        const zone = zones.find(z=>z.name==this.props.zone);
+        const refresh_cost = zone && zone.refresh_cost;
+        const total_cost = selected_list.length*refresh_cost;
         const Footer = <div className="default_footer">
-              {refresh_enabled &&
-                <button onClick={this.refresh_chosen} className="btn btn_lpm"
-                  disabled={!selected_list.length}>
-                  Refresh
-                  {refresh_cost>0 && ` (${conv.fmt_currency(refresh_cost)})`}
-                </button>
-              }
-              <button onClick={this.close}
-                className="btn btn_lpm btn_lpm_primary">OK</button>
-            </div>;
+          {refresh_enabled &&
+            <button onClick={this.refresh_chosen} className="btn btn_lpm"
+              disabled={!selected_list.length}>
+              Refresh
+              {total_cost>0 && ` (${conv.fmt_currency(total_cost)})`}
+            </button>
+          }
+          <button onClick={this.close}
+            className="btn btn_lpm btn_lpm_primary">OK</button>
+        </div>;
         const sub_title = `IPs: ${selected_list.length}/`
         +`${this.props.form.pool_size} out of`
         +` ${this.state.available_list.length} available`;
         return <Modal id="allocated_ips" className="allocated_ips_modal"
-              title={title} footer={Footer}>
-              <Infinite_chrome_table cols={this.cols}
-                title={sub_title}
-                toolbar={<div className="search_box">
-                  <input value={this.state.ip_filter} placeholder="IP filter"
-                    onChange={e=>this.on_filter_change(e)}/>
-                </div>}
-                class_name="in_modal_table"
-                selectable
-                toggle={this.toggle}
-                select_all={this.select_all}
-                unselect_all={this.unselect_all}
-                selected_list={selected_list}
-                selected_all={this.state.selected_all}
-                rows={this.state.rendered_list}>
-              </Infinite_chrome_table>
-            </Modal>;
+          title={title} footer={Footer}>
+          <Infinite_chrome_table cols={this.cols}
+            title={sub_title}
+            toolbar={<div className="search_box">
+              <input value={this.state.ip_filter} placeholder="IP filter"
+                onChange={e=>this.on_filter_change(e)}/>
+            </div>}
+            class_name="in_modal_table"
+            selectable
+            toggle={this.toggle}
+            select_all={this.select_all}
+            unselect_all={this.unselect_all}
+            selected_list={selected_list}
+            selected_all={this.state.selected_all}
+            rows={this.state.rendered_list}>
+          </Infinite_chrome_table>
+        </Modal>;
     }
 }

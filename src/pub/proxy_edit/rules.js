@@ -5,7 +5,6 @@ import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import setdb from '../../../util/setdb.js';
-import ajax from '../../../util/ajax.js';
 import conv from '../../../util/conv.js';
 import {migrate_trigger, no_ssl_trigger_types, trigger_types,
     action_types, default_action, WWW_API} from '../../../util/rules_util.js';
@@ -421,19 +420,9 @@ class Action extends Pure_component {
         });
         this.setdb_on('head.proxy_edit.zone_name', curr_zone=>{
             if (curr_zone)
-                this.setState({curr_zone}, this.load_refresh_cost);
+                this.setState({curr_zone});
         });
     }
-    load_refresh_cost = ()=>{
-        if (!this.should_show_refresh())
-            return;
-        const _this = this;
-        this.etask(function*(){
-            const response = yield ajax.json({url: '/api/refresh_cost',
-                qs: {zone: _this.state.curr_zone}});
-            _this.setState({refresh_cost: response.cost});
-        });
-    };
     action_changed = val=>{
         const {ports_opt, match, rule, set_rule_field,
             change_ui_block} = this.props;
@@ -485,12 +474,13 @@ class Action extends Pure_component {
     };
     render(){
         const {rule, match, ports_opt} = this.props;
-        const {defaults, settings, zones, curr_zone, refresh_cost, form} =
-            this.state;
+        const {defaults, settings, zones, curr_zone, form} = this.state;
         if (!rule.trigger_type || !settings || !defaults || !form)
             return null;
         if (!zones || !curr_zone)
             return null;
+        const zone = (zones.zones||[]).find(z=>z.name==curr_zone);
+        const refresh_cost = zone && zone.refresh_cost;
         let _action_types = this.action_types_with_updated_domain()
             .filter(at=>rule.trigger_type=='url' && at.url ||
                 rule.trigger_type!='url' && !at.only_url)
@@ -528,42 +518,42 @@ class Action extends Pure_component {
             {value: 60, label: '60 minutes'},
         ];
         return <React.Fragment>
-              <div className="action ui">
-                {rule.trigger_type &&
-                  <Rule_config id="action" type="select" data={_action_types}
-                    on_change={this.action_changed} rule={rule}/>
-                }
-                {rule.action=='retry' &&
-                  <Rule_config id="retry_number" type="select_number"
+          <div className="action ui">
+            {rule.trigger_type &&
+              <Rule_config id="action" type="select" data={_action_types}
+                on_change={this.action_changed} rule={rule}/>
+            }
+            {rule.action=='retry' &&
+              <Rule_config id="retry_number" type="select_number"
+                rule={rule}/>
+            }
+            {rule.action=='retry_port' &&
+              <Rule_config id="retry_port" type="select" data={ports}
+                rule={rule}/>
+            }
+            {rule.action=='switch_port' &&
+              <Rule_config id="switch_port" type="select" data={ports}
+                rule={rule}/>
+            }
+            {ban_action &&
+              <Rule_config id="ban_ip_duration" type="select_number"
+                data={ban_opt} rule={rule} note={<Ban_ips_note/>}
+                class_name="ban_action"/>
+            }
+            {rule.action=='request_url' &&
+              <div>
+                <Rule_config id="request_url" type="url" rule={rule}/>
+                <Rule_config id="request_method" type="select" rule={rule}
+                    data={this.request_methods()}
+                    on_change={this.request_method_changed}/>
+                {rule.request_method && rule.request_method!='GET' &&
+                  <Rule_config id="request_payload" type="json"
                     rule={rule}/>
-                }
-                {rule.action=='retry_port' &&
-                  <Rule_config id="retry_port" type="select" data={ports}
-                    rule={rule}/>
-                }
-                {rule.action=='switch_port' &&
-                  <Rule_config id="switch_port" type="select" data={ports}
-                    rule={rule}/>
-                }
-                {ban_action &&
-                  <Rule_config id="ban_ip_duration" type="select_number"
-                    data={ban_opt} rule={rule} note={<Ban_ips_note/>}
-                    class_name="ban_action"/>
-                }
-                {rule.action=='request_url' &&
-                  <div>
-                    <Rule_config id="request_url" type="url" rule={rule}/>
-                    <Rule_config id="request_method" type="select" rule={rule}
-                        data={this.request_methods()}
-                        on_change={this.request_method_changed}/>
-                    {rule.request_method && rule.request_method!='GET' &&
-                      <Rule_config id="request_payload" type="json"
-                        rule={rule}/>
-                    }
-                  </div>
                 }
               </div>
-            </React.Fragment>;
+            }
+          </div>
+        </React.Fragment>;
     }
 }));
 
@@ -599,43 +589,46 @@ class Trigger extends Pure_component {
                 it based on your selections.`;
         }
         return <React.Fragment>
-              <div className="trigger ui" onFocus={e=>e.stopPropagation()}>
-                <Tooltip title={tip}>
-                <div className={classnames('mask', {active: ui_blocked})}>
-                  <button className="btn btn_lpm btn_lpm_small reset_btn"
-                    onClick={()=>change_ui_block(false)}>
-                    Restore
-                  </button>
-                </div>
-                </Tooltip>
-                <Rule_config id="trigger_type" type="select"
-                  data={ssl ? trigger_types : no_ssl_trigger_types}
-                  on_change={this.trigger_changed} rule={rule}/>
-                {rule.trigger_type=='body' &&
-                  <Rule_config id="body_regex" type="regex_text" rule={rule}
-                    field_row_inner_style={{paddingBottom: '1em'}}
-                    style={{borderRadius: '4px'}}/>
-                }
-                {rule.trigger_type=='min_req_time' &&
-                  <Rule_config id="min_req_time" type="select_number"
-                    range="ms" sufix="milliseconds" rule={rule}/>
-                }
-                {rule.trigger_type=='max_req_time' &&
-                  <Rule_config id="max_req_time" type="select_number"
-                    range="ms" sufix="milliseconds" rule={rule}/>
-                }
-                {rule.trigger_type=='status' &&
-                  <Rule_config id="status" type="select_status" rule={rule}/>
-                }
-                {rule.trigger_type &&
-                  <Rule_config id="trigger_url_regex" type="regex"
-                    rule={rule} style={{width: '100%'}}
-                    field_row_inner_style={{paddingBottom: '1em'}}/>}
-              </div>
-              <Trigger_code rule={rule} disabled={disabled}
-                type_changed={()=>change_ui_block(true)}
-                trigger_code_changed={this.trigger_code_changed}/>
-            </React.Fragment>;
+          <div className="trigger ui" onFocus={e=>e.stopPropagation()}>
+            <Tooltip title={tip}>
+            <div className={classnames('mask', {active: ui_blocked})}>
+              <button className="btn btn_lpm btn_lpm_small reset_btn"
+                onClick={()=>change_ui_block(false)}>
+                Restore
+              </button>
+            </div>
+            </Tooltip>
+            <Rule_config id="trigger_type" type="select"
+              data={ssl ? trigger_types : no_ssl_trigger_types}
+              on_change={this.trigger_changed} rule={rule}/>
+            {rule.trigger_type=='body' &&
+              <Rule_config id="body_regex" type="regex_text" rule={rule}
+                field_row_inner_style={{paddingBottom: '1em'}}
+                style={{borderRadius: '4px'}}/>
+            }
+            {rule.trigger_type=='min_req_time' &&
+              <Rule_config id="min_req_time" type="select_number"
+                range="ms" sufix="milliseconds" rule={rule}/>
+            }
+            {rule.trigger_type=='max_req_time' &&
+              <Rule_config id="max_req_time" type="select_number"
+                range="ms" sufix="milliseconds" rule={rule}/>
+            }
+            {rule.trigger_type=='status' &&
+              <Rule_config id="status" type="select_status" rule={rule}/>
+            }
+            {rule.trigger_type &&
+              <Rule_config id="trigger_url_regex" type="regex"
+                rule={rule} style={{width: '100%'}}
+                field_row_inner_style={{paddingBottom: '1em'}}/>}
+          </div>
+          <Trigger_code
+            rule={rule}
+            disabled={disabled}
+            type_changed={()=>change_ui_block(true)}
+            trigger_code_changed={this.trigger_code_changed}
+          />
+        </React.Fragment>;
     }
 }
 
@@ -665,14 +658,22 @@ class Trigger_code extends Pure_component {
         if (!this.state.trigger_code)
             return null;
         return <div className="trigger code">
-              <Rule_config id="type" type="select" data={this.type_opt}
-                rule={rule} val={this.state.type}
-                desc_style={{width: 'auto', minWidth: 'initial'}}
-                field_row_inner_style={{paddingBottom: 6}}
-                on_change={type_changed}/>
-              <Cm_wrapper on_change={trigger_code_changed}
-                val={this.state.trigger_code} readonly={disabled}/>
-            </div>;
+          <Rule_config
+            id="type"
+            type="select"
+            data={this.type_opt}
+            rule={rule}
+            val={this.state.type}
+            desc_style={{width: 'auto', minWidth: 'initial'}}
+            field_row_inner_style={{paddingBottom: 6}}
+            on_change={type_changed}
+          />
+          <Cm_wrapper
+            on_change={trigger_code_changed}
+            val={this.state.trigger_code}
+            readonly={disabled}
+          />
+        </div>;
     }
 }
 
@@ -691,11 +692,11 @@ const Btn_rule_toggle = ({expanded, expand, collapse})=>{
     };
     const tip = expanded ? 'Collapse' : 'Expand';
     return <Tooltip title={tip}>
-        <div tabIndex={-1}
-        className="btn_rule toggle"
-        onClick={on_click}
-        onFocus={e=>e.stopPropagation()}>
-          <button className={classnames({expanded, collapsed: !expanded})}/>
-        </div>
-      </Tooltip>;
+      <div tabIndex={-1}
+      className="btn_rule toggle"
+      onClick={on_click}
+      onFocus={e=>e.stopPropagation()}>
+        <button className={classnames({expanded, collapsed: !expanded})}/>
+      </div>
+    </Tooltip>;
 };

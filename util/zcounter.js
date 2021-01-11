@@ -231,6 +231,8 @@ E.glob_inc_level = (name, inc, agg_mas, agg_srv)=>
 E.glob_avg = (name, value, agg_srv)=>E.avg('glob/'+name, value, agg_srv);
 E.glob_max = (name, value, agg_srv)=>E.max('glob/'+name, value, agg_srv);
 E.glob_min = (name, value, agg_srv)=>E.min('glob/'+name, value, agg_srv);
+E.glob_set_level = (name, value, agg_mas, agg_srv)=>
+    E.set_level('glob/'+name, value, agg_mas, agg_srv);
 
 E.del = name=>{
     if (reported_names[name])

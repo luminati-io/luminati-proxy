@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.216.52",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added an option to fetch single proxy ports over the API"
+            },
+            {
+                "type": "star",
+                "text": "Moved part of the API from HTTP to Web Socket"
+            }
+        ]
+    },
+    {
         "ver": "1.215.236",
         "type": "stable",
         "changes": [

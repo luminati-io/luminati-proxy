@@ -5,7 +5,6 @@ import $ from 'jquery';
 import moment from 'moment';
 import classnames from 'classnames';
 import {withRouter} from 'react-router-dom';
-import React_tooltip from 'react-tooltip';
 import {Waypoint} from 'react-waypoint';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -14,35 +13,12 @@ import 'codemirror/mode/htmlmixed/htmlmixed';
 import Pure_component from '/www/util/pub/pure_component.js';
 import zutil from '../../../util/util.js';
 import setdb from '../../../util/setdb.js';
-import etask from '../../../util/etask.js';
-import ajax from '../../../util/ajax.js';
-import {bytes_format} from '../util.js';
+import {bytes_format, get_troubleshoot} from '../util.js';
 import {Toolbar_button} from '../chrome_widgets.js';
-import {Tooltip_bytes} from '../common.js';
 import Tooltip from '../common/tooltip.js';
 import {trigger_types, action_types} from '../../../util/rules_util.js';
 import {Copy_btn} from '../common.js';
 import './viewer.less';
-
-const loader = {
-    start: ()=>$('#har_viewer').addClass('waiting'),
-    end: ()=>$('#har_viewer').removeClass('waiting'),
-};
-
-// XXX krzysztof: to move to Lpm_har_viewer
-const enable_ssl_click = port=>etask(function*(){
-    this.on('finally', ()=>{
-        loader.end();
-    });
-    loader.start();
-    yield window.fetch('/api/enable_ssl', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({port}),
-    });
-    const proxies = yield ajax.json({url: '/api/proxies_running'});
-    setdb.set('head.proxies_running', proxies);
-});
 
 export class Preview extends Pure_component {
     panes = [
@@ -651,193 +627,6 @@ const Value_object = ({val})=>{
     return <span className="value object">{JSON.stringify(val)}</span>;
 };
 
-const error_desc = [
-    // proxy.js
-    {
-        regex: /Bad Port. Ports we support/,
-        description: <span/>,
-    },
-    {
-        regex: /We do not have IPs in the city you requested/,
-        description: <span/>,
-    },
-    {
-        regex: /Request is not allowed from peers and sent from super proxy/,
-        description: <span/>,
-    },
-    {
-        regex: /You tried to target .* but got blocked/,
-        description: <span/>,
-    },
-    {
-        regex: /request needs to be made using residential network/,
-        description: <span/>,
-    },
-    {
-        regex: /target site requires special permission/,
-        description: <span/>,
-    },
-    {
-        regex: /target site requires exclusive domains permission/,
-        description: <span/>,
-    },
-    {
-        regex: /Forbidden Host/,
-        description: <span/>,
-    },
-    {
-        regex: /Forbidden auth key ipv6/,
-        description: <span/>,
-    },
-    {
-        regex: /Zone has reached its usage limit/,
-        description: <span/>,
-    },
-    {
-        regex: /Request rate too high/,
-        description: <span/>,
-    },
-    {
-        regex: /Host is blocked in requested country/,
-        description: <span/>,
-    },
-    {
-        regex: /Zone has reached its usage limit/,
-        description: <span/>,
-    },
-    // agent_conn.js find_reasons
-    {
-        regex: /No peers available/,
-        description: <span/>,
-    },
-    {
-        regex: /not matching any of allocated gIPs/,
-        description: <span>This error means that the chosen targeting could
-            not be applied on any of the allocated gIPs. Go to the
-            <b>Targeting</b> tab and remove the selected criteria and try
-            again
-        </span>,
-    },
-    {
-        regex: /Zone wrong status/,
-        description: <span/>,
-    },
-    {
-        regex: /Internal server error/,
-        description: <span/>,
-    },
-    {
-        regex: /Wrong city/,
-        description: <span/>,
-    },
-    {
-        regex: /No matching fallback IP/,
-        description: <span/>,
-    },
-    // zone_util.js disabled_reasons_names
-    {
-        regex: /Wrong customer name/,
-        description: <span/>,
-    },
-    {
-        regex: /Customer suspended/,
-        description: <span/>,
-    },
-    {
-        regex: /Customer disabled/,
-        description: <span/>,
-    },
-    {
-        regex: /IP forbidden/,
-        description: <span/>,
-    },
-    {
-        regex: /Wrong password/,
-        description: <span/>,
-    },
-    {
-        regex: /Zone not found/,
-        description: <span/>,
-    },
-    {
-        regex: /No passwords/,
-        description: <span/>,
-    },
-    {
-        regex: /No IPs/,
-        description: <span/>,
-    },
-    {
-        regex: /Usage limit reached/,
-        description: <span/>,
-    },
-    {
-        regex: /No plan/,
-        description: <span/>,
-    },
-    {
-        regex: /Plan disabled/,
-        description: <span/>,
-    },
-    // other errors
-    {
-        regex: /socket hang up/,
-        description: <span/>,
-    },
-    {
-        regex: /Could not resolve host/,
-        description: <span/>,
-    },
-    {
-        regex: /ECONNREFUSED/,
-        description: <span/>,
-    },
-    {
-        regex: /EADDRINUSE/,
-        description: <span/>,
-    },
-    {
-        regex: /ENETUNREACH/,
-        description: <span/>,
-    }
-];
-
-const get_troubleshoot = (body, status_code, headers)=>{
-    let title;
-    let info;
-    headers = headers||[];
-    if (/([123]..|404)/.test(status_code))
-        return {title, info};
-    if (status_code=='canceled')
-    {
-        return {title: 'canceled by the sender', info: 'This request has been'
-            +' canceled by the sender (your browser or scraper).'};
-    }
-    title = (headers.find(h=>
-        h.name=='x-luminati-error'||h.name=='x-lpm-error')||{}).value||'';
-    for (let {regex, description} of error_desc)
-    {
-        if (regex.test(title))
-            return {title, info: description};
-    }
-    if (title)
-    {
-        let lpm = (headers.find(h=>h.name=='x-lpm-error')||{}).value||'';
-        let lum = (headers.find(h=>h.name=='x-luminati-error')||{}).value||'';
-        undescribed_error({status_code, title, lpm, lum});
-    }
-    return {title, info: ''};
-};
-
-const undescribed_error = (()=>{
-    let executed;
-    return message=>{
-        if (executed)
-            return;
-        executed = true;
-    };
-})();
-
 const with_resizable_cols = Table=>{
     class Resizable extends React.PureComponent {
         constructor(props){
@@ -1078,6 +867,7 @@ export class Har_viewer extends Pure_component {
             />
             <div className="split_widget vbox flex_auto">
               <Tables_container
+                Cell_value={this.props.Cell_value}
                 table_cols={this.props.table_cols}
                 main_panel_moving={this.main_panel_moving}
                 main_panel_stopped_moving=
@@ -1289,6 +1079,7 @@ class Tables_container extends Pure_component {
               sorted={this.props.sorted}
               only_name={!!this.props.cur_preview}/>
             <Data_container
+              Cell_value={this.props.Cell_value}
               cols={this.props.cols}
               reqs={this.props.reqs}
               handle_viewpoint_enter={this.props.handle_viewpoint_enter}
@@ -1383,7 +1174,9 @@ class Data_container extends Pure_component {
                 />
               )}
             </colgroup>
-            <Data_rows reqs={reqs}
+            <Data_rows
+              Cell_value={this.props.Cell_value}
+              reqs={reqs}
               cols={cols}
               open_preview={open_preview}
               cur_preview={cur_preview}
@@ -1408,7 +1201,9 @@ class Data_rows extends React.Component {
     render(){
         return <tbody>
           {this.props.reqs.map(r=>
-            <Data_row cols={this.props.cols}
+            <Data_row
+              Cell_value={this.props.Cell_value}
+              cols={this.props.cols}
               key={r.uuid}
               open_preview={this.props.open_preview}
               cur_preview={this.props.cur_preview}
@@ -1450,205 +1245,10 @@ class Data_row extends React.Component {
         return <tr className={classes}>
           {cols.map((c, idx)=>
             <td key={c.title} onClick={this.cell_clicked}>
-              <Cell_value col={c.title} req={req}/>
+              <this.props.Cell_value col={c.title} req={req}/>
             </td>
           )}
         </tr>;
     }
 }
-
-const maybe_pending = Component=>function pies(props){
-    if (props.pending)
-    {
-        return <Tooltip title="The request is still loading">
-          <div className="disp_value">pending</div>
-        </Tooltip>;
-    }
-    return <Component {...props}/>;
-};
-
-class Cell_value extends React.Component {
-    render(){
-        const {col, req, req: {details: {timeline, rules}}} = this.props;
-        if (col=='Name')
-            return <Name_cell req={req} timeline={timeline} rules={rules}/>;
-        else if (col=='Status')
-        {
-            return <Status_code_cell req={req}
-              status={req.response.status}
-              status_text={req.response.statusText}
-              pending={!!req.pending}
-              uuid={req.uuid}
-            />;
-        }
-        else if (col=='Proxy port')
-            return <Tooltip_and_value val={req.details.port}/>;
-        else if (col=='Bandwidth')
-            return <Tooltip_bytes bytes={req.details.bw}/>;
-        else if (col=='Time')
-        {
-            return <Time_cell time={req.time}
-              url={req.request.url}
-              pending={!!req.pending}
-              uuid={req.uuid}
-              port={req.details.port}
-            />;
-        }
-        else if (col=='Peer proxy')
-        {
-            const ip = req.details.proxy_peer;
-            const ext_proxy = (setdb.get('head.proxies_running')||[])
-                .some(p=>p.port==req.details.port && p.ext_proxies);
-            let val;
-            if (ip && (ip=='superproxy bypass' || ip.length < 16))
-                val = ip;
-            else if (ip)
-                val = `...${ip.slice(-5)}`;
-            else
-                val = '';
-            const tip = ext_proxy ? 'This feature is only available when '
-                +'using proxies by Luminati network' : ip;
-            return <Tooltip_and_value
-              val={val}
-              tip={tip}
-              pending={!!req.pending}
-            />;
-        }
-        else if (col=='Date')
-        {
-            const local = moment(new Date(req.details.timestamp))
-                .format('YYYY-MM-DD HH:mm:ss');
-            return <Tooltip_and_value val={local}/>;
-        }
-        else if (col=='Troubleshooting')
-        {
-            const troubleshoot = get_troubleshoot(req.response.content.text,
-                req.response.status, req.response.headers);
-            return <Tooltip_and_value val={troubleshoot.title}/>;
-        }
-        return col;
-    }
-}
-
-class Name_cell extends Pure_component {
-    go_to_rules = e=>setdb.emit('har_viewer.set_pane', 4);
-    render(){
-        const {req, rules} = this.props;
-        const rule_tip = 'At least one rule has been applied to this '
-        +'request. Click to see more details';
-        const status_check = req.details.context=='STATUS CHECK';
-        const is_ban = r=>Object.keys(r.action||{})
-            .some(a=>a.startsWith('ban_ip'));
-        const bad = (rules||[]).some(is_ban);
-        const icon_classes = classnames('small_icon', 'rules', {
-            good: !bad, bad});
-        return <div className="col_name">
-          <div>
-            <div className="icon script"/>
-            {!!rules && !!rules.length &&
-              <Tooltip title={rule_tip}>
-                <div onClick={this.go_to_rules} className={icon_classes}/>
-              </Tooltip>
-            }
-            <Tooltip title={req.request.url}>
-              <div className="disp_value">
-                {req.request.url + (status_check ? ' (status check)' : '')}
-              </div>
-            </Tooltip>
-          </div>
-        </div>;
-    }
-}
-
-const Status_code_cell = maybe_pending(props=>{
-    const {status, status_text, uuid, req} = props;
-    const get_desc = ()=>{
-        const err_header = req.response.headers.find(
-            r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
-        if (status==502 && err_header)
-            return err_header.value;
-        return status=='canceled' ? '' : status_text;
-    };
-    if (status=='unknown')
-    {
-        return <Encrypted_cell name="Status code"
-          id={`s${uuid}`}
-          port={req.details.port}
-        />;
-    }
-    const desc = get_desc(status);
-    return <Tooltip title={`${status} ${desc}`}>
-      <div className="disp_value">{status}</div>
-    </Tooltip>;
-});
-
-const Time_cell = maybe_pending(props=>{
-    const {port, time, url, uuid} = props;
-    if (!url.endsWith(':443') || !time)
-        return <Tooltip_and_value val={time && time+' ms'}/>;
-    return <Encrypted_cell name="Timing" id={uuid} port={port}/>;
-});
-
-class Encrypted_cell extends Pure_component {
-    state = {proxies: []};
-    componentDidMount(){
-        this.setdb_on('head.proxies_running', proxies=>{
-            if (!proxies)
-                return;
-            this.setState({proxies});
-        });
-    }
-    is_ssl_on = port=>{
-        const proxy = this.state.proxies.find(p=>p.port==port);
-        if (!proxy)
-            return false;
-        return proxy.ssl;
-    };
-    render(){
-        const {id, name, port} = this.props;
-        const ssl = this.is_ssl_on(port);
-        return <div onClick={e=>e.stopPropagation()} className="disp_value">
-          <React_tooltip id={id}
-            type="info"
-            effect="solid"
-            delayHide={100}
-            delayShow={0}
-            delayUpdate={500}
-            offset={{top: -10}}>
-            <div>
-              {name} of this request could not be parsed because the
-              connection is encrypted.
-            </div>
-            {!ssl &&
-                <div style={{marginTop: 10}}>
-                  <a onClick={()=>enable_ssl_click(port)}
-                    className="link">
-                    Enable SSL analyzing
-                  </a>
-                  <span>
-                    to see {name} and other information about requests
-                  </span>
-                </div>
-            }
-            {ssl &&
-                <div style={{marginTop: 10}}>
-                  SSL analyzing is already turned on and all the future
-                  requestes will be decoded. This request can't be decoded
-                  retroactively
-                </div>
-            }
-          </React_tooltip>
-          <div data-tip="React-tooltip" data-for={id}>
-            <span>unknown</span>
-            <div className="small_icon status info"/>
-          </div>
-        </div>;
-    }
-}
-
-const Tooltip_and_value = maybe_pending(({val, tip})=>
-    <Tooltip title={tip||val}>
-      <div className="disp_value">{val||'—'}</div>
-    </Tooltip>
-);
 

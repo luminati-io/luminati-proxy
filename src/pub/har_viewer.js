@@ -4,18 +4,39 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 import {Route, Link, withRouter} from 'react-router-dom';
+import classnames from 'classnames';
+import moment from 'moment';
+import React_tooltip from 'react-tooltip';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ajax from '../../util/ajax.js';
+import etask from '../../util/etask.js';
 import zescape from '../../util/escape.js';
 import setdb from '../../util/setdb.js';
 import zutil from '../../util/util.js';
+import Tooltip from './common/tooltip.js';
 import {Har_viewer} from './har/viewer.js';
+import {Tooltip_bytes} from './common.js';
+import {get_troubleshoot} from './util.js';
 import ws from './ws.js';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
     end: ()=>$('#har_viewer').removeClass('waiting'),
 };
+
+const enable_ssl_click = port=>etask(function*(){
+    this.on('finally', ()=>{
+        loader.end();
+    });
+    loader.start();
+    yield window.fetch('/api/enable_ssl', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({port}),
+    });
+    const proxies = yield ajax.json({url: '/api/proxies_running'});
+    setdb.set('head.proxies_running', proxies);
+});
 
 const table_cols = [
     {title: 'select', hidden: true, fixed: 27, tooltip: 'Select/unselect all'},
@@ -315,6 +336,7 @@ class Lpm_har_viewer extends Pure_component {
             />;
         }
         return <Har_viewer {...this.props}
+          Cell_value={Cell_value}
           table_cols={table_cols}
           proxies={this.state.proxies}
           clear_logs={this.clear_logs}
@@ -344,3 +366,199 @@ const Logs_off_notice = ()=>
         <Link to="/settings">General settings</Link>
       </h4>
     </div>;
+
+const maybe_pending = Component=>function pies(props){
+    if (props.pending)
+    {
+        return <Tooltip title="The request is still loading">
+          <div className="disp_value">pending</div>
+        </Tooltip>;
+    }
+    return <Component {...props}/>;
+};
+
+const Status_code_cell = maybe_pending(props=>{
+    const {status, status_text, uuid, req} = props;
+    const get_desc = ()=>{
+        const err_header = req.response.headers.find(
+            r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
+        if (status==502 && err_header)
+            return err_header.value;
+        return status=='canceled' ? '' : status_text;
+    };
+    if (status=='unknown')
+    {
+        return <Encrypted_cell name="Status code"
+          id={`s${uuid}`}
+          port={req.details.port}
+        />;
+    }
+    const desc = get_desc(status);
+    return <Tooltip title={`${status} ${desc}`}>
+      <div className="disp_value">{status}</div>
+    </Tooltip>;
+});
+
+const Time_cell = maybe_pending(props=>{
+    const {port, time, url, uuid} = props;
+    if (!url.endsWith(':443') || !time)
+        return <Tooltip_and_value val={time && time+' ms'}/>;
+    return <Encrypted_cell name="Timing" id={uuid} port={port}/>;
+});
+
+const Tooltip_and_value = maybe_pending(({val, tip})=>
+    <Tooltip title={tip||val}>
+      <div className="disp_value">{val||'—'}</div>
+    </Tooltip>
+);
+
+class Name_cell extends Pure_component {
+    go_to_rules = e=>setdb.emit('har_viewer.set_pane', 4);
+    render(){
+        const {req, rules} = this.props;
+        const rule_tip = 'At least one rule has been applied to this '
+        +'request. Click to see more details';
+        const status_check = req.details.context=='STATUS CHECK';
+        const is_ban = r=>Object.keys(r.action||{})
+            .some(a=>a.startsWith('ban_ip'));
+        const bad = (rules||[]).some(is_ban);
+        const icon_classes = classnames('small_icon', 'rules', {
+            good: !bad, bad});
+        return <div className="col_name">
+          <div>
+            <div className="icon script"/>
+            {!!rules && !!rules.length &&
+              <Tooltip title={rule_tip}>
+                <div onClick={this.go_to_rules} className={icon_classes}/>
+              </Tooltip>
+            }
+            <Tooltip title={req.request.url}>
+              <div className="disp_value">
+                {req.request.url + (status_check ? ' (status check)' : '')}
+              </div>
+            </Tooltip>
+          </div>
+        </div>;
+    }
+}
+
+class Encrypted_cell extends Pure_component {
+    state = {proxies: []};
+    componentDidMount(){
+        this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies)
+                return;
+            this.setState({proxies});
+        });
+    }
+    is_ssl_on = port=>{
+        const proxy = this.state.proxies.find(p=>p.port==port);
+        if (!proxy)
+            return false;
+        return proxy.ssl;
+    };
+    render(){
+        const {id, name, port} = this.props;
+        const ssl = this.is_ssl_on(port);
+        return <div onClick={e=>e.stopPropagation()} className="disp_value">
+          <React_tooltip id={id}
+            type="info"
+            effect="solid"
+            delayHide={100}
+            delayShow={0}
+            delayUpdate={500}
+            offset={{top: -10}}>
+            <div>
+              {name} of this request could not be parsed because the
+              connection is encrypted.
+            </div>
+            {!ssl &&
+                <div style={{marginTop: 10}}>
+                  <a onClick={()=>enable_ssl_click(port)}
+                    className="link">
+                    Enable SSL analyzing
+                  </a>
+                  <span>
+                    to see {name} and other information about requests
+                  </span>
+                </div>
+            }
+            {ssl &&
+                <div style={{marginTop: 10}}>
+                  SSL analyzing is already turned on and all the future
+                  requestes will be decoded. This request can't be decoded
+                  retroactively
+                </div>
+            }
+          </React_tooltip>
+          <div data-tip="React-tooltip" data-for={id}>
+            <span>unknown</span>
+            <div className="small_icon status info"/>
+          </div>
+        </div>;
+    }
+}
+
+class Cell_value extends React.Component {
+    render(){
+        const {col, req, req: {details: {timeline, rules}}} = this.props;
+        if (col=='Name')
+            return <Name_cell req={req} timeline={timeline} rules={rules}/>;
+        else if (col=='Status')
+        {
+            return <Status_code_cell req={req}
+              status={req.response.status}
+              status_text={req.response.statusText}
+              pending={!!req.pending}
+              uuid={req.uuid}
+            />;
+        }
+        else if (col=='Proxy port')
+            return <Tooltip_and_value val={req.details.port}/>;
+        else if (col=='Bandwidth')
+            return <Tooltip_bytes bytes={req.details.bw}/>;
+        else if (col=='Time')
+        {
+            return <Time_cell time={req.time}
+              url={req.request.url}
+              pending={!!req.pending}
+              uuid={req.uuid}
+              port={req.details.port}
+            />;
+        }
+        else if (col=='Peer proxy')
+        {
+            const ip = req.details.proxy_peer;
+            const ext_proxy = (setdb.get('head.proxies_running')||[])
+                .some(p=>p.port==req.details.port && p.ext_proxies);
+            let val;
+            if (ip && (ip=='superproxy bypass' || ip.length < 16))
+                val = ip;
+            else if (ip)
+                val = `...${ip.slice(-5)}`;
+            else
+                val = '';
+            const tip = ext_proxy ? 'This feature is only available when '
+                +'using proxies by Luminati network' : ip;
+            return <Tooltip_and_value
+              val={val}
+              tip={tip}
+              pending={!!req.pending}
+            />;
+        }
+        else if (col=='Date')
+        {
+            const local = moment(new Date(req.details.timestamp))
+                .format('YYYY-MM-DD HH:mm:ss');
+            return <Tooltip_and_value val={local}/>;
+        }
+        else if (col=='Troubleshooting')
+        {
+            const troubleshoot = get_troubleshoot(req.response.content.text,
+                req.response.status, req.response.headers);
+            return <Tooltip_and_value val={troubleshoot.title}/>;
+        }
+        return col;
+    }
+}
+

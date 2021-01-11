@@ -4,7 +4,7 @@ import React from 'react';
 import classnames from 'classnames';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Logo, Code, with_www_api} from './common.js';
-import {Instructions, Li} from './common/bullets.js';
+import {Instructions, Li} from '/www/util/pub/bullets.js';
 import ws from './ws.js';
 import {get_location_port} from './util.js';
 import './css/whitelist_ips.less';

@@ -16,10 +16,6 @@ class Index extends Pure_component {
         possible.`;
     state = {desc: '', email: '', sending: false, no_upgrade: false};
     componentDidMount(){
-        this.setdb_on('head.consts', consts=>{
-            if (consts && consts.logins && consts.logins.length==1)
-                this.setState({email: consts.logins[0]});
-        });
         this.setdb_on('head.version', version=>this.setState({version}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
     }

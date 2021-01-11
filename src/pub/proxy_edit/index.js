@@ -371,25 +371,35 @@ const Index = withRouter(class Index extends Pure_component {
         const zone = this.state.form.zone ||
             this.state.zones && this.state.zones.def;
         return <div className="proxy_edit vbox">
-              <div className="cp_panel vbox">
-                <Loader show={this.state.show_loader||this.state.loading}/>
-                <div>
-                  <Header match={this.props.match}
-                    internal_name={this.state.form.internal_name}
-                    is_saving={this.state.saving}
-                    on_back_click={this.on_back_click}/>
-                  <Nav disabled={!!this.state.form.ext_proxies}
-                    form={this.state.form} plan={curr_plan}
-                    on_change_preset={this.apply_preset}/>
-                  <Nav_tabs_wrapper/>
-                </div>
-                {this.state.zones && <Main_window/>}
-                <Warnings_modal id="save_proxy_errors"
-                  warnings={this.state.error_list}/>
-                <Alloc_modal type={type} form={this.state.form} zone={zone}
-                  plan={curr_plan}/>
-              </div>
-            </div>;
+          <div className="cp_panel vbox">
+            <Loader show={this.state.show_loader||this.state.loading}/>
+            <div>
+              <Header
+                match={this.props.match}
+                internal_name={this.state.form.internal_name}
+                is_saving={this.state.saving}
+                on_back_click={this.on_back_click}
+              />
+              <Nav
+                disabled={!!this.state.form.ext_proxies}
+                form={this.state.form}
+                plan={curr_plan}
+                on_change_preset={this.apply_preset}
+              />
+              <Nav_tabs_wrapper/>
+            </div>
+            {this.state.zones && <Main_window/>}
+            <Warnings_modal id="save_proxy_errors"
+              warnings={this.state.error_list}/>
+            <Alloc_modal
+              type={type}
+              form={this.state.form}
+              zone={zone}
+              zones={this.state.zones}
+              plan={curr_plan}
+            />
+          </div>
+        </div>;
     }
 });
 
@@ -403,9 +413,9 @@ class Nav_tabs_wrapper extends Pure_component {
     };
     render(){
         return <Nav_tabs set_tab={this.set_tab}>
-              {this.tabs.map(t=><Nav_tab key={t} id={t} title={tabs[t].label}
-                tooltip={tabs[t].tooltip}/>)}
-            </Nav_tabs>;
+          {this.tabs.map(t=><Nav_tab key={t} id={t} title={tabs[t].label}
+            tooltip={tabs[t].tooltip}/>)}
+        </Nav_tabs>;
     }
 });
 
@@ -431,10 +441,10 @@ export class Back_btn extends Pure_component {
     render(){
         const {lock} = this.state;
         return <div className={classnames('back_wrapper', {lock})}
-              onClick={this.props.click}>
-              <div className="cp_icon back"/>
-              <span>Back to overview</span>
-            </div>;
+          onClick={this.props.click}>
+          <div className="cp_icon back"/>
+          <span>Back to overview</span>
+        </div>;
     }
 }
 
@@ -456,15 +466,15 @@ class Open_browser_btn extends Pure_component {
     };
     render(){
         return <T>{t=>
-              <Tooltip title={t('Open browser configured with this port')}
-                placement="bottom">
-                <button className="btn btn_lpm btn_browse"
-                  onClick={this.open_browser}>
-                  {t('Browse')}
-                  <div className="icon browse_icon"></div>
-                </button>
-              </Tooltip>
-            }</T>;
+          <Tooltip title={t('Open browser configured with this port')}
+            placement="bottom">
+            <button className="btn btn_lpm btn_browse"
+              onClick={this.open_browser}>
+              {t('Browse')}
+              <div className="icon browse_icon"></div>
+            </button>
+          </Tooltip>
+        }</T>;
     }
 }
 
@@ -545,22 +555,22 @@ class Nav extends Pure_component {
         const is_unblocker = this.props.plan.type=='unblocker';
         const preset_disabled = this.props.disabled;
         return <div className="nav">
-              <Select_zone val={this.props.form.zone} on_change_wrapper={val=>
-                  this.confirm_update(()=>this.update_zone(val))}
-                disabled={this.props.disabled} preview/>
-              <Field i18n options={opts}
-                on_change={val=>this.confirm_update(()=>
-                  this.update_preset(val))}
-                value={preset} disabled={preset_disabled}
-                ext_tooltip={!is_unblocker} id="preset"
-                tooltip={
-                  <Preset_description preset={preset} rule_clicked={()=>0}/>
-                }/>
-              {is_local() &&
-                <Open_browser_btn port={this.props.form.port}/>
-              }
-              <Confirmation_modal on_ok={this.state.confirm_action}/>
-            </div>;
+          <Select_zone val={this.props.form.zone} on_change_wrapper={val=>
+              this.confirm_update(()=>this.update_zone(val))}
+            disabled={this.props.disabled} preview/>
+          <Field i18n options={opts}
+            on_change={val=>this.confirm_update(()=>
+              this.update_preset(val))}
+            value={preset} disabled={preset_disabled}
+            ext_tooltip={!is_unblocker} id="preset"
+            tooltip={
+              <Preset_description preset={preset} rule_clicked={()=>0}/>
+            }/>
+          {is_local() &&
+            <Open_browser_btn port={this.props.form.port}/>
+          }
+          <Confirmation_modal on_ok={this.state.confirm_action}/>
+        </div>;
     }
 }
 
@@ -589,11 +599,11 @@ class Confirmation_modal extends Pure_component {
             value={this.state.no_confirm} checked={!!this.state.no_confirm}
             on_change={this.toggle_dismiss}/>;
         return <Modal title="Confirm changing preset or zone"
-            id="confirm_modal" click_ok={this.handle_ok} ok_btn_title="Yes"
-            left_footer_item={left_item} on_hidden={this.handle_dismiss}>
-            <h4>Changing preset or zone may reset some other options. Are you
-              sure you want to continue?</h4>
-          </Modal>;
+          id="confirm_modal" click_ok={this.handle_ok} ok_btn_title="Yes"
+          left_footer_item={left_item} on_hidden={this.handle_dismiss}>
+          <h4>Changing preset or zone may reset some other options. Are you
+            sure you want to continue?</h4>
+        </Modal>;
     }
 }
 
@@ -601,19 +611,19 @@ class Confirmation_modal extends Pure_component {
 const Field = ({id, disabled, children, i18n, ext_tooltip, ...props})=>{
     const options = props.options||[];
     return <T>{t=><div className="field" data-tip data-for={id+'tip'}>
-          <React_tooltip id={id+'tip'} type="light" effect="solid"
-            place="bottom" delayHide={0} delayUpdate={300}>
-            {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
-          </React_tooltip>
-          <select value={props.value} disabled={disabled}
-            onChange={e=>props.on_change(e.target.value)}>
-            {options.map(o=>
-              <option key={o.key} value={o.value}>
-                {i18n ? t(o.key) : o.key}
-              </option>
-            )}
-          </select>
-        </div>}</T>;
+      <React_tooltip id={id+'tip'} type="light" effect="solid"
+        place="bottom" delayHide={0} delayUpdate={300}>
+        {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
+      </React_tooltip>
+      <select value={props.value} disabled={disabled}
+        onChange={e=>props.on_change(e.target.value)}>
+        {options.map(o=>
+          <option key={o.key} value={o.value}>
+            {i18n ? t(o.key) : o.key}
+          </option>
+        )}
+      </select>
+    </div>}</T>;
 };
 
 export default Index;

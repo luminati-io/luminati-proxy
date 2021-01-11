@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import {Code} from './common.js';
-import {Instructions, Li} from './common/bullets.js';
+import {Instructions, Li} from '/www/util/pub/bullets.js';
 import {T} from './common/i18n.js';
 
 const E = {};
@@ -128,15 +128,15 @@ print $agent->get('http://lumtest.com/myip.json')->content();`,
 
 const Last_step = ()=>
     <Li>
-      <T>You are all set! Open a</T>
-      <a className="link" onClick={()=>window.open()}><T>new tab</T></a>
+      <T>You are all set! Open a</T>{' '}
+      <a className="link" onClick={()=>window.open()}><T>new tab</T></a>{' '}
       <T>and start browsing.</T>
     </Li>;
 
 E.browser = (proxy=24000, hostname=document.location.hostname)=>({
     chrome_win:
         <Instructions>
-          <Li><T>Open</T><Code>chrome://settings/</Code> <T>in a</T>
+          <Li><T>Open</T><Code>chrome://settings/</Code> <T>in a</T>{' '}
             <a className="link" onClick={()=>window.open()}>
               <T>new tab</T></a>
           </Li>

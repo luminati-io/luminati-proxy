@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.216.52 Stable
+- :star: Added an option to fetch single proxy ports over the API
+- :star: Moved part of the API from HTTP to Web Socket
+
 ## 1.215.236 Stable
 - :bug: Fixed lpm_f communication in Cloud LPM servers after a new server assignment
 - :bug: Fixed a bug where some credential fields were not cleared from proxies memory on logout
