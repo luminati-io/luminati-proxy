@@ -30,6 +30,7 @@ export class Infinite_chrome_table extends Pure_component {
         if (props.rowData=='filler')
             return <div className="chrome_td"></div>;
         return <Checkbox
+          className="checkbox_single"
           checked={this.props.selected_list.includes(props.rowData)}
           on_change={()=>null}
         />;
@@ -72,7 +73,9 @@ export class Infinite_chrome_table extends Pure_component {
                           <Column key="select"
                             cellRenderer={this.select_renderer.bind(this)}
                             label={
-                              <Checkbox checked={this.props.selected_all}
+                              <Checkbox
+                                className="checkbox_single"
+                                checked={this.props.selected_all}
                                 on_change={()=>null}
                               />
                             }
@@ -80,7 +83,7 @@ export class Infinite_chrome_table extends Pure_component {
                             className="chrome_td"
                             flexGrow={0}
                             flexShrink={1}
-                            width={20}
+                            width={40}
                           />
                           {this.props.cols.map(col=>
                             <Column key={col.id}

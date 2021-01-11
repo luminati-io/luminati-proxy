@@ -265,19 +265,36 @@
         }
         .chrome_td, td {
             height: 18px;
+            margin-right: 0;
+            padding-right: 10px;
+            &:first-of-type {
+                margin-left: 0;
+                padding-left: 10px
+            }
         }
     }
     &.header_container, .header_container {
         height: 27px;
         overflow: hidden;
         .chrome_table, table.chrome_table {
-            .chrome_th, th {
+            th, .ReactVirtualized__Table__headerRow {
+                border-top: 1px solid @chrome_border;
+                border-bottom: 1px solid rgb(205, 205, 205);
+            }
+            th {
                 height: 100%;
+            }
+            .chrome_th {
+                height: 23px;
+                &:first-child {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                }
+            }
+            .chrome_th, th {
                 margin: 0;
                 position: relative;
                 background-color: #f3f3f3;
-                border-top: 1px solid @chrome_border;
-                border-bottom: 1px solid rgb(205, 205, 205);
                 border-left: 1px solid rgb(205, 205, 205);
                 cursor: default;
                 &:first-child, &:nth-child(2) { border-left: none; }

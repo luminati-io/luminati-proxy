@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.216.178 Stable
+- :bug: Fixed visual bugs in the alloc IPs modal
+
 ## 1.216.52 Stable
 - :star: Added an option to fetch single proxy ports over the API
 - :star: Moved part of the API from HTTP to Web Socket
