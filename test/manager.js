@@ -66,10 +66,7 @@ describe('manager', ()=>{
             args = args.concat('--loki', '/tmp/testdb');
         }
         Manager.prototype.set_current_country = ()=>null;
-        Manager.prototype.check_conn = ()=>null;
         Manager.prototype.lpm_users_get = ()=>null;
-        Manager.prototype.init_ws_lpm_f = ()=>null;
-        Manager.prototype.init_ws_lpm_conn = ()=>null;
         Manager.prototype.get_lpm_conf = function(){
             return {_defaults: {zones: {
                 static: {},
@@ -77,6 +74,8 @@ describe('manager', ()=>{
             }}};
         };
         manager = new Manager(lpm_util.init_args(args));
+        manager.lpm_conn.init = ()=>null;
+        manager.lpm_f.init = ()=>null;
         yield manager.start();
         return {manager};
     });

@@ -1,6 +1,16 @@
 [
     {
-        "ver": "1.216.178",
+        "ver": "1.216.473",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed updating SMTP configuration"
+            }
+        ]
+    },
+    {
+        "ver": "1.216.179",
         "type": "stable",
         "changes": [
             {

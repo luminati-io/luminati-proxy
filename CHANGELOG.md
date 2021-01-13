@@ -1,6 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.216.178 Stable
+## 1.216.473 Stable
+- :bug: Fixed updating SMTP configuration
+
+## 1.216.179 Stable
 - :bug: Fixed visual bugs in the alloc IPs modal
 
 ## 1.216.52 Stable
