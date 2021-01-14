@@ -120,7 +120,8 @@ export default with_www_api(class Targeting extends Pure_component {
     carriers = ()=>{
         const {locations, carriers, form: {country}} = this.state;
         const res = new Set(country && locations.carriers[country] ||
-            Object.values(locations.carriers).flat());
+            Object.values(locations.carriers).reduce((acc, val)=>
+            acc.concat(val), []));
         return carriers.filter(c=>res.has(c.label));
     };
     city_changed = e=>{

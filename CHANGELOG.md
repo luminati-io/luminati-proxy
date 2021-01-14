@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.216.628 Stable
+- :star: Added "Country" column in the alloc IPs modal
+
 ## 1.216.473 Stable
 - :bug: Fixed updating SMTP configuration
 

@@ -97,12 +97,12 @@ for (let k in presets)
 
 const E = {
     opts: is_unblocker=>{
-        return Object.entries(presets).flatMap(([p, o])=>{
+        return Object.entries(presets).map(([p, o])=>{
             if (!is_unblocker && o.hidden)
-                return [];
+                return null;
             const key = o.default ? `${o.title} (default)` : o.title;
-            return [{key, value: p}];
-        });
+            return {key, value: p};
+        }).filter(Boolean);
     },
     get: key=>presets[key],
     get_default: ()=>presets[default_preset],

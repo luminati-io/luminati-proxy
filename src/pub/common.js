@@ -360,8 +360,10 @@ export const Labeled_controller = props=>
 export const Checkbox = props=>
   <div className="form-check">
     <label className="form-check-label">
-      <input className="form-check-input"
+      <input
         type="checkbox"
+        className={props.className ? 'form-check-input '+props.className :
+          'form-check-input'}
         value={props.value}
         onChange={props.on_change}
         onClick={props.on_click}
@@ -445,8 +447,8 @@ export const any_flag = <T>{t=>
       </Tooltip>
     }</T>;
 
-export const flag_with_title = (country, title)=>{
-    return <Tooltip title={country.toUpperCase()}>
+export const flag_with_title = (country, title, tooltip)=>{
+    return <Tooltip title={tooltip||country.toUpperCase()}>
       <span>
         <span className={'flag-icon flag-icon-'+country}/>
         <span className="lit">{title}</span>

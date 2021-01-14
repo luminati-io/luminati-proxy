@@ -10,6 +10,8 @@ import {Modal} from '../common/modals.js';
 import {report_exception} from '../util.js';
 import {Infinite_chrome_table} from '../chrome_widgets.js';
 import conv from '../../../util/conv.js';
+import zcountry from '../../../util/country.js';
+import {flag_with_title} from '../common.js';
 
 export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -60,20 +62,27 @@ export default class Alloc_modal extends Pure_component {
                 _this.loading(false);
             }));
             const res = yield ajax.json({url});
-            const _available_list = type=='ips' ? res.ips : res.vips;
-            const available_set = new Set();
-            _available_list.forEach(v=>available_set.add(v));
-            const chosen_set = new Set();
+            const _available_list = type=='ips' ? res.ips_cn : res.vips_cn;
+            const available_hash = _available_list.reduce((acc, value)=>{
+                acc[value.ip] = value;
+                return acc;
+            }, {});
+            const chosen_ips = [];
+            const chosen_ips_hash = {};
             form[type].forEach(v=>{
-                if (available_set.has(v))
-                    chosen_set.add(v);
+                const found_ip = available_hash[v];
+                if (found_ip!==undefined)
+                {
+                    chosen_ips.push(found_ip);
+                    chosen_ips_hash[v] = found_ip;
+                }
             });
-            const not_chosen_set = new Set();
+            const not_chosen_ips = [];
             _available_list.forEach(v=>{
-                if (!chosen_set.has(v))
-                    not_chosen_set.add(v);
+                if (chosen_ips_hash[v.ip]===undefined)
+                    not_chosen_ips.push(v);
             });
-            const available_list = [...chosen_set, ...not_chosen_set];
+            const available_list = [...chosen_ips, ...not_chosen_ips];
             _this.setState({available_list,
                 rendered_list: _this.filter_ips(available_list)},
                 _this.sync_selected_vals);
@@ -83,16 +92,16 @@ export default class Alloc_modal extends Pure_component {
     sync_selected_vals = ()=>{
         const curr_vals = this.props.form[this.props.type];
         const new_vals = curr_vals.filter(v=>
-            this.state.available_list.includes(v));
+            this.state.available_list.find(r=>r.ip==v));
         this.set_field(this.props.type, new_vals);
     };
     loading = loading=>{
         setdb.set('head.proxy_edit.loading', loading);
         this.setState({loading});
     };
-    checked = row=>(this.props.form[this.props.type]||[]).includes(row);
+    checked = ip=>(this.props.form[this.props.type]||[]).includes(ip);
     toggle = e=>{
-        const value = e.rowData;
+        const value = e.rowData.ip;
         const checked = !this.checked(value);
         const {type, form} = this.props;
         let new_alloc;
@@ -101,7 +110,9 @@ export default class Alloc_modal extends Pure_component {
             const selected = new Set();
             form[type].forEach(v=>selected.add(v));
             selected.add(value);
-            new_alloc = this.state.available_list.filter(v=>selected.has(v));
+            new_alloc = this.state.available_list
+                .filter(v=>selected.has(v.ip))
+                .map(v=>v.ip);
         }
         else
             new_alloc = form[type].filter(r=>r!=value);
@@ -149,8 +160,8 @@ export default class Alloc_modal extends Pure_component {
                 return void (yield report_exception(res.error,
                     'alloc_modal.Alloc_modal.refresh'));
             }
-            const new_vals = _this.props.type=='ips' ?
-                res.ips.map(i=>i.ip) : res.vips.map(v=>v.vip);
+            const new_vals = _this.props.type=='ips' ? res.ips :
+                res.vips.map(v=>({...v, ip: v.vip}));
             const norm_vals = _this.normalize_vals(new_vals);
             const map = _this.map_vals(norm_vals);
             const new_ips = _this.props.form.ips.map(val=>map[val]);
@@ -187,21 +198,23 @@ export default class Alloc_modal extends Pure_component {
                 return;
             });
         }
-        const old_set = new Set();
-        old_vals.forEach(v=>old_set.add(v));
+        const old_vals_hash = {};
+        old_vals.forEach(v=>old_vals_hash[v.ip] = v);
         const refreshed = [];
-        const stable = new Set();
-        for (let new_val of new_vals)
+        const stable = {};
+        for (let i=0, l=new_vals.length; i<l; i++)
         {
-            if (old_set.has(new_val))
-                stable.add(new_val);
+            const new_val = new_vals[i];
+            if (old_vals_hash[new_val.ip]!==undefined)
+                stable[new_val.ip] = new_val;
             else
                 refreshed.push(new_val);
         }
         const normalized = [];
-        for (let old_val of old_vals)
+        for (let i=0, l=old_vals.length; i<l; i++)
         {
-            if (stable.has(old_val))
+            const old_val = old_vals[i];
+            if (stable[old_val.ip]!==undefined)
                 normalized.push(old_val);
             else
                 normalized.push(refreshed.shift());
@@ -212,7 +225,7 @@ export default class Alloc_modal extends Pure_component {
         const old_vals = this.state.available_list;
         const map = {};
         for (let i = 0; i < old_vals.length; i++)
-            map[old_vals[i]] = normalized[i];
+            map[old_vals[i].ip] = normalized[i].ip;
         return map;
     };
     update_multiply_and_pool_size = size=>{
@@ -237,9 +250,13 @@ export default class Alloc_modal extends Pure_component {
     filter_ips(available_list){
         let rows = available_list;
         if (this.state.ip_filter)
-            rows = rows.filter(ip=>ip.indexOf(this.state.ip_filter)>=0);
+            rows = rows.filter(ip=>ip.ip.indexOf(this.state.ip_filter)>=0);
         return rows;
     }
+    flag_by_code = code=>code ? flag_with_title(code, code.toUpperCase(),
+        zcountry.code2label(code)) : null;
+    get_extra_cols = ()=>this.props.type=='ips' ? [{id: 'maxmind', title:
+        'Maxmind'}] : [{id: 'country', title: 'Country'}];
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'gIPs';
         const title = 'Select the '+type_label+' ('+this.props.zone+')';
@@ -265,7 +282,8 @@ export default class Alloc_modal extends Pure_component {
         +` ${this.state.available_list.length} available`;
         return <Modal id="allocated_ips" className="allocated_ips_modal"
           title={title} footer={Footer}>
-          <Infinite_chrome_table cols={this.cols}
+          <Infinite_chrome_table
+            cols={[...this.cols, ...this.get_extra_cols()]}
             title={sub_title}
             toolbar={<div className="search_box">
               <input value={this.state.ip_filter} placeholder="IP filter"
@@ -278,8 +296,12 @@ export default class Alloc_modal extends Pure_component {
             unselect_all={this.unselect_all}
             selected_list={selected_list}
             selected_all={this.state.selected_all}
-            rows={this.state.rendered_list}>
-          </Infinite_chrome_table>
+            rows={this.state.rendered_list.map(v=>({
+                ...v,
+                maxmind: this.flag_by_code(v.maxmind),
+                country: this.flag_by_code(v.country)
+            }))}
+          />
         </Modal>;
     }
 }

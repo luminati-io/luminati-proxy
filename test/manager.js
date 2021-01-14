@@ -360,7 +360,8 @@ describe('manager', ()=>{
             assert.ok(!app.manager.proxy_ports[22225]);
         }));
     });
-    describe('api', ()=>{
+    describe('api', function(){
+        this.timeout(6000);
         it('ssl', etask._fn(function*(_this){
             app = yield app_with_args();
             const res = yield api('ssl');
