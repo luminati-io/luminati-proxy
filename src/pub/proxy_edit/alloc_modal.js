@@ -12,6 +12,7 @@ import {Infinite_chrome_table} from '../chrome_widgets.js';
 import conv from '../../../util/conv.js';
 import zcountry from '../../../util/country.js';
 import {flag_with_title} from '../common.js';
+import {Filter} from '../har/viewer.js';
 
 export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -20,6 +21,8 @@ export default class Alloc_modal extends Pure_component {
         rendered_list: [],
         selected_all: false,
         ip_filter: '',
+        cn_filter: '',
+        countries: []
     };
     constructor(props){
         super(props);
@@ -78,14 +81,19 @@ export default class Alloc_modal extends Pure_component {
                 }
             });
             const not_chosen_ips = [];
+            const countries = new Set();
             _available_list.forEach(v=>{
                 if (chosen_ips_hash[v.ip]===undefined)
                     not_chosen_ips.push(v);
+                const country = v.country || v.maxmind;
+                countries.add(country);
             });
             const available_list = [...chosen_ips, ...not_chosen_ips];
-            _this.setState({available_list,
-                rendered_list: _this.filter_ips(available_list)},
-                _this.sync_selected_vals);
+            _this.setState({
+                available_list,
+                countries: [...countries],
+                rendered_list: _this.filter_ips(available_list),
+            }, _this.sync_selected_vals);
             _this.loading(false);
         });
     };
@@ -125,8 +133,9 @@ export default class Alloc_modal extends Pure_component {
         this.set_field('multiply', 1);
     };
     select_all = ()=>{
-        this.set_field(this.props.type, this.state.available_list);
-        this.update_multiply_and_pool_size(this.state.available_list.length);
+        const {available_list} = this.state;
+        this.set_field(this.props.type, available_list.map(r=>r.ip));
+        this.update_multiply_and_pool_size(available_list.length);
     };
     refresh_chosen = ()=>{
         if (this.props.type=='ips')
@@ -166,8 +175,18 @@ export default class Alloc_modal extends Pure_component {
             const map = _this.map_vals(norm_vals);
             const new_ips = _this.props.form.ips.map(val=>map[val]);
             const new_vips = _this.props.form.vips.map(val=>map[val]);
-            _this.setState({available_list: norm_vals,
-                rendered_list: _this.filter_ips(norm_vals)});
+            const countries = new Set();
+            for (let i=0, l=norm_vals.length; i<l; i++)
+            {
+                const val = norm_vals[i];
+                const country = val.country||val.maxmind;
+                countries.add(country);
+            }
+            _this.setState({
+                available_list: norm_vals,
+                countries: [...countries],
+                rendered_list: _this.filter_ips(norm_vals),
+            });
             _this.set_field('ips', new_ips);
             _this.set_field('vips', new_vips);
             yield _this.update_other_proxies(map);
@@ -244,13 +263,16 @@ export default class Alloc_modal extends Pure_component {
     cols = [
         {id: 'ip', title: 'IP'},
     ];
-    on_filter_change(e){
-        this.setState({ip_filter: e.target.value}, this.sync_rendered_list);
+    on_filter_change(e, field_name){
+        this.setState({[field_name]: e.target.value}, this.sync_rendered_list);
     }
     filter_ips(available_list){
         let rows = available_list;
-        if (this.state.ip_filter)
-            rows = rows.filter(ip=>ip.ip.indexOf(this.state.ip_filter)>=0);
+        const {ip_filter, cn_filter} = this.state;
+        if (ip_filter)
+            rows = rows.filter(r=>r.ip.indexOf(ip_filter)>=0);
+        if (cn_filter)
+            rows = rows.filter(r=>r.country==cn_filter||r.maxmind==cn_filter);
         return rows;
     }
     flag_by_code = code=>code ? flag_with_title(code, code.toUpperCase(),
@@ -285,10 +307,16 @@ export default class Alloc_modal extends Pure_component {
           <Infinite_chrome_table
             cols={[...this.cols, ...this.get_extra_cols()]}
             title={sub_title}
-            toolbar={<div className="search_box">
-              <input value={this.state.ip_filter} placeholder="IP filter"
-                onChange={e=>this.on_filter_change(e)}/>
-            </div>}
+            toolbar={<React.Fragment>
+              <div className="search_box">
+                <input value={this.state.ip_filter} placeholder="IP filter"
+                  onChange={e=>this.on_filter_change(e, 'ip_filter')}/>
+              </div>
+              <Filter vals={this.state.countries} val={this.state.cn_filter}
+                format_text={zcountry.code2label} tooltip="Countries"
+                default_value="All countries"
+                set={e=>this.on_filter_change(e, 'cn_filter')}/>
+            </React.Fragment>}
             class_name="in_modal_table"
             selectable
             toggle={this.toggle}

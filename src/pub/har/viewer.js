@@ -989,12 +989,16 @@ class Filters extends Pure_component {
     }
 }
 
-const Filter = ({vals, val, set, default_value, tooltip})=>
+export const Filter = ({vals, val, set, default_value, tooltip, format_text})=>
     <Tooltip title={tooltip} placement="bottom">
       <div className="custom_filter">
         <select value={val} onChange={set}>
           <option value="">{default_value}</option>
-          {vals.map(p=><option key={p} value={p}>{p}</option>)}
+          {vals.map(p=>
+            <option key={p} value={p}>
+              {format_text ? format_text(p) : p}
+            </option>
+          )}
         </select>
         <span className="arrow"/>
       </div>

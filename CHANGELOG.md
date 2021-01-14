@@ -1,7 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.216.706 Stable
+## 1.216.736 Stable
 - :star: Improved builder for regular expressions on the trigger side for any actions
+- :bug: WS connection is always created which fixes zones updates
+- :star: Added filter by country in alloc modal
 
 ## 1.216.628 Stable
 - :star: Added "Country" column in the alloc IPs modal
