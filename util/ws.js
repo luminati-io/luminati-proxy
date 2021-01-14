@@ -1342,8 +1342,13 @@ class Mux {
             this.remote_write_pause(vfd);
     }
     _on_bin_ack(stream, buf){
-        stream.send_win_size();
-        stream.push(buf.slice(vfd_sz));
+        try {
+            stream.send_win_size();
+            stream.push(buf.slice(vfd_sz));
+        } catch(e){
+            zerr(`${this.ws}: ${zerr.e2s(e)}`);
+            throw e;
+        }
     }
     _on_json(msg){
         if (msg && msg.backpressure_cmd)

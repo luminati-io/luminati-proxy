@@ -99,7 +99,6 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     local_login: false,
     cluster: true,
     read_only: false,
-    cloud: true,
     flex_tls: false,
     zagent: false,
     sync_config: false,

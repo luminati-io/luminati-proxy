@@ -181,7 +181,8 @@ export default class Rules extends Pure_component {
         this.rule_add({
             action: 'bypass_proxy',
             trigger_type: 'url',
-            trigger_url_regex: '\\.(png|jpg|jpeg|svg|gif|mp3|avi|mp4)$',
+            trigger_url_regex: '\\.(png|jpg|jpeg|svg|gif|mp3|avi|mp4)'
+                +'(#.*|\\?.*)?$',
         });
     };
     retry_rule_exists = ()=>{

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.216.706",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved builder for regular expressions on the trigger side for any actions"
+            }
+        ]
+    },
+    {
         "ver": "1.216.628",
         "type": "stable",
         "changes": [

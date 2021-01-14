@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.216.628-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.216.706-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -171,7 +171,6 @@ Options:
                                                       [boolean] [default: false]
   --lpm_token                   An authorization token                  [string]
   --high_perf                                         [boolean] [default: false]
-  --cloud                                              [boolean] [default: true]
   --zagent                                            [boolean] [default: false]
   --cluster                                             [string] [default: true]
   --sync_config                 Synchronize LPM configuration with the cloud

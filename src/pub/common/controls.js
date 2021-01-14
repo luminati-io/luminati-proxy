@@ -383,7 +383,8 @@ export class Regex extends Pure_component {
             this.gen_regexp);
     };
     recognize_regexp = ()=>{
-        const m = this.props.val && this.props.val.match(/\\\.\((.+)\)\$/);
+        const re = /\\\.\((.+)\)(\(#\.\*\|\\\?\.\*\)\?)?\$/;
+        const m = this.props.val && this.props.val.match(re);
         if (m&&m[1])
         {
             const checked = m[1].split('|').reduce(
@@ -398,7 +399,7 @@ export class Regex extends Pure_component {
         .filter(f=>this.state.checked[f]).join('|');
         let regexp = '';
         if (formats)
-            regexp = `\\.(${formats})$`;
+            regexp = `\\.(${formats})(#.*|\\?.*)?$`;
         this.props.on_change_wrapper(regexp, this.props.id);
     };
     tip = f=>{
@@ -421,27 +422,27 @@ export class Regex extends Pure_component {
     render(){
         const val = this.props.val||'';
         return <div className="regex_field">
-              <div className="regex_input">
-                {!this.props.no_tip_box && <div className="tip_box active">
-                  <div className="checks">
-                    {this.formats.map(f=>
-                      <Tooltip key={f+!!this.state.checked[f]}
-                        title={this.tip(f)}>
-                        <button onClick={this.toggle.bind(null, f)}
-                          className={this.classes(f)}
-                          disabled={this.props.disabled||
-                              !!this.state.invalid_regexp}>.{f}</button>
-                      </Tooltip>
-                    )}
-                  </div>
-                </div>}
-                <Input className="regex" {...this.props}
-                  val={this.state.invalid_regexp||val} type="text"
-                  on_change_wrapper={this.on_input_change}/>
-                <span className={classnames('regex_error',
-                    {active: this.state.invalid_regexp})}>Invalid regex</span>
+          <div className="regex_input">
+            {!this.props.no_tip_box && <div className="tip_box active">
+              <div className="checks">
+                {this.formats.map(f=>
+                  <Tooltip key={f+!!this.state.checked[f]}
+                    title={this.tip(f)}>
+                    <button onClick={this.toggle.bind(null, f)}
+                      className={this.classes(f)}
+                      disabled={this.props.disabled||
+                          !!this.state.invalid_regexp}>.{f}</button>
+                  </Tooltip>
+                )}
               </div>
-            </div>;
+            </div>}
+            <Input className="regex" {...this.props}
+              val={this.state.invalid_regexp||val} type="text"
+              on_change_wrapper={this.on_input_change}/>
+            <span className={classnames('regex_error',
+                {active: this.state.invalid_regexp})}>Invalid regex</span>
+          </div>
+        </div>;
     }
 }
 

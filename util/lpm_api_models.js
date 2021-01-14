@@ -105,7 +105,6 @@ E.manager_fields = {
         +'statistics'},
     lpm_token: {type: 'string', desc: 'An authorization token'},
     high_perf: {type: 'boolean'},
-    cloud: {type: 'boolean'},
     zagent: {type: 'boolean'},
     cluster: {type: 'string'},
     sync_config: {type: 'boolean', desc: 'Synchronize LPM configuration with '

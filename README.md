@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.216.628/luminati-proxy-manager-v1.216.628-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.216.706/luminati-proxy-manager-v1.216.706-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -226,7 +226,6 @@ Options:
                                                       [boolean] [default: false]
   --lpm_token                   An authorization token                  [string]
   --high_perf                                         [boolean] [default: false]
-  --cloud                                              [boolean] [default: true]
   --zagent                                            [boolean] [default: false]
   --cluster                                             [string] [default: true]
   --sync_config                 Synchronize LPM configuration with the cloud
