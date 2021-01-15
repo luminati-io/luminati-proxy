@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.216.910 Stable
+- :star: Show statistics start time
+
 ## 1.216.840 Stable
 - :bug: Fixed auth on WS connections
 

@@ -11,6 +11,7 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
 import {T} from './common/i18n.js';
 import React_tooltip from 'react-tooltip';
+import moment from 'moment';
 
 export const Logs_context = React.createContext(true);
 
@@ -49,38 +50,49 @@ export class Stats extends Pure_component {
     };
     render(){
         const {toggling, request_stats, stats} = this.state;
+        const ts = stats&&stats.start_ts&&moment(new Date(stats.start_ts));
         if (request_stats!==undefined && !request_stats)
         {
             return <Stats_off_btn turn_on_stats={()=>this.toggle_stats(true)}
               disabled={toggling}/>;
         }
+        const no_ts_tooltip = 'No traffic recorded yet. Start sending the'
+            +' requests to see the stats here';
+        const ts_tooltip = ts&&'Stats since: '+ts.format('YYYY-MM-DD HH:mm:ss')
+            +'. Clear stats to reset the date';
+        const tooltip = !ts ? no_ts_tooltip : ts_tooltip;
         return <div className="stats_wrapper">
-              <div className="stats_panel cp_panel vbox">
-                <Header_panel stats={stats}
-                  disable_stats={()=>this.toggle_stats(false)}/>
-                {!request_stats &&
-                  <Loader_small show loading_msg="Loading..."/>
-                }
-                {request_stats && <React.Fragment>
-                  <Stat_table stats={stats} tooltip="Status code"
-                    style={{flex: 1, overflowY: 'auto'}}
-                    row_key="status_code" logs="code" title="Code"/>
-                  <Stat_table stats={stats} tooltip="Domain name"
-                    style={{flex: 1, overflowY: 'auto'}}
-                    row_key="hostname" logs="domain" title="Domain"/>
-                  <Stat_table stats={stats} tooltip="Protocol"
-                    style={{flex: 'none', overflowY: 'auto'}}
-                    ssl_warning={stats.ssl_warning} row_key="protocol"
-                    logs="protocol" title="Protocol"/>
-                </React.Fragment>}
-              </div>
-            </div>;
+          <div className="stats_panel cp_panel vbox">
+            <Header_panel
+              stats={stats}
+              disable_stats={()=>this.toggle_stats(false)}
+              tooltip={tooltip}
+            />
+            {!request_stats &&
+              <Loader_small show loading_msg="Loading..."/>
+            }
+            {request_stats && <React.Fragment>
+              <Stat_table stats={stats} tooltip="Status code"
+                style={{flex: 1, overflowY: 'auto'}}
+                row_key="status_code" logs="code" title="Code"/>
+              <Stat_table stats={stats} tooltip="Domain name"
+                style={{flex: 1, overflowY: 'auto'}}
+                row_key="hostname" logs="domain" title="Domain"/>
+              <Stat_table stats={stats} tooltip="Protocol"
+                style={{flex: 'none', overflowY: 'auto'}}
+                ssl_warning={stats.ssl_warning} row_key="protocol"
+                logs="protocol" title="Protocol"/>
+            </React.Fragment>}
+          </div>
+        </div>;
     }
 }
 
 const Header_panel = props=>
   <div className="cp_panel_header">
-    <h2>Statistics</h2>
+    <Tooltip title={props.tooltip}>
+      <h2>Statistics</h2>
+    </Tooltip>
     <Toolbar stats={props.stats} disable_stats={props.disable_stats}/>
   </div>;
 
@@ -110,45 +122,45 @@ const enable_ssl_click = port=>etask(function*(){
 
 const Key_cell = ({title, warning, row_key})=>{
     return <td>
-          <Cell row_key={row_key} onClick={e=>e.stopPropagation()}>
-            {title}
-          </Cell>
-          {warning &&
-            <span onClick={e=>e.stopPropagation()}>
-              <React_tooltip id="ssl_warn" type="info" effect="solid"
-                delayHide={100} delayShow={0} delayUpdate={500}
-                offset={{top: -10}}>
-                <div>
-                  Some of your proxy ports don't have SSL analyzing enabled and
-                  there are connections on HTTPS protocol detected.
-                </div>
-                <div style={{marginTop: 10}}>
-                  <a onClick={enable_ssl_click} className="link">
-                    Enable SSL analyzing
-                  </a>
-                  <span>
-                    to see {name} and other information about requests
-                  </span>
-                </div>
-              </React_tooltip>
-              <span data-tip="React-tooltip" data-for="ssl_warn">
-                <div className="ic_warning"/>
+      <Cell row_key={row_key} onClick={e=>e.stopPropagation()}>
+        {title}
+      </Cell>
+      {warning &&
+        <span onClick={e=>e.stopPropagation()}>
+          <React_tooltip id="ssl_warn" type="info" effect="solid"
+            delayHide={100} delayShow={0} delayUpdate={500}
+            offset={{top: -10}}>
+            <div>
+              Some of your proxy ports don't have SSL analyzing enabled and
+              there are connections on HTTPS protocol detected.
+            </div>
+            <div style={{marginTop: 10}}>
+              <a onClick={enable_ssl_click} className="link">
+                Enable SSL analyzing
+              </a>
+              <span>
+                to see {name} and other information about requests
               </span>
-            </span>
-          }
-        </td>;
+            </div>
+          </React_tooltip>
+          <span data-tip="React-tooltip" data-for="ssl_warn">
+            <div className="ic_warning"/>
+          </span>
+        </span>
+      }
+    </td>;
 };
 
 const Cell = ({row_key, children})=>{
     if (row_key=='status_code')
     {
         return <Tooltip title={children+' '+status_codes[children]}>
-              <div className="disp_value">{children}</div>
-            </Tooltip>;
-    }
-    return <Tooltip title={children}>
           <div className="disp_value">{children}</div>
         </Tooltip>;
+    }
+    return <Tooltip title={children}>
+      <div className="disp_value">{children}</div>
+    </Tooltip>;
 };
 
 class Stat_table extends Pure_component {
@@ -164,13 +176,13 @@ class Stat_table extends Pure_component {
         const cols = [{id: 'key'}, {id: 'bw'}, {id: 'bypass_bw'},
             {id: 'reqs'}];
         return <div className="tables_container vbox">
-              <Header_container title={title} cols={cols}
-                tooltip={this.props.tooltip}
-                sorting={this.state.sorting} sort={this.sort}/>
-              <Data_container stats={cur_stats} row_key={row_key} logs={logs}
-                ssl_warning={ssl_warning} cols={cols}
-                sorting={this.state.sorting}/>
-            </div>;
+          <Header_container title={title} cols={cols}
+            tooltip={this.props.tooltip}
+            sorting={this.state.sorting} sort={this.sort}/>
+          <Data_container stats={cur_stats} row_key={row_key} logs={logs}
+            ssl_warning={ssl_warning} cols={cols}
+            sorting={this.state.sorting}/>
+        </div>;
     }
 }
 
@@ -219,27 +231,27 @@ const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
         return sorting.dir==-1 ? res : -res;
     });
     return <div className="data_container">
-          <table className="chrome_table">
-            <colgroup>
-              {(cols||[]).map((c, idx)=>
-                <col key={idx} style={{width: c.width}}/>
-              )}
-            </colgroup>
-            <tbody>
-              {!sorted.length && <Empty_row/>}
-              {sorted.map(s=>
-                <Row stat={s} key={s.key} row_key={row_key} logs={logs}
-                  warning={ssl_warning&&s.key=='https'}/>
-              )}
-              <tr className="filler">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>;
+      <table className="chrome_table">
+        <colgroup>
+          {(cols||[]).map((c, idx)=>
+            <col key={idx} style={{width: c.width}}/>
+          )}
+        </colgroup>
+        <tbody>
+          {!sorted.length && <Empty_row/>}
+          {sorted.map(s=>
+            <Row stat={s} key={s.key} row_key={row_key} logs={logs}
+              warning={ssl_warning&&s.key=='https'}/>
+          )}
+          <tr className="filler">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>;
 };
 
 const Row = withRouter(class Row extends Pure_component {
@@ -250,20 +262,20 @@ const Row = withRouter(class Row extends Pure_component {
     render(){
         const {stat, row_key, warning} = this.props;
         return <tr className={!this.context ? 'disabled' : ''}
-                onClick={this.context ? this.click : null}>
-              <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
-              <td>
-                <Tooltip_bytes
-                  chrome_style
-                  bytes_in={stat.in_bw}
-                  bytes_out={stat.out_bw}
-                  bytes={stat.in_bw+stat.out_bw}/>
-              </td>
-              <td>
-                <Tooltip_bytes bytes={stat.bypass_bw} cost={stat.bypass_cost}/>
-              </td>
-              <td><Cell>{stat.reqs||'—'}</Cell></td>
-            </tr>;
+            onClick={this.context ? this.click : null}>
+          <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
+          <td>
+            <Tooltip_bytes
+              chrome_style
+              bytes_in={stat.in_bw}
+              bytes_out={stat.out_bw}
+              bytes={stat.in_bw+stat.out_bw}/>
+          </td>
+          <td>
+            <Tooltip_bytes bytes={stat.bypass_bw} cost={stat.bypass_cost}/>
+          </td>
+          <td><Cell>{stat.reqs||'—'}</Cell></td>
+        </tr>;
     }
 });
 Row.WrappedComponent.contextType = Logs_context;
@@ -277,13 +289,13 @@ class Toolbar extends Pure_component {
     };
     render(){
         return <div className="toolbar">
-              <Success_ratio total={this.props.stats.total}
-                success={this.props.stats.success}/>
-              <Toolbar_button id="remove" tooltip="Clear"
-                on_click={this.clear}/>
-              <Toolbar_button id="arrow_down" tooltip="Disable"
-                placement="left" on_click={this.props.disable_stats}/>
-            </div>;
+          <Success_ratio total={this.props.stats.total}
+            success={this.props.stats.success}/>
+          <Toolbar_button id="remove" tooltip="Clear"
+            on_click={this.clear}/>
+          <Toolbar_button id="arrow_down" tooltip="Disable"
+            placement="left" on_click={this.props.disable_stats}/>
+        </div>;
     }
 }
 
@@ -293,20 +305,20 @@ const Success_ratio = ({total=0, success=0})=>{
     +'requests, where successful requests are calculated as 2xx, '
     +'3xx or 404 HTTP status codes';
     return <div className="title_wrapper">
-          <div className="success_title">
-            <T>{t=>
-              <Tooltip title={t(tooltip)}>
-                <span>{t('Success rate')}:</span>
-              </Tooltip>
-            }</T>
-          </div>
-          <div className="success_value">
-            <T>{t=>
-              <Tooltip
-                title={`${t('Total')}: ${total}, ${t('Success')}: ${success}`}>
-                {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}
-              </Tooltip>
-            }</T>
-          </div>
-        </div>;
+      <div className="success_title">
+        <T>{t=>
+          <Tooltip title={t(tooltip)}>
+            <span>{t('Success rate')}:</span>
+          </Tooltip>
+        }</T>
+      </div>
+      <div className="success_value">
+        <T>{t=>
+          <Tooltip
+            title={`${t('Total')}: ${total}, ${t('Success')}: ${success}`}>
+            {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}
+          </Tooltip>
+        }</T>
+      </div>
+    </div>;
 };
