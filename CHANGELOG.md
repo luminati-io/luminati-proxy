@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.216.840 Stable
+- :bug: Fixed auth on WS connections
+
 ## 1.216.736 Stable
 - :star: Improved builder for regular expressions on the trigger side for any actions
 - :bug: WS connection is always created which fixes zones updates

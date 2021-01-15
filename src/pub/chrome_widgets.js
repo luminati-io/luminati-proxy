@@ -42,6 +42,14 @@ export class Infinite_chrome_table extends Pure_component {
             this.props.select_all();
     };
     cell_data_getter = ({rowData, dataKey})=>rowData[dataKey];
+    header_row_renderer = function Header_renderer(props){
+        let {className} = props;
+        if (props.style.paddingRight)
+            className += ' chrome_tr_with_padding';
+        return <div role="row" className={className} style={props.style}>
+          {props.columns}
+        </div>;
+    };
     render(){
         const rows = this.props.rows||[];
         const {class_name, toolbar} = this.props;
@@ -68,6 +76,7 @@ export class Infinite_chrome_table extends Pure_component {
                           gridClassName="chrome_grid"
                           headerHeight={27}
                           headerClassName="chrome_th"
+                          headerRowRenderer={this.header_row_renderer}
                           rowClassName="chrome_tr"
                           rowHeight={22}
                           rowCount={rows.length+1}
