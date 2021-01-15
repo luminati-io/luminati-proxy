@@ -11,12 +11,10 @@ import {Typeahead} from 'react-bootstrap-typeahead';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
-import setdb from '../../../util/setdb.js';
-import ajax from '../../../util/ajax.js';
 import zurl from '../../../util/url.js';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
-import {Ext_tooltip, Loader} from '../common.js';
+import {Ext_tooltip} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
 import Toggle_on_off from './toggle_on_off.js';
@@ -548,17 +546,17 @@ export const Select = props=>{
     };
     const conf = (props.data||[]).find(c=>c.value==props.val);
     return <Tooltip key={props.val} title={conf&&conf.tooltip||''}>
-          <T>{t=><select value={''+props.val}
-            onChange={e=>update(e.target.value)}
-            disabled={props.disabled}>
-            {props.with_categories && props.data.map(i=>
-              <Section key={i.category} name={i.category} data={i.data} t={t}/>
-            )}
-            {!props.with_categories &&
-              <Section data={props.data||[]} t={t}/>
-            }
-          </select>}</T>
-        </Tooltip>;
+      <T>{t=><select value={''+props.val}
+        onChange={e=>update(e.target.value)}
+        disabled={props.disabled}>
+        {props.with_categories && props.data.map(i=>
+          <Section key={i.category} name={i.category} data={i.data} t={t}/>
+        )}
+        {!props.with_categories &&
+          <Section data={props.data||[]} t={t}/>
+        }
+      </select>}</T>
+    </Tooltip>;
 };
 
 const Section = props=>{
@@ -593,31 +591,13 @@ export const Input = props=>{
 
 export const Select_zone = withRouter(
 class Select_zone extends Pure_component {
-    state = {refreshing_zones: false, zones: {zones: []}};
+    state = {zones: {zones: []}};
     componentDidMount(){
         this.setdb_on('ws.zones', zones=>{
             if (zones)
                 this.setState({zones});
         });
     }
-    refresh_zones = ()=>{
-        const _this = this;
-        this.etask(function*(){
-            this.on('uncaught', ()=>{
-                _this.setState({refreshing_zones: false});
-            });
-            _this.setState({refreshing_zones: true});
-            const result = yield window.fetch('/api/refresh_zones',
-                {method: 'POST'});
-            if (result.status==400)
-                return _this.props.history.push({pathname: '/login'});
-            if (result.status==502)
-                return;
-            const zones = yield ajax.json({url: '/api/zones'});
-            _this.setState({refreshing_zones: false});
-            setdb.set('ws.zones', zones);
-        });
-    };
     render(){
         const {val, on_change_wrapper, disabled, preview} = this.props;
         const tooltip = preview ? '' : this.props.tooltip;
@@ -635,29 +615,22 @@ class Select_zone extends Pure_component {
                 items.push({category: network_types[n].label, data});
         }
         const selected = val || this.state.zones.def;
-        return <div className="select_zone">
-              <Tooltip title={tooltip}>
-                <span data-tip data-for="zone-tip">
-                  {preview &&
-                    <React_tooltip id="zone-tip" type="light" effect="solid"
-                      place="bottom" delayHide={0} delayUpdate={300}>
-                      {disabled ? <Ext_tooltip/> :
-                        <div className="zone_tooltip">
-                          <Zone_description zone_name={selected}/>
-                        </div>
-                      }
-                    </React_tooltip>
-                  }
-                  <Select val={selected} type="select"
-                    on_change_wrapper={on_change_wrapper} label="Default zone"
-                    with_categories data={items} disabled={disabled}/>
-                </span>
-              </Tooltip>
-              <T>{t=><Tooltip title={t('Refresh zones')}>
-                <div className="chrome_icon refresh"
-                  onClick={this.refresh_zones}/>
-              </Tooltip>}</T>
-              <Loader show={this.state.refreshing_zones}/>
-            </div>;
+        return <Tooltip title={tooltip}>
+          <span data-tip data-for="zone-tip" className="field">
+            {preview &&
+              <React_tooltip id="zone-tip" type="light" effect="solid"
+                place="bottom" delayHide={0} delayUpdate={300}>
+                {disabled ? <Ext_tooltip/> :
+                  <div className="zone_tooltip">
+                    <Zone_description zone_name={selected}/>
+                  </div>
+                }
+              </React_tooltip>
+            }
+            <Select val={selected} type="select"
+              on_change_wrapper={on_change_wrapper} label="Default zone"
+              with_categories data={items} disabled={disabled}/>
+          </span>
+        </Tooltip>;
     }
 });

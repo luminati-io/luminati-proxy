@@ -1,7 +1,8 @@
 Luminati Proxy manager - Change Log
 
-## 1.216.910 Stable
+## 1.216.924 Stable
 - :star: Show statistics start time
+- :star: Removed "Refresh zones" button because of websocket implementation
 
 ## 1.216.840 Stable
 - :bug: Fixed auth on WS connections

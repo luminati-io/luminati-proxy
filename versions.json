@@ -1,11 +1,15 @@
 [
     {
-        "ver": "1.216.910",
+        "ver": "1.216.924",
         "type": "stable",
         "changes": [
             {
                 "type": "star",
                 "text": "Show statistics start time"
+            },
+            {
+                "type": "star",
+                "text": "Removed \"Refresh zones\" button because of websocket implementation"
             }
         ]
     },
