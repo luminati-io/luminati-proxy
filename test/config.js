@@ -5,6 +5,7 @@ const fs = require('fs');
 const sinon = require('sinon');
 const {qw} = require('../util/string.js');
 const file = require('../util/file.js');
+const etask = require('../util/etask.js');
 const Manager = require('../lib/manager.js');
 const Config = require('../lib/config.js');
 const logger = require('../lib/logger.js');
@@ -97,5 +98,23 @@ describe('config', ()=>{
             sinon.assert.notCalled(logger.warn);
             assert.deepEqual(res.ext_proxies, ['1.2.3.4']);
         });
+    });
+    describe('upload', ()=>{
+        it('doesnt throw on "not_authorized" err from update_conf', etask.fn(
+        function*(){
+            const conf = new Config(new Manager({}), Manager.default,
+                {cloud_config: {_defaults: {}}});
+            const serialized_conf = conf._serialize([], {});
+            sinon.stub(conf.mgr, 'skip_config_sync').returns(false);
+            let update_conf_stub = sinon.stub(conf.mgr.lpm_f, 'update_conf')
+                .throws(new Error('not_authorized'));
+            try { yield conf.upload(serialized_conf); }
+            catch(e){ assert.fail('"not_authorized" Should not be thrown'); }
+            update_conf_stub.restore();
+            update_conf_stub = sinon.stub(conf.mgr.lpm_f, 'update_conf')
+                .throws(new Error('should_be_thrown'));
+            yield assert.rejects(()=>conf.upload(serialized_conf),
+                /should_be_thrown/);
+        }));
     });
 });

@@ -71,6 +71,7 @@ E.meminfo_parse = function(info){
         case 'MemFree': mem.memfree = m[2]*KB; break;
         case 'Buffers': mem.buffers = m[2]*KB; break;
         case 'Cached': mem.cached = m[2]*KB; break;
+        case 'MemAvailable': mem.memfree_all = m[2]*KB; break;
         }
     }
     return mem;
@@ -84,7 +85,7 @@ E.meminfo = function(){
     var mem = E.meminfo_parse(info);
     mem.buffers = mem.buffers||0; // openvz does not always have Buffers
     mem.cached = mem.cached||0; // cygwin does not have Cached
-    mem.memfree_all = mem.memfree+mem.buffers+mem.cached;
+    mem.memfree_all = mem.memfree_all||mem.memfree+mem.buffers+mem.cached;
     return mem;
 };
 E.freemem = function(){ return E.meminfo().memfree_all; };

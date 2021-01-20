@@ -250,6 +250,7 @@
       "extensions/timezone/manifest.json",
       "extensions/webrtc/background.js",
       "extensions/webrtc/manifest.json",
+      "lib/cache.js",
       "lib/cities.js",
       "lib/config.js",
       "lib/consts.js",
@@ -382,7 +383,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "9999309abdd2891763dcbb29a7f9b2f6"
+    "md5": "1931802ad0acd54301865c8d04898d55"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -417,5 +418,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.216.924"
+  "version": "1.217.753"
 }

@@ -32,6 +32,11 @@ const rule_prepare = rule=>{
         action.ban_ip_global = (rule.ban_ip_duration||0)*ms.MIN;
     else if (rule.action=='ban_ip_domain')
         action.ban_ip_domain = (rule.ban_ip_duration||0)*ms.MIN;
+    else if (rule.action=='cache')
+    {
+        action.cache = true;
+        action.cache_duration = (rule.cache_duration||0)*ms.MIN;
+    }
     else if (rule.action=='refresh_ip')
         action.refresh_ip = true;
     else if (rule.action=='save_to_pool')
@@ -106,6 +111,8 @@ export const map_rule_to_form = rule=>{
         result.ban_ip_duration = rule.action.ban_ip_global/ms.MIN;
     if (rule.action.ban_ip_domain)
         result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
+    if (rule.action.cache_duration)
+        result.cache_duration = rule.action.cache_duration/ms.MIN;
     result.trigger_code = rule.trigger_code;
     result.type = rule.type;
     result.active = rule.active;
@@ -510,7 +517,7 @@ class Action extends Pure_component {
         ports.unshift({key: '--Select--', value: ''});
         const ban_action = ['ban_ip', 'ban_ip_domain', 'ban_ip_global']
             .includes(rule.action);
-        const ban_opt = [
+        const duration_opt = [
             {value: 0, label: 'Until LPM restarts'},
             {value: 1, label: '1 minute'},
             {value: 5, label: '5 minutes'},
@@ -521,35 +528,72 @@ class Action extends Pure_component {
         return <React.Fragment>
           <div className="action ui">
             {rule.trigger_type &&
-              <Rule_config id="action" type="select" data={_action_types}
-                on_change={this.action_changed} rule={rule}/>
+              <Rule_config
+                id="action"
+                type="select"
+                data={_action_types}
+                on_change={this.action_changed}
+                rule={rule}
+              />
             }
             {rule.action=='retry' &&
-              <Rule_config id="retry_number" type="select_number"
-                rule={rule}/>
+              <Rule_config
+                id="retry_number"
+                type="select_number"
+                rule={rule}
+              />
             }
             {rule.action=='retry_port' &&
-              <Rule_config id="retry_port" type="select" data={ports}
-                rule={rule}/>
+              <Rule_config
+                id="retry_port"
+                type="select"
+                data={ports}
+                rule={rule}
+              />
             }
             {rule.action=='switch_port' &&
-              <Rule_config id="switch_port" type="select" data={ports}
-                rule={rule}/>
+              <Rule_config
+                id="switch_port"
+                type="select"
+                data={ports}
+                rule={rule}
+              />
             }
             {ban_action &&
-              <Rule_config id="ban_ip_duration" type="select_number"
-                data={ban_opt} rule={rule} note={<Ban_ips_note/>}
-                class_name="ban_action"/>
+              <Rule_config
+                id="ban_ip_duration"
+                type="select_number"
+                data={duration_opt}
+                rule={rule}
+                note={<Ban_ips_note/>}
+                class_name="duration"
+              />
+            }
+            {rule.action=='cache' &&
+              <Rule_config
+                id="cache_duration"
+                type="select_number"
+                data={duration_opt}
+                rule={rule}
+                class_name="duration"
+              />
             }
             {rule.action=='request_url' &&
               <div>
                 <Rule_config id="request_url" type="url" rule={rule}/>
-                <Rule_config id="request_method" type="select" rule={rule}
-                    data={this.request_methods()}
-                    on_change={this.request_method_changed}/>
+                <Rule_config
+                  id="request_method"
+                  type="select"
+                  rule={rule}
+                  data={this.request_methods()}
+                  on_change={this.request_method_changed}
+                />
                 {rule.request_method && rule.request_method!='GET' &&
-                  <Rule_config id="request_payload" type="json"
-                    rule={rule}/>
+                  <Rule_config
+                    id="request_payload"
+                    type="json"
+                    rule={rule}
+                  />
                 }
               </div>
             }

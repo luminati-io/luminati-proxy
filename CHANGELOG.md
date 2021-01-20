@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.217.753 Stable
+- :star: Improve LPM communication with lpm_f over WS
+
 ## 1.216.924 Stable
 - :star: Show statistics start time
 - :star: Removed "Refresh zones" button because of websocket implementation

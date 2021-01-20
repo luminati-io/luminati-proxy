@@ -19,6 +19,7 @@ const etask = require('../util/etask.js');
 const zutil = require('../util/util.js');
 const pkg = require('../package.json');
 const qw = require('../util/string.js').qw;
+const date = require('../util/date.js');
 const user_agent = require('../util/user_agent.js');
 const lpm_util = require('../util/lpm_util.js');
 const util_lib = require('../lib/util.js');
@@ -28,15 +29,16 @@ const customer = 'abc';
 const password = 'xyz';
 const {assert_has} = require('./common.js');
 const api_base = 'https://'+pkg.api_domain;
+const {SEC} = date.ms;
 
 describe('manager', ()=>{
-    let app, temp_files, logger_stub, sandbox;
+    let app, temp_files, logger_stub, sb;
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
         return i ? args[i] : null;
     };
-    const app_with_args = (args, only_explicit)=>etask(function*(){
-        let manager;
+    const app_with_args = (args, opt={})=>etask(function*(){
+        let manager, {only_explicit, start_manager} = opt;
         this.finally(()=>{
             if (this.error && manager)
                 return manager.stop(true);
@@ -76,26 +78,22 @@ describe('manager', ()=>{
         manager = new Manager(lpm_util.init_args(args));
         manager.lpm_conn.init = ()=>null;
         manager.lpm_f.init = ()=>null;
-        yield manager.start();
+        if (start_manager!==false)
+            yield manager.start();
         return {manager};
     });
     let tmp_file_counter = 0;
-    const temp_file_path = (ext='tmp')=>{
-        const p = path.join(os.tmpdir(),
-            `test-${Date.now()}-${tmp_file_counter++}.${ext}`);
-        const done = ()=>{
-            if (this.path)
-            {
-                try {
-                    fs.unlinkSync(path);
-                } catch(e){
-                    console.error(e.message);
-                }
-                this.path = null;
-            }
-        };
-        return {path: p, done};
-    };
+    const temp_file_path = (ext='tmp')=>({
+        path: path.join(os.tmpdir(),
+            `test-${Date.now()}-${tmp_file_counter++}.${ext}`),
+        done(){
+            if (!this.path)
+                return;
+            try { fs.unlinkSync(this.path); }
+            catch(e){ console.error(e.message); }
+            this.path = null;
+        },
+    });
     const temp_file = (content, ext)=>{
         const temp = temp_file_path(ext);
         fs.writeFileSync(temp.path, JSON.stringify(content));
@@ -126,7 +124,7 @@ describe('manager', ()=>{
             args.push(config_file.path);
             temp_files.push(config_file);
         }
-        return yield app_with_args(args, opt.only_explicit);
+        return yield app_with_args(args, opt);
     });
     const app_with_proxies = (proxies, cli)=>etask(function*(){
         return yield app_with_config({config: {proxies}, cli});
@@ -172,13 +170,13 @@ describe('manager', ()=>{
     }));
     beforeEach(()=>{
         temp_files = [];
-        sandbox = sinon.sandbox.create();
-        sandbox.stub(os, 'cpus').returns([1, 1]);
+        sb = sinon.sandbox.create();
+        sb.stub(os, 'cpus').returns([1, 1]);
         nock(api_base).get('/').times(2).reply(200, {});
         nock(api_base).get('/lpm/server_conf').query(true).reply(200, {});
     });
     afterEach('after manager 2', ()=>{
-        sandbox.verifyAndRestore();
+        sb.verifyAndRestore();
         temp_files.forEach(f=>f.done());
     });
     describe('get_params', ()=>{
@@ -812,6 +810,189 @@ describe('manager', ()=>{
             {port: 24000, ips: ['1.1.1.1']});
         t('overloading', [{port: 24000, pool_size: 1, ips: ['2.2.2.2']}],
             {port: 24000, ips: ['2.2.2.2']});
+    });
+    describe('lpm_f', function(){
+        this.timeout(6*SEC);
+        const server_meta_conf = {config: {_defaults: {
+            customer: 'abc',
+            account_id: 'abc',
+        }}};
+        const get_local_conf = ts=>({
+            _defaults: {
+                lpm_token: '123|abc',
+                customer: 'abc',
+                sync_config: true,
+            },
+            proxies: [{port: 24000}],
+            ts,
+        });
+        const get_server_conf = ts=>({
+            _defaults: {log: 'debug'},
+            proxies: [{port: 25000}, {port: 25001}],
+            ts,
+        });
+        const spy_obj_methods = (obj, ...methods)=>
+            Object.fromEntries(methods.map(m=>[m, sb.spy(obj, m)]));
+        describe('config on server is newer than local config', ()=>{
+            let local_conf, server_conf;
+            beforeEach(()=>{
+                local_conf = get_local_conf(date.add(date(), {day: -1}));
+                server_conf = get_server_conf(date());
+            });
+            afterEach(()=>local_conf = server_conf = null);
+            it('starts with valid lpm_token and customer', etask.fn(
+            function*(){
+                app = yield app_with_config({config: local_conf,
+                    start_manager: false});
+                const mgr = app.manager;
+                sb.stub(mgr.lpm_f, 'init');
+                sb.stub(mgr.lpm_f, 'get_conf').returns(server_conf);
+                sb.stub(mgr.lpm_f, 'get_meta_conf').returns(server_meta_conf);
+                const mgr_methods = qw`logged_update apply_cloud_config perr`;
+                const mgr_spies = spy_obj_methods(mgr, ...mgr_methods);
+                const {logged_update, apply_cloud_config, perr} = mgr_spies;
+                yield mgr.start();
+                sinon.assert.calledWith(perr, 'start_success');
+                sinon.assert.calledWithExactly(apply_cloud_config,
+                    server_conf);
+                const logged_in = logged_update.returnValues[0].retval;
+                assert.strictEqual(logged_in, true);
+                assert.equal(+mgr.config_ts, +server_conf.ts);
+                assert_has(mgr, {
+                    _defaults: server_conf._defaults,
+                    proxies: server_conf.proxies,
+                }, 'app.manager');
+            }));
+            it('starts with invalid lpm_token', etask.fn(function*(){
+                app = yield app_with_config({config: local_conf,
+                    start_manager: false});
+                const mgr = app.manager;
+                sb.stub(mgr.lpm_f, 'init');
+                sb.stub(mgr.lpm_f, 'get_conf').returns(false);
+                const get_meta_conf = sb.stub(mgr.lpm_f, 'get_meta_conf');
+                get_meta_conf.onCall(0).throws(new Error('not_authorized'));
+                get_meta_conf.onCall(1).returns(server_meta_conf);
+                const mgr_methods = qw`apply_cloud_config logged_update`;
+                const {apply_cloud_config, logged_update} =
+                    spy_obj_methods(mgr, ...mgr_methods);
+                yield mgr.start();
+                const logged_in = logged_update.returnValues[0].retval;
+                assert.strictEqual(logged_in, false);
+                assert.strictEqual(mgr._defaults.lpm_token, undefined);
+                sinon.assert.notCalled(apply_cloud_config);
+                assert_has(mgr, {
+                    _defaults: zutil.omit(local_conf._defaults, 'lpm_token'),
+                    proxies: local_conf.proxies,
+                }, 'app.manager');
+                sb.stub(mgr.lpm_f, 'login').returns(server_conf);
+                sb.stub(mgr, 'login_user').returns('123|abc');
+                yield api_json('api/creds_user', {method: 'post', body: {
+                    customer: 'abc',
+                    token: '123',
+                }});
+                sinon.assert.calledWithExactly(apply_cloud_config,
+                    server_conf);
+                const logged_in_2 = logged_update.returnValues[1].retval;
+                assert.strictEqual(logged_in_2, true);
+                assert_has(mgr, {
+                    _defaults: server_conf._defaults,
+                    proxies: server_conf.proxies,
+                }, 'app.manager');
+            }));
+        });
+        describe('local config is newer than config on the server', ()=>{
+            let local_conf, server_conf;
+            beforeEach(()=>{
+                local_conf = get_local_conf(date());
+                server_conf = get_server_conf(date.add(date(), {day: -1}));
+            });
+            afterEach(()=>local_conf = server_conf = null);
+            it('starts with valid lpm_token and customer', etask.fn(
+            function*(){
+                app = yield app_with_config({config: local_conf,
+                    start_manager: false});
+                const mgr = app.manager;
+                sb.stub(mgr.lpm_f, 'init');
+                sb.stub(mgr.lpm_f, 'get_conf').returns(server_conf);
+                sb.stub(mgr.lpm_f, 'get_meta_conf').returns(server_meta_conf);
+                const mgr_methods = qw`logged_update apply_cloud_config perr`;
+                const mgr_spies = spy_obj_methods(mgr, ...mgr_methods);
+                const {logged_update, apply_cloud_config, perr} = mgr_spies;
+                yield mgr.start();
+                sinon.assert.calledWith(perr, 'start_success');
+                sinon.assert.calledWithExactly(apply_cloud_config,
+                    server_conf);
+                const logged_in = logged_update.returnValues[0].retval;
+                assert.strictEqual(logged_in, true);
+                assert_has(mgr, {
+                    _defaults: local_conf._defaults,
+                    proxies: local_conf.proxies,
+                }, 'app.manager');
+            }));
+            it('synchronizes configs with the server after local change',
+            etask.fn(function*(){
+                app = yield app_with_config({config: local_conf,
+                    start_manager: false});
+                const mgr = app.manager;
+                sb.stub(mgr.lpm_f, 'init');
+                sb.stub(mgr.lpm_f, 'get_conf').returns(server_conf);
+                sb.stub(mgr.lpm_f, 'get_meta_conf').returns(server_meta_conf);
+                yield mgr.start();
+                assert.deepEqual(date(mgr.config_ts), date(local_conf.ts));
+                let local_update_ts;
+                sb.stub(mgr.lpm_f, 'update_conf', ({_defaults, ts})=>{
+                    local_update_ts = date(ts);
+                    zutil.extend_deep(server_conf, {_defaults, ts});
+                });
+                yield json('api/settings', 'put', {har_limit: 123});
+                assert.deepEqual(local_update_ts, mgr.config_ts);
+                let new_server_ts;
+                zutil.extend_deep(server_conf, {
+                    _defaults: {logs: 456},
+                    ts: new_server_ts = date.add(date(server_conf.ts), {s: 1}),
+                });
+                yield mgr.apply_cloud_config(server_conf);
+                const expected_defaults = {har_limit: 123, logs: 456};
+                assert_has(mgr, {_defaults: expected_defaults}, 'app.manager');
+                assert.deepEqual(mgr.config_ts, new_server_ts);
+            }));
+            it('starts with invalid lpm_token', etask.fn(function*(){
+                app = yield app_with_config({config: local_conf,
+                    start_manager: false});
+                const mgr = app.manager;
+                sb.stub(mgr.lpm_f, 'init');
+                sb.stub(mgr.lpm_f, 'get_conf').returns(false);
+                const get_meta_conf = sb.stub(mgr.lpm_f, 'get_meta_conf');
+                get_meta_conf.onCall(0).throws(new Error('not_authorized'));
+                get_meta_conf.onCall(1).returns(server_meta_conf);
+                const mgr_methods = qw`apply_cloud_config logged_update`;
+                const {apply_cloud_config, logged_update} =
+                    spy_obj_methods(mgr, ...mgr_methods);
+                yield mgr.start();
+                const logged_in = mgr.logged_update.returnValues[0].retval;
+                assert.strictEqual(logged_in, false);
+                assert.strictEqual(mgr._defaults.lpm_token, undefined);
+                sinon.assert.notCalled(apply_cloud_config);
+                assert_has(mgr, {
+                    _defaults: zutil.omit(local_conf._defaults, 'lpm_token'),
+                    proxies: local_conf.proxies,
+                }, 'app.manager');
+                sb.stub(mgr.lpm_f, 'login').returns(server_conf);
+                sb.stub(mgr, 'login_user').returns('123|abc');
+                yield api_json('api/creds_user', {method: 'post', body: {
+                    customer: 'abc',
+                    token: '123',
+                }});
+                sinon.assert.calledWithExactly(mgr.apply_cloud_config,
+                    server_conf);
+                const logged_in_2 = logged_update.returnValues[1].retval;
+                assert.strictEqual(logged_in_2, true);
+                assert_has(mgr, {
+                    _defaults: local_conf._defaults,
+                    proxies: local_conf.proxies,
+                }, 'app.manager');
+            }));
+        });
     });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{

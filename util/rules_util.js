@@ -61,6 +61,10 @@ E.action_types = [
     {key: 'Bypass proxy', value: 'bypass_proxy', tooltip: `Requests will be
         passed directly to target site without any proxy (super proxy or
         peer).`, type: 'pre', only_url: true, url: true},
+    {key: 'Cache the response', value: 'cache', tooltip: `The response will be
+        served from a local cache if exists. If the action is triggered and
+        cache for this specific URL does not exist then it will be cached`,
+        only_url: true, url: true, type: 'pre'},
     {key: 'Direct super proxy', value: 'direct', tooltip: `Requests will be
         passed through super proxy (not through peers)`, type: 'pre',
         only_url: true, url: true},
