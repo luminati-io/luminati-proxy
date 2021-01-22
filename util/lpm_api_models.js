@@ -118,6 +118,8 @@ E.manager_fields = {
     har_limit: {type: 'number', desc: 'Number of bytes to store'},
     ports_limit: {type: 'integer', desc: 'Limit the numer of open proxy ports '
         +'at the same time'},
+    ui_ws: {type: 'boolean', desc: 'Enable live logs preview and other live '
+        +'data communication on the UI'},
     force: {type: 'boolean', desc: 'Kill other instances of LPM if there are '
         +'any'},
     session_termination: {type: 'boolean', desc: 'Stop sending new requests '

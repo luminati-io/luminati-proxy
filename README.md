@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.217.753/luminati-proxy-manager-v1.217.753-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.218.23/luminati-proxy-manager-v1.218.23-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -242,6 +242,8 @@ Options:
   --har_limit                   Number of bytes to store[number] [default: 1024]
   --ports_limit                 Limit the numer of open proxy ports at the same
                                 time                            [default: 10000]
+  --ui_ws                       Enable live logs preview and other live data
+                                communication on the UI[boolean] [default: true]
   --force                       Kill other instances of LPM if there are any
                                                       [boolean] [default: false]
   --session_termination         Stop sending new requests when the peer IP

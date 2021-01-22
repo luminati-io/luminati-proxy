@@ -251,7 +251,9 @@
       "extensions/webrtc/background.js",
       "extensions/webrtc/manifest.json",
       "lib/cache.js",
+      "lib/cache_report.js",
       "lib/cities.js",
+      "lib/cluster_mgr.js",
       "lib/config.js",
       "lib/consts.js",
       "lib/context.js",
@@ -383,7 +385,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "1931802ad0acd54301865c8d04898d55"
+    "md5": "2a0940c57703c78d4065651cca118674"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -418,5 +420,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.217.753"
+  "version": "1.218.23"
 }

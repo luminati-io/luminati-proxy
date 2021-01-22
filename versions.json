@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.218.23",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Introduced Cache based on the URL as part of the Rules"
+            }
+        ]
+    },
+    {
         "ver": "1.217.753",
         "type": "stable",
         "changes": [

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.218.23 Stable
+- :star: Introduced Cache based on the URL as part of the Rules
+
 ## 1.217.753 Stable
 - :star: Improve LPM communication with lpm_f over WS
 

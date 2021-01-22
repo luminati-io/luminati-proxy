@@ -546,3 +546,9 @@ E.is_subdir = (root, sub)=>{
     return !root || sub.startsWith(root) && (root[nroot-1]=='/' ||
         sub[nroot]===undefined || sub[nroot]=='/');
 };
+E.chown_e = (src, opt)=>{
+    let stat = fs.statSync(src);
+    let owner = get_owner(stat, opt);
+    if (owner)
+        return fs.chownSync(src, owner.user, owner.group);
+};

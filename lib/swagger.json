@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.217.753",
+        "version": "1.218.23",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1382,6 +1382,10 @@
                 "ports_limit": {
                     "type": "integer",
                     "description": "Limit the numer of open proxy ports at the same time"
+                },
+                "ui_ws": {
+                    "type": "boolean",
+                    "description": "Enable live logs preview and other live data communication on the UI"
                 },
                 "force": {
                     "type": "boolean",
