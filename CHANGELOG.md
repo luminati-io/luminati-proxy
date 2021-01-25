@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.218.331 Stable
+- :sparkles: Performance optimizations in proxies overview UI
+
 ## 1.218.23 Stable
 - :star: Introduced Cache based on the URL as part of the Rules
 

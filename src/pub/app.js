@@ -95,8 +95,6 @@ const App = withRouter(class App extends Pure_component {
         this.spawn(etask(function*(){
             this.on('uncaught', err_handler('Error fetching locations'));
             const locations = yield ajax.json({url: '/api/all_locations'});
-            locations.countries_by_code = locations.countries
-            .reduce((acc, e)=>({...acc, [e.country_id]: e.country_name}), {});
             setdb.set('head.locations', locations);
         }));
         this.spawn(etask(function*(){

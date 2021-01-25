@@ -587,7 +587,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         if (proxy_filter===undefined)
             proxy_filter = this.state.proxy_filter;
         sort = sort||this.state.sort;
-        const is_master_proxy = port=>proxy=>proxy.port==port;
+        const master_ports_idx = new Map();
+        proxies.forEach(p=>!p.master_port && master_ports_idx.set(p.port, p));
         proxies = proxies.filter(p=>{
             if (proxy_filter &&
                 !(p.internal_name||'').includes(proxy_filter) &&
@@ -597,10 +598,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return false;
             }
             if (p.proxy_type=='duplicate')
-            {
-                return proxies.filter(is_master_proxy(p.master_port))[0]
-                    .expanded;
-            }
+                return master_ports_idx.get(p.master_port).expanded;
             return true;
         });
         let {zones} = this.state;
@@ -617,7 +615,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         return res;
     };
     prepare_proxies = proxies=>{
-        proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
         for (let i=0; i<proxies.length; i++)
         {
             const cur = proxies[i];

@@ -552,3 +552,4 @@ E.chown_e = (src, opt)=>{
     if (owner)
         return fs.chownSync(src, owner.user, owner.group);
 };
+E.chmod_e = (src, mode)=>fs.chmodSync(src, mode);

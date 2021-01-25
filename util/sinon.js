@@ -79,7 +79,7 @@ E.tick = function(time, opt){
     else if (time===undefined)
         time = 0;
     if (time<0)
-        throw Error('can’t tick backwards');
+        throw Error('can\'t tick backwards');
     return clock_tick.call(clock, time);
 };
 E.wait = function(){

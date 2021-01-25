@@ -104,7 +104,8 @@ class WS extends events.EventEmitter {
         this.idle_timeout = opt.idle_timeout;
         this.idle_timer = undefined;
         this.ipc = opt.ipc_client
-            ? new IPC_client(this, opt.ipc_client, {zjson: opt.ipc_zjson})
+            ? new IPC_client(this, opt.ipc_client, {zjson: opt.ipc_zjson,
+                mux: opt.mux})
             : undefined;
         this.time_parse = opt.time_parse;
         if (opt.ipc_server)
@@ -113,6 +114,7 @@ class WS extends events.EventEmitter {
                 zjson: opt.ipc_zjson,
                 sync: opt.ipc_sync,
                 call_zerr: opt.ipc_call_zerr,
+                mux: opt.mux
             });
         }
         this.mux = opt.mux ? new Mux(this, opt.backpressuring) : undefined;
@@ -440,6 +442,8 @@ class WS extends events.EventEmitter {
 
 class Client extends WS {
     constructor(url, opt={}){
+        if (opt.mux)
+            opt.mux = assign({}, opt.mux);
         super(opt);
         this.status = 'connecting';
         this.impl = client_impl(opt);
@@ -594,6 +598,8 @@ class Client extends WS {
 
 class Server {
     constructor(opt={}, handler=undefined){
+        if (opt.mux)
+            opt.mux = assign({}, {dec_vfd: true}, opt.mux);
         this.handler = handler;
         let ws_opt = {
             server: opt.http_server,
@@ -733,6 +739,12 @@ class Server {
 
 class IPC_client {
     constructor(zws, names, opt={}){
+        if (opt.mux)
+        {
+            this._vfd = opt.mux.start_vfd==undefined && 2147483647 ||
+                opt.mux.start_vfd;
+            this.mux = opt.mux;
+        }
         this._ws = zws;
         this._pending = new Map();
         this._ws.addListener(opt.zjson ? 'zjson' : 'json',
@@ -761,6 +773,9 @@ class IPC_client {
                 case 'post':
                     this[name] = this._post.bind(this, _opt, name);
                     break;
+                case 'mux':
+                    this[name] = this._mux.bind(this, _opt, name);
+                    break;
                 default:
                     zerr.zexit(
                         `${this._ws}: ${name}: Invalid IPC client spec`);
@@ -773,7 +788,8 @@ class IPC_client {
         let timeout = opt.timeout||5*MIN;
         let send_retry_timeout = 3*SEC;
         return etask(function*IPC_client_call(){
-            let req = {type: 'ipc_call', cmd, cookie: ++IPC_client._cookie};
+            let req = {type: opt.type=='mux' && 'ipc_mux' || 'ipc_call', cmd,
+                cookie: ++IPC_client._cookie};
             if (arg.length==1)
                 req.msg = arg[0];
             else if (arg)
@@ -833,6 +849,21 @@ class IPC_client {
         else
             this._ws.json(req);
     }
+    _mux(opt, cmd, ...args)
+    {
+        if (!this._ws.mux)
+            throw new Error('Mux is not defined');
+        let _this = this;
+        let vfd = this.mux.dec_vfd ? --this._vfd : ++this._vfd;
+        return etask(function*(){
+            let stream = _this._ws.mux.open(vfd, _this.mux.bytes_allowed,
+                _this.mux);
+            stream.close = ()=>_this._ws.mux.close(vfd);
+            args.unshift(vfd);
+            yield _this._call(opt, cmd, ...args);
+            return stream;
+        });
+    }
     _on_resp(msg){
         if (!msg || msg.type!='ipc_result' && msg.type!='ipc_error')
             return;
@@ -871,6 +902,7 @@ class IPC_server {
         else
             this.methods = methods;
         Object.setPrototypeOf(this.methods, null);
+        this.mux = opt.mux;
         this.zjson = !!opt.zjson;
         this.sync = !!opt.sync;
         this.call_zerr = !!opt.call_zerr;
@@ -887,7 +919,7 @@ class IPC_server {
         if (!msg || !msg.cmd)
             return;
         let type = msg.type||'ipc_call', cmd = msg.cmd;
-        if (type!='ipc_call' && type!='ipc_post')
+        if (!['ipc_call', 'ipc_post', 'ipc_mux'].includes(type))
             return;
         let method = this.methods[cmd];
         if (method==true)
@@ -905,7 +937,7 @@ class IPC_server {
             });
         }
         const res_process = rv=>{
-            if (type=='ipc_post')
+            if (type=='ipc_post' || type=='ipc_mux')
                 return;
             const res = {
                 type: 'ipc_result',
@@ -921,7 +953,7 @@ class IPC_server {
         const err_process = e=>{
             if (type=='ipc_call' && this.call_zerr)
                 zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
-            if (type=='ipc_post')
+            if (type=='ipc_post' || type=='ipc_mux')
                 return zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
             this.ws.json({
                 type: 'ipc_error',
@@ -932,6 +964,32 @@ class IPC_server {
             });
         };
         const arg = msg.arg || [msg.msg], ctx = this.ws.data||this.ws;
+        if (type=='ipc_mux')
+        {
+            if (!this.ws.mux)
+            {
+                return this.ws.json({
+                    type: 'ipc_error',
+                    cmd: cmd,
+                    cookie: msg.cookie,
+                    msg: `Mux is not defined`,
+                });
+            }
+            let vfd = arg.shift();
+            let stream = this.ws.mux.open(vfd, this.mux.bytes_allowed,
+                this.mux);
+            stream.close = ()=>this.ws.mux.close(vfd);
+            arg.unshift(stream);
+            const res = {
+                type: 'ipc_result',
+                cmd: cmd,
+                cookie: msg.cookie,
+            };
+            if (this.zjson)
+                this.ws.zjson(res);
+            else
+                this.ws.json(res);
+        }
         if (this.sync)
         {
             try { res_process(method.apply(ctx, arg)); }
@@ -940,7 +998,7 @@ class IPC_server {
         }
         const _this = this;
         etask(function*IPC_server_on_call(){
-            if (type=='ipc_post')
+            if (type=='ipc_post' || type=='ipc_mux')
             {
                 _this.pending.add(this);
                 this.finally(()=>_this.pending.delete(this));

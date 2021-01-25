@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.218.23-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.218.331-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -68,11 +68,11 @@ luminati
 
 登录之后，你会看到Luminati的默认设置所含一个”drop in”代理服务器在接口22225运行。细节提供在下面.
 
-### 超级代理服务器的‘Dropin’替代
+### 超级代理服务器的'Dropin'替代
 
-Luminati 代理服务器所含的”Dropin 模式” 和现有的超级代理服务器的功能相同。在 ‘dropin’ 模式运行代理时，你不需要登录行政UI就能发出请求。代理账户和密码会自动被提供。’dropin’ 模式是默认模式，和可以让你容易的从一般的超级代理服务器转到Luminati 代理管理器.
+Luminati 代理服务器所含的”Dropin 模式” 和现有的超级代理服务器的功能相同。在 'dropin' 模式运行代理时，你不需要登录行政UI就能发出请求。代理账户和密码会自动被提供。'dropin' 模式是默认模式，和可以让你容易的从一般的超级代理服务器转到Luminati 代理管理器.
 
-’dropin’ 模式是默认模式。如果你想禁用’dropin’,请用命令：--no-dropin:
+'dropin' 模式是默认模式。如果你想禁用'dropin',请用命令：--no-dropin:
 
 ```sh
 luminati --no-dropin
