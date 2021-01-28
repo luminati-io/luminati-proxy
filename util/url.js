@@ -199,7 +199,7 @@ E.is_valid_domain = function(domain){
 
 // XXX josh: move to email.js:is_valid
 E.is_valid_email = function(email, is_signup){
-    if (!email)
+    if (!email || typeof email!='string')
         return false;
     var re = /^[a-z0-9_\-+*]+(?:\.[a-z0-9_\-+*]+)*@(.*)$/;
     var n = email.toLowerCase().match(re);

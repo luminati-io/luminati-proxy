@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.218.904 Stable
+- :sparkles: Resolving super proxies over web socket instead of HTTP
+
 ## 1.218.331 Stable
 - :sparkles: Performance optimizations in proxies overview UI
 

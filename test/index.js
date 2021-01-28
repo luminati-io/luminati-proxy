@@ -16,9 +16,10 @@ const zutil = require('../util/util.js');
 const sinon = require('sinon');
 const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
+const Socks = require('../lib/socks.js');
+const Cache = require('../lib/cache.js');
 const requester = require('../lib/requester.js');
 const Timeline = require('../lib/timeline.js');
-const Config = require('../lib/config.js');
 const lutil = require('../lib/util.js');
 const consts = require('../lib/consts.js');
 const common = require('./common.js');
@@ -40,7 +41,6 @@ describe('proxy', ()=>{
         opt = opt||{};
         if (opt.ssl===true)
             opt.ssl = Object.assign({requestCert: false}, ssl());
-        const mgr = {config: new Config()};
         const l = new Server(Object.assign({
             proxy: '127.0.0.1',
             proxy_port: proxy.port,
@@ -48,7 +48,7 @@ describe('proxy', ()=>{
             password,
             log: 'none',
             port: 24000,
-        }, opt), mgr);
+        }, opt), {cache: new Cache(), socks_server: new Socks()});
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')
                 req_opt = {url: req_opt};
@@ -72,11 +72,13 @@ describe('proxy', ()=>{
             }
             if (req_opt.no_usage)
                 return yield etask.nfn_apply(_this, '.request', [req_opt]);
-            let w = etask.wait();
+            const w = etask.wait();
+            l.on('error', e=>w.throw(e));
+            l.on('request_error', e=>w.throw(e));
             l.on('usage', ()=>w.continue());
             l.on('usage_abort', ()=>w.continue());
             l.on('switched', ()=>w.continue());
-            let res = yield etask.nfn_apply(_this, '.request', [req_opt]);
+            const res = yield etask.nfn_apply(_this, '.request', [req_opt]);
             yield w;
             return res;
         });
@@ -374,23 +376,6 @@ describe('proxy', ()=>{
                     assert.ok(!auth_keys.includes(k)));
             }));
         });
-        describe('socks', ()=>{
-            const t = (name, _url)=>it(name, etask._fn(function*(_this){
-                _this.timeout(30000);
-                l = yield lum({port: 25000});
-                let res = yield etask.nfn_apply(request, [{
-                    agent: new socks.HttpAgent({
-                        proxyHost: '127.0.0.1',
-                        proxyPort: 25000,
-                        auths: [socks.auth.None()],
-                    }),
-                    url: _url,
-                }]);
-                let body = JSON.parse(res.body);
-                assert.equal(body.url, _url);
-            }));
-            t('http', test_url.http);
-        });
         describe('throttle', ()=>{
             const t = throttle=>it(''+throttle, etask._fn(function*(_this){
                 _this.timeout(3000);
@@ -516,52 +501,52 @@ describe('proxy', ()=>{
                 assert(error.includes('tunneling socket could not be '
                 +'established, statusCode=407'));
             }));
-            it('socks http', etask._fn(function*(){
-                l = yield lum();
-                let res = yield etask.nfn_apply(request, [{
-                    agent: new socks.HttpAgent({
-                        proxyHost: '127.0.0.1',
-                        proxyPort: l.port,
-                        auths: [socks.auth.None()],
-                    }),
-                    rejectUnauthorized: false,
-                    url: test_url.http,
-                }]);
-                assert.equal(res.statusCode, 200);
-            }));
-            it('socks http reject', etask._fn(function*(){
-                l = yield lum({whitelist_ips: ['1.1.1.1']});
-                sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
-                let res = yield etask.nfn_apply(request, [{
-                    agent: new socks.HttpAgent({
-                        proxyHost: '127.0.0.1',
-                        proxyPort: l.port,
-                        auths: [socks.auth.None()],
-                    }),
-                    rejectUnauthorized: false,
-                    url: test_url.http,
-                }]);
-                assert.equal(res.statusCode, 407);
-            }));
-            it('socks https', etask._fn(function*(){
-                l = yield lum();
-                let res = yield etask.nfn_apply(request, [{
-                    agent: new socks.HttpsAgent({
-                        proxyHost: '127.0.0.1',
-                        proxyPort: l.port,
-                        auths: [socks.auth.None()],
-                    }),
-                    rejectUnauthorized: false,
-                    url: test_url.https,
-                }]);
-                assert.equal(res.statusCode, 200);
-            }));
-            it('socks https reject', etask._fn(function*(){
-                l = yield lum({whitelist_ips: ['1.1.1.1']});
-                sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
-                let error;
-                try {
-                    yield etask.nfn_apply(request, [{
+            describe('socks', ()=>{
+                it('http', etask._fn(function*(_this){
+                    _this.timeout(30000);
+                    l = yield lum({port: 25000});
+                    let res = yield etask.nfn_apply(request, [{
+                        agent: new socks.HttpAgent({
+                            proxyHost: '127.0.0.1',
+                            proxyPort: 25000,
+                            auths: [socks.auth.None()],
+                        }),
+                        url: test_url.http,
+                    }]);
+                    let body = JSON.parse(res.body);
+                    assert.equal(body.url, test_url.http);
+                }));
+                it('socks http', etask._fn(function*(){
+                    l = yield lum();
+                    let res = yield etask.nfn_apply(request, [{
+                        agent: new socks.HttpAgent({
+                            proxyHost: '127.0.0.1',
+                            proxyPort: l.port,
+                            auths: [socks.auth.None()],
+                        }),
+                        rejectUnauthorized: false,
+                        url: test_url.http,
+                    }]);
+                    assert.equal(res.statusCode, 200);
+                }));
+                it('socks http reject', etask._fn(function*(){
+                    l = yield lum({whitelist_ips: ['1.1.1.1']});
+                    sinon.stub(l, 'is_whitelisted').onFirstCall()
+                        .returns(false);
+                    let res = yield etask.nfn_apply(request, [{
+                        agent: new socks.HttpAgent({
+                            proxyHost: '127.0.0.1',
+                            proxyPort: l.port,
+                            auths: [socks.auth.None()],
+                        }),
+                        rejectUnauthorized: false,
+                        url: test_url.http,
+                    }]);
+                    assert.equal(res.statusCode, 407);
+                }));
+                it('socks https', etask._fn(function*(){
+                    l = yield lum();
+                    let res = yield etask.nfn_apply(request, [{
                         agent: new socks.HttpsAgent({
                             proxyHost: '127.0.0.1',
                             proxyPort: l.port,
@@ -570,10 +555,28 @@ describe('proxy', ()=>{
                         rejectUnauthorized: false,
                         url: test_url.https,
                     }]);
-                } catch(e){ error = e.toString(); }
-                assert(error.includes('Client network socket disconnected '
-                +'before secure TLS connection was established'));
-            }));
+                    assert.equal(res.statusCode, 200);
+                }));
+                it('socks https reject', etask._fn(function*(){
+                    l = yield lum({whitelist_ips: ['1.1.1.1']});
+                    sinon.stub(l, 'is_whitelisted').onFirstCall()
+                        .returns(false);
+                    let error;
+                    try {
+                        yield etask.nfn_apply(request, [{
+                            agent: new socks.HttpsAgent({
+                                proxyHost: '127.0.0.1',
+                                proxyPort: l.port,
+                                auths: [socks.auth.None()],
+                            }),
+                            rejectUnauthorized: false,
+                            url: test_url.https,
+                        }]);
+                    } catch(e){ error = e.toString(); }
+                    assert(error.includes('Client network socket disconnected '
+                    +'before secure TLS connection was established'));
+                }));
+            });
         });
         describe('proxy_resolve', ()=>{
             const dns_resolve = dns.resolve;

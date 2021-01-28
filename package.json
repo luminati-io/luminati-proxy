@@ -77,7 +77,7 @@
     "log-buffer": "0.0.3",
     "prompt-sync": "4.1.7",
     "lum_lokijs": "1.5.11",
-    "lum_socksv5": "0.0.12",
+    "lum_socksv5": "0.0.13",
     "ps-list": "6.3.0",
     "extract-zip": "1.6.7",
     "cookie": "0.4.0",
@@ -385,7 +385,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "d0feb1c3e3a88ac66ad54d92d354f5f2"
+    "md5": "e8eaa88864ee401057c8644eeeb3e811"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -420,5 +420,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.218.331"
+  "version": "1.218.904"
 }

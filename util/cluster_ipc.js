@@ -5,7 +5,8 @@ const cluster = require('cluster');
 const etask = require('./etask.js');
 const zerr = require('./zerr.js');
 const zutil = require('./util.js');
-const env = process.env, assign = Object.assign, ef = etask.ef, E = exports;
+const assign = Object.assign, ef = etask.ef, E = exports;
+const VERBOSE_IPC = +process.env.VERBOSE_IPC;
 let current_cookie = 1;
 let handlers = {}, waiting = {}, incoming_pending = {};
 
@@ -25,7 +26,7 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
         queue.push([sender, msg, sock]);
         return;
     }
-    if (+env.VERBOSE_IPC)
+    if (VERBOSE_IPC)
     {
         zerr.notice(`cluster_ipc: received ${msg.type} `
             +`from ${sender}.${msg.handler}`
@@ -56,7 +57,7 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
     else
         assign(response, {type: 'ipc_result', msg: value});
     try {
-        if (+env.VERBOSE_IPC)
+        if (VERBOSE_IPC)
         {
             zerr.notice(`cluster_ipc: sending ${response.type} `
                 +`to ${sender}.${msg.handler} cookie ${msg.cookie}`);
@@ -75,7 +76,7 @@ let on_response = (sender, msg)=>{
         zerr.zexit('cluster_on_response: no handler: '+key
             +' ['+(sender.id||sender)+']');
     }
-    if (+env.VERBOSE_IPC)
+    if (VERBOSE_IPC)
     {
         zerr.notice(`cluster_ipc: received ${msg.type} `
             +`from ${sender}.${msg.handler} cookie ${msg.cookie}`);
@@ -136,7 +137,7 @@ let call = (to, name, args, sock)=>etask(function*ipc_call(){
         if (to!='master')
             init_worker(cluster.workers[to]);
         waiting[to][key] = this;
-        if (+env.VERBOSE_IPC)
+        if (VERBOSE_IPC)
         {
             zerr.notice(`cluster_ipc: sending ipc_call to ${to}.${name} `
                 +`cookie ${cookie}`);
@@ -146,14 +147,11 @@ let call = (to, name, args, sock)=>etask(function*ipc_call(){
         return yield this.wait();
     } catch(e){ ef(e);
         zerr.err(`cluster_ipc.call to ${to} ${name}(${args}): `+zerr.e2s(e));
-        // XXX vladimir: rm conf if no fails
-        if (!+env.CLUSTER_IPC_CALL_IGNORE_FAILS)
-            throw e;
     }
 });
 
 let post = (to, name, args, sock)=>{
-    if (+env.VERBOSE_IPC)
+    if (VERBOSE_IPC)
         zerr.notice(`cluster_ipc: sending ipc_post to ${to}.${name}`);
     let msg = {type: 'ipc_post', handler: name, msg: args};
     send(to, msg, sock);
