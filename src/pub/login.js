@@ -351,7 +351,7 @@ class Two_step_form extends Pure_component {
           </div>
           {this.props.sending_email ?
               t('Sending email...') :
-              t('Can’t find it? Check your spam folder')
+              t('Can\'t find it? Check your spam folder')
           }
           <button onClick={this.submit} className="btn btn_lpm btn_login"
             disabled={verifying_token}>

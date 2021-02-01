@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.219.343",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed whitelisted IPs when using SOCKS5"
+            }
+        ]
+    },
+    {
         "ver": "1.218.904",
         "type": "stable",
         "changes": [

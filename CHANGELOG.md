@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.219.343 Stable
+- :bug: Fixed whitelisted IPs when using SOCKS5
+
 ## 1.218.904 Stable
 - :sparkles: Resolving super proxies over web socket instead of HTTP
 
