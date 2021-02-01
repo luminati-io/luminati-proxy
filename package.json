@@ -279,6 +279,7 @@
       "lib/smtp.js",
       "lib/socks.js",
       "lib/ssl.js",
+      "lib/throttle_mgr.js",
       "lib/timeline.js",
       "lib/timeouts.js",
       "lib/username.js",
@@ -385,7 +386,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "69ce6119668b73a984d46b3820be0800"
+    "md5": "25a4a470d6bb507b8d827302095b3c44"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -420,5 +421,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.219.343"
+  "version": "1.219.457"
 }

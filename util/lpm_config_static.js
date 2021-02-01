@@ -79,6 +79,7 @@ conf.server_default = {
     bw_limit: 0,
     log: 'notice',
     ua: false,
+    throttle: '',
 };
 conf.manager_default = Object.assign({}, conf.server_default, {
     www: 22999,

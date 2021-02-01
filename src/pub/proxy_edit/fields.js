@@ -183,7 +183,7 @@ export const tabs = {
             },
             throttle: {
                 label: 'Throttle requests',
-                tooltip: `Throttle requests above the given number.
+                tooltip: `Throttle requests per domain above the given number.
                     Allow a maximal number of parallel requests.`,
                 ext: true,
             },

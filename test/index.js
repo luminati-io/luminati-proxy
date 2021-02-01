@@ -377,22 +377,35 @@ describe('proxy', ()=>{
             }));
         });
         describe('throttle', ()=>{
+            const get_throttled = domain=>
+                l.throttle_mgr.throttled.get(domain)||[];
+            const get_active = domain=>l.throttle_mgr.active.get(domain)||0;
             const t = throttle=>it(''+throttle, etask._fn(function*(_this){
                 _this.timeout(3000);
-                let requests = [];
                 proxy.connection = hold_request;
+                const requests = [];
+                const domain = 'lumtest.com';
+                const total_reqs = 2*throttle;
                 l = yield lum({throttle});
-                repeat(2*throttle, ()=>requests.push(l.test()));
+                repeat(total_reqs, ()=>requests.push(l.test()));
                 yield etask.sleep(300);
                 assert.equal(waiting.length, throttle);
-                for (let i=0; i < throttle; ++i)
+                const active = get_active(domain);
+                assert.equal(active, total_reqs);
+                const throttled_tasks = get_throttled(domain);
+                assert.equal(throttled_tasks.length, total_reqs-throttle);
+                for (let i=0; i<throttle; i++)
                 {
                     release(1);
-                    yield etask.sleep(100);
-                    assert.equal(waiting.length, throttle);
+                    yield etask.sleep(200);
+                    assert.equal(get_active(domain), total_reqs-i-1);
+                    assert.equal(get_throttled(domain).length, throttle-i-1);
                 }
+                assert.equal(get_active(domain), throttle);
+                assert.equal(l.throttle_mgr.throttled.size, 0);
                 release(throttle);
                 yield etask.all(requests);
+                assert.ok(!get_active(domain));
             }));
             t(1);
             t(3);

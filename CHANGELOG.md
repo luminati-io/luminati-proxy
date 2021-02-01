@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.219.457 Stable
+- :star: Introduced a mechanism to allow throttling requests per domain name
+
 ## 1.219.343 Stable
 - :bug: Fixed whitelisted IPs when using SOCKS5
 

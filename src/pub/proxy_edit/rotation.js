@@ -94,6 +94,8 @@ export default class Rotation extends Pure_component {
                   <Config type="text" id="reverse_lookup_file"/>}
                 {this.state.form.reverse_lookup=='values' &&
                   <Config type="textarea" id="reverse_lookup_values"/>}
+                <Config type="select_number" id="throttle"
+                  data={[0, 10, 100, 1000]}/>
               </Tab_context.Provider>
             </div>;
     }
