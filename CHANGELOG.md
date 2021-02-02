@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.219.637 Stable
+- :bug: Selecting all IPs in the Pool size allocation modal will now properly select only the filtered IPs
+
 ## 1.219.457 Stable
 - :star: Introduced a mechanism to allow throttling requests per domain name
 

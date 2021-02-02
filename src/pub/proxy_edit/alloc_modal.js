@@ -43,7 +43,7 @@ export default class Alloc_modal extends Pure_component {
             return null;
         return {
             selected_all: (props.form[props.type]||[]).length==
-                state.available_list.length,
+                state.rendered_list.length,
         };
     }
     close = ()=>$('#allocated_ips').modal('hide');
@@ -118,7 +118,7 @@ export default class Alloc_modal extends Pure_component {
             const selected = new Set();
             form[type].forEach(v=>selected.add(v));
             selected.add(value);
-            new_alloc = this.state.available_list
+            new_alloc = this.state.rendered_list
                 .filter(v=>selected.has(v.ip))
                 .map(v=>v.ip);
         }
@@ -133,9 +133,9 @@ export default class Alloc_modal extends Pure_component {
         this.set_field('multiply', 1);
     };
     select_all = ()=>{
-        const {available_list} = this.state;
-        this.set_field(this.props.type, available_list.map(r=>r.ip));
-        this.update_multiply_and_pool_size(available_list.length);
+        const {rendered_list} = this.state;
+        this.set_field(this.props.type, rendered_list.map(r=>r.ip));
+        this.update_multiply_and_pool_size(rendered_list.length);
     };
     refresh_chosen = ()=>{
         if (this.props.type=='ips')
@@ -301,7 +301,7 @@ export default class Alloc_modal extends Pure_component {
         </div>;
         const sub_title = `IPs: ${selected_list.length}/`
         +`${this.props.form.pool_size} out of`
-        +` ${this.state.available_list.length} available`;
+        +` ${this.state.rendered_list.length} available`;
         return <Modal id="allocated_ips" className="allocated_ips_modal"
           title={title} footer={Footer}>
           <Infinite_chrome_table

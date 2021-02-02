@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.219.637",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Selecting all IPs in the Pool size allocation modal will now properly select only the filtered IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.219.457",
         "type": "stable",
         "changes": [
