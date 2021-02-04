@@ -811,6 +811,28 @@ describe('manager', ()=>{
         t('overloading', [{port: 24000, pool_size: 1, ips: ['2.2.2.2']}],
             {port: 24000, ips: ['2.2.2.2']});
     });
+    describe('refresh_ip', ()=>{
+        it('refreshes ip & sessions and updates proxy port', etask._fn(
+        function*(_this){
+            const alloc_ip = '1.1.1.1', alloc_inet_addr = 16843009;
+            const new_ip = '2.2.2.2';
+            const proxy = {port: 24000, zone: 'abc', ips: [alloc_ip]};
+            app = yield app_with_proxies([proxy]);
+            const mgr = app.manager;
+            sb.stub(mgr, 'request_allocated_ips').returns({ips: [alloc_ip]});
+            const refresh_ips = sb.stub(mgr, 'refresh_ips')
+                .returns({ips: [{ip: new_ip}]});
+            const proxy_port = mgr.proxy_ports[proxy.port];
+            const proxy_conf = mgr.proxies.find(p=>p.port==proxy.port);
+            const refresh_sessions = sb.spy(proxy_port, 'refresh_sessions');
+            const expected_refresh_args = [proxy.zone, {ips: alloc_inet_addr}];
+            yield mgr.refresh_ip(alloc_ip, null, proxy.port);
+            assert.ok(refresh_ips.calledWithExactly(...expected_refresh_args));
+            assert.ok(refresh_sessions.called);
+            assert.deepEqual(proxy_port.opt.ips, [new_ip]);
+            assert.deepEqual(proxy_conf.ips, [new_ip]);
+        }));
+    });
     describe('lpm_f', function(){
         this.timeout(6*SEC);
         const server_meta_conf = {config: {_defaults: {

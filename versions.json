@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.220.91",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Refresh IP rule action"
+            }
+        ]
+    },
+    {
         "ver": "1.219.637",
         "type": "stable",
         "changes": [

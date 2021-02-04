@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.220.91 Stable
+- :bug: Fixed Refresh IP rule action
+
 ## 1.219.637 Stable
 - :bug: Selecting all IPs in the Pool size allocation modal will now properly select only the filtered IPs
 

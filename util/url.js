@@ -482,6 +482,13 @@ E.qs_add = function(url, qs){
     return E.uri_obj_href(u);
 };
 
+E.qs_remove = function(url, qs){
+    var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {});
+    qs.forEach(function(query){ delete q[query]; });
+    u.path = u.pathname+'?'+E.qs_str(q);
+    return E.uri_obj_href(u);
+};
+
 E.qs_parse_url = function(url){
     return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, ''));
 };
