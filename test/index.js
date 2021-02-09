@@ -83,7 +83,7 @@ describe('proxy', ()=>{
             return res;
         });
         yield l.listen();
-        l.session_mgr._request_session({});
+        l.session_mgr.retrieve_session({});
         l.history = [];
         l.on('usage', data=>l.history.push(data));
         l.on('usage_abort', data=>l.history.push(data));

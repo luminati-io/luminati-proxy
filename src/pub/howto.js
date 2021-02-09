@@ -33,10 +33,11 @@ const Howto = withRouter(class Howto extends Pure_component {
     };
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
-        const {zagent, customer} = this.state.settings;
+        const {zagent, customer, lpm_token} = this.state.settings;
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];
         const hostname = zagent ? cloud_url_address(customer) : undefined;
+        const lpm_token_value = (lpm_token||'').split('|')[0];
         let Instructions = ()=>null;
         if (option=='browser')
             Instructions = Browser_instructions;
@@ -60,7 +61,7 @@ const Howto = withRouter(class Howto extends Pure_component {
                   <Nav_tab id="proxy_tester" title="Web tester"
                     tooltip="Send example requests from here"/>
                 </Nav_tabs>
-                <Instructions hostname={hostname}>
+                <Instructions hostname={hostname} lpm_token={lpm_token_value}>
                   {this.props.children}
                 </Instructions>
               </div>
@@ -98,8 +99,8 @@ class Code_instructions extends Pure_component {
               <Lang_btn active={lang==props.lang} {...props}/>
             </span>;
         const tutorial_port = window.localStorage.getItem(
-            'quickstart-first-proxy')||24000;
-        const to_copy = instructions.code(tutorial_port,
+            'quickstart-first-proxy')||22225;
+        const to_copy = instructions.code(tutorial_port, this.props.lpm_token,
             this.props.hostname)[lang];
         const code = prism.highlight(to_copy, prism.languages.clike);
         const api_url = this.props.www_api+'/doc/api#lpm_endpoints';
@@ -137,7 +138,7 @@ class Code_instructions extends Pure_component {
 
 const Browser_instructions = withRouter(
 class Browser_instructions extends Pure_component {
-    port = window.localStorage.getItem('quickstart-first-proxy')||24000;
+    port = window.localStorage.getItem('quickstart-first-proxy')||22225;
     browser_changed = e=>{
         const browser = e.target.value;
         const pathname = `/howto/browser/${browser}`;
@@ -157,7 +158,8 @@ class Browser_instructions extends Pure_component {
                 </select>
               </div>
               <div className="instructions_well">
-                {instructions.browser(this.port, this.props.hostname)[browser]}
+                {instructions.browser(this.port, this.props.lpm_token,
+                    this.props.hostname)[browser]}
               </div>
             </div>;
     }

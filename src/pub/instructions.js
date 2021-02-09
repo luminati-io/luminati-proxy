@@ -4,15 +4,19 @@ import React from 'react';
 import {Code} from './common.js';
 import {Instructions, Li} from '/www/util/pub/bullets.js';
 import {T} from './common/i18n.js';
+import {is_local} from './util.js';
 
 const E = {};
 
-E.code = (proxy=24000, hostname=document.location.hostname)=>({
-    shell: `curl --proxy ${hostname}:${proxy} "http://lumtest.com/myip.json"`,
+E.code = (proxy=22225, lpm_token, hostname=document.location.hostname)=>({
+    shell: `curl --proxy ${hostname}:${proxy} ${!is_local() && lpm_token ?
+        `--proxy-user lum-auth-token:${lpm_token} ` : ''}`
+        +`"http://lumtest.com/myip.json"`,
     node: `#!/usr/bin/env node
 require('request-promise')({
     url: 'https://lumtest.com/myip.json',
-    proxy: 'http://${hostname}:${proxy}',
+    proxy: 'http://${!is_local() && lpm_token ? `lum-auth-token:${lpm_token}@`
+        : ''}${hostname}:${proxy}',
     rejectUnauthorized: false
 }).then(function(data){
     console.log(data);
@@ -24,7 +28,8 @@ require('request-promise')({
 import java.io.*;
 import java.net.*;
 import java.security.cert.X509Certificate;
-import javax.net.ssl.*;
+import javax.net.ssl.*;${
+    !is_local() && lpm_token ?`\nimport java.util.Base64;` : ''}
 
 public class Example {
     public static void main(String[] args) throws Exception {
@@ -42,7 +47,13 @@ public class Example {
         URL url = new URL("https://lumtest.com/myip.json");
         Proxy proxy = new Proxy(Proxy.Type.HTTP,
             new InetSocketAddress("${hostname}", ${proxy}));
-        URLConnection yc = url.openConnection(proxy);
+        URLConnection yc = url.openConnection(proxy);${!is_local() &&
+            lpm_token ? `
+        String auth = "lum-auth-token:${lpm_token}";
+        String encoded_auth = Base64.getEncoder().encodeToString(
+            auth.getBytes());
+        yc.setRequestProperty("Proxy-Authorization", "Basic "+encoded_auth);`
+            : ''}
         BufferedReader in = new BufferedReader(new InputStreamReader(
             yc.getInputStream()));
         String input_line;
@@ -61,7 +72,9 @@ class Example
         ServicePointManager.ServerCertificateValidationCallback =
             delegate { return true; };
         var client = new WebClient();
-        client.Proxy = new WebProxy("${hostname}:${proxy}");
+        client.Proxy = new WebProxy("${hostname}:${proxy}");${!is_local() &&
+            lpm_token? `
+        client.Proxy.Credentials = new NetworkCredential("lum-auth-token", "${lpm_token}");` : ''};
         Console.WriteLine(client.DownloadString(
             "https://lumtest.com/myip.json"));
     }
@@ -71,7 +84,9 @@ class Example
 Module Example
     Sub Main()
         Dim Client As New WebClient
-        Client.Proxy = New WebProxy("http://${hostname}:${proxy}")
+        Client.Proxy = New WebProxy("http://${hostname}:${proxy}")${
+            !is_local() && lpm_token ? `
+        Client.Proxy.Credentials = New NetworkCredential("lum-auth-token", "${lpm_token}")` : ''}
         Console.WriteLine(Client.DownloadString(
             "http://lumtest.com/myip.json"))
     End Sub
@@ -87,7 +102,8 @@ if sys.version_info[0]==2:
     ctx = ssl.create_default_context()
     ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = request.build_opener(
-        request.ProxyHandler({'http': 'http://${hostname}:${proxy}'}),
+        request.ProxyHandler({'http': 'http://${!is_local && lpm_token ?
+        `lum-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
         request.HTTPSHandler(context=ctx))
     print(opener.open('https://lumtest.com/myip.json').read())
 if sys.version_info[0]==3:
@@ -95,7 +111,8 @@ if sys.version_info[0]==3:
     ctx = ssl.create_default_context()
     ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = urllib.request.build_opener(
-        urllib.request.ProxyHandler({'http': 'http://${hostname}:${proxy}'}),
+        urllib.request.ProxyHandler({'http': 'http://${!is_local() && lpm_token
+            ? `lum-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
         urllib.request.HTTPSHandler(context=ctx))
     print(opener.open('https://lumtest.com/myip.json').read())`,
     ruby: `#!/usr/bin/ruby
@@ -104,7 +121,8 @@ require 'uri'
 require 'net/http'
 
 uri = URI.parse('{{example.user_url}}')
-proxy = Net::HTTP::Proxy('${hostname}', ${proxy})
+proxy = Net::HTTP::Proxy('${hostname}', ${proxy}${!is_local() && lpm_token ?
+    `, 'lum-auth-token', '${lpm_token}'` : ''})
 
 req = Net::HTTP::Get.new(uri.path)
 
@@ -115,14 +133,16 @@ end
 puts result.body`,
     php: `<?php
     $curl = curl_init('https://lumtest.com/myip.json');
-    curl_setopt($curl, CURLOPT_PROXY, 'http://${hostname}:${proxy}');
+    curl_setopt($curl, CURLOPT_PROXY, 'http://${hostname}:${proxy}');${!is_local() && lpm_token ? `
+    curl_setopt($curl, CURLOPT_PROXYUSERPWD, 'lum-auth-token:${lpm_token}')` : ''}
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_exec($curl);
 ?>`,
     perl: `#!/usr/bin/perl
 use LWP::UserAgent;
 my $agent = LWP::UserAgent->new();
-$agent->proxy(['http', 'https'], "http://${hostname}:${proxy}");
+$agent->proxy(['http', 'https'], "http://${!is_local() && lpm_token ?
+    `lum-auth-token:${lpm_token}\\@` : ''}${hostname}:${proxy}");
 print $agent->get('http://lumtest.com/myip.json')->content();`,
 });
 
@@ -133,7 +153,28 @@ const Last_step = ()=>
       <T>and start browsing.</T>
     </Li>;
 
-E.browser = (proxy=24000, hostname=document.location.hostname)=>({
+const Auth_step = ({lpm_token, type})=>{
+    if (is_local() || !lpm_token)
+        return null;
+    const creds = <React.Fragment>
+      <code><T>Username</T></code>:<Code>lum-auth-token</Code><br/>
+      <code><T>Password</T></code>:<Code>{lpm_token}</Code>
+    </React.Fragment>;
+    if (type=='mac')
+    {
+        return <Li>
+          <T>Check</T><code>Proxy server requires password</code><T> and enter:
+            </T><br/>
+          {creds}
+        </Li>;
+    }
+    return <Li>
+      <T>If prompt for a username and password, enter the following:</T><br/>
+      {creds}
+    </Li>;
+};
+
+E.browser = (proxy=22225, lpm_token, hostname=document.location.hostname)=>({
     chrome_win:
         <Instructions>
           <Li><T>Open</T><Code>chrome://settings/</Code> <T>in a</T>{' '}
@@ -160,12 +201,13 @@ E.browser = (proxy=24000, hostname=document.location.hostname)=>({
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
           <Li><T>Restart browser</T></Li>
+          <Auth_step lpm_token={lpm_token}/>
           <Last_step/>
         </Instructions>,
     chrome_mac:
         <Instructions>
           <Li>
-            <T>Open</T><Code>chrome://settings/</Code><T>in a</T>
+            <T>Open</T><Code>chrome://settings/</Code><T>in a</T>{' '}
             <a className="link" onClick={()=>window.open()}><T>new tab</T></a>
           </Li>
           <Li><T>Click</T><code><T>Advanced</T></code></Li>
@@ -184,6 +226,7 @@ E.browser = (proxy=24000, hostname=document.location.hostname)=>({
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
           <Li><T>Restart browser</T></Li>
+          <Auth_step lpm_token={lpm_token} type="mac"/>
           <Last_step/>
         </Instructions>,
     ie:
@@ -204,12 +247,13 @@ E.browser = (proxy=24000, hostname=document.location.hostname)=>({
             <code><T>Port</T></code>: <Code> {proxy}</Code>
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
+          <Auth_step lpm_token={lpm_token}/>
           <Last_step/>
         </Instructions>,
     firefox:
         <Instructions>
           <Li>
-            <T>Open</T><Code>about:preferences</Code><T>in a</T>
+            <T>Open</T><Code>about:preferences</Code><T>in a</T>{' '}
             <a className="link" onClick={()=>window.open()}><T>new tab</T></a>
           </Li>
           <Li>
@@ -237,6 +281,7 @@ E.browser = (proxy=24000, hostname=document.location.hostname)=>({
             <T>to "No proxy for:" text area</T>
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
+          <Auth_step lpm_token={lpm_token}/>
           <Last_step/>
         </Instructions>,
     safari:
@@ -261,6 +306,7 @@ E.browser = (proxy=24000, hostname=document.location.hostname)=>({
             <Code> {proxy}</Code>
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
+          <Auth_step lpm_token={lpm_token} type="mac"/>
           <Last_step/>
         </Instructions>,
 });

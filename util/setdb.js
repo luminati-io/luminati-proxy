@@ -3,8 +3,8 @@
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -29,6 +29,14 @@ E.on = (path, fn, opt)=>{
     if (opt.init)
         fn(E.get(path));
     return {path, fn, recursive: opt.recursive};
+};
+
+E.once = (path, fn, opt)=>{
+    let listener;
+    listener = E.on(path, (...args)=>{
+        E.off(listener);
+        return fn(...args);
+    }, _.assign({init: false}, opt));
 };
 
 E.off = listener=>{

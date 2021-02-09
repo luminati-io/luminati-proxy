@@ -2342,7 +2342,7 @@
   "You are all set! Open a": "一切准备就绪！打开",
   "new tab": "一个新标签",
   "and start browsing.": "并开始浏览。",
-  "Open": "未解决",
+  "Open": "打开",
   "in a": "方式：",
   "Click": "单击",
   "Advanced": "高级",
@@ -5158,5 +5158,11 @@
   "Back to collector list":"返回收集器列表",
   "Looking for other ways to collect data?":"寻找其他收集数据的方式吗？",
   "Drag and drop your":"拖放您的",
-  "Limit pages crawled":"限制抓取页面的数量"
+  "Limit pages crawled":"限制抓取页面的数量",
+  "If you think we were wrong, please fill the following form":"如果您认为我们错了，请填写以下表格",
+  "user evaluation form":"用户评估表",
+  "We typically reply within one business day.":"我们通常会在一个工作日内回复",
+  "This website uses cookies to improve the user experience. ":"本网站使用cookie来改善用户体验。 ",
+  "To learn more about our cookie policy or withdraw from it. ":"要了解有关我们Cookie政策的更多信息或从中退出。",
+  "please check our ":"请查一下"
 }

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.220.764 Stable
+- :star: Full synchronization of the statistics between all the instances
+- :bug: Fixed keeping IPs withing the same session
+
 ## 1.220.91 Stable
 - :bug: Fixed Refresh IP rule action
 
