@@ -229,15 +229,16 @@ const Old_modals = ()=>
     </div>;
 
 class Page extends Pure_component {
-    state = {};
+    state = {settings: {}};
     componentDidMount(){
-        this.setdb_on('head.settings', settings=>this.setState({settings}));
+        this.setdb_on('head.settings', settings=>
+            settings && this.setState({settings}));
     }
     render(){
-        const zagent = this.state.settings && this.state.settings.zagent;
+        const {settings: {zagent, lpm_token}} = this.state;
         return <div>
           <Nav/>
-          <Proxy_add/>
+          <Proxy_add lpm_token={lpm_token}/>
           <div className={classnames('page_body vbox', {zagent})}>
             <Error_boundry>
               <Switch>

@@ -21,6 +21,8 @@ const Howto = withRouter(class Howto extends Pure_component {
     componentDidMount(){
         this.setdb_on('head.settings', settings=>
             settings && this.setState({settings}));
+        this.setdb_on('head.proxies_running', proxies=>
+            proxies && this.setState({example_port: (proxies[0]||{}).port}));
     }
     choose_click = option=>{
         const pathname = `/howto/${option}`;
@@ -33,7 +35,8 @@ const Howto = withRouter(class Howto extends Pure_component {
     };
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
-        const {zagent, customer, lpm_token} = this.state.settings;
+        const {settings, example_port=22225} = this.state;
+        const {zagent, customer, lpm_token} = settings;
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];
         const hostname = zagent ? cloud_url_address(customer) : undefined;
@@ -61,7 +64,10 @@ const Howto = withRouter(class Howto extends Pure_component {
                   <Nav_tab id="proxy_tester" title="Web tester"
                     tooltip="Send example requests from here"/>
                 </Nav_tabs>
-                <Instructions hostname={hostname} lpm_token={lpm_token_value}>
+                <Instructions
+                  hostname={hostname}
+                  lpm_token={lpm_token_value}
+                  port={example_port}>
                   {this.props.children}
                 </Instructions>
               </div>
@@ -93,15 +99,13 @@ class Code_instructions extends Pure_component {
         this.props.history.push({pathname});
     };
     render(){
+        const {port, lpm_token, hostname} = this.props;
         const lang = this.props.match.params.suboption||'shell';
         const Lang_btn_clickable = props=>
             <span onClick={()=>this.click_lang(props.lang)}>
               <Lang_btn active={lang==props.lang} {...props}/>
             </span>;
-        const tutorial_port = window.localStorage.getItem(
-            'quickstart-first-proxy')||22225;
-        const to_copy = instructions.code(tutorial_port, this.props.lpm_token,
-            this.props.hostname)[lang];
+        const to_copy = instructions.code(port, lpm_token, hostname)[lang];
         const code = prism.highlight(to_copy, prism.languages.clike);
         const api_url = this.props.www_api+'/doc/api#lpm_endpoints';
         return <div className="code_instructions">
@@ -138,13 +142,13 @@ class Code_instructions extends Pure_component {
 
 const Browser_instructions = withRouter(
 class Browser_instructions extends Pure_component {
-    port = window.localStorage.getItem('quickstart-first-proxy')||22225;
     browser_changed = e=>{
         const browser = e.target.value;
         const pathname = `/howto/browser/${browser}`;
         this.props.history.push({pathname});
     };
     render(){
+        const {port, lpm_token, hostname} = this.props;
         const browser = this.props.match.params.suboption||'chrome_win';
         return <div className="browser_instructions">
               <div className="header_well">
@@ -158,8 +162,7 @@ class Browser_instructions extends Pure_component {
                 </select>
               </div>
               <div className="instructions_well">
-                {instructions.browser(this.port, this.props.lpm_token,
-                    this.props.hostname)[browser]}
+                {instructions.browser(port, lpm_token, hostname)[browser]}
               </div>
             </div>;
     }

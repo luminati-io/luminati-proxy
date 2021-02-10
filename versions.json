@@ -1,7 +1,17 @@
 [
     {
+        "ver": "1.220.899",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Updated the publisher name to match new certificate"
+            }
+        ]
+    },
+    {
         "ver": "1.220.764",
-        "type": "stable",
+        "type": "dev",
         "changes": [
             {
                 "type": "star",

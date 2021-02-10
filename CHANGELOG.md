@@ -1,6 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.220.764 Stable
+## 1.220.899 Development Latest
+- :star: Updated the publisher name to match new certificate
+
+## 1.220.764 Development Latest
 - :star: Full synchronization of the statistics between all the instances
 - :bug: Fixed keeping IPs withing the same session
 

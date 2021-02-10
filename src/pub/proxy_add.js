@@ -117,8 +117,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             {
                 const proxies = yield ajax.json({url: '/api/proxies_running'});
                 setdb.set('head.proxies_running', proxies);
-                window.localStorage.setItem('quickstart-first-proxy',
-                    resp.port);
                 _this.next_step();
             }
         });
@@ -128,6 +126,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     on_hidden = ()=>this.setState(this.init_state);
     next_step = ()=>this.setState(prev=>({step: prev.step+1}));
     render(){
+        if (!this.state.proxies_running || !this.state.zones)
+            return null;
         const disabled = this.state.cur_tab=='proxy_ext'&&
             !this.state.valid_json;
         const Footer_wrapper = <Footer
@@ -136,8 +136,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             step={this.state.step}
             next_step={this.next_step}
             created_port={this.state.created_port}/>;
-        if (!this.state.proxies_running || !this.state.zones)
-            return null;
         return <div className="lpm">
               <Loader show={this.state.show_loader}/>
               <Modal id="add_new_proxy_modal" no_header no_close
@@ -192,8 +190,11 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                     <Li>
                       <Step curr_step={this.state.step} step={2}
                         title="Example">
-                        <Created_port port={this.state.created_port}
-                          preset={this.state.preset}/>
+                        <Created_port
+                          port={this.state.created_port}
+                          preset={this.state.preset}
+                          lpm_token={(this.props.lpm_token||'').split('|')[0]}
+                        />
                       </Step>
                     </Li>
                   </Instructions>
@@ -220,8 +221,8 @@ const Step = ({title, step, curr_step, children})=>{
         </div>;
 };
 
-const Created_port = ({port, preset})=>{
-    const to_copy = instructions.code(port).shell;
+const Created_port = ({port, preset, lpm_token})=>{
+    const to_copy = instructions.code(port, lpm_token).shell;
     const code = prism.highlight(to_copy, prism.languages.clike);
     return <div className="howto">
           <Note>
