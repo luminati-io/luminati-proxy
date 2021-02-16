@@ -14,6 +14,7 @@ class Pure_component extends React.PureComponent {
     }
     componentWillUnmount(){
         let t0 = Date.now();
+        this._unmount_time = t0;
         if (this.sp)
         {
             this.sp.return();
@@ -38,10 +39,27 @@ class Pure_component extends React.PureComponent {
     setdb_get(path){ return setdb.get(path); }
     setdb_set(path, curr, opt){ return setdb.set(path, curr, opt); }
     etask(sp){
+        let fn_start = Date.now();
+        let orig_unmount_time = this._unmount_time, new_sp;
         if (!this.sp)
-            this.sp = etask('Component', function*(){ yield this.wait(); });
+        {
+            this.sp = new_sp = etask('Component',
+                function*(){ yield this.wait(); });
+        }
         if (sp.constructor.name!='Etask')
             sp = etask(sp);
+        if (!this.sp) // XXX philippe: debug code for strange null error
+        {
+            let dstr = v=>v==null ? v : new Date(v).toISOString();
+            throw Object.assign(new Error('Pure_component.etask glitch'), {
+                constructor_name: this.constructor.name,
+                fn_start: dstr(fn_start),
+                sp: this.sp,
+                new_sp: !!new_sp,
+                orig_unmount_time: dstr(orig_unmount_time),
+                unmount_time: dstr(this._unmount_time),
+            });
+        }
         this.sp.spawn(sp);
         return sp;
     }

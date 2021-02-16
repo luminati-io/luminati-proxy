@@ -1164,6 +1164,8 @@ class Mux {
                     return next_tick(cb, err);
                 }
                 stream.zdestroy = this;
+                if (stream._unused_tm)
+                    clearTimeout(stream._unused_tm);
                 // XXX vladislavl: hack-fix node bug (need remove on update)
                 // https://github.com/nodejs/node/issues/26015
                 stream.prependListener('error', ()=>{
@@ -1328,6 +1330,19 @@ class Mux {
                 } catch(e){ w_log(e, 'ending'); }
                 fn();
             });
+        };
+        stream.set_timeout = timeout=>{
+            clearTimeout(stream._unused_tm);
+            if (!timeout)
+                return;
+            stream._unused_tm_fn = ()=>{
+                const delta = Date.now()-(stream.last_use_ts||0);
+                if (delta>=timeout)
+                    return stream.emit('timeout');
+                stream._unused_tm = setTimeout(stream._unused_tm_fn,
+                    timeout-delta);
+            };
+            stream._unused_tm = setTimeout(stream._unused_tm_fn, timeout);
         };
         // XXX vladislavl: rm custom '_close' event: svc_bridge uses it
         stream.on('_close', ()=>{

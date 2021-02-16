@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.221.843 Stable
+- :star: Improved monitoring of potential issues
+- :bug: Fixed a bug with refreshing sessions after resetting the explicit session field in the IP control tab
+
 ## 1.220.899 Development Latest
 - :star: Updated the publisher name to match new certificate
 

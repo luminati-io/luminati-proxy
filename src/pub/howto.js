@@ -12,9 +12,7 @@ import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Back_btn} from './proxy_edit/index.js';
-
-const cloud_url_address = cname=>
-    `lpm-customer-${cname}.zproxy.lum-superproxy.io`;
+import {cloud_url_address} from './util.js';
 
 const Howto = withRouter(class Howto extends Pure_component {
     state = {settings: {}};
@@ -36,10 +34,10 @@ const Howto = withRouter(class Howto extends Pure_component {
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
         const {settings, example_port=22225} = this.state;
-        const {zagent, customer, lpm_token} = settings;
+        const {zagent, account_id, lpm_token} = settings;
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];
-        const hostname = zagent ? cloud_url_address(customer) : undefined;
+        const hostname = zagent ? cloud_url_address(account_id) : undefined;
         const lpm_token_value = (lpm_token||'').split('|')[0];
         let Instructions = ()=>null;
         if (option=='browser')

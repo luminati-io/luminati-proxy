@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {Loader, Warnings, Code, Preset_description,
     with_www_api} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
-import {report_exception} from './util.js';
+import {report_exception, cloud_url_address} from './util.js';
 import presets from './common/presets.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
@@ -136,6 +136,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             step={this.state.step}
             next_step={this.next_step}
             created_port={this.state.created_port}/>;
+        const {settings: {lpm_token='', zagent, account_id}} = this.props;
+        const hostname = zagent ? cloud_url_address(account_id) : undefined;
         return <div className="lpm">
               <Loader show={this.state.show_loader}/>
               <Modal id="add_new_proxy_modal" no_header no_close
@@ -192,8 +194,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                         title="Example">
                         <Created_port
                           port={this.state.created_port}
-                          preset={this.state.preset}
-                          lpm_token={(this.props.lpm_token||'').split('|')[0]}
+                          lpm_token={lpm_token.split('|')[0]}
+                          hostname={hostname}
                         />
                       </Step>
                     </Li>
@@ -221,8 +223,8 @@ const Step = ({title, step, curr_step, children})=>{
         </div>;
 };
 
-const Created_port = ({port, preset, lpm_token})=>{
-    const to_copy = instructions.code(port, lpm_token).shell;
+const Created_port = ({port, hostname, lpm_token})=>{
+    const to_copy = instructions.code(port, lpm_token, hostname).shell;
     const code = prism.highlight(to_copy, prism.languages.clike);
     return <div className="howto">
           <Note>

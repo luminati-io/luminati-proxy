@@ -147,6 +147,7 @@ let call = (to, name, args, sock)=>etask(function*ipc_call(){
         return yield this.wait();
     } catch(e){ ef(e);
         zerr.err(`cluster_ipc.call to ${to} ${name}(${args}): `+zerr.e2s(e));
+        throw e;
     }
 });
 

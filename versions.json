@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.221.843",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved monitoring of potential issues"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed a bug with refreshing sessions after resetting the explicit session field in the IP control tab"
+            }
+        ]
+    },
+    {
         "ver": "1.220.899",
         "type": "dev",
         "changes": [

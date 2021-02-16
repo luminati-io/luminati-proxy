@@ -235,10 +235,11 @@ class Page extends Pure_component {
             settings && this.setState({settings}));
     }
     render(){
-        const {settings: {zagent, lpm_token}} = this.state;
+        const {settings} = this.state;
+        const {zagent} = settings;
         return <div>
           <Nav/>
-          <Proxy_add lpm_token={lpm_token}/>
+          <Proxy_add settings={settings}/>
           <div className={classnames('page_body vbox', {zagent})}>
             <Error_boundry>
               <Switch>

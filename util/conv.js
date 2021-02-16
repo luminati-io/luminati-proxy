@@ -73,10 +73,15 @@ E.cache_str_fn2 = function(fn){
 E.o = function(oct_str){ return parseInt(oct_str, 8); };
 
 // XXX vladimir: only nodejs
-E.md5 = function(buf, hash_len, encoding){
+E.hash = function(buf, hash_len, encoding, type){
+    type = type||'sha256';
     // update() ignores encoding if buf is a Buffer
-    return hash.createHash('md5').update(buf, encoding||'utf8')
+    return hash.createHash(type).update(buf, encoding||'utf8')
     .digest('hex').slice(0, hash_len);
+};
+
+E.md5 = function(buf, hash_len, encoding){
+    return E.hash(buf, hash_len, encoding, 'md5');
 };
 E.md5_zero = function(key, hash_len){
     assert(hash_len<=32, 'invalid hash len'+hash_len);

@@ -524,6 +524,20 @@ describe('manager', ()=>{
                     stub.restore();
                 }));
             });
+            describe('refresh_sessions', ()=>{
+                const t = (name, opt, eq)=>it(name, etask.fn(function*(){
+                    const proxy = Object.assign({port: 24000}, opt);
+                    app = yield app_with_proxies([proxy], {});
+                    const {statusCode, body} =
+                        yield api_json(`api/refresh_sessions/${proxy.port}`);
+                    assert.equal(statusCode, eq.code);
+                    assert.deepEqual(body, eq.body);
+                }));
+                t('returns session_id when not rotating', null,
+                    {code: 200, body: {session_id: '24000_1'}});
+                t('does not return session_id when rotating',
+                    {rotate_session: true}, {code: 204});
+            });
         });
         describe('har logs', function(){
             this.timeout(6000);

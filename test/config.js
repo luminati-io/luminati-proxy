@@ -73,30 +73,38 @@ describe('config', ()=>{
             conf_mgr = null;
         });
         it('should remove rules and warn if it exists and not an array', ()=>{
-            const res = conf_mgr._prepare_proxy({rules: {}});
+            const proxy = conf_mgr._prepare_proxy({rules: {}});
             sinon.assert.called(logger.warn);
-            assert.ok(!res.rules);
+            assert.ok(!proxy.rules);
         });
         it('should not warn if rules do not exist', ()=>{
             conf_mgr._prepare_proxy({});
             sinon.assert.notCalled(logger.warn);
         });
         it('should leave rules without warning if an array', ()=>{
-            const res = conf_mgr._prepare_proxy({rules: [1, 2]});
+            const proxy = conf_mgr._prepare_proxy({rules: [1, 2]});
             sinon.assert.notCalled(logger.warn);
-            assert.deepEqual(res.rules, [1, 2]);
+            assert.deepEqual(proxy.rules, [1, 2]);
         });
         it('should remove ext proxies when exceeding the limit', ()=>{
             const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
                 .map((_, i)=>`${++i}`);
-            const res = conf_mgr._prepare_proxy({ext_proxies});
+            const proxy = conf_mgr._prepare_proxy({ext_proxies});
             sinon.assert.called(logger.warn);
-            assert.ok(!res.ext_proxies);
+            assert.ok(!proxy.ext_proxies);
         });
         it('should not touch ext proxies if within the limit', ()=>{
-            const res = conf_mgr._prepare_proxy({ext_proxies: ['1.2.3.4']});
+            const proxy = conf_mgr._prepare_proxy({ext_proxies: ['1.2.3.4']});
             sinon.assert.notCalled(logger.warn);
-            assert.deepEqual(res.ext_proxies, ['1.2.3.4']);
+            assert.deepEqual(proxy.ext_proxies, ['1.2.3.4']);
+        });
+        describe('session', ()=>{
+            const t = (name, session, eq)=>it(name, ()=>{
+                const proxy = conf_mgr._prepare_proxy({session});
+                assert.strictEqual(proxy.session, eq);
+            });
+            t('non-empty session string is untouched', 'sess_123', 'sess_123');
+            t('empty session string is removed', '', undefined);
         });
     });
     describe('upload', ()=>{

@@ -410,7 +410,7 @@ const First_form = with_www_api(class First_form extends Pure_component {
             <div className="row">
               <div className="signup">
                 {t('Don\'t have a Luminati account?')}
-                <a href={`${this.props.www_api}/?need_signup=1`}
+                <a href={`${this.props.www_api}/?hs_signup=1`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link">

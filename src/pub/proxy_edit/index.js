@@ -342,10 +342,13 @@ const Index = withRouter(class Index extends Pure_component {
                 save_form.headers = save_form.headers.filter(h=>
                     h.name&&h.value);
             }
-            if (field=='session'&&save_form[field]&&save_form[field].replace)
+            if (field=='session' && typeof save_form[field]=='string')
             {
-                save_form.session = save_form.session.replace(/-/g, '')
-                    .replace(/ /g, '');
+                const {session} = save_form;
+                if (!session.trim())
+                    save_form.session = true;
+                else
+                    save_form.session = session.replace(/(-| )/g, '');
             }
         }
         return save_form;

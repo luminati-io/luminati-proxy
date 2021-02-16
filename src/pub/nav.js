@@ -257,11 +257,11 @@ const Account = withRouter(class Account extends Pure_component {
         const is_upgradable = !zagent && this.state.ver_last &&
             this.state.ver_last.newer;
         const is_downgradable = !zagent && this.state.backup_exist;
-        const customer = this.props.settings.customer;
+        const {account_id, customer} = this.props.settings;
         return <T>{t=><div className="dropdown">
               <a className="link dropdown-toggle" data-toggle="dropdown">
                 <span>
-                  {customer}
+                  {account_id} ({customer})
                   <span style={{marginLeft: 5}} className="caret"/>
                 </span>
               </a>

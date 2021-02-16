@@ -61,7 +61,7 @@ E.send = function(opt){
                 _this.continue(null);
                 return;
             }
-            if (!err && data_type=='text' && _xhr && _xhr.responseText)
+            if (!err && _xhr && _xhr.responseText && !_xhr.responseJSON)
                 err = _xhr.responseText;
             _this.throw(err instanceof Error ? err : new Error(''+err));
         });
@@ -78,6 +78,8 @@ E.send = function(opt){
             E.events.emit('timeout', this);
         if (xhr.status==403)
             E.events.emit('unauthorized', this, xhr);
+        if (xhr.status==500)
+            E.events.emit('unhandledException', this, xhr);
         if (opt.no_throw)
         {
             return {
