@@ -9,16 +9,15 @@ const LONG_CB_MS = 100;
 class Pure_component extends React.PureComponent {
     constructor(props){
         super(props);
-        this.listeners = {};
         this.comp_name = this.constructor.name;
+        this.listeners = {};
     }
     componentWillUnmount(){
-        let t0 = Date.now();
-        this._unmount_time = t0;
-        if (this.sp)
+        let t0 = this.unmount_time = Date.now();
+        if (this.root_et)
         {
-            this.sp.return();
-            delete this.sp;
+            this.root_et.return();
+            delete this.root_et;
         }
         // XXX michaelg: 'let of' requires shim with babel+react+ie11
         // requires further investigation, leave as is till 01-Feb-2018
@@ -38,30 +37,22 @@ class Pure_component extends React.PureComponent {
     setdb_off(path){ this.listeners[path] && setdb.off(this.listeners[path]); }
     setdb_get(path){ return setdb.get(path); }
     setdb_set(path, curr, opt){ return setdb.set(path, curr, opt); }
-    etask(sp){
-        let fn_start = Date.now();
-        let orig_unmount_time = this._unmount_time, new_sp;
-        if (!this.sp)
+    etask(et){
+        if (et.constructor.name!='Etask')
+            et = etask(et);
+        // note: in some cases etask(sp) ends up calling componentWillUnmount
+        // synchronously, so this.root_et can be null after initialization
+        let root_et;
+        if (!(root_et = this.root_et))
         {
-            this.sp = new_sp = etask('Component',
-                function*(){ yield this.wait(); });
+            root_et = etask('Component', function*(){ yield this.wait(); });
+            if (this.unmount_time)
+                root_et.return();
+            else
+                this.root_et = root_et;
         }
-        if (sp.constructor.name!='Etask')
-            sp = etask(sp);
-        if (!this.sp) // XXX philippe: debug code for strange null error
-        {
-            let dstr = v=>v==null ? v : new Date(v).toISOString();
-            throw Object.assign(new Error('Pure_component.etask glitch'), {
-                constructor_name: this.constructor.name,
-                fn_start: dstr(fn_start),
-                sp: this.sp,
-                new_sp: !!new_sp,
-                orig_unmount_time: dstr(orig_unmount_time),
-                unmount_time: dstr(this._unmount_time),
-            });
-        }
-        this.sp.spawn(sp);
-        return sp;
+        root_et.spawn(et);
+        return et;
     }
     setState(updater, cb){
         let t0, t1, t2, t3;

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.221.905 Stable
+- :star: Logging more details to the changelog and keeping the whole history of configuration files
+
 ## 1.221.843 Stable
 - :star: Improved monitoring of potential issues
 - :bug: Fixed a bug with refreshing sessions after resetting the explicit session field in the IP control tab
