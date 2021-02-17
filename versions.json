@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.222.89",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Stability fixes on Windows"
+            }
+        ]
+    },
+    {
         "ver": "1.221.905",
         "type": "stable",
         "changes": [

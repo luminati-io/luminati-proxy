@@ -80,6 +80,18 @@ E.hash = function(buf, hash_len, encoding, type){
     .digest('hex').slice(0, hash_len);
 };
 
+E.encode_base64_shift = function(data){
+    data = Buffer.from(data, 'ascii').toString('base64');
+    if (!data.endsWith('='))
+        data = data.substr(3)+data.substr(0, 3);
+    else
+    {
+        var i = data.indexOf('=');
+        data = data.substring(3, i)+data.substr(0, 3)+data.substr(i);
+    }
+    return data;
+};
+
 E.md5 = function(buf, hash_len, encoding){
     return E.hash(buf, hash_len, encoding, 'md5');
 };

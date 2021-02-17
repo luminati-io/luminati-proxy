@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.222.89 Stable
+- :sparkles: Stability fixes on Windows
+
 ## 1.221.905 Stable
 - :star: Logging more details to the changelog and keeping the whole history of configuration files
 

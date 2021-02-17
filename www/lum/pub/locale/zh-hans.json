@@ -5037,7 +5037,8 @@
   "Edit Crawler - User Compliance Evaluation required":"编辑收集器-需要进行用户合规评估",
   "Zones (Proxy setup)":"通道-代理",
   "Install on your server (Free)":"在服务器安装（免费）",
-  "We just sent you a verification email to [%email] (check your spam folder as well)":"我们刚刚向您发送了一封验证电子邮件至[％email]（也请检查您的垃圾邮件文件夹）",
+  "(check your spam folder as well)":"（也请检查您的垃圾邮件文件夹）",
+  "We just sent you a verification email to ":"我们刚刚向您发送了一封验证电子邮件至 ",
   "Luminati's proxy and data collection infrastructure including the Luminati proxy management tools and load balancing servers.":"路觅的代理和数据收集基础结构，包括Luminati代理管理工具和负载平衡服务器。",
   "You are using google for authentication, 2-step verification for your user is apply via google services" : "您正在使用google帐户进行身份验证，您的用户的两步验证是通过google服务申请的",
   "Set your password":"设置您的密码",
@@ -5164,5 +5165,8 @@
   "We typically reply within one business day.":"我们通常会在一个工作日内回复",
   "This website uses cookies to improve the user experience. ":"本网站使用cookie来改善用户体验。 ",
   "To learn more about our cookie policy or withdraw from it. ":"要了解有关我们Cookie政策的更多信息或从中退出。",
-  "please check our ":"请查一下"
+  "please check our ":"请查一下",
+  "Download extension":"下载扩展",
+  "Please check the following:":"请检查以下内容",
+  "Edit template":"更改代码"
 }
