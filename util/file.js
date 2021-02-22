@@ -104,12 +104,16 @@ E.fread_e = (fd, start, size, opt)=>{
     return ret;
 };
 E.write_e = (file, data, opt)=>{
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     check_file(file, opt);
     fs.writeFileSync(file, data, opt);
     return true;
 };
 E.write_atomic_e = (file, data, opt)=>{
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     check_file(file, opt);
     let tmpfile = file+'.'+(1000000*Math.random()|0)+'.tmp';
@@ -128,6 +132,8 @@ E.write_lines_e = (file, data, opt)=>{
     return E.write_e(file, data, opt);
 };
 E.append_e = (file, data, opt)=>{
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     check_file(file, opt);
     fs.appendFileSync(file, data, opt);

@@ -846,11 +846,11 @@ describe('proxy', ()=>{
             assert.ok(!l.rules.can_retry({}));
             assert.ok(l.rules.can_retry({retry: 2}, {retry: 5}));
             assert.ok(!l.rules.can_retry({retry: 5}));
-            assert.ok(l.rules.can_retry({retry: 3}, {refresh_ip: false,
-                retry: 5}));
-            assert.ok(!l.rules.can_retry({retry: 3}, {refresh_ip: false,
+            assert.ok(l.rules.can_retry({retry: 2}, {refresh_ip: false,
+                retry: 3}));
+            assert.ok(!l.rules.can_retry({retry: 2}, {refresh_ip: false,
                 retry: true}));
-            assert.ok(!l.rules.can_retry({retry: 3}, {refresh_ip: true,
+            assert.ok(!l.rules.can_retry({retry: 2}, {refresh_ip: true,
                 retry: true}));
             assert.ok(l.rules.can_retry({retry: 1}, {retry_port: 24001,
                 retry: true}));

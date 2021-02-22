@@ -33,7 +33,7 @@ const Howto = withRouter(class Howto extends Pure_component {
     };
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
-        const {settings, example_port=22225} = this.state;
+        let {settings, example_port=22225} = this.state;
         const {zagent, account_id, lpm_token} = settings;
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];
@@ -45,7 +45,10 @@ const Howto = withRouter(class Howto extends Pure_component {
         else if (option=='code')
             Instructions = Code_instructions;
         else if (option=='proxy_tester')
+        {
+            example_port = undefined;
             Instructions = Proxy_tester;
+        }
         return <T>{t=><div className="howto">
             <div className="cp_panel vbox">
               <div className="cp_panel_header">

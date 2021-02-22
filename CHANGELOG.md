@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.222.632 Stable
+- :bug: Fixed missing ports dropdown in the LPM Web tester UI
+
 ## 1.222.104 Stable
 - :sparkles: Stability fixes on Windows
 - :star: Improved error handling: added more details if the request fails

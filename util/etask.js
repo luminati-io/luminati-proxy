@@ -556,7 +556,10 @@ E.prototype._spawn_parent_guess = function(parent){
 };
 E.prototype._parent_guess_remove = function(){
     if (!this.parent_guess.child_guess.delete(this))
-        assert(0, 'etask not in parent_guess\n'+E.ps({MARK: this}));
+    {
+        assert(0, 'etask not in parent_guess\n'+this.ps({MARK: this})+'\n'
+            +E.ps({MARK: this}));
+    }
     this.parent_guess = undefined;
 };
 E.prototype.spawn_parent = function(parent){

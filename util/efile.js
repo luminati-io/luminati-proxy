@@ -43,6 +43,8 @@ E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
     return ret;
 });
 E.write_e = (path, data, opt)=>etask(function*write_e(){
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     yield check_file(path, opt);
     yield etask.nfn_apply(fs.writeFile, [path, data, opt]);
@@ -52,6 +54,8 @@ E.tmp_path = file=>{
     return dir+'/.'+name+'.'+(1000000*Math.random()|0)+'.tmp';
 };
 E.write_atomic_e = (file, data, opt)=>etask(function*write_atomic_e(){
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     yield check_file(file, opt);
     let tmpfile = E.tmp_path(file);
@@ -311,6 +315,8 @@ E.write_lines_e = (file, data, opt)=>etask(function*write_lines_e(){
     return yield E.write_e(file, data, opt);
 });
 E.append_e = (file, data, opt)=>etask(function*append_e(){
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     yield check_file(file, opt);
     yield etask.nfn_apply(fs.appendFile, [file, data, opt]);
