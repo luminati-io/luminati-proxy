@@ -10,6 +10,7 @@ const Manager = require('../lib/manager.js');
 const Config = require('../lib/config.js');
 const logger = require('../lib/logger.js');
 const consts = require('../lib/consts.js');
+const {assert_has} = require('./common.js');
 
 describe('config', ()=>{
     it('proxies should not include unwanted fields', ()=>{
@@ -106,6 +107,17 @@ describe('config', ()=>{
             t('non-empty session string is untouched', 'sess_123', 'sess_123');
             t('empty session string is removed', '', undefined);
         });
+    });
+    describe('limit specific proxy opts in zagents', ()=>{
+        const t = (name, proxy_opt, eq_has)=>it(name, ()=>{
+            const proxy = Object.assign({port: 24000}, proxy_opt);
+            const conf = new Config(new Manager({zagent: true}),
+                Manager.default, {cloud_config: {proxies: [proxy]}});
+            const {proxies: [proxy_conf]} = conf.get_proxy_configs();
+            assert_has(proxy_conf, eq_has);
+        });
+        t('proxy_connection_type is "http"', {proxy_connection_type: 'https'},
+            {proxy_connection_type: 'http'});
     });
     describe('upload', ()=>{
         it('doesnt throw on "not_authorized" err from update_conf', etask.fn(

@@ -193,7 +193,8 @@ E.master_once = (name, fn)=>E.master_on(name, function(){
 E.call_worker = function(worker, name, args, send_handle){
     if (!cluster.isMaster)
         throw new Error('call_worker called not from Cluster master');
-    return call(worker.id, name, args, send_handle);
+    let id = typeof worker=='string' ? worker : worker.id;
+    return call(id, name, args, send_handle);
 };
 
 E.call_all_workers = function(message, args){

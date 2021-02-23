@@ -1265,7 +1265,6 @@ E.unallowed_list = {
     LB: 1,
     IR: 1,
     IQ: 1,
-    DO: 1,
 };
 
 E.is_allowed = function(code){

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.222.778 Stable
+- :bug: Fixed memory leak
+
 ## 1.222.632 Stable
 - :bug: Fixed missing ports dropdown in the LPM Web tester UI
 

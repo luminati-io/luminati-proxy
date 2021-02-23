@@ -98,6 +98,7 @@ export default class General extends Pure_component {
                   disabled_ips={disabled_wl}
                   no_any={this.state.settings.zagent}/>
                 <T>{t=><Config type="select"
+                  disabled={this.state.settings.zagent}
                   data={this.proxy_connection_type_opt(t)}
                   id="proxy_connection_type"/>}</T>
                 <Config type="yes_no" id="ssl"/>
