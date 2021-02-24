@@ -248,4 +248,13 @@ E.master_remove_listener = function(name){
     delete handlers[name];
 };
 
+E.master_remove_all_listeners = function(){
+    if (!cluster.isMaster)
+    {
+        throw new Error(
+            'master_remove_all_listeners called from Cluster worker');
+    }
+    handlers = {};
+};
+
 init();

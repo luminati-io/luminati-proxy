@@ -30,6 +30,9 @@ E.default_action = {key: '--Select--', value: '', tooltip: `Select an
     automatically.`};
 
 E.action_types = [
+    {key: 'Retry with the same IP', value: 'retry_same', tooltip: `System will
+        send the exact same request again using the existing session/IP`,
+        min_req_time: true},
     {key: 'Retry with new IP', value: 'retry', tooltip: `System will send
         the exact same request again with newly generated session`,
         min_req_time: true},
@@ -64,7 +67,7 @@ E.action_types = [
     {key: 'Cache the response', value: 'cache', tooltip: `The response will be
         served from a local cache if exists. If the action is triggered and
         cache for this specific URL does not exist then it will be cached`,
-        only_url: true, url: true, type: 'pre'},
+        only_url: false, url: true, type: 'pre'},
     {key: 'Direct super proxy', value: 'direct', tooltip: `Requests will be
         passed through super proxy (not through peers)`, type: 'pre',
         only_url: true, url: true},

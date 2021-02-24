@@ -118,10 +118,6 @@ export const tabs = {
                 tooltip: `Ban the IP for a defined amount of time. Choose 0 to
                     ban forever`,
             },
-            cache_duration: {
-                label: 'Cache duration',
-                tooltip: 'Cache the response for a defined amount of time',
-            },
             type: {
                 label: 'Schedule',
                 tooltip: `The timing for the execution of the triggered

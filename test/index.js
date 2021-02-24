@@ -83,7 +83,6 @@ describe('proxy', ()=>{
             return res;
         });
         yield l.listen();
-        l.session_mgr.retrieve_session({});
         l.history = [];
         l.on('usage', data=>l.history.push(data));
         l.on('usage_abort', data=>l.history.push(data));
@@ -425,8 +424,8 @@ describe('proxy', ()=>{
                 yield test_session(after);
             }));
             t('pool', {pool_size: 1}, /24000_0/, /24000_1/);
-            t('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_1/,
-                /24000_127_0_0_1_2/);
+            t('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_0/,
+                /24000_127_0_0_1_1/);
         });
         describe('history aggregation', ()=>{
             let clock;
@@ -832,15 +831,12 @@ describe('proxy', ()=>{
                 assert.deepEqual(opt.req, _req);
                 called = true;
             });
-            l.rules.retry(_req, {}, {}, l.port);
+            l.rules.retry(_req, {}, {}, {retry_port: l.port});
             assert.equal(_req.retry, 1);
             assert.ok(called);
-            l.rules.retry(_req, {}, {}, l.port);
+            l.rules.retry(_req, {}, {}, {retry_port: l.port});
             assert.equal(_req.retry, 2);
         }));
-        it('check check_req_time_range', ()=>{
-            // XXX krzysztof: to implement
-        });
         it('check can_retry', ()=>etask(function*(){
             l = yield lum({rules: []});
             assert.ok(!l.rules.can_retry({}));
@@ -1291,7 +1287,9 @@ describe('proxy', ()=>{
             it('action null_response', ()=>etask(function*(){
                 l = yield lum({rules: [{action: {null_response: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
-                    log: l.log, timeline: new Timeline(1)}};
+                    log: l.log, timeline: new Timeline(1),
+                    init_stats: ()=>null,
+                }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const r = l.rules.pre(_req, _res, {});
                 assert.equal(r.status_code, 200);
@@ -1300,7 +1298,9 @@ describe('proxy', ()=>{
             it('action direct', ()=>etask(function*(){
                 l = yield lum({rules: [{url: '', action: {direct: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
-                    log: l.log, timeline: new Timeline(1)}};
+                    log: l.log, timeline: new Timeline(1),
+                    init_stats: ()=>null,
+                }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const r = l.rules.pre(_req, _res, {});
                 assert.equal(r, undefined);
@@ -1459,7 +1459,7 @@ describe('proxy', ()=>{
                     const first_session = Object.values(sticky_sessions)[0];
                     yield l.test({fake: 1});
                     const second_session = Object.values(sticky_sessions)[0];
-                    assert.ok(first_session==second_session);
+                    assert.ok(first_session!=second_session);
                 }));
             });
         });
@@ -1508,6 +1508,7 @@ describe('proxy', ()=>{
             }));
             it('should not send requests on terminated', etask._fn(function*(){
                 l = yield lum({pool_size: 1, session_termination: true});
+                yield l.test({fake: 1});
                 l.session_mgr.session.terminated = true;
                 const r = yield l.test({fake: 1});
                 assert.equal(r.body, consts.SESSION_TERMINATED_BODY);
@@ -1515,6 +1516,7 @@ describe('proxy', ()=>{
             }));
             it('should unblock when session refreshed', etask._fn(function*(){
                 l = yield lum({pool_size: 1, session_termination: true});
+                yield l.test({fake: 1});
                 l.session_mgr.session.terminated = true;
                 l.session_mgr.refresh_sessions();
                 const r = yield l.test({fake: 1});

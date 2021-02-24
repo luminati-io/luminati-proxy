@@ -446,7 +446,7 @@ class Single_timeline extends Pure_component {
             <li key="li" onClick={this.toggle}
               className={classnames('parent_title', 'expandable',
               {open: this.state.open})}>
-              {timeline.port}
+              Proxy port: {timeline.port}, session: {timeline.session}
             </li>,
             <ol key="ol" className={children_classes}>
               <table>

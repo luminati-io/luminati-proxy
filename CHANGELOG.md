@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.223.70 Stable
+- :star: Configurable API body limit
+
 ## 1.222.778 Stable
 - :bug: Fixed memory leak
 

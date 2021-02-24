@@ -20,8 +20,10 @@ import Toggle_on_off from '../common/toggle_on_off.js';
 
 const rule_prepare = rule=>{
     const action = {};
-    if (['retry', 'refresh_ip'].includes(rule.action))
+    if (['retry_same', 'retry', 'refresh_ip'].includes(rule.action))
         action.retry = true;
+    if (rule.action=='retry_same')
+        action.retry_same = true;
     if (rule.action=='retry' && rule.retry_number)
         action.retry = rule.retry_number;
     else if (rule.action=='retry_port')
@@ -33,10 +35,7 @@ const rule_prepare = rule=>{
     else if (rule.action=='ban_ip_domain')
         action.ban_ip_domain = (rule.ban_ip_duration||0)*ms.MIN;
     else if (rule.action=='cache')
-    {
         action.cache = true;
-        action.cache_duration = (rule.cache_duration||0)*ms.MIN;
-    }
     else if (rule.action=='refresh_ip')
         action.refresh_ip = true;
     else if (rule.action=='save_to_pool')
@@ -111,8 +110,6 @@ export const map_rule_to_form = rule=>{
         result.ban_ip_duration = rule.action.ban_ip_global/ms.MIN;
     if (rule.action.ban_ip_domain)
         result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
-    if (rule.action.cache_duration)
-        result.cache_duration = rule.action.cache_duration/ms.MIN;
     result.trigger_code = rule.trigger_code;
     result.type = rule.type;
     result.active = rule.active;
@@ -566,15 +563,6 @@ class Action extends Pure_component {
                 data={duration_opt}
                 rule={rule}
                 note={<Ban_ips_note/>}
-                class_name="duration"
-              />
-            }
-            {rule.action=='cache' &&
-              <Rule_config
-                id="cache_duration"
-                type="select_number"
-                data={duration_opt}
-                rule={rule}
                 class_name="duration"
               />
             }
