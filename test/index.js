@@ -1287,9 +1287,7 @@ describe('proxy', ()=>{
             it('action null_response', ()=>etask(function*(){
                 l = yield lum({rules: [{action: {null_response: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
-                    log: l.log, timeline: new Timeline(1),
-                    init_stats: ()=>null,
-                }};
+                    log: l.log, timeline: new Timeline(1)}};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const r = l.rules.pre(_req, _res, {});
                 assert.equal(r.status_code, 200);
@@ -1298,9 +1296,7 @@ describe('proxy', ()=>{
             it('action direct', ()=>etask(function*(){
                 l = yield lum({rules: [{url: '', action: {direct: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
-                    log: l.log, timeline: new Timeline(1),
-                    init_stats: ()=>null,
-                }};
+                    log: l.log, timeline: new Timeline(1)}};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const r = l.rules.pre(_req, _res, {});
                 assert.equal(r, undefined);

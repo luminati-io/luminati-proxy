@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.223.605",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed a memory leak involving bypassed and cached requests statistics"
+            }
+        ]
+    },
+    {
         "ver": "1.223.70",
         "type": "stable",
         "changes": [

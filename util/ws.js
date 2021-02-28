@@ -312,6 +312,7 @@ class WS extends events.EventEmitter {
             zcounter.inc(`${this.zc}_rx_msg`);
             zcounter.inc(`${this.zc}_rx_bytes`, msg.length);
             zcounter.avg(`${this.zc}_rx_bytes_per_msg`, msg.length);
+            zcounter.max(`${this.zc}_rx_bytes_per_msg_max`, msg.length);
         }
         try {
             if (typeof msg=='string')
@@ -1172,13 +1173,17 @@ class Mux {
                     if (stream._writableState)
                         stream._writableState.errorEmitted = true;
                 });
-                yield zfinish(true, false);
-                // XXX viktor: fix once it is clear what happens
-                // let real error from _http_client.js:441 throws
-                try { stream.push(null); }
-                catch(e){ zerr.notice('DEBUG RECURSIVE DESTROY '+e); }
-                stream.emit('_close');
-                next_tick(cb, err);
+                if (err) // don't try to end/finish stream gracefully if error
+                    yield zfinish(false, false);
+                else
+                {
+                    yield zfinish(true, false);
+                    try { stream.push(null); } catch(e){}
+                }
+                next_tick(()=>{
+                    cb(err);
+                    stream.emit('_close');
+                });
             }); },
         }, opt));
         // XXX vladislavl: support legacy version for peer side old mux streams
@@ -1237,7 +1242,7 @@ class Mux {
                 stream.emit('error', new Error('Fail to write pending data'));
             }
             stream.send_fin();
-            if (wait_rmt)
+            if (wait_rmt && !stream.fin_got)
             {
                 try { yield zfin_pending = this.wait(2*opt.fin_timeout); }
                 catch(e){ w_log(e, 'zfin_pending'); }
@@ -1314,8 +1319,12 @@ class Mux {
             if (pending)
                 pending.continue();
         };
-        stream.send_fin = ()=>{ _this.ws.json({vfd, fin: 1}); };
+        stream.send_fin = ()=>{
+            _this.ws.json({vfd, fin: 1});
+            stream.fin_sent = true;
+        };
         stream.on_fin = ()=>{
+            stream.fin_got = true;
             const fn = ()=>next_tick(()=>zfin_pending ?
                 zfin_pending.continue() : zfinish(true, false));
             etask(function*(){
