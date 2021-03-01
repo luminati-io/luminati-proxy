@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.223.771 Stable
+- :bug: Fixed external proxies, setting a correct port number
+
 ## 1.223.605 Stable
 - :bug: Fixed a memory leak involving bypassed and cached requests statistics
 

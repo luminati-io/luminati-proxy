@@ -719,6 +719,13 @@ describe('proxy', ()=>{
             // XXX krzysztof: add https with tests first support fake requests
         });
     });
+    describe('ext_proxies', ()=>{
+        it('should use host and proxy from config', ()=>etask(function*(){
+            l = yield lum({ext_proxies: ['1.1.1.1:123']});
+            const resp = yield l.test({fake: 1});
+            assert.equal(l.history[0].super_proxy, '1.1.1.1:123');
+        }));
+    });
     describe('retry', ()=>{
         it('should set rules', ()=>etask(function*(){
             l = yield lum({rules: []});

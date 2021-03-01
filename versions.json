@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.223.771",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed external proxies, setting a correct port number"
+            }
+        ]
+    },
+    {
         "ver": "1.223.605",
         "type": "stable",
         "changes": [
