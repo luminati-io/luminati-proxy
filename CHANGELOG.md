@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.223.826 Stable
+- :star: Added an option to add extra debug info to the responses (DNS resolution)
+
 ## 1.223.771 Stable
 - :bug: Fixed external proxies, setting a correct port number
 

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.223.826",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added an option to add extra debug info to the responses (DNS resolution)"
+            }
+        ]
+    },
+    {
         "ver": "1.223.771",
         "type": "stable",
         "changes": [

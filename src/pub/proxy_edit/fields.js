@@ -200,6 +200,12 @@ export const tabs = {
                 label: 'Values',
                 placeholder: '1.1.1.1 example.com',
             },
+            info: {
+                label: 'Show destination IP',
+                tooltip: `This option makes the responses include the
+                    destination IP (x-luminati-destination-ip) which is the
+                    IP used for making a request`,
+            },
         },
     },
     browser: {
