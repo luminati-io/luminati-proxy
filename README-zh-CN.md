@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.225.430-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.225.497-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -98,6 +98,7 @@ Options:
   --users                       List of users. This option has to be used along
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
+  --tls_lib                     SSL library       [string] [default: "open_ssl"]
   --iface                       Interface or IP to listen on            [string]
   --customer                    Customer name                           [string]
   --zone                        Zone name           [string] [default: "static"]
@@ -222,7 +223,6 @@ Options:
   --start-upgrader              Install CRON process that checks upgrades
   --stop-upgrader               Removes CRON process that checks upgrades
   --insecure-http-parser        Disables the strict checks
-  --flex_tls                                                    [default: false]
   --proxy_country                                                  [default: ""]
   --bw_limit                                                        [default: 0]
   --info                                                        [default: false]

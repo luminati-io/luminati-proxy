@@ -13,7 +13,6 @@ import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import zurl from '../../util/url.js';
-import './css/app.less';
 import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
@@ -34,6 +33,7 @@ window.setdb = setdb;
 setdb.setMaxListeners(50);
 
 const App = withRouter(class App extends Pure_component {
+    state = {};
     componentDidMount(){
         setdb.set('head.save_settings', this.save_settings);
         const _this = this;
@@ -85,6 +85,8 @@ const App = withRouter(class App extends Pure_component {
                 search: _this.props.location.search,
             });
         });
+        this.setdb_on('head.settings', settings=>
+            settings && this.setState({settings}));
     }
     load_data = ()=>this.etask(function*(){
         const errors = [];
@@ -105,6 +107,14 @@ const App = withRouter(class App extends Pure_component {
         etask(function*(){
             const settings = yield ajax.json({url: '/api/settings'});
             setdb.set('head.settings', settings);
+            const url_o = zurl.parse(document.location.href);
+            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+            const brd = settings.server_conf &&
+                settings.server_conf.client.rebranded || qs_o.brd;
+            if (brd)
+                require('./css/brd.less');
+            else
+                require('./css/app.less');
         });
         etask(function*(){
             const conn = yield ajax.json({url: '/api/conn'});
@@ -157,17 +167,19 @@ const App = withRouter(class App extends Pure_component {
       });
     };
     render(){
+        if (!this.state.settings)
+            return null;
         return <div className="page_wrapper">
-              <Enable_ssl_modal/>
-              <Api_url_modal/>
-              <Old_modals/>
-              <Switch>
-                <Route path="/login" exact component={Login}/>
-                <Route path="/whitelist_ips" exact component={Whitelist_ips}/>
-                <Route path="/dock_logs" exact component={Dock_logs}/>
-                <Route path="/" component={Page}/>
-              </Switch>
-            </div>;
+          <Enable_ssl_modal/>
+          <Api_url_modal/>
+          <Old_modals/>
+          <Switch>
+            <Route path="/login" exact component={Login}/>
+            <Route path="/whitelist_ips" exact component={Whitelist_ips}/>
+            <Route path="/dock_logs" exact component={Dock_logs}/>
+            <Route path="/" component={Page}/>
+          </Switch>
+        </div>;
     }
 });
 

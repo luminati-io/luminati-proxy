@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.225.430/luminati-proxy-manager-v1.225.430-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.225.497/luminati-proxy-manager-v1.225.497-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -145,6 +145,7 @@ Options:
   --users                       List of users. This option has to be used along
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
+  --tls_lib                     SSL library       [string] [default: "open_ssl"]
   --iface                       Interface or IP to listen on            [string]
   --customer                    Customer name                           [string]
   --zone                        Zone name           [string] [default: "static"]
@@ -269,7 +270,6 @@ Options:
   --start-upgrader              Install CRON process that checks upgrades
   --stop-upgrader               Removes CRON process that checks upgrades
   --insecure-http-parser        Disables the strict checks
-  --flex_tls                                                    [default: false]
   --proxy_country                                                  [default: ""]
   --bw_limit                                                        [default: 0]
   --info                                                        [default: false]

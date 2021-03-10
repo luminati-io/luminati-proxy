@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.225.497",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed process crashing on some linux server machines due to missing web socket library"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added an option to select the SSL library to be used when SSL analyzing is activated"
+            }
+        ]
+    },
+    {
         "ver": "1.225.430",
         "type": "stable",
         "changes": [

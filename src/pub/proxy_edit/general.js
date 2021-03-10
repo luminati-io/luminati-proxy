@@ -11,12 +11,17 @@ import {with_www_api, Note} from '../common.js';
 
 const route_err_opt = [
     {key: 'pass_dyn (default)', value: 'pass_dyn'},
-    {key: 'block', value: 'block'}
+    {key: 'block', value: 'block'},
 ];
 
 const debug_opt = [
     {key: 'Yes (default)', value: 'full'},
     {key: 'No', value: 'none'},
+];
+
+const tls_lib_opt = [
+    {key: 'OpenSSL (default)', value: 'open_ssl'},
+    {key: 'BoringSSL', value: 'flex_tls'},
 ];
 
 const Limit_zagent_note = with_www_api(({www_api})=>{
@@ -77,7 +82,7 @@ export default class General extends Pure_component {
         this.set_field('pool_size', size);
         this.set_field('multiply', 1);
     };
-    ssl_changed = val=>!val && this.set_field('flex_tls', false);
+    ssl_changed = val=>!val && this.set_field('tls_lib', 'open_ssl');
     open_static_modal = ()=>$('#allocated_ips').modal('show');
     open_users_modal = ()=>$('#users_modal').modal('show');
     render(){
@@ -106,7 +111,6 @@ export default class General extends Pure_component {
             <a className="link" onClick={this.open_users_modal}>
               <T>Select users</T>
             </a> : null;
-        const flex_tls_note = !zagent && <Limit_zagent_note/>;
         return <div className="general">
               <Tab_context.Provider value="general">
                 <Users_modal form={this.state.form}/>
@@ -121,8 +125,8 @@ export default class General extends Pure_component {
                   id="proxy_connection_type"/>}</T>
                 <Config type="yes_no" id="ssl" on_change={this.ssl_changed}/>
                 {form.ssl &&
-                  <Config type="yes_no" id="flex_tls" disabled={!zagent}
-                    note={flex_tls_note}/>
+                  <Config type="select" id="tls_lib" disabled={!zagent}
+                    note={!zagent && <Limit_zagent_note/>} data={tls_lib_opt}/>
                 }
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply"

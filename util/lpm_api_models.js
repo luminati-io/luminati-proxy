@@ -24,6 +24,8 @@ E.proxy_fields = {
     users: {type: 'array', desc: 'List of users. This option has to be used '
         +'along with "multiply_users"', params: {user: {type: 'string'}}},
     ssl: {type: 'boolean', desc: 'Enable SSL analyzing'},
+    tls_lib: {type: 'string', desc: 'SSL library',
+        values: 'open_ssl|flex_tls'},
     iface: {type: 'string', desc: 'Interface or IP to listen on'},
     customer: {type: 'string', desc: 'Customer name'},
     zone: {type: 'string', desc: 'Zone name'},

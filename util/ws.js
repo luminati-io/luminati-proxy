@@ -58,6 +58,7 @@ const ef = etask.ef, assign = Object.assign;
 // for security reasons 'func' is disabled by default
 const zjson_opt = {func: false, date: true, re: true};
 const is_win = /^win/.test((is_node||is_rn) && process.platform);
+const is_darwin = is_node && process.platform=='darwin';
 const default_user_agent = is_node ? (()=>{
     const zconf = require('./config.js');
     const conf = require('./conf.js');
@@ -1512,7 +1513,7 @@ function client_impl(opt){
 function server_impl(opt){
     if (!is_node)
         throw new Error(`WS server is not available`);
-    return lib(opt.impl || (is_win ? 'ws' : 'uws')).Server;
+    return lib(opt.impl || (is_win || is_darwin ? 'ws' : 'uws')).Server;
 }
 
 return {Client, Server, IPC_client, IPC_server, Mux, t: {WS}};

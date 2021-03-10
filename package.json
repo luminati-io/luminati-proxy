@@ -164,6 +164,14 @@
       "bin/lum_node.js",
       "bin/lum_node_index.js",
       "bin/pub/favicon.ico",
+      "bin/pub/font/Gibson-Book.woff",
+      "bin/pub/font/Gibson-BookItalic.woff",
+      "bin/pub/font/Gibson-Italic.woff",
+      "bin/pub/font/Gibson-Medium.woff",
+      "bin/pub/font/Gibson-MediumItalic.woff",
+      "bin/pub/font/Gibson-Regular.woff",
+      "bin/pub/font/Gibson-SemiBold.woff",
+      "bin/pub/font/Gibson-SemiBoldItalic.woff",
       "bin/pub/font/lato_bold.woff2",
       "bin/pub/font/lato_regular.woff2",
       "bin/pub/img/asn.svg",
@@ -314,8 +322,10 @@
       "src/pub/cpu_warning.js",
       "src/pub/css/api_url_modal.less",
       "src/pub/css/app.less",
+      "src/pub/css/brd.less",
       "src/pub/css/chrome_widgets.less",
       "src/pub/css/common.less",
+      "src/pub/css/common_brd.less",
       "src/pub/css/config.less",
       "src/pub/css/login.less",
       "src/pub/css/logs.less",
@@ -389,7 +399,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "6899a4713e308cd9455af494d1eafdac"
+    "md5": "064c2b9447090747b3d9e4bec7dd0699"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -404,11 +414,11 @@
     }
   ],
   "optionalDependencies": {
-    "uws": "luminati-io/uWebSockets-bindings#1d4f506",
     "heapdump": "0.3.12",
     "sinon": "1.17.7",
     "puppeteer": "2.0.0",
-    "longjohn": "0.2.12"
+    "longjohn": "0.2.12",
+    "uws": "luminati-io/uWebSockets-bindings#1d4f506"
   },
   "preferGlobal": true,
   "recommendedNode": ">=12.0.0",
@@ -425,5 +435,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.225.430"
+  "version": "1.225.497"
 }

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.225.430",
+        "version": "1.225.497",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1339,9 +1339,6 @@
                 "high_perf": {
                     "type": "boolean"
                 },
-                "flex_tls": {
-                    "type": "boolean"
-                },
                 "zagent": {
                     "type": "boolean"
                 },
@@ -1444,6 +1441,11 @@
                 "ssl": {
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
+                },
+                "tls_lib": {
+                    "type": "string",
+                    "pattern": "^(open_ssl|flex_tls)?$",
+                    "description": "SSL library"
                 },
                 "iface": {
                     "type": "string",

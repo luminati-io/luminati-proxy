@@ -258,8 +258,13 @@ export const tabs = {
                     requests`,
                 ext: true,
             },
-            flex_tls: {
-                label: 'BoringSSL',
+            tls_lib: {
+                label: 'SSL library',
+                tooltip: `Choose a specific SSL library for sending HTTPS
+                    requests. It affects the SSL fingerprint seen by the target
+                    site. OpenSSL can be detected as suspicious traffic because
+                    no browser uses it. Use BoringSSL if you need to keep using
+                    SSL analyzing and you are getting blocked`,
                 ext: true,
             },
             proxy_connection_type: {
