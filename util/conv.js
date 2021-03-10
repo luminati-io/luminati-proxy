@@ -259,8 +259,12 @@ E.fmt_currency = function(amount, digits, currency_sign){
         currency_sign = '$';
     var sign = amount<0 ? '-' : '';
     amount = Math.abs(amount);
-    amount = (+amount).toLocaleString('en-GB', {useGrouping: true,
-        maximumFractionDigits: digits})||amount;
+    amount = (+amount).toLocaleString('en-GB', {
+        useGrouping: true,
+        maximumFractionDigits: digits,
+        minimumFractionDigits: digits>=2&&2 || null,
+    }) || ''+amount;
+    amount = amount.replace(/\.0+$/, '');
     return sign+currency_sign+amount;
 };
 

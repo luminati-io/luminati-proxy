@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.225.430",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed connection issues from China"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed a memory leak in web socket connections"
+            },
+            {
+                "type": "star",
+                "text": "Introduced an option to allow using BoringSSL in Cloud Proxy Manager"
+            }
+        ]
+    },
+    {
         "ver": "1.223.826",
         "type": "stable",
         "changes": [
@@ -55,7 +73,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed missing ports dropdown in the LPM Web tester UI"
+                "text": "Fixed missing ports dropdown in the Proxy Manager Web tester UI"
             }
         ]
     },
@@ -197,7 +215,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Improve LPM communication with lpm_f over WS"
+                "text": "Improve Proxy Manager communication with lpm_f over WS"
             }
         ]
     },
@@ -293,7 +311,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed lpm_f communication in Cloud LPM servers after a new server assignment"
+                "text": "Fixed lpm_f communication in Cloud Proxy Manager servers after a new server assignment"
             },
             {
                 "type": "bug",
@@ -435,7 +453,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed LPM upgrade on Windows"
+                "text": "Fixed Proxy Manager upgrade on Windows"
             }
         ]
     },
@@ -445,7 +463,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Consistency improvements with LPM browser timezone emulation"
+                "text": "Consistency improvements with Proxy Manager browser timezone emulation"
             }
         ]
     },
@@ -573,7 +591,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed LPM installation script for Mac OS"
+                "text": "Fixed Proxy Manager installation script for Mac OS"
             }
         ]
     },
@@ -597,7 +615,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Added a targeting option to select a timezone to be used by the LPM browser"
+                "text": "Added a targeting option to select a timezone to be used by the Proxy Manager browser"
             }
         ]
     },
@@ -701,7 +719,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed out of memory crashes on Cloud LPM servers"
+                "text": "Fixed out of memory crashes on Cloud Proxy Manager servers"
             }
         ]
     },
@@ -735,7 +753,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed restarting Cloud LPM button from luminati.io/cp/lpm"
+                "text": "Fixed restarting Cloud Proxy Manager button from luminati.io/cp/lpm"
             },
             {
                 "type": "star",
@@ -773,7 +791,7 @@
             },
             {
                 "type": "star",
-                "text": "Display modal when upgrading LPM from UI without root permissions"
+                "text": "Display modal when upgrading Proxy Manager from UI without root permissions"
             },
             {
                 "type": "star",
@@ -815,7 +833,7 @@
             },
             {
                 "type": "star",
-                "text": "Request is canceled if all the IPs LPM is getting are banned"
+                "text": "Request is canceled if all the IPs Proxy Manager is getting are banned"
             }
         ]
     },
@@ -1183,7 +1201,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Adjustments for LPM in the Cloud"
+                "text": "Adjustments for Proxy Manager in the Cloud"
             }
         ]
     },
@@ -1317,7 +1335,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Added reporting capabilities to Cloud LPM"
+                "text": "Added reporting capabilities to Cloud Proxy Manager"
             }
         ]
     },
@@ -1407,7 +1425,7 @@
             },
             {
                 "type": "star",
-                "text": "Improved security in Cloud LPM"
+                "text": "Improved security in Cloud Proxy Manager"
             }
         ]
     },
@@ -1501,7 +1519,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Always enable config synchronization for Cloud LPM"
+                "text": "Always enable config synchronization for Cloud Proxy Manager"
             }
         ]
     },
@@ -1515,11 +1533,11 @@
             },
             {
                 "type": "bug",
-                "text": "Fix websocket error when LPM works on default port 80"
+                "text": "Fix websocket error when Proxy Manager works on default port 80"
             },
             {
                 "type": "sparkles",
-                "text": "Enable config synchronization for new LPM users by default"
+                "text": "Enable config synchronization for new Proxy Manager users by default"
             }
         ]
     },
@@ -1563,7 +1581,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Cloud LPM release - Host the LPM on Luminati server. Check luminati.io/cp/lpm"
+                "text": "Cloud Proxy Manager release - Host the Proxy Manager on Luminati server. Check luminati.io/cp/lpm"
             }
         ]
     },
@@ -1652,7 +1670,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "UI Improvements in the embedded Cloud LPM"
+                "text": "UI Improvements in the embedded Cloud Proxy Manager"
             }
         ]
     },
@@ -1690,7 +1708,7 @@
             },
             {
                 "type": "bug",
-                "text": "Start LPM even if some ports failed to start"
+                "text": "Start Proxy Manager even if some ports failed to start"
             }
         ]
     },
@@ -1700,7 +1718,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Adjustemnts for LPM in the Cloud"
+                "text": "Adjustemnts for Proxy Manager in the Cloud"
             }
         ]
     },
@@ -1714,7 +1732,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Adjustemnts for LPM in the Cloud"
+                "text": "Adjustemnts for Proxy Manager in the Cloud"
             }
         ]
     },
@@ -1744,7 +1762,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Serving UI on HTTPS when LPM in the cloud"
+                "text": "Serving UI on HTTPS when Proxy Manager in the cloud"
             }
         ]
     },
@@ -1830,7 +1848,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Support TLS connection between client and LPM"
+                "text": "Support TLS connection between client and Proxy Manager"
             }
         ]
     },
@@ -1984,7 +2002,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Running LPM on all the CPUs for all the presets"
+                "text": "Running Proxy Manager on all the CPUs for all the presets"
             },
             {
                 "type": "bug",
@@ -2499,7 +2517,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Added --downgrade option that will downgrade LPM to the version before upgrades"
+                "text": "Added --downgrade option that will downgrade Proxy Manager to the version before upgrades"
             },
             {
                 "type": "star",
@@ -2521,7 +2539,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Adjustments for LPM <> Extension integration"
+                "text": "Adjustments for Proxy Manager <> Extension integration"
             }
         ]
     },
@@ -2621,7 +2639,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Add --show-logs feature that follows LPM daemon process logs"
+                "text": "Add --show-logs feature that follows Proxy Manager daemon process logs"
             },
             {
                 "type": "sparkles",
@@ -2655,7 +2673,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "CPU and mem usage are now shown per LPM process in --status"
+                "text": "CPU and mem usage are now shown per Proxy Manager process in --status"
             },
             {
                 "type": "bug",
@@ -2817,7 +2835,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Improved --upgrade argument behavior: it will now upgrade LPM and restart previously running daemons"
+                "text": "Improved --upgrade argument behavior: it will now upgrade Proxy Manager and restart previously running daemons"
             },
             {
                 "type": "sparkles",
@@ -2825,7 +2843,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed LPM's memory usage"
+                "text": "Fixed Proxy Manager's memory usage"
             }
         ]
     },
@@ -2857,7 +2875,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed error handling for SOCKS5 connections between LPM and Super Proxies"
+                "text": "Fixed error handling for SOCKS5 connections between Proxy Manager and Super Proxies"
             },
             {
                 "type": "bug",
@@ -2871,7 +2889,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Added --read_only CLI option that prevents LPM from writing to the config file"
+                "text": "Added --read_only CLI option that prevents Proxy Manager from writing to the config file"
             }
         ]
     },
@@ -2909,7 +2927,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed LPM crash on subsequent Proxy Tester calls with unexistent proxy ports"
+                "text": "Fixed Proxy Manager crash on subsequent Proxy Tester calls with unexistent proxy ports"
             }
         ]
     },
@@ -2969,7 +2987,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Added option to use SOCKS to connect LPM and Super Proxy"
+                "text": "Added option to use SOCKS to connect Proxy Manager and Super Proxy"
             },
             {
                 "type": "sparkles",
@@ -2991,7 +3009,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed 'Cannnot read property 'toLowerCase' of undefined' when running LPM on Docker"
+                "text": "Fixed 'Cannnot read property 'toLowerCase' of undefined' when running Proxy Manager on Docker"
             }
         ]
     },
@@ -3425,7 +3443,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed LPM WS connection when accessed with https"
+                "text": "Fixed Proxy Manager WS connection when accessed with https"
             },
             {
                 "type": "bug",
@@ -3673,7 +3691,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "fix LPM response when cert is wrong and not using insecure flag"
+                "text": "fix Proxy Manager response when cert is wrong and not using insecure flag"
             },
             {
                 "type": "sparkles",
@@ -3730,7 +3748,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Super Proxy's icon flag in LPM isn't changing"
+                "text": "Super Proxy's icon flag in Proxy Manager isn't changing"
             },
             {
                 "type": "bug",
@@ -4451,7 +4469,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Separation between multiple LPM instances"
+                "text": "Separation between multiple Proxy Manager instances"
             },
             {
                 "type": "bug",
@@ -4723,7 +4741,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed running LPM without UI"
+                "text": "Fixed running Proxy Manager without UI"
             }
         ]
     },
@@ -5332,7 +5350,7 @@
             },
             {
                 "type": "star",
-                "text": "Refreshing IPs/gIPs from LPM"
+                "text": "Refreshing IPs/gIPs from Proxy Manager"
             },
             {
                 "type": "bug",
@@ -5390,7 +5408,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Refreshing IPs/gIPs from LPM"
+                "text": "Refreshing IPs/gIPs from Proxy Manager"
             },
             {
                 "type": "star",
@@ -7859,7 +7877,7 @@
         "changes": [
             {
                 "type": "boom",
-                "text": "Luminati Proxy Manager will now refuse to run on older versions of Node.js"
+                "text": "Proxy Manager will now refuse to run on older versions of Node.js"
             }
         ]
     },

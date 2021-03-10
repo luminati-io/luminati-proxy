@@ -83,7 +83,8 @@ export default class Api_url_modal extends Pure_component {
                       id="skype">
                       luminati.io
                     </Contact_btn>
-                    <Contact_btn href="//web.wechat.com" type="fab" id="weixin">
+                    <Contact_btn href="//web.wechat.com" type="fab"
+                      id="weixin">
                       luminati_io
                     </Contact_btn>
                     <Contact_btn href={mail_link} type="fas" id="envelope">
@@ -111,7 +112,7 @@ export default class Api_url_modal extends Pure_component {
                     </span>}
                   </Li>
                   <Li>
-                    Click OK to save and wait till the LPM restarts
+                    Click OK to save and wait till the Proxy Manager restarts
                   </Li>
                 </Instructions>
                 </div>

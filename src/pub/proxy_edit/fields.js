@@ -156,8 +156,9 @@ export const tabs = {
             sticky_ip: {
                 label: 'Session per machine',
                 tooltip: `Keep separate sessions / IPs for each connecting
-                    device from an external network. Useful when the LPM is
-                    hosted on a server and multiple machines send requests`,
+                    device from an external network. Useful when the Proxy
+                    Manager is hosted on a server and multiple machines send
+                    requests`,
                 ext: true,
             },
             rotate_session: {
@@ -210,7 +211,8 @@ export const tabs = {
     },
     browser: {
         label: 'Browser',
-        tooltip: 'Configure settings for the browser launched by LPM',
+        tooltip: `Configure settings for the browser launched by Proxy
+            Manager`,
         fields: {
             ua: {
                 label: 'Unblocker Mobile UA',
@@ -240,8 +242,8 @@ export const tabs = {
                 label: 'Internal name',
                 tooltip: `You can choose a name for this proxy port.
                     If the name is passed it will be shown in the dropdowns
-                    across whole LPM. It doesn't change any behavior of the
-                    proxy port`,
+                    across whole Proxy Manager. It doesn't change any behavior
+                    of the proxy port`,
                 ext: true,
             },
             port: {
@@ -256,9 +258,14 @@ export const tabs = {
                     requests`,
                 ext: true,
             },
+            flex_tls: {
+                label: 'BoringSSL',
+                ext: true,
+            },
             proxy_connection_type: {
                 label: 'Connection to Super Proxy',
-                tooltip: 'Connection type between LPM and Super Proxy',
+                tooltip: `Connection type between Proxy Manager and Super
+                    Proxy`,
             },
             route_err: {
                 label: 'Route',
@@ -285,8 +292,8 @@ export const tabs = {
             },
             multiply_users: {
                 label: 'Multiply proxy port per user',
-                tooltip: `Create a proxy port for every selected LPM user
-                    configured in control panel`,
+                tooltip: `Create a proxy port for every selected Proxy Manager
+                    user configured in control panel`,
             },
             iface: {
                 label: 'Interface',

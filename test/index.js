@@ -7,23 +7,22 @@ const https = require('https');
 const socks = require('lum_socksv5');
 const {Netmask} = require('netmask');
 const {Readable, Writable} = require('stream');
+const lolex = require('lolex');
+const sinon = require('sinon');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
-const lolex = require('lolex');
 const etask = require('../util/etask.js');
 const {ms} = require('../util/date.js');
 const zutil = require('../util/util.js');
-const sinon = require('sinon');
 const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
-const Socks = require('../lib/socks.js');
-const Cache = require('../lib/cache.js');
+const Worker = require('../lib/worker.js');
 const requester = require('../lib/requester.js');
 const Timeline = require('../lib/timeline.js');
 const lutil = require('../lib/util.js');
 const consts = require('../lib/consts.js');
 const common = require('./common.js');
-const {assert_has, http_proxy, smtp_test_server, http_ping} = common;
+const {assert_has, http_proxy, smtp_test_server, http_ping, keys} = common;
 const qw = require('../util/string.js').qw;
 const test_url = {http: 'http://lumtest.com/test',
     https: 'https://lumtest.com/test'};
@@ -40,7 +39,7 @@ describe('proxy', ()=>{
     const lum = opt=>etask(function*(){
         opt = opt||{};
         if (opt.ssl===true)
-            opt.ssl = Object.assign({requestCert: false}, ssl());
+            opt.ssl = Object.assign({requestCert: false}, ssl(keys));
         const l = new Server(Object.assign({
             proxy: '127.0.0.1',
             proxy_port: proxy.port,
@@ -48,7 +47,7 @@ describe('proxy', ()=>{
             password,
             log: 'none',
             port: 24000,
-        }, opt), {cache: new Cache(), socks_server: new Socks()});
+        }, opt), new Worker().run().setup({keys}));
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')
                 req_opt = {url: req_opt};
@@ -722,7 +721,7 @@ describe('proxy', ()=>{
     describe('ext_proxies', ()=>{
         it('should use host and proxy from config', ()=>etask(function*(){
             l = yield lum({ext_proxies: ['1.1.1.1:123']});
-            const resp = yield l.test({fake: 1});
+            yield l.test({fake: 1});
             assert.equal(l.history[0].super_proxy, '1.1.1.1:123');
         }));
     });
@@ -1294,7 +1293,9 @@ describe('proxy', ()=>{
             it('action null_response', ()=>etask(function*(){
                 l = yield lum({rules: [{action: {null_response: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
-                    log: l.log, timeline: new Timeline(1)}};
+                    log: l.log, timeline: new Timeline(1),
+                    init_stats: ()=>null,
+                }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const r = l.rules.pre(_req, _res, {});
                 assert.equal(r.status_code, 200);
@@ -1303,7 +1304,9 @@ describe('proxy', ()=>{
             it('action direct', ()=>etask(function*(){
                 l = yield lum({rules: [{url: '', action: {direct: true}}]});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
-                    log: l.log, timeline: new Timeline(1)}};
+                    log: l.log, timeline: new Timeline(1),
+                    init_stats: ()=>null,
+                }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const r = l.rules.pre(_req, _res, {});
                 assert.equal(r, undefined);

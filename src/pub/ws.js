@@ -31,9 +31,9 @@ class Ws_wrapper extends EventTarget {
     };
     global_handler = event=>{
         const json = JSON.parse(event.data);
-        if (json.type!='global')
+        if (json.msg!='update_path')
             return;
-        const {path, payload} = json.data;
+        const {path, payload} = json;
         if (path.endsWith('.remove') || path.endsWith('.add'))
             return setdb.emit('ws.'+path, payload);
         setdb.set('ws.'+path, payload);

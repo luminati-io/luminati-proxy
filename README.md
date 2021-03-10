@@ -1,4 +1,4 @@
-# Luminati Proxy manager
+# Proxy manager
 
 [![dependencies Status](https://david-dm.org/luminati-io/luminati-proxy/status.svg)](https://david-dm.org/luminati-io/luminati-proxy)
 [![devDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/dev-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=dev)
@@ -6,10 +6,10 @@
 
 A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribute/manage/monitor/report/log/debug traffic to your proxies around the world.
 
-With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IPs or Luminati static IPs.
+With Proxy manager you can drive the Luminati residential IPs or Luminati static IPs.
 
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
-Please report issues or bugs to your Luminati account manager or from our [help center](https://luminati.io/faq#proxy)
+Please report issues or bugs to your account manager or from our [help center](https://luminati.io/faq#proxy)
 
 <em>Read this in [中文](https://lum-lpm.com/static/lpm/README-zh-CN.html).</em>
 
@@ -36,7 +36,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.223.826/luminati-proxy-manager-v1.223.826-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.225.430/luminati-proxy-manager-v1.225.430-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -52,7 +52,7 @@ curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
   Node.js version for the proxy manager should be any at least 12.18.3
 - Make sure npm version is 6.14.6 or higher
   - if not, run: `sudo npm install -g npm@6.14.6`
-- Install Luminati Proxy from the terminal prompt:
+- Install Proxy Manager from the terminal prompt:
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy
 ```
@@ -71,7 +71,7 @@ sudo npm install -g @luminati-io/luminati-proxy
 ```
 Or use the cli command:
 ```sh
-luminati --upgrade
+proxy-manager --upgrade
 ```
 
 
@@ -93,7 +93,7 @@ You can review the [CHANGELOG.md](CHANGELOG.md) for list of changes in every ver
 ### First run
 After running the app for the first time:
 ```sh
-luminati
+proxy-manager
 ```
 Point your browser to the app admin UI
 [http://127.0.0.1:22999](http://127.0.0.1:22999) to set up credentials
@@ -102,24 +102,24 @@ and configure your proxies.
 ### Run as daemon
 To run the proxy manager in the background:
 ```sh
-luminati --daemon
+proxy-manager --daemon
 ```
 
 ### Dropin replacement for existing super-proxies
 
-Luminati Proxy comes with a "dropin mode" which behaves exactly like the
+Proxy Manager comes with a "dropin mode" which behaves exactly like the
 existing super-proxies. When running a proxy in dropin mode, you do not need to
 sign in via the administrative UI in order to make requests through your
 proxies. Rather, the proxy username and password are provided with each request
 to the proxy server. This mode is enabled by default, and you can use this mode
-as an easy replacement when migrating from the regular super-proxy to the
-Luminati Proxy Manager.
+as an easy replacement when migrating from the regular super-proxy to the Proxy
+Manager.
 
 Dropin mode is enabled by default. To disable the dropin proxy, use the flag
 `--no-dropin`:
 
 ```sh
-luminati --no-dropin
+proxy-manager --no-dropin
 ```
 
 For full documentation on the API for making requests through the dropin proxy,
@@ -128,18 +128,10 @@ API Example page in your Luminati.io account</a>.
 
 ### Complete list of command line options
 
-All command line options below are also available also as ENV variables.
-Example:
 ```sh
-cli: --port 22900 , env: LPM_PORT=22900
-cli: --ssl true , env: LPM_SSL=true
-cli: --log "error" , env: LPM_LOG=error
-```
-
-```sh
-luminati --help
+proxy-manager --help
 Usage:
-  luminati [options] config1 config2 ...
+  proxy-manager [options] config1 config2 ...
 
 Options:
   --help, -h, -?                Show help                              [boolean]
@@ -154,14 +146,14 @@ Options:
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
   --iface                       Interface or IP to listen on            [string]
-  --customer                    Luminati customer                       [string]
-  --zone                        Luminati zone       [string] [default: "static"]
+  --customer                    Customer name                           [string]
+  --zone                        Zone name           [string] [default: "static"]
   --password                    Zone password                           [string]
   --proxy                       Hostname or IP of super proxy
                                   [string] [default: "zproxy.lum-superproxy.io"]
   --proxy_port                  Super proxy port       [number] [default: 22225]
   --proxy_connection_type       Determines what kind of connection will be used
-                                between LPM and Super Proxy
+                                between Proxy Manager and Super Proxy
                                                       [string] [default: "http"]
   --proxy_retry                 Automatically retry on super proxy failure
                                                            [number] [default: 2]
@@ -183,7 +175,7 @@ Options:
                                                       [boolean] [default: false]
   --reverse_lookup_file         Process reverse lookup via file         [string]
   --reverse_lookup_values       Process reverse lookup via value         [array]
-  --session                     Luminati session for all proxy requests
+  --session                     Session for all proxy requests
                                                         [string] [default: true]
   --sticky_ip                   Use session per requesting host to maintain IP
                                 per host              [boolean] [default: false]
@@ -199,8 +191,7 @@ Options:
   --override_headers                                                   [boolean]
   --os                          Operating System of the Peer IP         [string]
   --headers                     Request headers                          [array]
-  --debug                       Luminati request debug info
-                                                      [string] [default: "full"]
+  --debug                       Request debug info    [string] [default: "full"]
   --socket_inactivity_timeout                         [number] [default: 120000]
   --multiply_ips                                      [boolean] [default: false]
   --multiply_vips                                     [boolean] [default: false]
@@ -229,8 +220,8 @@ Options:
   --high_perf                                         [boolean] [default: false]
   --zagent                                            [boolean] [default: false]
   --cluster                                             [string] [default: true]
-  --sync_config                 Synchronize LPM configuration with the cloud
-                                                      [boolean] [default: false]
+  --sync_config                 Synchronize Proxy Manager configuration with the
+                                cloud                 [boolean] [default: false]
   --sync_zones                                         [boolean] [default: true]
   --sync_stats                                         [boolean] [default: true]
   --request_stats               Enable requests statistics
@@ -245,8 +236,8 @@ Options:
                                 time                            [default: 10000]
   --ui_ws                       Enable live logs preview and other live data
                                 communication on the UI[boolean] [default: true]
-  --force                       Kill other instances of LPM if there are any
-                                                      [boolean] [default: false]
+  --force                       Kill other instances of Proxy Manager if there
+                                are any               [boolean] [default: false]
   --session_termination         Stop sending new requests when the peer IP
                                 becomes unavailable and redirect to confimration
                                 page before new IP is taken
@@ -255,7 +246,7 @@ Options:
   --api_domain                  Alternative domain url to luminati API
                                                [string] [default: "lum-lpm.com"]
   --local_login                 Requires each browser to authenticate against
-                                LPM                   [boolean] [default: false]
+                                Proxy Manager         [boolean] [default: false]
   --read_only                   Avoid saving current config in the config file
                                                       [boolean] [default: false]
   --extra_ssl_ips               List of IPs to add to SSL certificate
@@ -278,10 +269,10 @@ Options:
   --start-upgrader              Install CRON process that checks upgrades
   --stop-upgrader               Removes CRON process that checks upgrades
   --insecure-http-parser        Disables the strict checks
+  --flex_tls                                                    [default: false]
   --proxy_country                                                  [default: ""]
   --bw_limit                                                        [default: 0]
   --info                                                        [default: false]
-  --flex_tls                                                    [default: false]
   --cn                                                          [default: false]
   --api_body_limit                                              [default: "2mb"]
   --api_domain_fallback                                   [default: "l-lpm.com"]
@@ -294,9 +285,9 @@ A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy
 ```sh
 docker pull luminati/luminati-proxy
 
-docker run luminati/luminati-proxy luminati
+docker run luminati/luminati-proxy proxy-manager
 
-docker run luminati/luminati-proxy luminati --version
+docker run luminati/luminati-proxy proxy-manager --version
 ```
 Make sure to forward appropriate ports. Proxy manager uses by default 22999
 for the web console and the api, 22225 for dropin and 24000 for first
@@ -304,7 +295,7 @@ configurable proxy.
 
 - To run docker with cli option see the below example:
 ```sh
-docker run luminati/luminati-proxy luminati --www_whitelist_ips "172.17.0.1" --ssl true
+docker run luminati/luminati-proxy proxy-manager --www_whitelist_ips "172.17.0.1" --ssl true
 ```
 You can add many more options to this run.
 
@@ -345,7 +336,7 @@ files generated by the container)
 - run docker image and attach this volume:
 ```sh
   docker run --rm --name 'lpm1' --mount source=lpm-vol,target=/root
-"luminati/luminati-proxy" luminati
+"luminati/luminati-proxy" proxy-manager
 ```
 
 ### SSL Requests

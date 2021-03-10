@@ -18,11 +18,11 @@
         }
     ],
     "manifest_version": 2,
-    "name": "Luminati Proxy Manager Timezone",
+    "name": "Proxy Manager Timezone",
     "permissions": [
         "storage",
         "*://*/*",
         "webNavigation"
     ],
-    "version": "1.223.826"
+    "version": "1.225.430"
 }

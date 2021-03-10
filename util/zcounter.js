@@ -15,11 +15,6 @@ const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
 
-let hosts = ['zs-graphite.luminati.io'];
-
-if (!+env.LXC)
-    hosts.push('zs-graphite-log.luminati.io');
-
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
         if (process.env.IS_MOCHA)
@@ -411,17 +406,22 @@ let prepare = ()=>etask(function*zcounter_prepare(){
         ? mas_get_counters : loc_get_counters;
     let counters = yield get_counters_fn(true);
     let prefix = `stats.${conf.hostname}.${conf.app}.`;
-    let metrics = [];
+    let res = {lum: [], stats: []};
     for (let t in agg_mas_fn)
     {
         let _type = counters[t];
         let agg_fn = agg_mas_fn[t];
         for (let key in _type)
         {
+            let world = 'stats';
             let c = _type[key], agg = agg_fn(key, c);
             let path;
             if (key[0]=='.')
+            {
                 path = key.slice(1).replace(/\//g, '.');
+                if (path.startsWith('lum.'))
+                    world = 'lum';
+            }
             else
             {
                 let parts = key.split('/');
@@ -430,11 +430,11 @@ let prepare = ()=>etask(function*zcounter_prepare(){
                 else
                     path = `stats.${parts[0]}.${conf.app}.${parts[1]}`;
             }
-            metrics.push({path, v: agg.v, w: agg.w,
+            res[world].push({path, v: agg.v, w: agg.w,
                 agg_srv: c.agg_srv, agg_tm: c.agg_tm});
         }
     }
-    return metrics;
+    return res;
 });
 
 let get_agg_counters = ()=>etask(function*zcounter_get_agg_counters(){
@@ -462,38 +462,40 @@ function init(){
         cluster_ipc.worker_on('get_zcounters', loc_get_counters);
 }
 
-let ws_queue = new queue('zcounter');
-const ws_conn = new Map();
-let send_loop = ()=>etask(function*(){
-    if (send_loop.et)
+let ws_queue = {lum: new queue('lum zc'), stats: new queue('stats zc')};
+const ws_conn = {lum: new Map(), stats: new Map()};
+let send_loop = world=>etask(function*(){
+    if (send_loop[world])
         zerr.perr('zcounter_double_conn');
-    this.finally(()=>send_loop.et = null);
-    send_loop.et = this;
+    this.finally(()=>send_loop[world] = null);
+    send_loop[world] = this;
     for (;;)
     {
-        const data = ws_format(yield ws_queue.wait());
-        if (!ws_conn.size)
-            return void (send_loop.et = null);
-        ws_conn.forEach(ws=>ws.json(data));
+        const data = ws_format(yield ws_queue[world].wait());
+        let conns = ws_conn[world];
+        if (!conns.size)
+            return void (send_loop[world] = null);
+        conns.forEach(ws=>ws.json(data));
     }
 });
 
-function ws_client(url){
+function ws_client(world, url){
+    let conns = ws_conn[world];
     if (!url.startsWith('ws'))
         url = `ws://${url}`;
-    if (ws_conn.has(url))
-        return ws_conn.get(url);
+    if (conns.has(url))
+        return conns.get(url);
     zerr.notice(`Opening zcounter conn to ${url}`);
     let zws = require('./ws.js');
     const label = url.split(':')[1].replace(/^\/\//, '');
-    const ws = new zws.Client(url, {label: `zcounter-${label}`,
+    const ws = new zws.Client(url, {label: `zcounter-${world}-${label}`,
         retry_interval: ms.SEC});
     ws.on('connected', ()=>{
-        ws_conn.set(url, ws);
-        if (!send_loop.et)
-            send_loop();
+        conns.set(url, ws);
+        if (!send_loop[world])
+            send_loop(world);
     });
-    ws.on('disconnected', ()=>ws_conn.delete(url));
+    ws.on('disconnected', ()=>conns.delete(url));
     return ws;
 }
 
@@ -503,38 +505,77 @@ function run(){
         return;
     let port = env.ZCOUNTER_PORT||3374;
     if (env.NODE_ENV!='production')
-        ws_client(`ws://localhost:${port}`);
-    else if (env.ZCOUNTER_URL)
-        env.ZCOUNTER_URL.split(';').forEach(ws_client);
+    {
+        ws_client('lum', `ws://localhost:${port}`);
+        ws_client('stats', `ws://localhost:${port}`);
+    }
+    else if (env.ZCOUNTER_STATS_URL && env.ZCOUNTER_LUM_URL)
+    {
+        env.ZCOUNTER_STATS_URL.split(';').forEach(x=>ws_client('stats', x));
+        env.ZCOUNTER_LUM_URL.split(';').forEach(x=>ws_client('lum', x));
+    }
     else
-        hosts.forEach(h=>ws_client(`ws://${h}:${port}`));
+    {
+        let lum = ['zs-graphite.luminati.io', 'zs-graphite-log.luminati.io'];
+        let stats = ['zs-graphite.luminati.io', 'zs-graphite-log.luminati.io',
+            'zs-graphite-stats.luminati.io'];
+        if (+env.LXC)
+        {
+            lum = ['zs-graphite.luminati.io'];
+            stats = [...lum, 'zs-graphite-stats.luminati.io'];
+        }
+        lum.forEach(h=>ws_client('lum', `ws://${h}:${port}`));
+        stats.forEach(h=>ws_client('stats', `ws://${h}:${port}`));
+    }
     etask.interval({ms: interval, mode: 'smart'}, function*zcounter_run(){
-        let metrics = yield prepare();
-        if (metrics.length)
-            ws_queue.put(metrics, max_age);
+        let data = yield prepare();
+        for (let world of ['lum', 'stats'])
+        {
+            if (data[world].length)
+                ws_queue[world].put(data[world], max_age);
+        }
     });
 }
 
-E.submit_raw = (metrics, ttl)=>ws_queue.put(metrics, ttl);
+E.submit_raw = (data, ttl)=>{
+    if (data.world)
+        return void ws_queue[data.world].put(data.metrics, ttl);
+    let lum = [], stats = [];
+    for (let metric of data)
+    {
+        if (!metric.path)
+            continue;
+        let world = metric.path.startsWith('lum.') && lum || stats;
+        world.push(metric);
+    }
+    if (lum.length)
+        ws_queue.lum.put(lum, ttl);
+    if (stats.length)
+        ws_queue.stats.put(stats, ttl);
+};
 
 E.flush = ()=>etask(function*zcounter_flush(){
     if (cluster.isWorker)
         zerr.zexit('zcounter.flush must be called from the master');
-    let metrics = yield prepare();
-    if (metrics.length)
-        ws_queue.put(metrics, max_age);
-    if (ws_conn.size)
-        return;
     const dir = env.ZCOUNTER_DIR||'/run/shm/zcounter';
-    for (;;)
+    let data = yield prepare();
+    for (let world of ['lum', 'stats'])
     {
-        let entry = ws_queue.get_ex();
-        if (!entry)
-            break;
-        let r = Math.random()*1e8|0;
-        file.mkdirp(dir);
-        file.write_atomic(`${dir}/${entry.expires}.${conf.app}.${r}.json`,
-            JSON.stringify(entry.item));
+        let metrics = data[world];
+        if (metrics.length)
+            ws_queue[world].put(metrics, max_age);
+        if (ws_conn[world].size)
+            continue;
+        for (;;)
+        {
+            let entry = ws_queue[world].get_ex();
+            if (!entry)
+                break;
+            let r = Math.random()*1e8|0;
+            file.mkdirp(dir);
+            file.write_atomic(`${dir}/${entry.expires}.${conf.app}.${r}.json`,
+                JSON.stringify({world, metrics: entry.item}));
+        }
     }
 });
 

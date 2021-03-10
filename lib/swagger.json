@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.223.826",
-        "title": "Luminati Proxy Manager",
+        "version": "1.225.430",
+        "title": "Proxy Manager",
         "license": {
             "name": "MIT",
             "url": "http://opensource.org/licenses/MIT"
@@ -29,7 +29,7 @@
         },
         "/version": {
             "get": {
-                "description": "Returns the version of the running Luminati Proxy Manager\n",
+                "description": "Returns the version of the running Proxy Manager\n",
                 "tags": [
                     "Manager"
                 ],
@@ -40,11 +40,11 @@
                             "type": "object",
                             "properties": {
                                 "version": {
-                                    "description": "LPM version",
+                                    "description": "Proxy Manager version",
                                     "type": "string"
                                 },
                                 "argv": {
-                                    "description": "Command line arguments passed to LPM",
+                                    "description": "Command line arguments passed to Proxy Manager",
                                     "type": "string"
                                 }
                             }
@@ -66,15 +66,15 @@
                             "type": "object",
                             "properties": {
                                 "version": {
-                                    "description": "Latest LPM version",
+                                    "description": "Latest Proxy Manager version",
                                     "type": "string"
                                 },
                                 "newer": {
-                                    "description": "Whether or not latest version is newer than current LPM version",
+                                    "description": "Whether or not latest version is newer than current Proxy Manager version",
                                     "type": "boolean"
                                 },
                                 "versions": {
-                                    "description": "LPM versions changelog",
+                                    "description": "Proxy Manager versions changelog",
                                     "type": "array",
                                     "items": {
                                         "type": "object",
@@ -441,7 +441,7 @@
         },
         "/shutdown": {
             "post": {
-                "description": "Shutdown LPM",
+                "description": "Shutdown Proxy Manager",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -452,7 +452,7 @@
         },
         "/upgrade": {
             "post": {
-                "description": "Upgrade LPM",
+                "description": "Upgrade Proxy Manager",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -463,7 +463,7 @@
         },
         "/restart": {
             "post": {
-                "description": "Restart LPM",
+                "description": "Restart Proxy Manager",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -873,19 +873,19 @@
         },
         "/settings": {
             "get": {
-                "description": "Return current LPM general settings",
+                "description": "Return current general settings",
                 "tags": ["Proxy"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/settings"  
+                            "$ref": "#/definitions/settings"
                         }
                     }
                 }
             },
             "put": {
-                "description": "Update LPM general settings",
+                "description": "Update general settings",
                 "tags": ["Proxy"],
                 "parameters": [
                     {
@@ -894,7 +894,7 @@
                         "description": "New settings",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/updatable_settings"  
+                            "$ref": "#/definitions/updatable_settings"
                         }
                     }
                 ],
@@ -902,7 +902,7 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/settings"  
+                            "$ref": "#/definitions/settings"
                         }
                     }
                 }
@@ -1035,7 +1035,7 @@
         },
         "/lpm_users": {
             "get": {
-                "description": "List of all the available LPM users for the account",
+                "description": "List of all the available pmgr users for the account",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -1057,7 +1057,7 @@
         },
         "/lpm_user": {
             "post": {
-                "description": "Creates a new LPM user",
+                "description": "Creates a new pmgr user",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -1244,10 +1244,6 @@
                     "type": "string",
                     "description": "Alternative domain url to luminati API"
                 },
-                "mail_domain": {
-                    "type": "string",
-                    "description": "Luminati support email domain (used in the UI)"
-                },
                 "logs": {
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
@@ -1263,7 +1259,7 @@
                 "pending_www_ips": {
                     "type": "array",
                     "items": {"type": "string"},
-                    "description": "List of IPs not whitelisted that recently tried to access LPM"
+                    "description": "List of IPs not whitelisted that recently tried to access Proxy Manager"
                 }
             }
         },
@@ -1389,7 +1385,7 @@
                 },
                 "force": {
                     "type": "boolean",
-                    "description": "Kill other instances of LPM if there are any"
+                    "description": "Kill other instances of Proxy Manager if there are any"
                 },
                 "session_termination": {
                     "type": "boolean",
@@ -1405,7 +1401,7 @@
                 },
                 "local_login": {
                     "type": "boolean",
-                    "description": "Requires each browser to authenticate against LPM"
+                    "description": "Requires each browser to authenticate against Proxy Manager"
                 },
                 "read_only": {
                     "type": "boolean",
@@ -1413,7 +1409,7 @@
                 },
                 "sync_config": {
                     "type": "boolean",
-                    "description": "Synchronize LPM configuration with the cloud"
+                    "description": "Synchronize Proxy Manager configuration with the cloud"
                 },
                 "extra_ssl_ips": {
                     "type": "array",
@@ -1455,7 +1451,7 @@
                 },
                 "customer": {
                     "type": "string",
-                    "description": "Luminati customer"
+                    "description": "Customer name"
                 },
                 "zone": {
                     "type": "string",
@@ -1476,7 +1472,7 @@
                 "proxy_connection_type": {
                     "type": "string",
                     "pattern": "^(http|https|socks)?$",
-                    "description": "Determines what kind of connection will be used between LPM and Super Proxy"
+                    "description": "Determines what kind of connection will be used between Proxy Manager and Super Proxy"
                 },
                 "proxy_retry": {
                     "type": "integer",
@@ -1545,7 +1541,7 @@
                 "session": {
                     "type": "string",
                     "pattern": "^[^\\.\\-]*$",
-                    "description": "Luminati session for all proxy requests"
+                    "description": "Session for all proxy requests"
                 },
                 "sticky_ip": {
                     "type": "boolean",
@@ -1610,7 +1606,7 @@
                 "debug": {
                     "type": "string",
                     "pattern": "^(full|none)?$",
-                    "description": "Luminati request debug info"
+                    "description": "Request debug info"
                 }
             }
         }

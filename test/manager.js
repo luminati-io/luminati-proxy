@@ -31,7 +31,8 @@ const {assert_has} = require('./common.js');
 const api_base = 'https://'+pkg.api_domain;
 const {SEC} = date.ms;
 
-describe('manager', ()=>{
+describe('manager', function(){
+    this.timeout(2500);
     let app, temp_files, logger_stub, sb;
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
@@ -305,6 +306,21 @@ describe('manager', ()=>{
                 pkg.api_domain_fallback);
             assert.equal(opt.har_limit, 1337);
             assert.equal(opt.api_domain, pkg.api_domain_fallback);
+        }));
+    });
+    describe('cloud config synchronization', ()=>{
+        it('argv is re-applied when applying a new cloud conf', ()=>etask(
+        function*(){
+            const cli = {zagent: true};
+            app = yield app_with_config({cli, config: []});
+            const mgr = app.manager;
+            sinon.stub(mgr, 'skip_config_sync').returns(false);
+            const argv_spy = sinon.spy(mgr, 'apply_argv_opts');
+            const cloud_conf = {_defaults: {logs: '123'}};
+            yield mgr.apply_cloud_config(cloud_conf, {force: 1});
+            assert(argv_spy.calledOnce);
+            assert_has(mgr._defaults,
+                Object.assign({}, cloud_conf._defaults, cli));
         }));
     });
     describe('report_bug', ()=>{

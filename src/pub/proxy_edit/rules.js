@@ -515,7 +515,7 @@ class Action extends Pure_component {
         const ban_action = ['ban_ip', 'ban_ip_domain', 'ban_ip_global']
             .includes(rule.action);
         const duration_opt = [
-            {value: 0, label: 'Until LPM restarts'},
+            {value: 0, label: 'Until Proxy Manager restarts'},
             {value: 1, label: '1 minute'},
             {value: 5, label: '5 minutes'},
             {value: 10, label: '10 minutes'},

@@ -113,7 +113,7 @@ export default class Browser extends Pure_component {
             <div className="warning_container">
               <span>
                 These options are applied <strong>ONLY</strong> when using a
-                browser from the LPM.
+                browser from the Proxy Manager.
                 <br/>
                 These settings alter the default behavior of the browser, such
                 as proxy configuration and JavaScript environment.

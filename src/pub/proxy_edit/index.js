@@ -429,9 +429,9 @@ const Header = props=>
       <Port_title port={props.match.params.port}
         name={props.internal_name} t={t}/>
       <Loader_small saving={props.is_saving}
-        std_msg={t('All changes saved in LPM')}
+        std_msg={t('All changes saved in Proxy Manager')}
         std_tooltip=
-        {t('All changes are automatically saved to LPM')}/>
+        {t('All changes are automatically saved to Proxy Manager')}/>
     </div>
   }</T>;
 

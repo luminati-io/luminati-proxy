@@ -177,6 +177,8 @@ E.is_ip_netmask = function(host){
 };
 
 E.is_ip_range = function(host){
+    if (typeof host.split !== 'function')
+        return false;
     var ips = host.split('-');
     if (ips.length!=2 || !E.is_ip(ips[0]) || !E.is_ip(ips[1]))
         return false;

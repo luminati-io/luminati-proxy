@@ -50,7 +50,8 @@ const Nav_left = with_www_api(withRouter(props=>{
     return <div className="nav_left">
           <div className={classnames('menu', {lock: props.lock})}>
             <Nav_link to="/overview" name="overview" label="Overview"/>
-            <Nav_link to="/howto" name="howto" label="How to use LPM"/>
+            <Nav_link to="/howto" name="howto"
+              label="How to use Proxy Manager"/>
             <Nav_link to="/logs" name="logs" label="Request logs"/>
             <Nav_link to="/settings" name="general_config"
               label="General settings"/>
@@ -116,7 +117,7 @@ class Nav_top extends Pure_component {
         if (!this.state.settings)
             return null;
         const {ver} = this.state;
-        const tooltip = `Luminati Proxy Manager v.${ver}`;
+        const tooltip = `Proxy Manager v.${ver}`;
         return <div className="nav_top">
               <Tooltip title={tooltip} placement="right">
                 <div><Logo lock={this.state.lock}/></div>

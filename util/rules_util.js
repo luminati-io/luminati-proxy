@@ -46,7 +46,8 @@ E.action_types = [
         url: true, type: 'post'},
     {key: 'Ban IP globally', value: 'ban_ip_global', tooltip: `The same as
         'Ban IP' action but will ban the IP globally for all the proxy ports
-        configured on this LPM.`, min_req_time: true, url: true, type: 'post'},
+        configured on this Proxy Manager.`, min_req_time: true, url: true,
+        type: 'post'},
     {key: 'Ban IP per domain', value: 'ban_ip_domain', tooltip: `Will ban the
         IP for custom amount of time per domain.`, min_req_time: true,
         url: true, type: 'post'},
@@ -57,10 +58,10 @@ E.action_types = [
     {key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: `Save
         the current IP to a pool of reserved IPs.  you can then download all
         the IPs at a later time.`, type: 'post'},
-    {key: 'Null response', value: 'null_response', tooltip: `LPM will return a
-        "null response" without proxying. It is useful when users do not want
-        to make a request, but a browser expects 200 response.`, type: 'pre',
-        only_url: true, url: true},
+    {key: 'Null response', value: 'null_response', tooltip: `Proxy Manager will
+        return a "null response" without proxying. It is useful when users do
+        not want to make a request, but a browser expects 200 response.`,
+        type: 'pre', only_url: true, url: true},
     {key: 'Bypass proxy', value: 'bypass_proxy', tooltip: `Requests will be
         passed directly to target site without any proxy (super proxy or
         peer).`, type: 'pre', only_url: true, url: true},

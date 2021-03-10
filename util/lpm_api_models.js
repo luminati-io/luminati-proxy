@@ -25,13 +25,13 @@ E.proxy_fields = {
         +'along with "multiply_users"', params: {user: {type: 'string'}}},
     ssl: {type: 'boolean', desc: 'Enable SSL analyzing'},
     iface: {type: 'string', desc: 'Interface or IP to listen on'},
-    customer: {type: 'string', desc: 'Luminati customer'},
-    zone: {type: 'string', desc: 'Luminati zone'},
+    customer: {type: 'string', desc: 'Customer name'},
+    zone: {type: 'string', desc: 'Zone name'},
     password: {type: 'string', desc: 'Zone password'},
     proxy: {type: 'string', desc: 'Hostname or IP of super proxy'},
     proxy_port: {type: 'integer', desc: 'Super proxy port'},
     proxy_connection_type: {type: 'string', desc: 'Determines what kind of '
-        +'connection will be used between LPM and Super Proxy',
+        +'connection will be used between Proxy Manager and Super Proxy',
         values: 'http|https|socks'},
     proxy_retry: {type: 'integer', desc: 'Automatically retry on super '
         +'proxy failure'},
@@ -59,7 +59,7 @@ E.proxy_fields = {
         +'via file'},
     reverse_lookup_values: {type: 'array', desc: 'Process reverse lookup '
         +'via value'},
-    session: {type: 'string', desc: 'Luminati session for all proxy requests',
+    session: {type: 'string', desc: 'Session for all proxy requests',
         values: '^[^\\.\\-]*$'},
     sticky_ip: {type: 'boolean', desc: 'Use session per requesting host to '
         +'maintain IP per host'},
@@ -74,7 +74,7 @@ E.proxy_fields = {
     os: {type: 'string', desc: 'Operating System of the Peer IP'},
     headers: {type: 'array', desc: 'Request headers',
         params: {name: {type: 'string'}, value: {type: 'string'}}},
-    debug: {type: 'string', desc: 'Luminati request debug info',
+    debug: {type: 'string', desc: 'Request debug info',
         values: 'full|none'},
     socket_inactivity_timeout: {type: 'integer'},
     multiply_ips: {type: 'boolean'},
@@ -107,8 +107,8 @@ E.manager_fields = {
     high_perf: {type: 'boolean'},
     zagent: {type: 'boolean'},
     cluster: {type: 'string'},
-    sync_config: {type: 'boolean', desc: 'Synchronize LPM configuration with '
-        +'the cloud'},
+    sync_config: {type: 'boolean', desc: 'Synchronize Proxy Manager '
+        +'configuration with the cloud'},
     sync_zones: {type: 'boolean'},
     sync_stats: {type: 'boolean'},
     request_stats: {type: 'boolean', desc: 'Enable requests statistics'},
@@ -120,8 +120,8 @@ E.manager_fields = {
         +'at the same time'},
     ui_ws: {type: 'boolean', desc: 'Enable live logs preview and other live '
         +'data communication on the UI'},
-    force: {type: 'boolean', desc: 'Kill other instances of LPM if there are '
-        +'any'},
+    force: {type: 'boolean', desc: 'Kill other instances of Proxy Manager if '
+        +'there are any'},
     session_termination: {type: 'boolean', desc: 'Stop sending new requests '
         +'when the peer IP becomes unavailable and redirect to confimration '
         +'page before new IP is taken'},
@@ -129,7 +129,7 @@ E.manager_fields = {
     api_domain: {type: 'string', desc: 'Alternative domain url to luminati '
         +'API'},
     local_login: {type: 'boolean', desc: 'Requires each browser to '
-        +'authenticate against LPM'},
+        +'authenticate against Proxy Manager'},
     read_only: {type: 'boolean', desc: 'Avoid saving current config in the '
         +'config file'},
     extra_ssl_ips: {type: 'array', desc: 'List of IPs to add to SSL '

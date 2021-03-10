@@ -2,7 +2,9 @@
   "author": "Luminati Networks Ltd <lpm@luminati.io> (https://luminati.io/)",
   "bin": {
     "luminati": "bin/index.js",
-    "luminati-proxy": "bin/index.js"
+    "luminati-proxy": "bin/index.js",
+    "pmgr": "bin/index.js",
+    "proxy-manager": "bin/index.js"
   },
   "config": {
     "unsafe-perm": true
@@ -387,7 +389,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "2694562f5266b154e439782cf8cfef9d"
+    "md5": "6899a4713e308cd9455af494d1eafdac"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -402,6 +404,7 @@
     }
   ],
   "optionalDependencies": {
+    "uws": "luminati-io/uWebSockets-bindings#1d4f506",
     "heapdump": "0.3.12",
     "sinon": "1.17.7",
     "puppeteer": "2.0.0",
@@ -422,5 +425,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.223.826"
+  "version": "1.225.430"
 }

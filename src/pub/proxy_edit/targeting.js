@@ -63,7 +63,7 @@ export default with_www_api(class Targeting extends Pure_component {
         else if (curr_plan && curr_plan.ip_alloc_preset=='shared_block')
         {
             res = res.filter(r=>
-                this.state.locations.shared_countries.includes(r.id));
+                (this.state.locations.shared_countries||[]).includes(r.id));
         }
         if (curr_plan && curr_plan.mobile)
             res = res.filter(r=>r.mob);

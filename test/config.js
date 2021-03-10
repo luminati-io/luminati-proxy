@@ -27,7 +27,8 @@ describe('config', ()=>{
             banlist: {cache: {}},
             error: 'my_error',
         }];
-        const conf_mgr = new Config(new Manager({}), Manager.default);
+        const mgr = new Manager({});
+        const conf_mgr = new Config(mgr, Manager.default);
         const s = conf_mgr._serialize(proxies, {});
         const config = JSON.parse(s);
         const proxy = config.proxies[0];

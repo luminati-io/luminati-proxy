@@ -7,6 +7,7 @@ import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
 import Users_modal from './users_modal.js';
+import {with_www_api, Note} from '../common.js';
 
 const route_err_opt = [
     {key: 'pass_dyn (default)', value: 'pass_dyn'},
@@ -17,6 +18,20 @@ const debug_opt = [
     {key: 'Yes (default)', value: 'full'},
     {key: 'No', value: 'none'},
 ];
+
+const Limit_zagent_note = with_www_api(({www_api})=>{
+    const path = '/cp/lpm';
+    const href = www_api+path;
+    const display_url = new URL(www_api).hostname+path;
+    return <T>{t=>
+      <Note>
+        <span>{t('This option is available only in the Cloud Proxy '
+          +'Manager, read more on')}</span>{' '}
+        <a className="link" href={href} target="_blank"
+          rel="noopener noreferrer">{display_url}</a>
+      </Note>
+    }</T>;
+});
 
 export default class General extends Pure_component {
     state = {defaults: {}};
@@ -62,11 +77,13 @@ export default class General extends Pure_component {
         this.set_field('pool_size', size);
         this.set_field('multiply', 1);
     };
+    ssl_changed = val=>!val && this.set_field('flex_tls', false);
     open_static_modal = ()=>$('#allocated_ips').modal('show');
     open_users_modal = ()=>$('#users_modal').modal('show');
     render(){
         if (!this.state.form || !this.state.proxy || !this.state.settings)
             return null;
+        const {zagent} = this.state.settings;
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
         let type;
@@ -89,6 +106,7 @@ export default class General extends Pure_component {
             <a className="link" onClick={this.open_users_modal}>
               <T>Select users</T>
             </a> : null;
+        const flex_tls_note = !zagent && <Limit_zagent_note/>;
         return <div className="general">
               <Tab_context.Provider value="general">
                 <Users_modal form={this.state.form}/>
@@ -96,12 +114,16 @@ export default class General extends Pure_component {
                 <Config type="number" id="port"/>
                 <Config type="pins" id="whitelist_ips"
                   disabled_ips={disabled_wl}
-                  no_any={this.state.settings.zagent}/>
+                  no_any={zagent}/>
                 <T>{t=><Config type="select"
-                  disabled={this.state.settings.zagent}
+                  disabled={zagent}
                   data={this.proxy_connection_type_opt(t)}
                   id="proxy_connection_type"/>}</T>
-                <Config type="yes_no" id="ssl"/>
+                <Config type="yes_no" id="ssl" on_change={this.ssl_changed}/>
+                {form.ssl &&
+                  <Config type="yes_no" id="flex_tls" disabled={!zagent}
+                    note={flex_tls_note}/>
+                }
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply"
                   data={[0, 5, 20, 100, 500]}/>

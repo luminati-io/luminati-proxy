@@ -106,10 +106,10 @@ class Overview extends Pure_component {
                     synchronization?</T>}>
                 <p>
                   <T>
-                    Synchronizing your LPM configuration gives you reliable
-                    backup, single configuration across all instances which
-                    propagates automatically and central control via control
-                    panel.
+                    Synchronizing your Proxy Manager configuration gives you
+                    reliable backup, single configuration across all instances
+                    which propagates automatically and central control via
+                    control panel.
                   </T>
                 </p>
                 <p><T>You can always change it later in settings.</T></p>
@@ -226,7 +226,7 @@ class Upgrade extends Pure_component {
             </div>
             {ver_node && !ver_node.satisfied && !electron &&
               <div>
-                To upgrade Luminati Proxy Manager, you need to update Node.js
+                To upgrade Proxy Manager, you need to update Node.js
                 to version {this.state.ver_node.recommended}.
               </div>
             }
@@ -250,7 +250,8 @@ class Upgrade_warning extends Pure_component {
             return null;
         return <Warning id={'upgrade_alert'+ver}>
               <span>
-                <strong><T>LPM was upgraded in the background. </T></strong>
+                <strong><T>Proxy Manager was upgraded in the background. </T>
+                </strong>
                 <T>Click here to </T>
                 <a className="link"
                   onClick={this.on_click.bind(this)}><T>downgrade.</T></a>

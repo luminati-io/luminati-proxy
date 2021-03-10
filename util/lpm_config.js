@@ -13,7 +13,7 @@ conf.hola_agent = 'proxy='+pkg.version+' node='+process.version
 conf.is_lum = file.exists(file.cyg2unix('/usr/local/hola/zon_config.sh'));
 conf.work_dir = lpm_file.work_dir;
 Object.assign(conf.manager_default, {
-    api_domain: process.env.LPM_API||pkg.api_domain,
+    api_domain: process.env.PMGR_API||pkg.api_domain,
     config: lpm_file.get_file_path(
         '.luminati.json'.substr(conf.is_win ? 1 : 0)),
     loki: lpm_file.get_file_path(

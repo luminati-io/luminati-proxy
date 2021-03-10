@@ -180,19 +180,19 @@ const general_modals_info = [
     },
     {
         id: 'missing_root_perm',
-        title: 'LPM process is not running with root permissions',
-        body: "You can't upgrade LPM from the UI because it's not running "
-            +'with root permission. You have to close the process in the '
-            +'terminal and run <code>sudo luminati --upgrade</code>',
+        title: 'Proxy Manager process is not running with root permissions',
+        body: "You can't upgrade Proxy Manager from the UI because it's not "
+            +'running with root permission. You have to close the process in '
+            +'the terminal and run <code>sudo luminati --upgrade</code>',
     },
     {
         id: 'upgrading',
-        title: 'Luminati Proxy Manager is upgrading',
+        title: 'Proxy Manager is upgrading',
         body: 'Please wait...',
     },
     {
         id: 'downgrading',
-        title: 'Luminati Proxy Manager is downgrading',
+        title: 'Proxy Manager is downgrading',
         body: 'Please wait...',
     },
     {
@@ -224,7 +224,8 @@ const Old_modals = ()=>
         title="Downloading Chromium. Please wait..." no_cancel_btn>
       </Modal>
       <Modal id="applying_config"
-        title="Synchronizing LPM configuration. Please wait..." no_cancel_btn>
+        title="Synchronizing Proxy Manager configuration. Please wait..."
+        no_cancel_btn>
       </Modal>
     </div>;
 

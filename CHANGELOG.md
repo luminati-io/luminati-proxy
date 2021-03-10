@@ -1,4 +1,9 @@
-Luminati Proxy manager - Change Log
+Proxy manager - Change Log
+
+## 1.225.430 Stable
+- :bug: Fixed connection issues from China
+- :bug: Fixed a memory leak in web socket connections
+- :star: Introduced an option to allow using BoringSSL in Cloud Proxy Manager
 
 ## 1.223.826 Stable
 - :star: Added an option to add extra debug info to the responses (DNS resolution)
@@ -16,7 +21,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed memory leak
 
 ## 1.222.632 Stable
-- :bug: Fixed missing ports dropdown in the LPM Web tester UI
+- :bug: Fixed missing ports dropdown in the Proxy Manager Web tester UI
 
 ## 1.222.104 Stable
 - :sparkles: Stability fixes on Windows
@@ -58,7 +63,7 @@ Luminati Proxy manager - Change Log
 - :star: Introduced Cache based on the URL as part of the Rules
 
 ## 1.217.753 Stable
-- :star: Improve LPM communication with lpm_f over WS
+- :star: Improve Proxy Manager communication with lpm_f over WS
 
 ## 1.216.924 Stable
 - :star: Show statistics start time
@@ -86,7 +91,7 @@ Luminati Proxy manager - Change Log
 - :star: Moved part of the API from HTTP to Web Socket
 
 ## 1.215.236 Stable
-- :bug: Fixed lpm_f communication in Cloud LPM servers after a new server assignment
+- :bug: Fixed lpm_f communication in Cloud Proxy Manager servers after a new server assignment
 - :bug: Fixed a bug where some credential fields were not cleared from proxies memory on logout
 
 ## 1.213.501 Stable
@@ -128,10 +133,10 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed banning IPs API when the list of IPs contains duplicates
 
 ## 1.206.760 Stable
-- :bug: Fixed LPM upgrade on Windows
+- :bug: Fixed Proxy Manager upgrade on Windows
 
 ## 1.206.425 Stable
-- :bug: Consistency improvements with LPM browser timezone emulation
+- :bug: Consistency improvements with Proxy Manager browser timezone emulation
 
 ## 1.206.232 Stable
 - :star: UI improvements in zone description
@@ -169,14 +174,14 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed support for resolving Chinese Super Proxies
 
 ## 1.203.697 Stable
-- :bug: Fixed LPM installation script for Mac OS
+- :bug: Fixed Proxy Manager installation script for Mac OS
 
 ## 1.203.627 Stable
 - :bug: Fixed a Firefox UI bug in Windows Server 2012 when targeting amazon
 
 ## 1.203.284 Stable
 - :sparkles: UI improvements in proxies view: open browser button moved to a dedicated column
-- :sparkles: Added a targeting option to select a timezone to be used by the LPM browser
+- :sparkles: Added a targeting option to select a timezone to be used by the Proxy Manager browser
 
 ## 1.202.863 Stable
 - :sparkles: Existing proxy ports whose zone was disabled will not automatically switch to default zone
@@ -207,7 +212,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed broken IPC causing crashes whole instance
 
 ## 1.200.411 Stable
-- :bug: Fixed out of memory crashes on Cloud LPM servers
+- :bug: Fixed out of memory crashes on Cloud Proxy Manager servers
 
 ## 1.199.160 Stable
 - :bug: Fixed logout: stop authenticating requests after logging out
@@ -217,7 +222,7 @@ Luminati Proxy manager - Change Log
 - :sparkles: Upgraded electron version to support recommended node version
 
 ## 1.198.629 Stable
-- :bug: Fixed restarting Cloud LPM button from luminati.io/cp/lpm
+- :bug: Fixed restarting Cloud Proxy Manager button from luminati.io/cp/lpm
 - :star: UI improvement: added Rules column option in proxy ports list
 
 ## 1.198.139 Stable
@@ -228,7 +233,7 @@ Luminati Proxy manager - Change Log
 
 ## 1.197.33 Stable
 - :bug: Fixed double vertical scrollbars in proxy edit page
-- :star: Display modal when upgrading LPM from UI without root permissions
+- :star: Display modal when upgrading Proxy Manager from UI without root permissions
 - :star: UI improvements for Ban IP durations in Rules tab
 
 ## 1.196.832 Stable
@@ -240,7 +245,7 @@ Luminati Proxy manager - Change Log
 
 ## 1.196.424 Stable
 - :bug: Fixed crashing on Windows
-- :star: Request is canceled if all the IPs LPM is getting are banned
+- :star: Request is canceled if all the IPs Proxy Manager is getting are banned
 
 ## 1.195.934 Stable
 - :bug: Fixed unbanning IPs API
@@ -347,7 +352,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed logging out when luminati server is not available
 
 ## 1.188.647 Stable
-- :sparkles: Adjustments for LPM in the Cloud
+- :sparkles: Adjustments for Proxy Manager in the Cloud
 
 ## 1.188.363 Stable
 - :bug: Fixed socket closing on proxy port restart
@@ -386,7 +391,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed sessions/IPs rotation when using multiple CPUs
 
 ## 1.186.153 Stable
-- :sparkles: Added reporting capabilities to Cloud LPM
+- :sparkles: Added reporting capabilities to Cloud Proxy Manager
 
 ## 1.186.28 Stable
 - :sparkles: Added SNI support for web interface
@@ -412,7 +417,7 @@ Luminati Proxy manager - Change Log
 ## 1.184.310 Stable
 - :sparkles: Implement sorting for ports table
 - :sparkles: Make ports filter works also for zone names
-- :star: Improved security in Cloud LPM
+- :star: Improved security in Cloud Proxy Manager
 
 ## 1.183.659 Stable
 - :bug: Fix memory leak on frequent config synchronization
@@ -440,12 +445,12 @@ Luminati Proxy manager - Change Log
 
 ## 1.182.564 Stable
 - :sparkles: When running UI on https listen also for http requests to redirect to https
-- :sparkles: Always enable config synchronization for Cloud LPM
+- :sparkles: Always enable config synchronization for Cloud Proxy Manager
 
 ## 1.182.426 Stable
 - :bug: Fix date column sorting
-- :bug: Fix websocket error when LPM works on default port 80
-- :sparkles: Enable config synchronization for new LPM users by default
+- :bug: Fix websocket error when Proxy Manager works on default port 80
+- :sparkles: Enable config synchronization for new Proxy Manager users by default
 
 ## 1.182.312 Stable
 - :bug: Fix memory leak caused by retry rules
@@ -458,7 +463,7 @@ Luminati Proxy manager - Change Log
 - :star: Multiple UI fixes and improvements
 
 ## 1.181.960 Stable
-- :star: Cloud LPM release - Host the LPM on Luminati server. Check luminati.io/cp/lpm
+- :star: Cloud Proxy Manager release - Host the Proxy Manager on Luminati server. Check luminati.io/cp/lpm
 
 ## 1.181.892 Stable
 - :bug: UI fixes
@@ -485,7 +490,7 @@ Luminati Proxy manager - Change Log
 ## 1.181.265 
 
 ## 1.181.265 Stable
-- :star: UI Improvements in the embedded Cloud LPM
+- :star: UI Improvements in the embedded Cloud Proxy Manager
 
 ## 1.181.199 Stable
 - :sparkles: Fix default country in new port popup and improve country dropdown at targeting section
@@ -496,14 +501,14 @@ Luminati Proxy manager - Change Log
 ## 1.181.51 Stable
 - :sparkles: Remove 'sending emails as a rule action' logic
 - :sparkles: Improve troubleshooting section
-- :bug: Start LPM even if some ports failed to start
+- :bug: Start Proxy Manager even if some ports failed to start
 
 ## 1.180.690 Stable
-- :sparkles: Adjustemnts for LPM in the Cloud
+- :sparkles: Adjustemnts for Proxy Manager in the Cloud
 
 ## 1.180.664 Stable
 - :sparkles: Changed port for WS connection with Luminati servers
-- :sparkles: Adjustemnts for LPM in the Cloud
+- :sparkles: Adjustemnts for Proxy Manager in the Cloud
 
 ## 1.180.240 Stable
 - :bug: Fixed error message for authentication
@@ -512,7 +517,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed styling in Firefox
 
 ## 1.179.924 Stable
-- :sparkles: Serving UI on HTTPS when LPM in the cloud
+- :sparkles: Serving UI on HTTPS when Proxy Manager in the cloud
 
 ## 1.179.847 Stable
 - :sparkles: Backup local configuration on config synchronization
@@ -537,7 +542,7 @@ Luminati Proxy manager - Change Log
 - :star: Store configuration on Luminati servers as a backup
 
 ## 1.178.241 Stable
-- :star: Support TLS connection between client and LPM
+- :star: Support TLS connection between client and Proxy Manager
 
 ## 1.178.104 Stable
 - :star: UI and presets simplifications
@@ -582,7 +587,7 @@ Luminati Proxy manager - Change Log
 - :star: Show IPs refresh cost in pool IPs popup
 
 ## 1.173.820 Stable
-- :star: Running LPM on all the CPUs for all the presets
+- :star: Running Proxy Manager on all the CPUs for all the presets
 - :bug: Fix bug when parallel requests might cause pool overloading
 
 ## 1.173.424 Stable
@@ -733,13 +738,13 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed external IPs rotating in SSL analyzing mode
 
 ## 1.163.474 Stable
-- :star: Added --downgrade option that will downgrade LPM to the version before upgrades
+- :star: Added --downgrade option that will downgrade Proxy Manager to the version before upgrades
 - :star: Removed usage of Google Analytics
 - :sparkles: Merged HTTP and WS to use single port
 - :sparkles: Added devtool nosources-source-map to Webpack config
 
 ## 1.163.237 Stable
-- :star: Adjustments for LPM <> Extension integration
+- :star: Adjustments for Proxy Manager <> Extension integration
 
 ## 1.163.144 Stable
 - :bug: Fix database (Lokijs) errors
@@ -768,7 +773,7 @@ Luminati Proxy manager - Change Log
 
 ## 1.161.309 Stable
 - :sparkles: Improve High CPU usage message
-- :sparkles: Add --show-logs feature that follows LPM daemon process logs
+- :sparkles: Add --show-logs feature that follows Proxy Manager daemon process logs
 - :sparkles: Canceled requests will now be saved and shown in HAR viewer
 
 ## 1.161.127 Stable
@@ -778,7 +783,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed WSS connections handling
 
 ## 1.160.654 Stable
-- :sparkles: CPU and mem usage are now shown per LPM process in --status
+- :sparkles: CPU and mem usage are now shown per Proxy Manager process in --status
 - :bug: Fixed request retry with banned IPs
 
 ## 1.160.574 Stable
@@ -825,9 +830,9 @@ Luminati Proxy manager - Change Log
 - :bug: Fix EventEmitter listeners issues and ECONNREFUSED errors
 
 ## 1.157.534 Stable
-- :sparkles: Improved --upgrade argument behavior: it will now upgrade LPM and restart previously running daemons
+- :sparkles: Improved --upgrade argument behavior: it will now upgrade Proxy Manager and restart previously running daemons
 - :sparkles: Added missing carriers
-- :bug: Fixed LPM's memory usage
+- :bug: Fixed Proxy Manager's memory usage
 
 ## 1.157.243 Stable
 - :sparkles: Improved requests bandwith calculation
@@ -836,11 +841,11 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed connected from MLA when SSL analyzing is on
 - :bug: Fixed specific IPs selection for static shared zones
 - :bug: Fixed link tester in Docker containers
-- :bug: Fixed error handling for SOCKS5 connections between LPM and Super Proxies
+- :bug: Fixed error handling for SOCKS5 connections between Proxy Manager and Super Proxies
 - :bug: Fixed 2-Step error shown when logging in
 
 ## 1.156.820 
-- :sparkles: Added --read_only CLI option that prevents LPM from writing to the config file
+- :sparkles: Added --read_only CLI option that prevents Proxy Manager from writing to the config file
 
 ## 1.156.236 Stable
 - :bug: Fixed rule email sending for cluster mode
@@ -851,7 +856,7 @@ Luminati Proxy manager - Change Log
 ## 1.156.38 Stable
 - :bug: Fixed error when the first IP was whitelisted to use admin UI through the API
 - :sparkles: Swagger documentation improvements
-- :bug: Fixed LPM crash on subsequent Proxy Tester calls with unexistent proxy ports
+- :bug: Fixed Proxy Manager crash on subsequent Proxy Tester calls with unexistent proxy ports
 
 ## 1.155.637 Development Latest
 - :sparkles: Improved UX and simplified UI
@@ -869,13 +874,13 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed SMTP settings in proxy port's General tab
 
 ## 1.154.894 Development Latest
-- :sparkles: Added option to use SOCKS to connect LPM and Super Proxy
+- :sparkles: Added option to use SOCKS to connect Proxy Manager and Super Proxy
 - :sparkles: Dashboard UI improvements, allowing to enable/disable recent stats panel
 
 ## 1.154.55 Development Latest
 - :sparkles: Added proxy port specific IPs whitelisting in General tab
 - :sparkles: Added option to unban IPs from UI in 'Banned IPs' table
-- :bug: Fixed 'Cannnot read property 'toLowerCase' of undefined' when running LPM on Docker
+- :bug: Fixed 'Cannnot read property 'toLowerCase' of undefined' when running Proxy Manager on Docker
 
 ## 1.153.629 Stable
 - :bug: Fixed error logging
@@ -1002,7 +1007,7 @@ Luminati Proxy manager - Change Log
 - :star: Added support for domain param in /proxies/:port/banip and /proxies/:port/banips APIs
 
 ## 1.146.158 Stable
-- :bug: Fixed LPM WS connection when accessed with https
+- :bug: Fixed Proxy Manager WS connection when accessed with https
 - :bug: Fix socket hang up errors
 
 ## 1.146.94 Stable
@@ -1075,7 +1080,7 @@ Luminati Proxy manager - Change Log
 - :star: More accurate BW measurement
 
 ## 1.139.623 Stable
-- :bug: fix LPM response when cert is wrong and not using insecure flag
+- :bug: fix Proxy Manager response when cert is wrong and not using insecure flag
 - :sparkles: Added new Rule action: "Ban IPs globally"
 
 ## 1.139.129 Stable
@@ -1092,7 +1097,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed IP rotation for external proxies
 
 ## 1.138.518 Stable
-- :bug: Super Proxy's icon flag in LPM isn't changing
+- :bug: Super Proxy's icon flag in Proxy Manager isn't changing
 - :bug: *_chrome_icon elements are not showed correctly on Mozilla
 
 ## 1.138.327 Stable
@@ -1307,7 +1312,7 @@ Luminati Proxy manager - Change Log
 - :bug: Ban IP bug fixes
 
 ## 1.118.284 Development Latest
-- :star: Separation between multiple LPM instances
+- :star: Separation between multiple Proxy Manager instances
 - :bug: UI and bug fixes
 
 ## 1.117.683 Stable
@@ -1388,7 +1393,7 @@ Luminati Proxy manager - Change Log
 ## 1.111.808 Stable
 - :sparkles: Improved instructions in Howto section
 - :sparkles: Support for 'ban IP' rule for 25 port
-- :bug: Fixed running LPM without UI
+- :bug: Fixed running Proxy Manager without UI
 
 ## 1.111.212 Stable
 - :bug: Fixed stability issues
@@ -1563,7 +1568,7 @@ Luminati Proxy manager - Change Log
 ## 1.101.324 Development Latest
 - :star: Added button to open a modal with IPs/gIPs
 - :star: New tab in proxy configuration: Headers
-- :star: Refreshing IPs/gIPs from LPM
+- :star: Refreshing IPs/gIPs from Proxy Manager
 - :bug: Fixed memory leaks
 - :star: Improved performance
 - :bug: Fixed web access security issue
@@ -1578,7 +1583,7 @@ Luminati Proxy manager - Change Log
 - :star: HAR viewer improvements
 
 ## 1.101.34 Development Latest
-- :star: Refreshing IPs/gIPs from LPM
+- :star: Refreshing IPs/gIPs from Proxy Manager
 - :star: UI improvements and additional tooltips
 
 ## 1.100.731 Stable
@@ -2331,7 +2336,7 @@ Luminati Proxy manager - Change Log
 - :star: improve upgrade process
 
 ## 0.9.4 
-- :boom: Luminati Proxy Manager will now refuse to run on older versions of Node.js
+- :boom: Proxy Manager will now refuse to run on older versions of Node.js
 
 ## 0.9.3 
 - :sparkles: delete credentials from config after logout

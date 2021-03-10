@@ -54,7 +54,7 @@ E.downgrade = cb=>{
     sudo_run(bash_cmd('lpm_downgrade.sh'), e=>{
         if (e && e.code==1)
         {
-            e = 'Luminati proxy manager backup version does not exist!';
+            e = 'Proxy Manager backup version does not exist!';
             logger.error(e);
         }
         if (e)
@@ -75,7 +75,7 @@ const sudo_run = (cmd, cb, opt={})=>{
     const exec = process.getuid()===0 ?
         child_process.exec.bind(child_process) :
         sudo_prompt.exec.bind(sudo_prompt);
-    exec(cmd, {name: 'Upgrader LPM'}, (e, stdout, stderr)=>{
+    exec(cmd, {name: 'Upgrader Proxy Manager'}, (e, stdout, stderr)=>{
         if (cb)
             cb(e, stdout, stderr);
         if (e)
@@ -108,8 +108,8 @@ const add_cron_job = ()=>etask(function*(){
         else
         {
             console.log('Auto-upgrader has been successfully installed');
-            console.log('To run LPM run \'luminati\' or \'luminati -d\' to'
-                +' keep it in the daemon mode');
+            console.log('To run Proxy Manager run \'proxy-manager\' or '
+                +'\'proxy-manager -d\' to keep it in the daemon mode');
         }
         _this.continue();
     });

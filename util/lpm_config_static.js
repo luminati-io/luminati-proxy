@@ -61,6 +61,7 @@ conf.server_default = {
     sticky_ip: false,
     proxy_connection_type: 'http',
     ssl: false,
+    flex_tls: false,
     test_url: 'http://lumtest.com/myip.json',
     proxy: 'zproxy.lum-superproxy.io',
     proxy_port: 22225,

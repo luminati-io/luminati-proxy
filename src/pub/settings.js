@@ -55,8 +55,8 @@ const tooltips = {
             calls</li>
           <li><strong>debug: </strong>all the above and debug info</li>
         </ul>`,
-    sync_config: `All changes on LPMs with enabled config synchronization
-        will be propagated and applied immediately.`,
+    sync_config: `All changes on Proxy Manager instances with enabled config
+        synchronization will be propagated and applied immediately.`,
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');

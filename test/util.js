@@ -52,22 +52,22 @@ describe('util', ()=>{
             }
         };
         t({}, {port: {type: 'integer'}}, {});
-        t({LPM_PORT: '11123'}, {port: {type: 'integer'}}, {port: 11123});
-        t({LPM_PORT: 'asdasdasd'}, {port: {type: 'integer'}}, {},
-            'LPM_PORT not a number asdasdasd');
-        t({LPM_IP: '127.0.0.1'}, {ip: {type: 'string'}}, {ip: '127.0.0.1'});
-        t({LPM_IP: '127.0.0.1'}, {ip: {type: 'string',
+        t({PMGR_PORT: '11123'}, {port: {type: 'integer'}}, {port: 11123});
+        t({PMGR_PORT: 'asdasdasd'}, {port: {type: 'integer'}}, {},
+            'PMGR_PORT not a number asdasdasd');
+        t({PMGR_IP: '127.0.0.1'}, {ip: {type: 'string'}}, {ip: '127.0.0.1'});
+        t({PMGR_IP: '127.0.0.1'}, {ip: {type: 'string',
             pattern: '^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$'}}, {ip: '127.0.0.1'});
-        t({LPM_IP: 'notIp'}, {ip: {type: 'string',
+        t({PMGR_IP: 'notIp'}, {ip: {type: 'string',
             pattern: '^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$'}}, {},
-            'LPM_IP wrong value pattern ^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$');
-        t({LPM_IPS: '127.0.0.1'}, {ips: {type: 'array'}},
+            'PMGR_IP wrong value pattern ^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$');
+        t({PMGR_IPS: '127.0.0.1'}, {ips: {type: 'array'}},
             {ips: ['127.0.0.1']});
-        t({LPM_IPS: '127.0.0.1;192.168.1.1'}, {ips: {type: 'array'}},
+        t({PMGR_IPS: '127.0.0.1;192.168.1.1'}, {ips: {type: 'array'}},
             {ips: ['127.0.0.1', '192.168.1.1']});
-        t({LPM_OBJECT: '[asdasd'}, {object: {type: 'object'}}, {},
-            'LPM_OBJECT contains invalid JSON: [asdasd');
-        t({LPM_OBJECT: '{"test": [1,2,3]}'}, {object: {type: 'object'}}, {
+        t({PMGR_OBJECT: '[asdasd'}, {object: {type: 'object'}}, {},
+            'PMGR_OBJECT contains invalid JSON: [asdasd');
+        t({PMGR_OBJECT: '{"test": [1,2,3]}'}, {object: {type: 'object'}}, {
             object: {test: [1, 2, 3]}});
     });
     it('get_file_path', ()=>{

@@ -1,4 +1,4 @@
-# Luminati Proxy manager
+# Proxy manager
 
 [![dependencies Status](https://david-dm.org/luminati-io/luminati-proxy/status.svg)](https://david-dm.org/luminati-io/luminati-proxy)
 [![devDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/dev-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=dev)
@@ -6,7 +6,7 @@
 
 一个HTTP/HTTPS 代理服务器在你身边，为你世界各地的代理流量加速/压缩/轮流/分发/管理/监控/汇报/日志/调试
 
-用 Luminati HTTP/HTTPS 代理管理器你可以使用Luminati 住宅 IPs 或 Luminati 数据心 IPs.
+用 代理管理器你可以使用Luminati 住宅 IPs 或 Luminati 数据心 IPs.
 
 这个工具需要一个 [Luminati](https://lum-lpm.com/?cam=github-proxy) 账户.
 
@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.223.826-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.225.430-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -99,14 +99,14 @@ Options:
                                 with "multiply_users"                    [array]
   --ssl                         Enable SSL analyzing  [boolean] [default: false]
   --iface                       Interface or IP to listen on            [string]
-  --customer                    Luminati customer                       [string]
-  --zone                        Luminati zone       [string] [default: "static"]
+  --customer                    Customer name                           [string]
+  --zone                        Zone name           [string] [default: "static"]
   --password                    Zone password                           [string]
   --proxy                       Hostname or IP of super proxy
                                   [string] [default: "zproxy.lum-superproxy.io"]
   --proxy_port                  Super proxy port       [number] [default: 22225]
   --proxy_connection_type       Determines what kind of connection will be used
-                                between LPM and Super Proxy
+                                between Proxy Manager and Super Proxy
                                                       [string] [default: "http"]
   --proxy_retry                 Automatically retry on super proxy failure
                                                            [number] [default: 2]
@@ -128,7 +128,7 @@ Options:
                                                       [boolean] [default: false]
   --reverse_lookup_file         Process reverse lookup via file         [string]
   --reverse_lookup_values       Process reverse lookup via value         [array]
-  --session                     Luminati session for all proxy requests
+  --session                     Session for all proxy requests
                                                         [string] [default: true]
   --sticky_ip                   Use session per requesting host to maintain IP
                                 per host              [boolean] [default: false]
@@ -144,8 +144,7 @@ Options:
   --override_headers                                                   [boolean]
   --os                          Operating System of the Peer IP         [string]
   --headers                     Request headers                          [array]
-  --debug                       Luminati request debug info
-                                                      [string] [default: "full"]
+  --debug                       Request debug info    [string] [default: "full"]
   --socket_inactivity_timeout                         [number] [default: 120000]
   --multiply_ips                                      [boolean] [default: false]
   --multiply_vips                                     [boolean] [default: false]
@@ -174,8 +173,8 @@ Options:
   --high_perf                                         [boolean] [default: false]
   --zagent                                            [boolean] [default: false]
   --cluster                                             [string] [default: true]
-  --sync_config                 Synchronize LPM configuration with the cloud
-                                                      [boolean] [default: false]
+  --sync_config                 Synchronize Proxy Manager configuration with the
+                                cloud                 [boolean] [default: false]
   --sync_zones                                         [boolean] [default: true]
   --sync_stats                                         [boolean] [default: true]
   --request_stats               Enable requests statistics
@@ -190,8 +189,8 @@ Options:
                                 time                            [default: 10000]
   --ui_ws                       Enable live logs preview and other live data
                                 communication on the UI[boolean] [default: true]
-  --force                       Kill other instances of LPM if there are any
-                                                      [boolean] [default: false]
+  --force                       Kill other instances of Proxy Manager if there
+                                are any               [boolean] [default: false]
   --session_termination         Stop sending new requests when the peer IP
                                 becomes unavailable and redirect to confimration
                                 page before new IP is taken
@@ -200,7 +199,7 @@ Options:
   --api_domain                  Alternative domain url to luminati API
                                                [string] [default: "lum-lpm.com"]
   --local_login                 Requires each browser to authenticate against
-                                LPM                   [boolean] [default: false]
+                                Proxy Manager         [boolean] [default: false]
   --read_only                   Avoid saving current config in the config file
                                                       [boolean] [default: false]
   --extra_ssl_ips               List of IPs to add to SSL certificate
@@ -223,10 +222,10 @@ Options:
   --start-upgrader              Install CRON process that checks upgrades
   --stop-upgrader               Removes CRON process that checks upgrades
   --insecure-http-parser        Disables the strict checks
+  --flex_tls                                                    [default: false]
   --proxy_country                                                  [default: ""]
   --bw_limit                                                        [default: 0]
   --info                                                        [default: false]
-  --flex_tls                                                    [default: false]
   --cn                                                          [default: false]
   --api_body_limit                                              [default: "2mb"]
   --api_domain_fallback                                   [default: "l-lpm.com"]

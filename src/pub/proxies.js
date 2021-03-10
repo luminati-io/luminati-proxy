@@ -306,7 +306,7 @@ const columns = [
     {
         key: 'proxy_connection_type',
         title: 'Proxy connection type',
-        tooltip: 'Connection type between LPM and Super Proxy',
+        tooltip: 'Connection type between Proxy Manager and Super Proxy',
         ext: true,
     },
     {

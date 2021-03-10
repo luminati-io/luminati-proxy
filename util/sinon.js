@@ -150,7 +150,7 @@ E.create_sandbox = function(opt){
     return sandbox;
 };
 E.is_fake_clock = function(){ return clock!==undefined; };
-if (zutil.is_mocha())
+if (zutil.is_mocha() && typeof afterEach!='undefined')
     afterEach(function(){ return E.uninit(); });
 
 return E; }); }());

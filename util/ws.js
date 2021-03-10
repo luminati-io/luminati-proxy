@@ -80,6 +80,8 @@ class WS extends events.EventEmitter {
         this.reason = undefined;
         this.zc_rx = opt.zcounter=='rx' || opt.zcounter=='all';
         this.zc_tx = opt.zcounter=='tx' || opt.zcounter=='all';
+        this.msg_log = assign({}, {treshold_size: null, print_size: 100},
+            opt.msg_log);
         this.zc = opt.zcounter
             ? opt.label ? `${opt.label}_ws` : 'ws' : undefined;
         this.zjson_opt = assign({}, zjson_opt, opt.zjson_opt);
@@ -350,6 +352,13 @@ class WS extends events.EventEmitter {
                 {
                     this.emit('text', msg);
                     handled = true;
+                }
+                if (this.msg_log.treshold_size &&
+                    msg.length>=this.msg_log.treshold_size)
+                {
+                     zerr.warn(`${this}: Message length treshold`
+                         +` ${this.msg_log.treshold_size} exceeded:`
+                         +` ${msg.substr(0, this.msg_log.print_size)}`);
                 }
             }
             else

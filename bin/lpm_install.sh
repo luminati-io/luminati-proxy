@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.223.826"
+VERSION="1.225.430"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -660,7 +660,7 @@ check_install()
 
 dev_setup()
 {
-    echo "removing LPM dependencies..."
+    echo "removing Proxy Manager dependencies..."
     local lib_path="$(npm prefix -g)/lib"
     if prompt "Remove curl, wget, nodejs and npm" n; then
         sys_rm "curl wget nodejs npm"

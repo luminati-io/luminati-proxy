@@ -6,9 +6,9 @@
         ]
     },
     "manifest_version": 2,
-    "name": "Luminati Proxy Manager WebRTC",
+    "name": "Proxy Manager WebRTC",
     "permissions": [
         "privacy"
     ],
-    "version": "1.223.826"
+    "version": "1.225.430"
 }

@@ -46,8 +46,10 @@ const restart = ()=>{
 let upgrade = ver=>etask(function*(){
     if (!can_upgrade)
     {
-        let res = yield show_message({type: 'info', title: 'Luminati update',
-            message: (ver ? `Luminati version ${ver}` : 'Luminati update')
+        let res = yield show_message({type: 'info',
+            title: 'Proxy manager update',
+            message: (ver ? `Proxy Manager version ${ver}` :
+                'Proxy Manager update')
             +' will be installed on exit',
             buttons: ['Install on exit', 'Install now']});
         if (!res)
@@ -94,8 +96,8 @@ auto_updater.on('update-available', e=>etask(function*(){
     if (!can_upgrade)
     {
         let res = yield show_message({type: 'info',
-            title: `Luminati update ${e.version} is available`,
-            message: 'Luminati version '+e.version
+            title: `Proxy Manager update ${e.version} is available`,
+            message: 'Proxy Manager version '+e.version
             +' is available. Would you like to download it?',
             buttons: ['No', 'Yes']});
         if (!res)
@@ -121,16 +123,16 @@ const check_conflicts = ()=>etask(function*(){
     let tasks;
     try { tasks = yield tasklist(); }
     catch(e){ process.exit(); }
-    tasks = tasks.filter(t=>t.imageName.includes('Luminati Proxy Manager') &&
+    tasks = tasks.filter(t=>t.imageName.includes('Proxy Manager') &&
         t.pid!=process.pid);
     if (tasks.length<=2)
         return;
     const res = yield show_message({
         type: 'warning',
         title: 'Address in use',
-        message: `LPM is already running (${tasks[0].pid})\n`
+        message: `Proxy Manager is already running (${tasks[0].pid})\n`
             +'Click OK to stop the '
-            +'offending processes or Cancel to close LPM.\n\n'
+            +'offending processes or Cancel to close Proxy Manager.\n\n'
             +'Suspected processes:\n'
             +'PID\t Image Name\t Session Name\t Mem Usage\n'
             +tasks.map(t=>`${t.pid}\t ${t.imageName}\t ${t.sessionName}\t `
@@ -145,7 +147,7 @@ const check_conflicts = ()=>etask(function*(){
         yield show_message({
             type: 'warning',
             title: 'Failed stopping processes',
-            message: 'Failed stopping processes. Restart Luminati Proxy '
+            message: 'Failed stopping processes. Restart Proxy '
                 +'Manager as administrator or stop the processes manually '
                 +'and then restart.\n\n'+e,
             buttons: ['Ok'],

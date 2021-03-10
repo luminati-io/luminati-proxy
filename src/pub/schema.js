@@ -9,7 +9,7 @@ import {T} from './common/i18n.js';
 
 const tooltips = t=>({
     crawler: t('Your crawler or bot that systematically browses the web. '
-        +'Connect any type of crawler to the Luminati Proxy Manager:')
+        +'Connect any type of crawler to the Proxy Manager:')
         +`<ul>
           <li>
             <div>${t('Browser and extension based crawlers')}</div>
@@ -25,8 +25,8 @@ const tooltips = t=>({
             <div class="logo_icon import"></div>
           </li>
         </ul>`,
-    port_numbers: t('Defined proxy ports in Luminati Proxy Manager'),
-    lpm: t('Luminati Proxy Manager - open-source proxy service that holds '
+    port_numbers: t('Defined proxy ports in Proxy Manager'),
+    lpm: t('Proxy Manager - open-source proxy service that holds '
         +'valuable features, such as:')
         +`<ul>
           <li>${t('IP rotation control')}</li>
@@ -39,7 +39,7 @@ const tooltips = t=>({
             +'in the')
         +`<strong> ${t('Proxies')}</strong> ${t('table')}`,
     super_proxy: t('Load balancing servers that manage the traffic between '
-        +'the Luminati Proxy Manager and the peer'),
+        +'the Proxy Manager and the peer'),
     peer: `${t('Exit node (IP) - This might be:')}
         <ul>
           <li>${t('Residential IP - provided through cable modem, DSL or '
@@ -98,7 +98,7 @@ class Schema extends Pure_component {
               <Proxy_port_layer proxies={this.state.proxies}
                 form={this.state.form}/>
               <Layer id="lpm" class_names="port active">
-                <T>LPM</T>
+                <T>Proxy Manager</T>
               </Layer>
               <Layer no_btn id="port_numbers"><T>Port</T> 22225</Layer>
               <Layer id="super_proxy">

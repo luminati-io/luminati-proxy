@@ -20,9 +20,9 @@ export default class Whitelist_ips extends Pure_component {
     }
     on_message = event=>{
         const json = JSON.parse(event.data);
-        if (json.type!='whitelisted')
+        if (json.msg!='whitelisted')
             return;
-        if (this.state.ip==json.data)
+        if (this.state.ip==json.ip)
             window.location.reload();
     };
     render(){

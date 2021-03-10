@@ -117,10 +117,10 @@ class Lpm_har_viewer extends Pure_component {
     }
     on_message = event=>{
         const json = JSON.parse(event.data);
-        if (json.type=='har_viewer')
-            this.on_request_message(json.data);
-        else if (json.type=='har_viewer_start')
-            this.on_request_started_message(json.data);
+        if (json.msg=='har_viewer')
+            this.on_request_message(json.req);
+        else if (json.msg=='har_viewer_start')
+            this.on_request_started_message(json.req);
     };
     on_request_started_message = req=>{
         req.pending = true;

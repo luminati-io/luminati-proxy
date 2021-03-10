@@ -12,10 +12,9 @@ import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Back_btn} from './proxy_edit/index.js';
-import {cloud_url_address} from './util.js';
 
 const Howto = withRouter(class Howto extends Pure_component {
-    state = {settings: {}};
+    state = {};
     componentDidMount(){
         this.setdb_on('head.settings', settings=>
             settings && this.setState({settings}));
@@ -33,11 +32,13 @@ const Howto = withRouter(class Howto extends Pure_component {
     };
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
+        if (!this.state.settings)
+            return null;
         let {settings, example_port=22225} = this.state;
-        const {zagent, account_id, lpm_token} = settings;
+        const {zagent, cloud_url_address, lpm_token} = settings;
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];
-        const hostname = zagent ? cloud_url_address(account_id) : undefined;
+        const hostname = zagent ? cloud_url_address : undefined;
         const lpm_token_value = (lpm_token||'').split('|')[0];
         let Instructions = ()=>null;
         if (option=='browser')
@@ -53,14 +54,15 @@ const Howto = withRouter(class Howto extends Pure_component {
             <div className="cp_panel vbox">
               <div className="cp_panel_header">
                 <Back_btn click={this.back_btn_click}/>
-                <h2>{t('How to use LPM')} {t(cur_title)}</h2>
+                <h2>{t('How to use Proxy Manager')} {t(cur_title)}</h2>
               </div>
               <div className="panel_inner vbox">
                 <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
                   <Nav_tab id="code" title="Code"
-                    tooltip="Examples how to use LPM programmatically"/>
+                    tooltip="Examples how to use Proxy Manager
+                    programmatically"/>
                   <Nav_tab id="browser" title="Browser"
-                    tooltip="Examples how to integrate LPM with the
+                    tooltip="Examples how to integrate Proxy Manager with the
                     browser"/>
                   <Nav_tab id="proxy_tester" title="Web tester"
                     tooltip="Send example requests from here"/>

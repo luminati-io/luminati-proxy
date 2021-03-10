@@ -18,10 +18,10 @@ class Cpu_warning extends React.Component {
     }
     on_message = event=>{
         const json = JSON.parse(event.data);
-        if (json.type!='cpu_usage')
+        if (json.msg!='cpu_usage')
             return;
-        const cpu_usage = json.data;
-        this.setState(cpu_usage);
+        const {usage, level} = json;
+        this.setState({usage, level});
     };
     render(){
         const {usage, level} = this.state;

@@ -33,7 +33,7 @@ class Lum_node_index {
     pm2_cmd(command, opt){ return etask(function*pm2_cmd(){
         this.on('uncaught', e=>{
             if (e.message=='process name not found')
-                logger.notice('There is no running LPM daemon process');
+                logger.notice('There is no running Proxy Manager daemons');
             else
                 logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
         });
@@ -87,7 +87,7 @@ class Lum_node_index {
         yield etask.nfn_apply(pm2, '.connect', []);
         const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
         if (!_this.is_daemon_running(pm2_list))
-            return logger.notice('There is no running LPM daemon process');
+            return logger.notice('There is no running Proxy Manager daemons');
         const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
         let start_logging;
         bus.on('log:out', data=>{
@@ -130,7 +130,7 @@ class Lum_node_index {
         const running_daemon = _this.is_daemon_running(pm2_list);
         const tasks = yield util_lib.get_lpm_tasks({all_processes: true});
         if (!tasks.length && !running_daemon)
-            return logger.notice('There is no LPM process running');
+            return logger.notice('There is no Proxy Manager process running');
         let msg = 'Proxy manager status:\n';
         if (running_daemon)
         {
@@ -243,8 +243,9 @@ class Lum_node_index {
         const node_ver = process.versions.node;
         if (!this.is_node_compatible(recommended_ver))
         {
-            logger.warn(nl2sp`Node version is too old (${node_ver}). LPM
-                requires at least ${recommended_ver} to run correctly.`);
+            logger.warn(nl2sp`Node version is too old (${node_ver}). Proxy
+                Manager requires at least ${recommended_ver} to run
+                correctly.`);
         }
     }
     run(){

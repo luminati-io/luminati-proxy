@@ -13,7 +13,7 @@ const parse_env_params = (env, fields)=>{
     const params = {};
     for (const [field, value] of Object.entries(fields))
     {
-        const key = 'LPM_'+field.toUpperCase();
+        const key = 'PMGR_'+field.toUpperCase();
         if (!env[key])
             continue;
         switch (value.type)
