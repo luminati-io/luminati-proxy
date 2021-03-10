@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.225.541 Stable
+- :sparkles: UI design changes
+
 ## 1.225.497 Stable
 - :bug: Fixed process crashing on some linux server machines due to missing web socket library
 - :sparkles: Added an option to select the SSL library to be used when SSL analyzing is activated

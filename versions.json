@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.225.541",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI design changes"
+            }
+        ]
+    },
+    {
         "ver": "1.225.497",
         "type": "stable",
         "changes": [

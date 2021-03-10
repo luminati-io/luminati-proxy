@@ -28,6 +28,8 @@ import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
 import {report_exception} from './util.js';
+import {createGlobalStyle} from 'styled-components';
+import './css/app.less';
 
 window.setdb = setdb;
 setdb.setMaxListeners(50);
@@ -113,8 +115,6 @@ const App = withRouter(class App extends Pure_component {
                 settings.server_conf.client.rebranded || qs_o.brd;
             if (brd)
                 require('./css/brd.less');
-            else
-                require('./css/app.less');
         });
         etask(function*(){
             const conn = yield ajax.json({url: '/api/conn'});
@@ -167,9 +167,13 @@ const App = withRouter(class App extends Pure_component {
       });
     };
     render(){
-        if (!this.state.settings)
-            return null;
+        const url_o = zurl.parse(document.location.href);
+        const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+        const settings = this.state.settings;
+        const brd = settings && settings.server_conf &&
+            settings.server_conf.client.rebranded || qs_o.brd;
         return <div className="page_wrapper">
+          <Global_styles brd={brd}/>
           <Enable_ssl_modal/>
           <Api_url_modal/>
           <Old_modals/>
@@ -182,6 +186,34 @@ const App = withRouter(class App extends Pure_component {
         </div>;
     }
 });
+
+const Global_styles_lum = createGlobalStyle`
+  html {
+    --first-color: #004d74;
+    --cp-second: rgba(0,77,116,0.5);
+    body {
+        font-family: "Lato";
+    }
+
+  }
+`;
+
+const Global_styles_brd = createGlobalStyle`
+  html {
+    --first-color: #526373;
+    --cp-second: rgba(82,99,115,0.5);
+    body {
+        font-family: "Gibson";
+    }
+
+  }
+`;
+
+const Global_styles = props=>{
+    if (props.brd)
+        return <Global_styles_brd/>;
+    return <Global_styles_lum/>;
+};
 
 const general_modals_info = [
     {
