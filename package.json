@@ -323,7 +323,6 @@
       "src/pub/cpu_warning.js",
       "src/pub/css/api_url_modal.less",
       "src/pub/css/app.less",
-      "src/pub/css/brd.less",
       "src/pub/css/chrome_widgets.less",
       "src/pub/css/common.less",
       "src/pub/css/config.less",
@@ -399,7 +398,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "d1358e072a2d26e9a5250173ae1577ac"
+    "md5": "319e36f96d98e60fb2a87b05bca4c148"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -435,5 +434,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.225.541"
+  "version": "1.225.712"
 }

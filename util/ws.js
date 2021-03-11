@@ -486,7 +486,7 @@ class Client extends WS {
             this.agent = opt.agent;
         this.reconnect_timer = undefined;
         this.handshake_timeout = opt.handshake_timeout===undefined
-            ? 10000 : opt.handshake_timeout;
+            ? 50000 : opt.handshake_timeout;
         this.handshake_timer = undefined;
         if (this.zc)
             zcounter.inc_level(`level_${this.zc}_online`, 0, 'sum');

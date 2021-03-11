@@ -42,6 +42,7 @@ const Login = withRouter(class Login extends Pure_component {
             this.token = qs_o.t.replace(/\s+/g, '+');
             this.save_user();
         }
+        this.setdb_on('head.brd', brd=>this.setState({brd}));
     }
     update_password = ({target: {value}})=>this.setState({password: value});
     update_username = ({target: {value}})=>this.setState({username: value});
@@ -161,6 +162,7 @@ const Login = withRouter(class Login extends Pure_component {
         });
     };
     render(){
+        const cmp_name = this.state.brd ? 'Bright Data' : 'Luminati';
         return <div className="lum_login">
           <Logo/>
           <Loader show={this.state.loading}/>
@@ -169,8 +171,9 @@ const Login = withRouter(class Login extends Pure_component {
             argv={this.state.argv}
             ver_node={this.state.ver_node}
           />
-          <Header/>
+          <Header cmp_name={cmp_name}/>
           <Form
+            cmp_name={cmp_name}
             save_user={this.save_user}
             user_account_ids={this.state.user_account_ids}
             customer_selected={this.state.customer_selected}
@@ -238,10 +241,11 @@ const Node_message = ({ver_node})=>{
     </div>;
 };
 
-const Header = ()=>
-    <div className="login_header">
-      <h3><T>Login with your Luminati account</T></h3>
+const Header = ({cmp_name})=>{
+    return <div className="login_header">
+      <h3>Login with your {cmp_name} account</h3>
     </div>;
+};
 
 const Form = props=>{
     const google_login_url = 'https://accounts.google.com/o/oauth2/v2/auth?'
@@ -266,6 +270,7 @@ const Form = props=>{
     if (props.two_step)
     {
         return <Two_step_form
+          cmp_name={props.cmp_name}
           verify_two_step={props.verify_two_step}
           email={props.username}
           verifying_token={props.loading}
@@ -273,6 +278,7 @@ const Form = props=>{
         />;
     }
     return <First_form
+      cmp_name={props.cmp_name}
       password={props.password}
       username={props.username}
       google_click={google_click}
@@ -338,8 +344,8 @@ class Two_step_form extends Pure_component {
           <div className="warning choose_customer">
             2-Step Verification
           </div>
-          {t('A Luminati 2-Step Verification email containing a token '
-          +'was sent to ')}
+          {t('A '+this.props.cmp_name+' 2-Step Verification email containing'
+              +' a token was sent to ')}
           {this.props.email}
           {t('. The token is valid for ')+'15 '+ t('minutes.')}
           <div className="form-group">
@@ -409,7 +415,7 @@ const First_form = with_www_api(class First_form extends Pure_component {
             </div>
             <div className="row">
               <div className="signup">
-                {t('Don\'t have a Luminati account?')}
+                {t('Don\'t have a '+this.props.cmp_name+' account?')}
                 <a href={`${this.props.www_api}/?hs_signup=1`}
                   target="_blank"
                   rel="noopener noreferrer"

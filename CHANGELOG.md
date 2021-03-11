@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.225.712 Stable
+- :sparkles: UI fixes
+
 ## 1.225.541 Stable
 - :sparkles: UI design changes
 

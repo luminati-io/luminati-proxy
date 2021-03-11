@@ -1,5 +1,21 @@
 @first_color: var(--first-color);
-@first_odd: #4a8398;
+@first_odd: var(--first-odd);
+@cp_border: var(--cp-border);
+@cp_border_dark: var(--cp-border-dark);
+@cp_dark: var(--cp-dark);
+@cp_second: var(--cp-second);
+@cp_third: var(--cp-third);
+
+@login_logo: var(--login-logo);
+@login_logo_width: var(--login-logo-width);
+@login_logo_version_top: var(--login-logo-version-top);
+@login_logo_version_left: var(--login-logo-version-left);
+@logo_icon: var(--logo-icon);
+@logo_bg_size: var(--logo-bg-size);
+@btn_lpm_border_radius: var(--btn-lpm-border-radius);
+@border_radius_round: var(--border-radius-round);
+@btn_lpm_font_weight: var(--btn-lpm-font-weight);
+
 @grey: #ccdbe3;
 @grey_border: #e0e9ee;
 @light_grey: #e2e2e2;
@@ -17,11 +33,6 @@
 @link: #428bca;
 @tooltip: #154055;
 @chrome_border: #d0d0d0;
-@cp_border: rgba(0,77,116,0.1);
-@cp_border_dark: rgba(0,77,116,0.2);
-@cp_dark: #E5EDF1;
-@cp_second: var(--cp-second);
-@cp_third: rgba(0,77,116,0.7);
 @keyframes field_highlight {
     0% {
         border: 1px solid white;
@@ -79,15 +90,15 @@ h4 { margin: 0; }
     width: auto;
     min-width: 140px;
     height: 32px;
-    border-radius: 2px;
+    border-radius: @border_radius_round;
     background-color: white;
     border: solid 1px @grey;
     color: @first_color;
     font-size: 16px;
-    font-weight: 300;
     padding-top: 3px;
     margin: 0 2px;
     box-shadow: none;
+    font-weight: @btn_lpm_font_weight;
     &:hover, &.active {
         background-color: @first_color;
         border-color: @first_color;
@@ -117,7 +128,7 @@ h4 { margin: 0; }
     line-height: 0;
     font-size: 32px;
     padding-bottom: 9px;
-    border-radius: 4px;
+    border-radius: @border_radius_round;
     font-weight: 700;
     width: 280px;
     height: 60px;
@@ -240,10 +251,10 @@ h4 { margin: 0; }
         height: 60px;
         width: 50px;
         display: inline-block;
-        background-image: url('img/lum_logo_short.svg');
+        background-image: @logo_icon;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: 40px;
+        background-size: @logo_bg_size;
         cursor: pointer;
         &.lock {
             pointer-events: none;
@@ -340,7 +351,8 @@ h4 { margin: 0; }
                 }
                 .layer_btn {
                     text-align: center;
-                    border-radius: 4px;
+                    border-radius: @border_radius_round;
+                    font-weight: @btn_lpm_font_weight;
                     border: solid 1px @cp_border;
                     padding: 4px 18px;
                     margin: 3px 0;
@@ -738,8 +750,9 @@ span.icon_link {
      }
     .close_btn {
         position: absolute;
-        right: 6px;
-        top: 14px;
+        right: 10px;
+        top: 9px;
+        cursor: pointer;
     }
 }
 .cp_icon {

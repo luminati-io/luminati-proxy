@@ -4,16 +4,16 @@
     .nav_top {
         background-color: white;
         .logo_big {
-            background-image: url(img/logo_1.svg);
-            width: 158px;
+            background-image: @login_logo;
+            width: @login_logo_width;
             height: 33px;
             margin: 7px;
             display: block;
         }
         .version {
             position: relative;
-            top: 24px;
-            left: -46px;
+            top: @login_logo_version_top;
+            left: @login_logo_version_left;
             font-size: 9px;
             font-weight: bold;
             opacity: 0.5;
