@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.226.157 Stable
+- :star: Improve Proxy Manager communication with lpm_f over WS
+
 ## 1.226.49 Stable
 - :star: Improve Proxy Manager communication with lpm_f over WS
 

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.226.157",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improve Proxy Manager communication with lpm_f over WS"
+            }
+        ]
+    },
+    {
         "ver": "1.226.49",
         "type": "stable",
         "changes": [
