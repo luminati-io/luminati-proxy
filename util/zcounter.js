@@ -479,17 +479,34 @@ let send_loop = world=>etask(function*(){
     }
 });
 
+let all_conns = new Map();
 function ws_client(world, url){
-    let conns = ws_conn[world];
     if (!url.startsWith('ws'))
         url = `ws://${url}`;
-    if (conns.has(url))
-        return conns.get(url);
-    zerr.notice(`Opening zcounter conn to ${url}`);
-    let zws = require('./ws.js');
-    const label = url.split(':')[1].replace(/^\/\//, '');
-    const ws = new zws.Client(url, {label: `zcounter-${world}-${label}`,
-        retry_interval: ms.SEC});
+    let ws, conn_info;
+    if (conn_info = all_conns.get(url))
+    {
+        if (conn_info.worlds.includes(world))
+            return conn_info.ws;
+        ws = conn_info.ws;
+        conn_info.worlds.push(world);
+    }
+    else
+    {
+        zerr.notice(`Opening zcounter conn to ${url}`);
+        let zws = require('./ws.js');
+        const label = url.split(':')[1].replace(/^\/\//, '');
+        ws = new zws.Client(url, {label: `zcounter-${label}`,
+            retry_interval: 3*ms.SEC});
+        all_conns.set(url, {ws, worlds: [world]});
+    }
+    let conns = ws_conn[world];
+    if (ws.connected && !conns.has(url))
+    {
+        conns.set(url, ws);
+        if (!send_loop[world])
+            send_loop(world);
+    }
     ws.on('connected', ()=>{
         conns.set(url, ws);
         if (!send_loop[world])
@@ -600,4 +617,4 @@ function test_reset(){
 }
 
 E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client,
-    test_reset};
+    test_reset, all_conns, ws_conn};

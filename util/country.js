@@ -826,7 +826,7 @@ E.timezone = {
     VC: 'America/St_Vincent',
     HN: 'America/Tegucigalpa',
     VG: 'America/Tortola',
-    AQ: 'Antarctica/McMurdo',
+    AQ: 'Pacific/Auckland',
     YE: 'Asia/Aden',
     KZ: 'Asia/Almaty',
     JO: 'Asia/Amman',

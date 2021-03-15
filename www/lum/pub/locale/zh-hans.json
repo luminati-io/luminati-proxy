@@ -5223,5 +5223,22 @@
   "You can whitelist your IP using this API:": "您可以通过使用以下 API，将您的 IP 列入白名单：",
   "Click the Edit icon, click the Remove icon next to the whitelisted IP you want to remove and Save. Note that choosing Any IP will weaken the security measures used to protect your account.": "点击编辑按钮，点击白名单IP旁的删除图标，删除你想删除的IP，保留你要的IP，然后单击保存。请注意，选择“任何IP”将削弱用于对您帐户的安全措施的保护。",
   "Get a list of blacklisted IPs for a specific Zone": "获取特定通道的黑名单IP列表",
-  "Add IP range to Zone blacklist": "将 IP 范围添加到通道黑名单"
+  "Add IP range to Zone blacklist": "将 IP 范围添加到通道黑名单",
+  "Initiate by API":"通过API初始化",
+  "Iniate manually":"手动启动",
+  "Edit collector":"编辑收集器",
+  "Edit the template":"编辑范本",
+  "Delete collector":"删除收集器",
+  "Disable collector":"关闭收集器",
+  "Search collector":"搜索收集器",
+  "Sort Collectors":"排序收集器",
+  "API code":"API代码",
+  "Copy the API code and initiate it from your system":"复制API代码并从您的系统启动",
+  "Regular request":"正常的请求",
+  "Queue request":"队列请求",
+  "Replace request":"替换原始请求",
+  "Trigger a real-time collection job for the input you provide. You'll immediately receive a response with the created job's ID":"为您提供的输入触发实时收集作业。 您将立即收到包含创建的作业ID的回复",
+  "We will continue automatically once you send your first request":"一旦您发送第一个请求，我们将自动继续",
+  "Waiting for your request":"等待您的要求",
+  "You should submit all your inputs in 1 batch so the collector can run faster in parallel":"您应该分批提交所有输入，以便收集器可以并行运行得更快"
 }
