@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.226.376",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Further improvements in the communication with servers over WS"
+            }
+        ]
+    },
+    {
         "ver": "1.226.157",
         "type": "stable",
         "changes": [
