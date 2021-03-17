@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.226.680",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Refresh IP rule when working with ports that are multiplied per IP"
+            }
+        ]
+    },
+    {
         "ver": "1.226.376",
         "type": "stable",
         "changes": [

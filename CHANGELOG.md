@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.226.680 Stable
+- :bug: Fixed Refresh IP rule when working with ports that are multiplied per IP
+
 ## 1.226.376 Stable
 - :star: Further improvements in the communication with servers over WS
 

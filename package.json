@@ -46,7 +46,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager"
+    "productName": "Proxy Manager"
   },
   "dependencies": {
     "body-parser": "1.19.0",
@@ -178,6 +178,8 @@
       "bin/pub/img/asn.svg",
       "bin/pub/img/banned_ips.svg",
       "bin/pub/img/bell.svg",
+      "bin/pub/img/brd_logo_large.svg",
+      "bin/pub/img/brd_logo_letter.svg",
       "bin/pub/img/checker.png",
       "bin/pub/img/city.svg",
       "bin/pub/img/columns.svg",
@@ -222,15 +224,10 @@
       "bin/pub/img/info.svg",
       "bin/pub/img/large_icons.png",
       "bin/pub/img/loader.gif",
-      "bin/pub/img/logo.png",
-      "bin/pub/img/logo_1.svg",
       "bin/pub/img/logo_80legs.svg",
-      "bin/pub/img/logo_big.svg",
       "bin/pub/img/logo_crawlera.svg",
       "bin/pub/img/logo_import.svg",
       "bin/pub/img/logs.svg",
-      "bin/pub/img/luminati_logo_2.svg",
-      "bin/pub/img/lum_logo_short.svg",
       "bin/pub/img/medium_icons.png",
       "bin/pub/img/mobile.svg",
       "bin/pub/img/preset_icon.png",
@@ -398,7 +395,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "8637f440d295fddbb81ecb65be1959e5"
+    "md5": "de4cb11e09a0320c2cb3b1392b5c9350"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -434,5 +431,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.226.376"
+  "version": "1.226.680"
 }

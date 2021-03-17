@@ -88,17 +88,8 @@ const App = withRouter(class App extends Pure_component {
             });
         });
         this.setdb_on('head.settings', settings=>
-            settings && this.setState({settings}, ()=>this.update_brd()));
-        this.setdb_on('head.local_brd', local_brd=>
-            this.setState({local_brd}, ()=>this.update_brd()));
-        this.setdb_on('head.brd', brd=>this.setState({brd}));
+            settings && this.setState({settings}));
     }
-    update_brd = ()=>{
-        const settings = this.state.settings;
-        const brd = settings && settings.server_conf &&
-            settings.server_conf.client.rebranded || this.state.local_brd;
-        setdb.set('head.brd', !!brd);
-    };
     load_data = ()=>this.etask(function*(){
         const errors = [];
         const err_handler = msg=>etask.fn(function*(e){
@@ -170,10 +161,8 @@ const App = withRouter(class App extends Pure_component {
       });
     };
     render(){
-        const server_conf = this.state.settings &&
-            this.state.settings.server_conf;
         return <div className="page_wrapper">
-          <Global_styles server_conf={server_conf} brd={this.state.brd}/>
+          <Global_styles_brd/>
           <Enable_ssl_modal/>
           <Api_url_modal/>
           <Old_modals/>
@@ -187,34 +176,7 @@ const App = withRouter(class App extends Pure_component {
     }
 });
 
-const Global_styles_lum = createGlobalStyle`
-  html {
-    --first-color: #004d74;
-    --first-odd: #4a8398;
-    --cp-border: rgba(0,77,116,0.1);
-    --cp-border-dark: rgba(0,77,116,0.2);
-    --cp-dark: #E5EDF1;
-    --cp-second: rgba(0,77,116,0.5);
-    --cp-third: rgba(0,77,116,0.7);
-
-    --btn-lpm-border-radius: 2px;
-    --border-radius-round: 4px;
-    --btn-lpm-font-weight: normal;
-
-    --login-logo: url(img/logo_1.svg);
-    --login-logo-width: 158px;
-    --login-logo-version-top: 24px;
-    --login-logo-version-left: -46px;
-    --logo-icon: url('img/lum_logo_short.svg');
-    --logo-bg-size: 40px;
-
-    body {
-        font-family: "Lato";
-    }
-  }
-`;
-
-const Global_styles_brd_ = server_conf=>createGlobalStyle`
+const Global_styles_brd = createGlobalStyle`
   html {
     --first-color: #526373;
     --first-odd: #526373;
@@ -228,27 +190,18 @@ const Global_styles_brd_ = server_conf=>createGlobalStyle`
     --border-radius-round: 100px;
     --btn-lpm-font-weight: 500;
 
-    --login-logo: url(${server_conf.client.brd_logo_large});
+    --login-logo: url(img/brd_logo_large.svg);
     --login-logo-width: 125px;
     --login-logo-version-top: 28px;
     --login-logo-version-left: -55px;
-    --logo-icon: url(${server_conf.client.brd_logo_letter});
-    --logo-bg-size: 12px;
+    --logo-icon: url(img/brd_logo_letter.svg);
+    --logo-bg-size: 38px;
 
     body {
         font-family: "Gibson";
     }
   }
 `;
-
-const Global_styles = props=>{
-    if (props.brd && props.server_conf)
-    {
-        const Global_styles_brd = Global_styles_brd_(props.server_conf);
-        return <Global_styles_brd/>;
-    }
-    return <Global_styles_lum/>;
-};
 
 const general_modals_info = [
     {
