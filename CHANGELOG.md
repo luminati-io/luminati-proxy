@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.226.959 Stable
+- :star: Connection improvements with Bright Data servers
+
 ## 1.226.680 Stable
 - :bug: Fixed Refresh IP rule when working with ports that are multiplied per IP
 
