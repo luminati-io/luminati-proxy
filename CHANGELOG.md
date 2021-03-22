@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.227.290 Stable
+- :sparkles: Introduced a mechanism to rename the Proxy Manager working directory at the process startup
+
 ## 1.226.959 Stable
 - :star: Connection improvements with Bright Data servers
 

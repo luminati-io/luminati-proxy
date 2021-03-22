@@ -170,6 +170,8 @@ E.is_ip_subnet = function(host){
 };
 
 E.is_ip_netmask = function(host){
+    if (!host || typeof host.split !== 'function')
+        return false;
     var ips = host.split('/');
     if (ips.length!=2 || !E.is_ip(ips[0]) || !E.is_ip_mask(ips[1]))
         return false;

@@ -71,7 +71,7 @@ describe('util', ()=>{
             object: {test: [1, 2, 3]}});
     });
     it('get_file_path', ()=>{
-        const dir = path.resolve(os.homedir(), 'luminati_proxy_manager');
+        const dir = path.resolve(os.homedir(), 'proxy_manager');
         const test_files = ['test1.file', 'test2.file'];
         const t = file=>{
             const p = lpm_file.get_file_path(file);
