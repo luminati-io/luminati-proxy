@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.227.883 Stable
+- :sparkles: Improved the process of renaming the Proxy Manager work directory at startup
+
 ## 1.227.290 Stable
 - :sparkles: Introduced a mechanism to rename the Proxy Manager working directory at the process startup
 

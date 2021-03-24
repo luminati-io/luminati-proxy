@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.227.883",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved the process of renaming the Proxy Manager work directory at startup"
+            }
+        ]
+    },
+    {
         "ver": "1.227.290",
         "type": "stable",
         "changes": [
