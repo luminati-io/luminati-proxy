@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.228.121",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Fixed bandwidth calculation for the HTTPS requests"
+            }
+        ]
+    },
+    {
         "ver": "1.228.97",
         "type": "stable",
         "changes": [

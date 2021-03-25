@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.228.121 Stable
+- :sparkles: Fixed bandwidth calculation for the HTTPS requests
+
 ## 1.228.97 Stable
 - :sparkles: Improvements for Chinese users: Proxy Manager works with slower connections
 
