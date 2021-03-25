@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.228.97",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improvements for Chinese users: Proxy Manager works with slower connections"
+            }
+        ]
+    },
+    {
         "ver": "1.227.883",
         "type": "stable",
         "changes": [

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.228.97 Stable
+- :sparkles: Improvements for Chinese users: Proxy Manager works with slower connections
+
 ## 1.227.883 Stable
 - :sparkles: Improved the process of renaming the Proxy Manager work directory at startup
 
