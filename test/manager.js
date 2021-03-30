@@ -70,15 +70,45 @@ describe('manager', function(){
         }
         Manager.prototype.set_current_country = ()=>null;
         Manager.prototype.lpm_users_get = ()=>null;
-        Manager.prototype.get_lpm_conf = function(){
-            return {_defaults: {zones: {
-                static: {},
-                foo: {},
-            }}};
-        };
         manager = new Manager(lpm_util.init_args(args));
         manager.lpm_conn.init = ()=>null;
         manager.lpm_f.init = ()=>null;
+        manager.lpm_f.get_meta_conf = ()=>({
+            _defaults: {
+                account_id: 'c_123',
+                customer: 'test_cust',
+                password: 'pass123',
+                zone: 'static',
+                zones: {
+                    static: {
+                        ips: 'any',
+                        password: ['pass1'],
+                        plan: {
+                            type: 'resident',
+                            city: 1,
+                        },
+                        perm: 'country',
+                        kw: {},
+                        cost: {'precommit': 1000, 'gb': 24},
+                        refresh_cost: null,
+                    },
+                    foo: {
+                        ips: 'any',
+                        password: ['pass2'],
+                        plan: {
+                            type: 'resident',
+                            city: 1,
+                        },
+                        perm: 'country city',
+                        kw: {},
+                        cost: {'precommit': 500, 'gb': 32},
+                        refresh_cost: 0.5,
+                    },
+                },
+            },
+            customers: ['test_cust'],
+            logins: [],
+        });
         if (start_manager!==false)
             yield manager.start();
         return {manager};
@@ -231,13 +261,7 @@ describe('manager', function(){
             [Object.assign({proxy_type: 'persist'}, simple_proxy)]);
         t('config file', {config: {proxies: [simple_proxy]}}, [simple_proxy]);
         describe('default zone', ()=>{
-            const zone_static = {password: ['pass1']};
-            const zone_foo = {password: ['pass2']};
-            const zones = {
-                static: Object.assign({}, zone_static),
-                foo: Object.assign({}, zone_foo),
-            };
-            const t2 = (name, config, expected, _defaults={zone: 'static'})=>{
+            const t2 = (name, config, expected)=>{
                 t(name, zutil.set(config, 'cli.customer', 'testc1'), expected);
             };
             t2('from defaults', {config: {
@@ -247,8 +271,7 @@ describe('manager', function(){
                     lpm_token: 'token',
                 },
                 proxies: [simple_proxy],
-            }}, [Object.assign({zone: 'foo'}, simple_proxy)],
-                {zone: 'static', zones});
+            }}, [Object.assign({zone: 'static'}, simple_proxy)]);
             t2('keep default', {config: {
                 _defaults: {
                     zone: 'foo',
@@ -256,7 +279,7 @@ describe('manager', function(){
                     lpm_token: 'token',
                 },
                 proxies: [simple_proxy]},
-            }, [Object.assign({zone: 'foo'}, simple_proxy)]);
+            }, [Object.assign({zone: 'static'}, simple_proxy)]);
         });
         describe('args as default params for proxy ports', ()=>{
             it('should use proxy from args', etask._fn(function*(_this){
@@ -407,8 +430,10 @@ describe('manager', function(){
             describe('post', ()=>{
                 it('normal persist', etask._fn(function*(_this){
                     let sample_proxy = {port: 24001};
-                    const res_proxy = Object.assign({customer, password},
-                        sample_proxy);
+                    const res_proxy = Object.assign({
+                        customer: 'test_cust',
+                        password: 'pass1',
+                    }, sample_proxy);
                     app = yield app_with_proxies([], {});
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});
@@ -465,10 +490,13 @@ describe('manager', function(){
                 it('inherit defaults', ()=>etask(function*(){
                     const put_proxy = {port: 24001};
                     const proxies = [{port: 24000}];
-                    const res_proxy = Object.assign({}, {customer, password},
-                        put_proxy);
+                    const res_proxy = Object.assign({}, {
+                        customer: 'test_cust',
+                        zone: 'static',
+                        password: 'pass1',
+                    }, put_proxy);
                     app = yield app_with_proxies(proxies, {});
-                    let res = yield json('api/proxies/24000', 'put',
+                    const res = yield json('api/proxies/24000', 'put',
                         {proxy: put_proxy});
                     assert_has(res, {data: res_proxy});
                 }));
@@ -479,6 +507,22 @@ describe('manager', function(){
                         {method: 'put', body: {proxy: {port: 24000}}});
                     assert.equal(res.statusCode, 400);
                     assert_has(res.body, {errors: []}, 'proxies');
+                }));
+                it('updates password recreating', etask._fn(function*(_this){
+                    const proxies = [{port: 24000}];
+                    app = yield app_with_proxies(proxies, {});
+                    const body = {proxy: {port: 24001, zone: 'foo'}};
+                    const res = yield api_json('api/proxies/24000',
+                        {method: 'put', body});
+                    assert.equal(res.body.data.password, 'pass2');
+                }));
+                it('updates password in place', etask._fn(function*(_this){
+                    const proxies = [{port: 24000}];
+                    app = yield app_with_proxies(proxies, {});
+                    const body = {proxy: {zone: 'foo'}};
+                    const res = yield api_json('api/proxies/24000',
+                        {method: 'put', body});
+                    assert.equal(res.body.data.password, 'pass2');
                 }));
             });
             describe('delete', ()=>{
@@ -844,9 +888,10 @@ describe('manager', function(){
     describe('refresh_ip', ()=>{
         it('refreshes ip & sessions and updates proxy port', etask._fn(
         function*(_this){
-            const alloc_ip = '1.1.1.1', alloc_inet_addr = 16843009;
+            const alloc_ip = '1.1.1.1';
+            const alloc_inet_addr = 16843009;
             const new_ip = '2.2.2.2';
-            const proxy = {port: 24000, zone: 'abc', ips: [alloc_ip]};
+            const proxy = {port: 24000, zone: 'static', ips: [alloc_ip]};
             app = yield app_with_proxies([proxy]);
             const mgr = app.manager;
             sb.stub(mgr, 'request_allocated_ips').returns({ips: [alloc_ip]});
@@ -871,8 +916,8 @@ describe('manager', function(){
         }}};
         const get_local_conf = ts=>({
             _defaults: {
-                lpm_token: '123|abc',
-                customer: 'abc',
+                lpm_token: '123|test_cust',
+                customer: 'test_cust',
                 sync_config: true,
             },
             proxies: [{port: 24000}],
@@ -885,7 +930,7 @@ describe('manager', function(){
         });
         const spy_obj_methods = (obj, ...methods)=>
             Object.fromEntries(methods.map(m=>[m, sb.spy(obj, m)]));
-        describe('config on server is newer than local config', ()=>{
+        describe('config on server is newer', ()=>{
             let local_conf, server_conf;
             beforeEach(()=>{
                 local_conf = get_local_conf(date.add(date(), {day: -1}));
@@ -899,7 +944,6 @@ describe('manager', function(){
                 const mgr = app.manager;
                 sb.stub(mgr.lpm_f, 'init');
                 sb.stub(mgr.lpm_f, 'get_conf').returns(server_conf);
-                sb.stub(mgr.lpm_f, 'get_meta_conf').returns(server_meta_conf);
                 const mgr_methods = qw`logged_update apply_cloud_config perr`;
                 const mgr_spies = spy_obj_methods(mgr, ...mgr_methods);
                 const {logged_update, apply_cloud_config, perr} = mgr_spies;
@@ -930,7 +974,7 @@ describe('manager', function(){
                 yield mgr.start();
                 const logged_in = logged_update.returnValues[0].retval;
                 assert.strictEqual(logged_in, false);
-                assert.strictEqual(mgr._defaults.lpm_token, undefined);
+                assert.strictEqual(mgr._defaults.lpm_token, '123|test_cust');
                 sinon.assert.notCalled(apply_cloud_config);
                 assert_has(mgr, {
                     _defaults: zutil.omit(local_conf._defaults, 'lpm_token'),
@@ -952,7 +996,7 @@ describe('manager', function(){
                 }, 'app.manager');
             }));
         });
-        describe('local config is newer than config on the server', ()=>{
+        describe('local config is newer', ()=>{
             let local_conf, server_conf;
             beforeEach(()=>{
                 local_conf = get_local_conf(date());
@@ -966,7 +1010,6 @@ describe('manager', function(){
                 const mgr = app.manager;
                 sb.stub(mgr.lpm_f, 'init');
                 sb.stub(mgr.lpm_f, 'get_conf').returns(server_conf);
-                sb.stub(mgr.lpm_f, 'get_meta_conf').returns(server_meta_conf);
                 const mgr_methods = qw`logged_update apply_cloud_config perr`;
                 const mgr_spies = spy_obj_methods(mgr, ...mgr_methods);
                 const {logged_update, apply_cloud_config, perr} = mgr_spies;
@@ -988,7 +1031,6 @@ describe('manager', function(){
                 const mgr = app.manager;
                 sb.stub(mgr.lpm_f, 'init');
                 sb.stub(mgr.lpm_f, 'get_conf').returns(server_conf);
-                sb.stub(mgr.lpm_f, 'get_meta_conf').returns(server_meta_conf);
                 yield mgr.start();
                 assert.deepEqual(date(mgr.config_ts), date(local_conf.ts));
                 let local_update_ts;
@@ -1023,14 +1065,14 @@ describe('manager', function(){
                 yield mgr.start();
                 const logged_in = mgr.logged_update.returnValues[0].retval;
                 assert.strictEqual(logged_in, false);
-                assert.strictEqual(mgr._defaults.lpm_token, undefined);
+                assert.strictEqual(mgr._defaults.lpm_token, '123|test_cust');
                 sinon.assert.notCalled(apply_cloud_config);
                 assert_has(mgr, {
                     _defaults: zutil.omit(local_conf._defaults, 'lpm_token'),
                     proxies: local_conf.proxies,
                 }, 'app.manager');
                 sb.stub(mgr.lpm_f, 'login').returns(server_conf);
-                sb.stub(mgr, 'login_user').returns('123|abc');
+                sb.stub(mgr, 'login_user').returns('123|test_cust');
                 yield api_json('api/creds_user', {method: 'post', body: {
                     customer: 'abc',
                     token: '123',

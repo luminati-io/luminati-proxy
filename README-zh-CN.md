@@ -6,9 +6,9 @@
 
 一个HTTP/HTTPS 代理服务器在你身边，为你世界各地的代理流量加速/压缩/轮流/分发/管理/监控/汇报/日志/调试
 
-用 代理管理器你可以使用Luminati 住宅 IPs 或 Luminati 数据心 IPs.
+用 代理管理器你可以使用Bright Data 住宅 IPs 或 Bright Data 数据心 IPs.
 
-这个工具需要一个 [Luminati](https://lum-lpm.com/?cam=github-proxy) 账户.
+这个工具需要一个 [Bright Data](https://lum-lpm.com/?cam=github-proxy) 账户.
 
 ## 特征
 - 可扩展
@@ -39,12 +39,12 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.228.121-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.228.582-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
   [nave](https://github.com/isaacs/nave))
-- 从终端安装 Luminati 代理:
+- 从终端安装 Bright Data 代理:
 ```sh
 sudo npm install -g luminati-io/luminati-proxy
 ```
@@ -62,29 +62,29 @@ sudo npm install -g luminati-io/luminati-proxy
 ### 第一次运行
 第一次运行之后:
 ```sh
-luminati
+pmgr
 ```
 把你的浏览器设到 [http://127.0.0.1:22999](http://127.0.0.1:22999) 为了设置凭证和代理服务器.
 
-登录之后，你会看到Luminati的默认设置所含一个”drop in”代理服务器在接口22225运行。细节提供在下面.
+登录之后，你会看到Bright Data的默认设置所含一个”drop in”代理服务器在接口22225运行。细节提供在下面.
 
 ### 超级代理服务器的'Dropin'替代
 
-Luminati 代理服务器所含的”Dropin 模式” 和现有的超级代理服务器的功能相同。在 'dropin' 模式运行代理时，你不需要登录行政UI就能发出请求。代理账户和密码会自动被提供。'dropin' 模式是默认模式，和可以让你容易的从一般的超级代理服务器转到Luminati 代理管理器.
+Bright Data 代理服务器所含的”Dropin 模式” 和现有的超级代理服务器的功能相同。在 'dropin' 模式运行代理时，你不需要登录行政UI就能发出请求。代理账户和密码会自动被提供。'dropin' 模式是默认模式，和可以让你容易的从一般的超级代理服务器转到Bright Data 代理管理器.
 
 'dropin' 模式是默认模式。如果你想禁用'dropin',请用命令：--no-dropin:
 
 ```sh
-luminati --no-dropin
+pmgr --no-dropin
 ```
 
-为了完整的API解说文件 （为了'dropin'代理请求），请从你的Luminati.io账户关注 <a href="https://lum-lpm.com/cp/api_example?manager=all&group=active">API例网页</a>.
+为了完整的API解说文件 （为了'dropin'代理请求），请从你的Bright Data账户关注 <a href="https://lum-lpm.com/cp/api_example?manager=all&group=active">API例网页</a>.
 
 ### 完整的API命令名单:
 ```sh
-luminati --help
+pmgr --help
 Usage:
-  luminati [options] config1 config2 ...
+  pmgr [options] config1 config2 ...
 
 Options:
   --help, -h, -?                Show help                              [boolean]
@@ -240,7 +240,7 @@ docker pull luminati/luminati-proxy
 
 docker run luminati/luminati-proxy
 
-docker run luminati/luminati-proxy luminati --version
+docker run luminati/luminati-proxy pmgr --version
 ```
 
 ### SSL 请求
@@ -251,9 +251,9 @@ docker run luminati/luminati-proxy luminati --version
 
 常见问题 [FAQ](https://lum-lpm.com/faq#proxy)
 
-如果你在Luminati 常见问题找不着解决方式，可以在 [github 上提问](https://github.com/luminati-io/luminati-proxy/issues).
+如果你在Bright Data 常见问题找不着解决方式，可以在 [github 上提问](https://github.com/luminati-io/luminati-proxy/issues).
 
-或联系 [support@luminati.io](mailto:support@luminati.io).
+或联系 [support@brightdata.com](mailto:support@brightdata.com).
 
 ## REST API
 

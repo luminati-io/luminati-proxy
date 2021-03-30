@@ -933,7 +933,7 @@ class IPC_server {
         if (!['ipc_call', 'ipc_post', 'ipc_mux'].includes(type))
             return;
         let method = this.methods[cmd];
-        if (method==true)
+        if (method===true) // avoid useless type conversion
             method = this.ws.data[cmd];
         if (!method)
         {

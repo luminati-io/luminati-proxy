@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.228.582 Stable
+- :bug: Fixed updating password when changing zone settings
+
 ## 1.228.121 Stable
 - :sparkles: Fixed bandwidth calculation for the HTTPS requests
 

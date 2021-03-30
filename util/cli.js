@@ -267,13 +267,19 @@ E.process_exit = (promise, opt)=>etask(function*process_main(){
 });
 
 // get input from user that works also in cygwin
-E.get_input = (prompt, hide)=>{
-    let res, hide_cmd = hide ? '-s' : '';
-    process.stdout.write(prompt+' ');
-    res = E.exec('read '+hide_cmd+' param && echo $param',
+E.get_input = (prompt, opt)=>{
+    if (opt!=null && opt.constructor!=Object)
+        opt = {hide: opt};
+    opt = opt||{};
+    let fd = opt.stderr&&'stderr' || 'stdout';
+    let hide_cmd = opt.hide ? '-s' : '';
+    if (zerr.log_buffer)
+        zerr.flush();
+    process[fd].write(prompt+' ', ()=>{});
+    let res = E.exec('read '+hide_cmd+' param && echo $param',
         {out: 'stdout', stdio: [0, 'pipe'], dry_run: false});
-    if (hide)
-        process.stdout.write('\n');
+    if (opt.hide)
+        process[fd].write('\n');
     return string.chomp(res);
 };
 
@@ -286,7 +292,7 @@ E.ask_approval = (prompt, opt)=>{
         return true;
     while (!opt.limit.test(res))
     {
-        if (!(res = E.get_input(prompt)) && opt.default_input)
+        if (!(res = E.get_input(prompt, opt)) && opt.default_input)
         {
             res = opt.default_input;
             break;

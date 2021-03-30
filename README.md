@@ -6,10 +6,10 @@
 
 A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribute/manage/monitor/report/log/debug traffic to your proxies around the world.
 
-With Proxy manager you can drive the Luminati residential IPs or Luminati static IPs.
+With Proxy manager you can drive the Bright Data residential IPs or Bright Data static IPs.
 
-This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
-Please report issues or bugs to your account manager or from our [help center](https://luminati.io/faq#proxy)
+This tool requires a [Bright Data](https://brightdata.com/?cam=github-proxy) account.
+Please report issues or bugs to your account manager or from our [help center](https://brightdata.com/faq#proxy)
 
 <em>Read this in [中文](https://lum-lpm.com/static/lpm/README-zh-CN.html).</em>
 
@@ -36,16 +36,16 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.228.121/luminati-proxy-manager-v1.228.121-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.228.582/luminati-proxy-manager-v1.228.582-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
 ```sh
-wget -qO- https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
+wget -qO- https://brightdata.com/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
 Or
 ```sh
-curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
+curl -L https://brightdata.com/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
 ### Linux/MacOS - Manual install
 - Install Node.js 12 ([nodejs.org](https://nodejs.org/en/download/))
@@ -123,8 +123,8 @@ proxy-manager --no-dropin
 ```
 
 For full documentation on the API for making requests through the dropin proxy,
-see <a href="https://luminati.io/cp/api_example?manager=all&group=active">the
-API Example page in your Luminati.io account</a>.
+see <a href="https://brightdata.com/cp/api_example?manager=all&group=active">the
+API Example page in your Bright Data account</a>.
 
 ### Complete list of command line options
 
@@ -345,16 +345,16 @@ The --ssl parameter is for SSL analyzing, HTTPS requests can be made without it.
 
 ## Help
 
-The FAQ can be found on the luminati
-[FAQ](https://luminati.io/faq#proxy)
+The FAQ can be found on the Bright Data
+[FAQ](https://brightdata.com/faq#proxy)
 
 If you do not find the answer there, feel free to open an
 [issue on github](issues).
 
-Or contact [support@luminati.io](mailto:support@luminati.io).
+Or contact [support@brightdata.com](mailto:support@brightdata.com).
 
 ## REST API
 
 Working documentation of the API can be found inside the app.
 
-The API also can be found on the luminati [here](https://luminati.io/doc/api#lpm_endpoints)
+The API also can be found on the Bright Data [here](https://brightdata.com/doc/api#lpm_endpoints)
