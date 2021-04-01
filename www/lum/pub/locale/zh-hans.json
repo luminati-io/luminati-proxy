@@ -4443,6 +4443,7 @@
   "This may happen because:": "这可能发生，因为:",
   "JavaScript is disabled or not running properly on your browser": "JavaScript已禁用或在您的浏览器上无法正常运行",
   "Your browsing behaviour is not likely to be that of a regular user": "您的浏览行为不太可能是普通用户的浏览行为",
+  "You are using a VPN service, please disable it and try again": "您正在使用VPN服务，请禁用它，然后重试",
   "Your email has been blocked!": "您的电子邮件已被阻止！",
   "Signing up with your email has been denied.": "注册wth您的电子邮件已被拒绝。",
   "Forbidden domain": "禁区域",
@@ -5341,5 +5342,16 @@
   "Can manage all aspects of the account. You will need to verify this user by typing a code sent to your email.":"可以管理帐户的各个方面。需要通过邮箱验证码来验证此用户。",
   "Can't modify users nor permissions. But can manage all the other aspects of the account, including billing.":"没有修改用户和账户权限，但可以管理帐户的所有其它方面，包括帐单。",
   "Operations. Can't modify users nor permissions. But can manage all the other aspects of the account, except billing.":"所有账户操作。无法修改用户或账户权限, 但可以管理账户除账单以外的所有其它方面。",
-  "Can use the account.":"允许使用本账户。"
+  "Can use the account.":"允许使用本账户。",
+  "Your payment is on hold!":"您的付款被暂停",
+  "We failed to validate your recent payment":"我们无法验证您最近的付款。",
+  "We took every step needed to validate our users automatically.":"我们采取了一切步骤来自动验证我们的用户。",
+  "Unfortunately, we couldn't verify your details.":"很遗憾，我们无法验证您的详细信息。",
+  "To maintain our high account security standards,":"为了维持我们的高帐户安全标准，",
+  "We need to ask you kindly to provide the following proof of identity":"我们需要请您提供以下身份证明",
+  "Please provide us with the following documentation":"请向我们提供以下文档",
+  "* Photo of the credit card you used for payment, revealing ":"*用于付款的信用卡照片，显示 ",
+  "ONLY the last 4-digits and name on the card":"卡上仅末4位数字和姓名",
+  "Additional information":"附加信息",
+  "The verification process can take up to 1 business day":"验证过程最多可能需要1个工作日"
 }

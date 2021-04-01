@@ -3506,6 +3506,7 @@
   "This may happen because:":"Esto puede suceder porque:",
   "JavaScript is disabled or not running properly on your browser":"JavaScript está deshabilitado o no se ejecuta correctamente en su navegador",
   "Your browsing behaviour is not likely to be that of a regular user":"Su comportamiento de navegación no es probable que sea el de un usuario normal",
+  "You are using a VPN service, please disable it and try again": "Estás utilizando un servicio VPN, desactívalo e inténtalo de nuevo",
   "Your email has been blocked!":"Su correo electrónico ha sido bloqueado!",
   "Signing up with your email has been denied.":"Registrarse con su correo electrónico ha sido denegado.",
   "Forbidden domain":"Dominio prohibido",

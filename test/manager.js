@@ -524,6 +524,15 @@ describe('manager', function(){
                         {method: 'put', body});
                     assert.equal(res.body.data.password, 'pass2');
                 }));
+                it('updates password no zone passed',
+                etask._fn(function*(_this){
+                    const proxies = [{port: 24000, zone: 'foo'}];
+                    app = yield app_with_proxies(proxies, {});
+                    const body = {proxy: {ssl: true}};
+                    const res = yield api_json('api/proxies/24000',
+                        {method: 'put', body});
+                    assert.equal(res.body.data.password, 'pass2');
+                }));
             });
             describe('delete', ()=>{
                 it('normal', etask._fn(function*(_this){

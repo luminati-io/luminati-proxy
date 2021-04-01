@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.228.877 Stable
+- :bug: Fixed updating password when updating proxy port
+
 ## 1.228.582 Stable
 - :bug: Fixed updating password when changing zone settings
 

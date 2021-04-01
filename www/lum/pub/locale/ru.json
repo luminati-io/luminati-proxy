@@ -3394,6 +3394,7 @@
   "This may happen because:": "Это могло произойти по следующим причинам:",
   "JavaScript is disabled or not running properly on your browser": "JavaScript отключен или не работает должным образом в вашем браузере",
   "Your browsing behaviour is not likely to be that of a regular user": "Ваше поведение не похоже на обычного пользователя",
+  "You are using a VPN service, please disable it and try again": "Вы используете службу VPN, отключите ее и повторите попытку",
   "Your email has been blocked!": "Ваша электронная почта была заблокирована!",
   "Signing up with your email has been denied.": "Регистрация с вашей электронной почты была отклонена.",
   "Forbidden domain": "Домен запрещён",

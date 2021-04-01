@@ -44,6 +44,6 @@ init();
 
 module.exports = {
     hostname: _hostname(),
-    app: script_path && path.basename(script_path, '.js'),
+    app: env.CONFIG_APP || script_path&&path.basename(script_path, '.js'),
     t: {parse},
 };
