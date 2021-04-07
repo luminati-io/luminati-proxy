@@ -1,5 +1,5 @@
 {
-  "author": "Luminati Networks Ltd <lpm@luminati.io> (https://luminati.io/)",
+  "author": "Bright Data Ltd <lpm@brightdata.com> (https://brightdata.com/)",
   "bin": {
     "luminati": "bin/index.js",
     "luminati-proxy": "bin/index.js",
@@ -10,7 +10,7 @@
     "unsafe-perm": true
   },
   "bugs": {
-    "email": "lpm@luminati.io"
+    "email": "lpm@brightdata.com"
   },
   "build": {
     "appId": "luminati.proxy_manager",
@@ -108,7 +108,7 @@
     "js-cookie": "2.2.1",
     "styled-components": "5.2.1"
   },
-  "description": "A configurable local proxy for luminati.io",
+  "description": "A configurable local proxy for brightdata.com",
   "devDependencies": {
     "animate.css": "3.5.2",
     "babel-cli": "6.24.1",
@@ -140,7 +140,7 @@
   "engines": {
     "node": ">=12.0.0"
   },
-  "homepage": "https://luminati.io/",
+  "homepage": "https://brightdata.com",
   "api_domain": "lum-lpm.com",
   "api_domain_fallback": "l-lpm.com",
   "mail_domain": "lumidaili.cn",
@@ -395,18 +395,14 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "680f3be5c3a1a7a8662a37e8be96a8f1"
+    "md5": "4ad4bcf561f36da37ce771a08167ccd1"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
   "contributors": [
     {
-      "name": "Assaf Zarfaty",
-      "email": "assafz@luminati.io"
-    },
-    {
       "name": "Krzysztof Fudali",
-      "email": "krzysztof@luminati.io"
+      "email": "krzysztof@brightdata.com"
     }
   ],
   "optionalDependencies": {
@@ -431,5 +427,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.228.877"
+  "version": "1.229.796"
 }

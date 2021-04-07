@@ -13,7 +13,7 @@ const carriers_note = (()=>{
     const body = `Hi,${n}${n}Didn't find the carrier you're looking for?`
     +`${n}${n}Write here the carrier's name: __________${n}${n}We will add`
     +` it soon as possible!`;
-    const mail = 'lumext@luminati.io';
+    const mail = 'lumext@brightdata.com';
     const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
     return <a className="link" href={mailto}><T>More carriers</T></a>;
 })();

@@ -202,7 +202,7 @@ export const with_www_api = Component=>{
             });
         }
         render(){
-            let www_api = 'https://luminati.io';
+            let www_api = 'https://brightdata.com';
             if (this.state.www_api)
                 www_api = this.state.www_api;
             return React.createElement(Component,

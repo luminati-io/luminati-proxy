@@ -109,6 +109,7 @@ describe('manager', function(){
             customers: ['test_cust'],
             logins: [],
         });
+        manager.lpm_f.get_server_conf = ()=>({client: {}});
         if (start_manager!==false)
             yield manager.start();
         return {manager};
@@ -358,7 +359,7 @@ describe('manager', function(){
         it('should send logs, har and config', etask._fn(function*(_this){
             _this.timeout(6000);
             app = yield app_with_config({config: {}, cli: {log: 'notice'}});
-            const desc = 'bug description', email = 'test@luminati.io';
+            const desc = 'bug description', email = 'test@brightdata.com';
             const ua = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '+
             'Gecko/20100101 Firefox/47.0';
             const req = {body: {desc, email}, get: ()=>ua};

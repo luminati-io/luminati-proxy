@@ -2,7 +2,7 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const E = module.exports;
 
-E.WWW_API = 'https://luminati.io';
+E.WWW_API = 'https://brightdata.com';
 
 E.no_ssl_trigger_types = [
     {key: '--Select--', value: '', tooltip: `Choose a trigger type.

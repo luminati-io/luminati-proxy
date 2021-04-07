@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.229.796",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed targeting options from China"
+            }
+        ]
+    },
+    {
         "ver": "1.228.877",
         "type": "stable",
         "changes": [
@@ -897,7 +907,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed restarting Cloud Proxy Manager button from luminati.io/cp/lpm"
+                "text": "Fixed restarting Cloud Proxy Manager button from brightdata.com/cp/lpm"
             },
             {
                 "type": "star",

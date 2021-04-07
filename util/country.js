@@ -2134,6 +2134,59 @@ E.us_states = {
     WV: 'West Virginia',
     WY: 'Wyoming',
 };
+E.us_states_timezone = {
+    AK: 'America/Anchorage',
+    AL: 'America/Chicago',
+    AR: 'America/Chicago',
+    AZ: 'America/Phoenix',
+    CA: 'America/Los_Angeles',
+    CO: 'America/Denver',
+    CT: 'America/New_York',
+    DC: 'America/New_York',
+    DE: 'America/New_York',
+    FL: 'America/New_York',
+    GA: 'America/New_York',
+    HI: 'Pacific/Honolulu',
+    IA: 'America/Chicago',
+    ID: 'America/Denver',
+    IL: 'America/Chicago',
+    IN: 'America/New_York',
+    KS: 'America/Chicago',
+    KY: 'America/Chicago',
+    LA: 'America/Chicago',
+    MA: 'America/New_York',
+    MD: 'America/New_York',
+    ME: 'America/New_York',
+    MI: 'America/Detroit',
+    MN: 'America/Chicago',
+    MO: 'America/Chicago',
+    MS: 'America/Chicago',
+    MT: 'America/Denver',
+    NC: 'America/New_York',
+    ND: 'America/Chicago',
+    NE: 'America/Chicago',
+    NH: 'America/New_York',
+    NJ: 'America/New_York',
+    NM: 'America/Denver',
+    NV: 'America/Los_Angeles',
+    NY: 'America/New_York',
+    OH: 'America/New_York',
+    OK: 'America/Chicago',
+    OR: 'America/Los_Angeles',
+    PA: 'America/New_York',
+    RI: 'America/New_York',
+    SC: 'America/New_York',
+    SD: 'America/Chicago',
+    TN: 'America/Chicago',
+    TX: 'America/Chicago',
+    UT: 'America/Denver',
+    VA: 'America/New_York',
+    VT: 'America/New_York',
+    WA: 'America/Los_Angeles',
+    WI: 'America/Chicago',
+    WV: 'America/New_York',
+    WY: 'America/Denver',
+};
 E.us_states2code = {};
 for (var s in E.us_states)
     E.us_states2code[E.us_states[s]] = s;
@@ -2151,6 +2204,13 @@ E.code2adj = function(code){
 E.code2timezone = function(code){
     code = code.toUpperCase();
     return E.timezone[code] || code;
+};
+
+E.state_code2timezone = function(_country, state){
+    if (_country!='US')
+        return;
+    state = state.toUpperCase();
+    return E.us_states_timezone[state];
 };
 
 E.label2code = function(label){

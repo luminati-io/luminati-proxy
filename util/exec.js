@@ -86,9 +86,7 @@ E.get_redir = (input, piped, ipc)=>{
             if (/^\/dev\/pipe$/.test(dst))
                 dst += src; // remember src fd
             if (!/^\/dev\/(null|pipe)/.test(dst)) // real file
-            {
                 fds.push(dst = fs.openSync(dst, redir_modes[match[2]]));
-            }
         }
         outputs[src] = dst;
     }
@@ -229,12 +227,16 @@ E.sys = (cmd, opt)=>etask(function*exec(){
         this.child_process = child;
     // Process stdio redirection
     let logger = (name, data)=>{
+        if (opt.log)
+        {
+            opt.log(data, name);
+            if (opt.no_buf)
+                return;
+        }
         if (opt[name])
             log[name] += data;
         if (opt.stdall)
             log.stdall += data;
-        if (opt.log)
-            opt.log(data, name);
     };
     handle_stdio(child, redir.pipes, logger);
     if (opt.stdin&&child.stdio[0])

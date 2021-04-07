@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.229.796 Stable
+- :bug: Fixed targeting options from China
+
 ## 1.228.877 Stable
 - :bug: Fixed updating password when updating proxy port
 
@@ -265,7 +268,7 @@ Proxy manager - Change Log
 - :sparkles: Upgraded electron version to support recommended node version
 
 ## 1.198.629 Stable
-- :bug: Fixed restarting Cloud Proxy Manager button from luminati.io/cp/lpm
+- :bug: Fixed restarting Cloud Proxy Manager button from brightdata.com/cp/lpm
 - :star: UI improvement: added Rules column option in proxy ports list
 
 ## 1.198.139 Stable
