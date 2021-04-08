@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Note, Ext_tooltip, with_www_api} from '../common.js';
+import {Note, Ext_tooltip, Faq_link, with_www_api} from '../common.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
 
@@ -196,6 +196,10 @@ export default with_www_api(class Targeting extends Pure_component {
                   note={carriers_note} disabled={carrier_disabled}/>
                 <Config type="select" id="os" data={this.os_opt}
                   disabled={is_static}/>
+                <Note>
+                  Read more about Targeting here
+                  <Faq_link id="pmgr-targeting"/>
+                </Note>
               </Tab_context.Provider>
             </div>;
     }

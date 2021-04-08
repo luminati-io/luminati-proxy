@@ -314,13 +314,25 @@ export class Cm_wrapper extends Pure_component {
     }
 }
 
+export const Faq_link = with_www_api(props=>{
+    const click = ()=>{
+        const url = `${props.www_api}/faq/#${props.id}`;
+        window.open(url, '_blank');
+    };
+    return <T>{t=><Tooltip title={t('Read more')}>
+      <span
+        onClick={click}
+        className="glyphicon glyphicon-question-sign faq_link"/>
+    </Tooltip>}</T>;
+});
+
 export const Note = props=>
     <div className="note">
       <span>{props.children}</span>
     </div>;
 
-export const Field_row_raw = ({disabled, note, animated, ...props})=>{
-    const classes = classnames('field_row', {disabled, note});
+export const Field_row_raw = ({disabled, animated, ...props})=>{
+    const classes = classnames('field_row', {disabled});
     const inner_classes = classnames('field_row_inner', props.inner_class_name,
         {animated});
     return <div className="field_row_wrapper">
@@ -333,11 +345,14 @@ export const Field_row_raw = ({disabled, note, animated, ...props})=>{
 };
 
 export const Labeled_controller = props=>
-    <Field_row_raw disabled={props.disabled} note={props.note}
-      animated={props.animated} inner_style={props.field_row_inner_style}>
+    <Field_row_raw
+      disabled={props.disabled}
+      animated={props.animated}
+      inner_style={props.field_row_inner_style}>
       <T>{t=><React.Fragment>
         <div className="desc" style={props.desc_style}>
           <Tooltip title={t(props.tooltip)}>{t(props.label)}</Tooltip>
+          {props.faq_id && <Faq_link id={props.faq_id}/>}
         </div>
         <div>
           <div className="field" data-tip data-for={props.id+'tip'}>

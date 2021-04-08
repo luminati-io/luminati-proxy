@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.230.0 Stable
+- :sparkles: Improved FAQ and linked with relevant places in Proxy Manager
+
 ## 1.229.796 Stable
 - :bug: Fixed targeting options from China
 

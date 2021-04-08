@@ -116,33 +116,63 @@ export default class General extends Pure_component {
                 <Users_modal form={this.state.form}/>
                 <Config type="text" id="internal_name"/>
                 <Config type="number" id="port"/>
-                <Config type="pins" id="whitelist_ips"
+                <Config
+                  type="pins"
+                  id="whitelist_ips"
                   disabled_ips={disabled_wl}
-                  no_any={zagent}/>
+                  no_any={zagent}
+                />
                 <T>{t=><Config type="select"
                   disabled={zagent}
                   data={this.proxy_connection_type_opt(t)}
-                  id="proxy_connection_type"/>}</T>
-                <Config type="yes_no" id="ssl" on_change={this.ssl_changed}/>
+                  id="proxy_connection_type"
+                  faq_id="pmgr-conn-sp"
+                />}</T>
+                <Config
+                  type="yes_no"
+                  id="ssl"
+                  on_change={this.ssl_changed}
+                  faq_id="pmgr-ssl-analyzing"
+                />
                 {form.ssl &&
-                  <Config type="select" id="tls_lib" disabled={!zagent}
-                    note={!zagent && <Limit_zagent_note/>} data={tls_lib_opt}/>
+                  <Config
+                    type="select"
+                    id="tls_lib"
+                    disabled={!zagent}
+                    note={!zagent && <Limit_zagent_note/>}
+                    data={tls_lib_opt}
+                  />
                 }
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply"
                   data={[0, 5, 20, 100, 500]}/>
                 {type=='ips' &&
-                  <Config type="yes_no" id="multiply_ips"
-                    on_change={this.multiply_static_changed} note={note_ips}/>
+                  <Config
+                    type="yes_no"
+                    id="multiply_ips"
+                    on_change={this.multiply_static_changed}
+                    note={note_ips}
+                  />
                 }
                 {type=='vips' &&
-                  <Config type="yes_no" id="multiply_vips"
-                    on_change={this.multiply_static_changed} note={note_vips}/>
+                  <Config
+                    type="yes_no"
+                    id="multiply_vips"
+                    on_change={this.multiply_static_changed}
+                    note={note_vips}
+                  />
                 }
-                <Config type="yes_no" id="multiply_users"
-                  on_change={this.multiply_users_changed} note={note_users}/>
-                <Config type="select" id="iface"
-                  data={this.state.proxy.iface.values}/>
+                <Config
+                  type="yes_no"
+                  id="multiply_users"
+                  on_change={this.multiply_users_changed}
+                  note={note_users}
+                />
+                <Config
+                  type="select"
+                  id="iface"
+                  data={this.state.proxy.iface.values}
+                />
                 <Config type="pins" id="smtp" exact no_any/>
                 <Config type="select" id="debug" data={debug_opt}/>
               </Tab_context.Provider>

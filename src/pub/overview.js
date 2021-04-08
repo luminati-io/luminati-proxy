@@ -164,7 +164,7 @@ const Logs_off_btn = props=>
   </Tooltip>;
 
 const Tls_warning = with_www_api(props=>{
-    const faq_url = props.www_api+'/faq#proxy-certificate';
+    const faq_url = props.www_api+'/faq#pmgr-cert-installation';
     if (!props.show)
         return null;
     return <Warning id="tls_warning">

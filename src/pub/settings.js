@@ -159,46 +159,85 @@ class Form extends Pure_component {
         const har_limit_data = s.zagent ? har_limit_options.filter(({value})=>
             [-1, 1024].includes(value)) : har_limit_options;
         return <div className="settings_form">
-              <Warnings_modal id='upd_settings_error'
-                warnings={this.state.api_error}/>
-              <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
-                <Select_zone val={s.zone} preview
-                  on_change_wrapper={this.on_change_handler('zone')}/>
-              </Labeled_controller>
-              <Labeled_controller label="Admin whitelisted IPs"
-                tooltip={tooltips.www_whitelist_ips}>
-                <Pins val={s.www_whitelist_ips} pending={s.pending_www_ips}
-                  no_any={s.zagent} on_change_wrapper={
-                      this.on_change_handler('www_whitelist_ips')}/>
-              </Labeled_controller>
-              <Labeled_controller type="pins" label="Proxy whitelisted IPs"
-                tooltip={tooltips.whitelist_ips}>
-                <Pins val={wl} pending={s.pending_ips} no_any={s.zagent}
-                  disabled_ips={s.fixed_whitelist_ips}
-                  on_change_wrapper={this.on_change_handler('whitelist_ips')}/>
-              </Labeled_controller>
-              <Labeled_controller val={s.request_stats} type="yes_no"
-                on_change_wrapper={this.on_change_handler('request_stats')}
-                label="Enable recent stats" default={true}
-                tooltip={tooltips.request_stats}/>
-              <Labeled_controller val={s.logs} type="select_number"
-                on_change_wrapper={this.on_change_handler('logs', {number: 1})}
-                data={logs_data} label="Limit for request logs"
-                default tooltip={tooltips.logs}/>
-              <Labeled_controller val={s.har_limit} type="select_number"
-                on_change_wrapper={this.on_change_handler('har_limit',
-                    {number: 1})} data={har_limit_data}
-                label="Response limit to save" default={1024}
-                tooltip={tooltips.har_limit}/>
-              <Labeled_controller val={s.log} type="select"
-                on_change_wrapper={this.on_change_handler('log')}
-                data={this.log_level_opts} disabled={s.zagent}
-                label="Log level / API logs" tooltip={tooltips.log_level}/>
-              <Labeled_controller val={s.sync_config} type="yes_no"
-                on_change_wrapper={this.on_change_handler('sync_config')}
-                label="Sync configuration" default={!!s.zagent}
-                tooltip={tooltips.sync_config} disabled={s.zagent}/>
-              <Loader_small show={this.state.saving}/>
-            </div>;
+          <Warnings_modal
+            id='upd_settings_error'
+            warnings={this.state.api_error}
+          />
+          <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
+            <Select_zone
+              val={s.zone}
+              preview
+              on_change_wrapper={this.on_change_handler('zone')}
+            />
+          </Labeled_controller>
+          <Labeled_controller label="Admin whitelisted IPs"
+            tooltip={tooltips.www_whitelist_ips}>
+            <Pins
+              val={s.www_whitelist_ips}
+              pending={s.pending_www_ips}
+              no_any={s.zagent}
+              on_change_wrapper={this.on_change_handler('www_whitelist_ips')}
+            />
+          </Labeled_controller>
+          <Labeled_controller
+            type="pins"
+            label="Proxy whitelisted IPs"
+            tooltip={tooltips.whitelist_ips}>
+            <Pins
+              val={wl}
+              pending={s.pending_ips}
+              no_any={s.zagent}
+              disabled_ips={s.fixed_whitelist_ips}
+              on_change_wrapper={this.on_change_handler('whitelist_ips')}
+            />
+          </Labeled_controller>
+          <Labeled_controller
+            val={s.request_stats}
+            type="yes_no"
+            on_change_wrapper={this.on_change_handler('request_stats')}
+            label="Enable recent stats"
+            default={true}
+            tooltip={tooltips.request_stats}
+          />
+          <Labeled_controller
+            val={s.logs}
+            type="select_number"
+            on_change_wrapper={this.on_change_handler('logs', {number: 1})}
+            data={logs_data}
+            label="Limit for request logs"
+            default tooltip={tooltips.logs}
+          />
+          <Labeled_controller
+            val={s.har_limit}
+            type="select_number"
+            on_change_wrapper={this.on_change_handler('har_limit',
+                {number: 1})}
+            data={har_limit_data}
+            label="Response limit to save"
+            default={1024}
+            tooltip={tooltips.har_limit}
+          />
+          <Labeled_controller
+            val={s.log}
+            type="select"
+            on_change_wrapper={this.on_change_handler('log')}
+            data={this.log_level_opts}
+            disabled={s.zagent}
+            label="Log level / API logs"
+            tooltip={tooltips.log_level}
+            faq_id="pmgr-logging"
+          />
+          <Labeled_controller
+            val={s.sync_config}
+            type="yes_no"
+            on_change_wrapper={this.on_change_handler('sync_config')}
+            label="Sync configuration"
+            default={!!s.zagent}
+            tooltip={tooltips.sync_config}
+            disabled={s.zagent}
+            faq_id="pmgr-sync-config"
+          />
+          <Loader_small show={this.state.saving}/>
+        </div>;
     }
 }

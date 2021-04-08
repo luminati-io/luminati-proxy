@@ -10,7 +10,7 @@ import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import {qw} from '../../../util/string.js';
 import {Loader, Loader_small, Preset_description, Ext_tooltip,
-    Checkbox} from '../common.js';
+    Checkbox, Faq_link} from '../common.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
@@ -558,17 +558,27 @@ class Nav extends Pure_component {
         const is_unblocker = this.props.plan.type=='unblocker';
         const preset_disabled = this.props.disabled;
         return <div className="nav">
-          <Select_zone val={this.props.form.zone} on_change_wrapper={val=>
+          <Select_zone
+            val={this.props.form.zone}
+            on_change_wrapper={val=>
               this.confirm_update(()=>this.update_zone(val))}
-            disabled={this.props.disabled} preview/>
-          <Field i18n options={opts}
+            disabled={this.props.disabled}
+            preview
+          />
+          <Field
+            i18n
+            options={opts}
             on_change={val=>this.confirm_update(()=>
               this.update_preset(val))}
-            value={preset} disabled={preset_disabled}
-            ext_tooltip={!is_unblocker} id="preset"
+            value={preset}
+            disabled={preset_disabled}
+            ext_tooltip={!is_unblocker}
+            id="preset"
             tooltip={
               <Preset_description preset={preset} rule_clicked={()=>0}/>
-            }/>
+            }
+            faq_id="pmgr-presets"
+          />
           {is_local() &&
             <Open_browser_btn port={this.props.form.port}/>
           }
@@ -626,6 +636,7 @@ const Field = ({id, disabled, children, i18n, ext_tooltip, ...props})=>{
           </option>
         )}
       </select>
+      {props.faq_id && <Faq_link id={props.faq_id}/>}
     </div>}</T>;
 };
 

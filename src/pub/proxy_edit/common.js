@@ -85,6 +85,7 @@ export const Config = withRouter(class Config extends Pure_component {
                   <Ext_tooltip/>}
               exact={this.props.exact}
               filter_by={this.props.filter_by}
+              faq_id={this.props.faq_id}
               no_any={this.props.no_any}/>;
     }
 });

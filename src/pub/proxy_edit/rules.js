@@ -11,7 +11,7 @@ import {migrate_trigger, no_ssl_trigger_types, trigger_types,
 import {ms} from '../../../util/date.js';
 import zutil from '../../../util/util.js';
 import {Labeled_controller, with_proxy_ports, Cm_wrapper,
-    Warning} from '../common.js';
+    Warning, Faq_link} from '../common.js';
 import {tabs} from './fields.js';
 import Proxy_tester from '../proxy_tester.js';
 import Tooltip from '../common/tooltip.js';
@@ -218,7 +218,9 @@ export default class Rules extends Pure_component {
                       </T>
                       {' '}
                       <a className="link" onClick={this.turn_ssl}>
-                      <T>SSL analyzing</T></a>
+                        <T>SSL analyzing</T>
+                      </a>
+                      <Faq_link id="pmgr-ssl-analyzing"/>
                     </span>
                   </React.Fragment>
                 }/>
