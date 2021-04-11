@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.230.178",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed sending usage stat with invalid domain name"
+            }
+        ]
+    },
+    {
         "ver": "1.230.0",
         "type": "stable",
         "changes": [

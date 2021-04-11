@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.230.178 Stable
+- :bug: Fixed sending usage stat with invalid domain name
+
 ## 1.230.0 Stable
 - :sparkles: Improved FAQ and linked with relevant places in Proxy Manager
 
