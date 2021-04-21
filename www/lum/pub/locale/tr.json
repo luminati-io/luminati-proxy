@@ -1382,5 +1382,7 @@
   "Privacy policy": "Gizlilik Politikası",
   "Legal": "Yasal",
   "SUPPORT": "DESTEK",
-  "FOOTER - END": "FOOTER - END"
+  "FOOTER - END": "FOOTER - END",
+  "Enter the code provided by the Google Authenticator app to attach a device":
+  "Bir cihaz eklemek için Google Authenticator uygulaması tarafından sağlanan kodu girin"
 }

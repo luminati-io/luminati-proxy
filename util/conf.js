@@ -21,7 +21,7 @@ function parse(conf){
 }
 
 function _hostname(){
-    let hostname = env.CONFIG_HOSTNAME || os.hostname();
+    let hostname = (env.CONFIG_HOSTNAME || os.hostname()).toLowerCase();
     return hostname.replace(/\.hola\.org$/, '').replace(/\.localdomain$/, '')
         .replace(/\.local$/, '').replace(/\.home$/, '');
 }

@@ -465,6 +465,7 @@ class Client extends WS {
         this.retry_random = opt.retry_random;
         this.next_retry = this.retry_interval;
         this.no_retry = opt.no_retry;
+        this.retry_chances = opt.retry_chances;
         this._retry_count = 0;
         this.lookup = opt.lookup;
         this.lookup_ip = opt.lookup_ip;
@@ -547,6 +548,12 @@ class Client extends WS {
     _reconnect(){
         if (this.no_retry)
             return false;
+        if (this.retry_chances && this._retry_count >= this.retry_chances-1)
+        {
+            this.close();
+            this.emit('out_of_retries');
+            return false;
+        }
         let delay = this.next_retry;
         if (typeof delay=='function')
             delay = delay();

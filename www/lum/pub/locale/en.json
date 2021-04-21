@@ -227,5 +227,7 @@
   "lpm_new_ver": "A new",
   "lpm_new_ver_version": "version",
   "lpm_new_ver_major": "major",
-  "lpm_new_ver_minor": "minor"
+  "lpm_new_ver_minor": "minor",
+  "Enter the code provided by the Google Authenticator app to attach a device":
+  "Enter the code provided by the Google Authenticator app to attach a device"
 }

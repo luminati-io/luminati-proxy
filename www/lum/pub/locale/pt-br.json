@@ -1756,7 +1756,7 @@
   "Special benefits": "benefícios especiais",
   "Bright Data's DNA": "DNA da Bright Data",
   "About us": "Sobre nós",
-  "We are building the world's largest business proxy network, bound to make the internet less centralized, more open, and, in one word - better. Bright Data is a high value secure service used by fortune 500 customers and thousands of enterprises for price comparison, travel, and other legitimate uses which form the foundations of a free market.": "Estamos construindo a maior rede proxy para negócios do mundo, dedicados a tornar a Internet menos centralizada, mais aberta, e, em uma palavra - melhor. Bright Data é um serviço seguro, de alto valor agregado, utilizados por clientes Fortune 500 e milhares de empresas de comparação de preços, viagens entre outras utilizações legítimas e que formam os alicerces de um mercado livre.",
+  "We are building the world's largest business proxy network, bound to make the internet less centralized, more open, and, in one word - better. Bright Data is a high value secure service used by Fortune 500 customers and thousands of enterprises for price comparison, travel, and other legitimate uses which form the foundations of a free market.": "Estamos construindo a maior rede proxy para negócios do mundo, dedicados a tornar a Internet menos centralizada, mais aberta, e, em uma palavra - melhor. Bright Data é um serviço seguro, de alto valor agregado, utilizados por clientes Fortune 500 e milhares de empresas de comparação de preços, viagens entre outras utilizações legítimas e que formam os alicerces de um mercado livre.",
   "We believe that the finest products are developed by small teams of great programmers. We are a small group of developers and we are interested in finding the best professionals in the world to join our team and develop the world's largest proxy network.": "Acreditamos que os melhores produtos são desenvolvidos por pequenas equipes de grandes programadores. Somos um pequeno grupo de desenvolvedores e estamos interessados ​​em encontrar os melhores profissionais do mundo para se juntar a nossa equipe e desenvolver a maior rede de proxy do mundo.",
   "Global approach": "abordagem global",
   "Apply now": "Junte-se agora",
@@ -2982,7 +2982,7 @@
   "We are looking for brilliant students from computer science or any equivelant field, even first years, for a part-time position. We want the next generation of stars; so we will train you, let you work remotely and give you the best compensation. just bring the talent!": "Estamos à procura de estudantes brilhantes de ciência da computação ou qualquer campo equivelante, até mesmo primeiros anos, para uma posição temporarias. Queremos a próxima geração de estrelas; por isso vamos treiná-lo, deixá-lo trabalhar remotamente e dar-lhe a melhor compensação. basta trazer o talento!",
   "Sales director": "diretor de vendas",
   "Lead generation": "geração de leads",
-  "We are looking for an experienced sales directors to join our growing business development and sales team. Preference for sales people that sold in to fortune 500 companies.": "Estamos à procura de um diretor de vendas experiente para participar do nosso time de negócios, que esta em constante crescimento. Preferência por pessoas de vendas que venderam para empresas da Fortune 500.",
+  "We are looking for an experienced sales directors to join our growing business development and sales team. Preference for sales people that sold in to Fortune 500 companies.": "Estamos à procura de um diretor de vendas experiente para participar do nosso time de negócios, que esta em constante crescimento. Preferência por pessoas de vendas que venderam para empresas da Fortune 500.",
   "Job description": "Descrição do trabalho",
   "Qualify and nurture inbound leads for high/low touch opportunities, create own opportunities and harvest them, with the help of the backend sales team personal responsibility for high tech accounts.": "Qualificar e trazer leads alto potencial de negocios, crie as suas próprias oportunidades e traga negócios com a ajuda da equipe de vendas",
   "Job requirements": "exigências da vaga",
@@ -3747,9 +3747,10 @@
   "Mobile": "Mobile",
   "See full proxy documentation": "Ver documentação proxy completa",
   "ISP Proxies": "Proxies ISP",
+  "ISP proxies": "Proxies ISP",
   "Static IP's from internet service providers (ISPs) network": "IPs estáticas de servidores de internet (ISPs)",
   "IP's from 3G and 4G network of real mobile devices": "IPs 3G/4G de telefones reais",
-  "Smart proxy, unblock the traffic of your existing applications": "Proxy Inteligente, desbloqueie o tráfego dos seus aplicativos atuais.",
+  "Automated tool to enhance proxy performance and manage end-to end unblocking actions": "Ferramenta automatizada para aumento da performance das proxies e ações de desbloqueio.",
   "The backbone for data-driven business decisions": "A espinha dorsal para a tomada de decisões de negócios por meio de dados",
   "For ambitious companies around the world, Bright Data makes collecting public online data simple, fast, and reliable--at any scale.": "Para empresas ambiciosas em todo o mundo, a Bright Data torna a coleta de dados públicos online simples, rápida e confiável - em qualquer escala",
   "Our multi-layered AI technologies collect data tailored to individual business needs, and we serve the data needs of thousands of companies each year, from startups to Fortune 500s.": "A nossas tecnologia multilayer de IA coletam dados sob medida para as necessidades dos seus negócios, e atendemos às necessidades de dados de milhares de empresas a cada ano, desde startups ate empresas Fortune 500",
@@ -3764,7 +3765,7 @@
   "Dedicated account managers": "Gerentes de Contas dedicados",
   "We've been working with Bright Data for a little over a year. Previously one of our main challenges was constantly dealing with flakey, unreliable proxy providers. Bright Data's stability and dependability has allowed us to focus on other revenue-generating activities.": "Trabalhamos com a Bright Data há pouco mais de um ano. Anteriormente, um dos nossos principais desafios era lidar constantemente com provedores de proxy instáveis e não confiáveis. A estabilidade e confiabilidade da Bright Data nos permitiu focar em outras atividades geradoras de receita",
   "Read more": "Leia Mais",
-  "No brainer pricing": "Preço básico",
+  "No-brainer pricing": "Preço básico",
   "Crawlers": "Crawlers",
   "Rotating Proxies": "Proxies Rotativos",
   "Static Proxies": "Proxies Estaticos",
@@ -3814,5 +3815,7 @@
   "Certified by": "Certificado por",
   "Browser Extension": "Extensão Browser",
   "Password required" : "Senha necessária",
-  "Please add a new password or click 'Cancel'": "Por favor adicione a sua senha ou clique 'Cancelar'"
+  "Please add a new password or click 'Cancel'": "Por favor adicione a sua senha ou clique 'Cancelar'",
+  "Enter the code provided by the Google Authenticator app to attach a device":
+  "Digite o código fornecido pelo aplicativo Google Authenticator para conectar um dispositivo"
 }

@@ -1773,7 +1773,7 @@
   "Bright Data is growing fast and looking for driven people to join our team.": "Bright Data está creciendo rápidamente y en busca de gente talentosa para unirse a nuestro equipo.",
   "Our company": "Nuestra compañía",
   "Open positions": "Posiciones abiertas",
-  "We are building the world's largest business proxy network, bound to make the internet less centralized, more open, and, in one word - better. Bright Data is a high value secure service used by fortune 500 customers and thousands of enterprises for price comparison, travel, and other legitimate uses which form the foundations of a free market.": "Estamos construyendo la mayor red proxy de negocios del mundo, con el bojetivo de hacer la Internet menos centralizada, más abierta, y, en una palabra - mejor. Bright Data es un servicio seguro y de alto valor, utilizado por la Fortune 500 clientes y miles de empresas, para la comparación de precios, viajes y otros usos legítimos que forman las bases de un mercado libre.",
+  "We are building the world's largest business proxy network, bound to make the internet less centralized, more open, and, in one word - better. Bright Data is a high value secure service used by Fortune 500 customers and thousands of enterprises for price comparison, travel, and other legitimate uses which form the foundations of a free market.": "Estamos construyendo la mayor red proxy de negocios del mundo, con el bojetivo de hacer la Internet menos centralizada, más abierta, y, en una palabra - mejor. Bright Data es un servicio seguro y de alto valor, utilizado por la Fortune 500 clientes y miles de empresas, para la comparación de precios, viajes y otros usos legítimos que forman las bases de un mercado libre.",
   "Bring us a R&D star and win $7,000": "Tráenos una estrella R&D y gana $7,000",
   "Special benefits": "beneficios especiales",
   "Bright Data's DNA": "ADN de Bright Data",
@@ -3613,6 +3613,7 @@
   "See full proxy documentation": "Mira la documentación de proxy completa",
   "Data center  Proxies": "Proxies de Data Center",
   "ISP Proxies": "Proxies de ISP",
+  "ISP proxies": "Proxies de ISP",
   "Static IP's from internet service providers (ISPs) network":  "IPs estáticas de Servicios Proveedores de Internet (ISPs)",
   "IP's from 3G and 4G network of real mobile devices": "IPs de Network 3G y 4G de dispositivos móviles reales",
   "Smart proxy, unblock the traffic of your existing applications": "Proxy Inteligente, desbloquea el tráfico de tus aplicaciones existentes.",
@@ -3628,7 +3629,7 @@
   "Dedicated account managers": "Account Managers dedicados",
   "We've been working with Bright Data for a little over a year. Previously one of our main challenges was constantly dealing with flakey, unreliable proxy providers. Bright Data's stability and dependability has allowed us to focus on other revenue-generating activities.": "Trabajamos con Bright Data desde hace poco más de un año. Anteriormente, uno de nuestros principales desafíos era tratar constantemente con proveedores de proxy poco fiables y poco confiables. La estabilidad y confiabilidad de Bright Data nos ha permitido enfocarnos en otras actividades generadoras de ingresos",
   "Read more": "Lee más",
-  "No brainer pricing": "Precios sencillos",
+  "No-brainer pricing": "Precios sencillos",
   "Crawlers": "Crawlers",
   "Rotating Proxies": "Proxies Rotativos",
   "Static Proxies": "Proxies Estáticos",
@@ -3674,5 +3675,7 @@
   "Follow Us": "Síguenos",
   "Certified by":  "Certified by",
   "Empowering web data collection of the world's leading universities and research institutes": "Potenciar la recopilación de datos web de las principales universidades e institutos de investigación del mundo",
-  "Join our academic program": "Únase a nuestro programa académico"
+  "Join our academic program": "Únase a nuestro programa académico",
+  "Enter the code provided by the Google Authenticator app to attach a device":
+  "Ingrese el código provisto por la aplicación Google Authenticator para adjuntar un dispositivo"
 }

@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.231.909 Stable
+- :sparkles: Added links to FAQ pages with the instrucitons
+- :bug: Fixed banning IPs feature
+
 ## 1.230.178 Stable
 - :bug: Fixed sending usage stat with invalid domain name
 

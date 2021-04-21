@@ -969,6 +969,7 @@ E.timezone = {
     WF: 'Pacific/Wallis',
     PL: 'Europe/Warsaw',
     US: 'America/New_York',
+    GF: 'America/Cayenne',
 };
 E.regions = {
     AD: ['Southern Europe', 'EMEA'],

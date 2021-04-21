@@ -170,7 +170,9 @@ class Form extends Pure_component {
               on_change_wrapper={this.on_change_handler('zone')}
             />
           </Labeled_controller>
-          <Labeled_controller label="Admin whitelisted IPs"
+          <Labeled_controller
+            label="Admin whitelisted IPs"
+            faq_id="pmgr-whitelist-ui"
             tooltip={tooltips.www_whitelist_ips}>
             <Pins
               val={s.www_whitelist_ips}
@@ -181,6 +183,7 @@ class Form extends Pure_component {
           </Labeled_controller>
           <Labeled_controller
             type="pins"
+            faq_id="pmgr-whitelist-proxy"
             label="Proxy whitelisted IPs"
             tooltip={tooltips.whitelist_ips}>
             <Pins

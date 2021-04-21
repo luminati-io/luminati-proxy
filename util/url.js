@@ -169,6 +169,10 @@ E.is_ip_subnet = function(host){
     return m && E.is_ip(m[1]) && +m[2]<=32;
 };
 
+E.cbl_key2sub = function(ip){
+    return ip.replace(/_/g, '.')+'/24';
+};
+
 E.is_ip_netmask = function(host){
     if (!host || typeof host.split !== 'function')
         return false;

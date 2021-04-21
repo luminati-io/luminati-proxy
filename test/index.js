@@ -774,6 +774,19 @@ describe('proxy', ()=>{
             assert.equal(retry_count, 1);
             assert.equal(r.body, 'test', 'body was sent on retry');
         }));
+        it('should retry if got a banned ip', ()=>etask(function*(){
+            l = yield lum();
+            let retry_count = 0;
+            l.on('retry', opt=>{
+                if (opt.req.retry)
+                    retry_count++;
+                l.lpm_request(opt.req, opt.res, opt.head, opt.post);
+            });
+            l.banlist.add('1.1.1.1');
+            const resp = yield l.test({fake: 1});
+            assert.notEqual(resp.statusCode, 502);
+            assert.equal(retry_count, 1);
+        }));
     });
     describe('rules', ()=>{
         const get_retry_rule = (retry_port=24001)=>({

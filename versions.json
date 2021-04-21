@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.231.909",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added links to FAQ pages with the instrucitons"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed banning IPs feature"
+            }
+        ]
+    },
+    {
         "ver": "1.230.178",
         "type": "stable",
         "changes": [
