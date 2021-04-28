@@ -534,12 +534,12 @@ function run(){
     else
     {
         let lum = ['zs-graphite.luminati.io', 'zs-graphite-log.luminati.io'];
-        let stats = ['zs-graphite.luminati.io', 'zs-graphite-log.luminati.io',
-            'zs-graphite-stats.luminati.io'];
+        let stats = ['zs-graphite-stats.luminati.io',
+            'zs-graphite-log.luminati.io'];
         if (+env.LXC)
         {
             lum = ['zs-graphite.luminati.io'];
-            stats = [...lum, 'zs-graphite-stats.luminati.io'];
+            stats = ['zs-graphite-stats.luminati.io'];
         }
         lum.forEach(h=>ws_client('lum', `ws://${h}:${port}`));
         stats.forEach(h=>ws_client('stats', `ws://${h}:${port}`));

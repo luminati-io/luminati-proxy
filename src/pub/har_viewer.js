@@ -14,9 +14,11 @@ import zescape from '../../util/escape.js';
 import setdb from '../../util/setdb.js';
 import zutil from '../../util/util.js';
 import Tooltip from './common/tooltip.js';
-import {Har_viewer} from './har/viewer.js';
+import {Har_viewer, Pane_headers, Pane_preview, Pane_response,
+    Pane_timing, Pane_info} from '/www/util/pub/har.js';
 import {Tooltip_bytes} from './common.js';
 import {get_troubleshoot} from './util.js';
+import {trigger_types, action_types} from '../../util/rules_util.js';
 import ws from './ws.js';
 
 const loader = {
@@ -51,6 +53,112 @@ const table_cols = [
     {title: 'Troubleshooting', data: 'details.troubleshoot'},
     {title: 'Date', sort_by: 'timestamp', data: 'details.timestamp'},
 ];
+
+class Pane_troubleshoot extends Pure_component {
+    render(){
+        const response = this.props.req.response;
+        const troubleshoot = get_troubleshoot(response.content.text,
+            response.status, response.headers);
+        if (troubleshoot.title)
+        {
+            return <div className="timing_view_wrapper">
+              <ol className="tree_outline">
+                <li key="li" onClick={this.toggle}
+                  className="parent_title expandable open">
+                  {troubleshoot.title}
+                </li>
+                <ol>{troubleshoot.info}</ol>
+              </ol>
+            </div>;
+        }
+        return <Pane_info>
+          <div>There's not troubleshooting for this request.</div>
+        </Pane_info>;
+    }
+}
+Pane_troubleshoot.width = 110;
+Pane_troubleshoot.id = 'troubleshooting';
+
+const Pane_rules = withRouter(class Pane_rules extends Pure_component {
+    goto_ssl = ()=>{
+        this.props.history.push({
+            pathname: `/proxy/${this.props.req.details.port}`,
+            state: {field: 'trigger_type'},
+        });
+    };
+    render(){
+        const {details: {rules}} = this.props.req;
+        if (!rules || !rules.length)
+        {
+            return <Pane_info>
+              <div>
+                <span>No rules have been triggered on this request. </span>
+                <a className="link" onClick={this.goto_ssl}>
+                  Configure Rules</a>
+              </div>
+            </Pane_info>;
+        }
+        return <div className="rules_view_wrapper">
+          <ol className="tree_outline">
+            {rules.map((r, idx)=>
+              <Rule_preview key={idx} rule={r} idx={idx+1}/>
+            )}
+          </ol>
+        </div>;
+    }
+});
+Pane_rules.width = 50;
+Pane_rules.id = 'rules';
+
+class Rule_preview extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        const {rule, idx} = this.props;
+        const children_classes = classnames('children', 'timeline',
+            {open: this.state.open});
+        const first_trigger = trigger_types.find(t=>rule[t.value])||{};
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {idx}. {first_trigger.key}
+            </li>,
+            <ol key="ol" className={children_classes}>
+              <Trigger_section rule={rule}/>
+              <Action_section actions={rule.action}/>
+            </ol>,
+        ];
+    }
+}
+
+const Trigger_section = ({rule})=>
+    <div className="trigger_section">
+      {trigger_types.map(t=><Trigger key={t.value} type={t} rule={rule}/>)}
+    </div>;
+
+const Trigger = ({type, rule})=>{
+    if (!rule[type.value])
+        return null;
+    return <div className="trigger">
+      {type.key}: {rule[type.value]}
+    </div>;
+};
+
+const Action_section = ({actions})=>
+    <div className="action_section">
+      {Object.keys(actions).map(a=>
+        <Action key={a} action={a} value={actions[a]}/>
+      )}
+    </div>;
+
+const Action = ({action, value})=>{
+    const key = (action_types.find(a=>a.value==action)||{}).key;
+    const val = action=='request_url' ? value&&value.url : value;
+    return <div className="action">
+      {key} {val ? `: ${val}` : ''}
+    </div>;
+};
 
 export default withRouter(
 class Lpm_har_viewer extends Pure_component {
@@ -331,11 +439,22 @@ class Lpm_har_viewer extends Pure_component {
         const show = this.state.logs>0;
         if (!show)
         {
-            return <Route path={['/logs', '/proxy/:port/logs/har']}
+            return <Route
+              path={['/logs', '/proxy/:port/logs/har']}
               component={Logs_off_notice}
             />;
         }
-        return <Har_viewer {...this.props}
+        const panes = [
+            Pane_headers,
+            Pane_preview,
+            Pane_response,
+            Pane_timing,
+            Pane_rules,
+            Pane_troubleshoot,
+        ];
+        return <Har_viewer
+          {...this.props}
+          panes={panes}
           Cell_value={Cell_value}
           table_cols={table_cols}
           proxies={this.state.proxies}
@@ -352,6 +471,7 @@ class Lpm_har_viewer extends Pure_component {
           type_filter={this.state.type_filter}
           set_filter={this.set_filter}
           filters={this.state.filters}
+          toolbar
         >
           {this.props.children}
         </Har_viewer>;

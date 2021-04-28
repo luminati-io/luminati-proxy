@@ -229,5 +229,8 @@
   "lpm_new_ver_major": "major",
   "lpm_new_ver_minor": "minor",
   "Enter the code provided by the Google Authenticator app to attach a device":
-  "Enter the code provided by the Google Authenticator app to attach a device"
+  "Enter the code provided by the Google Authenticator app to attach a device",
+  "The admin removed this user from account": "The admin removed this user from account",
+  "To create a new account": "To create a new account",
+  "click here": "click here"
 }

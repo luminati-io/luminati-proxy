@@ -92,6 +92,7 @@ E.mkdirp_e = p=>etask(function*mkdirp_e(){
 E.mkdirp_file_e = f=>E.mkdirp_e(path.dirname(f));
 E.readdir_e = path=>etask.nfn_apply(fs.readdir, [path]);
 E.rmdir_e = path=>etask.nfn_apply(fs.rmdir, [path]);
+E.rmdir_r_e = p=>etask.nfn_apply(fs.rmdir, [p, {recursive: true}]);
 E.rmdirs_empty_e = (dir, base)=>etask(function*(){
     dir = path.resolve(dir);
     if (base)

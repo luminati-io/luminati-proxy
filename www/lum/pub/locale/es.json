@@ -492,7 +492,6 @@
   "Ad networks use Bright Data to anonymously view their advertisers' landing pages to ensure they don't contain malware, or improper advertising. If ad networks used a regular server based proxy network, the malicious advertiser would know he's being checked, and could cloak them with a different message.": "Las AdNetworks usan Bright Data para ver anónimamente las Landing Pages de sus anunciantes para asegurarse de que no contengan malware o publicidad inapropiada. Si las AdNetworks usaran una red de proxy basada en un servidor regular, el anunciante malintencionado sabría que esta siendo revisado y podría mostrar un anuncio diferente.",
   "What customers are doing with Bright Data": "Qué están haciendo nuestros clientes con Bright Data",
   "Locations": "Ubicaciones",
-  "Bright Data SDK": "Bright Data SDK",
   "Sitemap": "Mapa de Sitio",
   "Patents": "Patentes",
   "My account": "Mi cuenta",
@@ -2280,7 +2279,7 @@
   "It is highly recommended to test this issue in advance by sending a request to": "Es muy recomendable probar esta cuestión con antelación mediante el envío de una solicitud a",
   "If the proxy-authorization header is exposed it will appear in the response.": "Si la cabecera Autorización proxy se expone que aparecerá en la respuesta.",
   "Can a peer intercept traffic?": "¿Puede un peer interceptar tráfico?",
-  "View FAQ for Bright Data SDK": "Ver preguntas frecuentes sobre el SDK de Bright Data",
+  "View FAQ for Bright SDK": "Ver preguntas frecuentes sobre el SDK de Bright",
   "We will provide a modest bounty for a qualified and unknown vulnerability report.": "Vamos a ofrecer una modesta recompensa por un informe de vulnerabilidad calificada y desconocido.",
   "Organic Keyword Tracking": "Seguimiento de Keywords Orgánico",
   "Track top results for company brands and trademarks": "Realizar un seguimiento primeros resultados de marcas de la compañía y las marcas",
@@ -3656,7 +3655,7 @@
   "Referral Program": "Programa de Referencias",
   "Accelerator Program": "Programa de Acelerador",
   "Reward Program": "Programa de Recompensa",
-  "Bright Data SDK": "SDK de Bright Data",
+  "Bright SDK": "SDK de Bright",
   "Partners": "Socios",
   "NDS response": "Respuesta de NDS",
   "Use Cases": "Casos de Uso",
@@ -3677,5 +3676,8 @@
   "Empowering web data collection of the world's leading universities and research institutes": "Potenciar la recopilación de datos web de las principales universidades e institutos de investigación del mundo",
   "Join our academic program": "Únase a nuestro programa académico",
   "Enter the code provided by the Google Authenticator app to attach a device":
-  "Ingrese el código provisto por la aplicación Google Authenticator para adjuntar un dispositivo"
+  "Ingrese el código provisto por la aplicación Google Authenticator para adjuntar un dispositivo",
+  "The admin removed this user from account": "El administrador eliminó a esta usuario de la cuenta,",
+  "To create a new account": "Para crear una nueva cuenta",
+  "click here": "haga clic aquí"
 }

@@ -66,55 +66,57 @@ class Overview extends Pure_component {
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
         const title = <T>Overview</T>;
         return <div className="overview_page">
-              <div className="warnings">
-                {!this.state.embedded &&
-                  <React.Fragment>
-                    <Upgrade/>
-                    <Upgrade_warning/>
-                  </React.Fragment>
-                }
-                <Tls_warning show={this.state.tls_warning}/>
-                <Whitelist_warning/>
-                <Warnings warnings={this.state.warnings}/>
-              </div>
-              <div className="proxies nav_header">
-                <h3>{title}</h3>
-                <Toolbar/>
-              </div>
-              <div className="panels" style={panels_style}>
-                <div className="proxies proxies_wrapper">
-                  <Proxies/>
-                </div>
-                {!zagent &&
-                  <Logs_context.Provider value={!!show_logs}>
-                    <Stats/>
-                  </Logs_context.Provider>
-                }
-              </div>
-              {show_logs===null &&
-                <Loader_small show loading_msg="Loading..."/>}
-              {show_logs &&
-                <div className="logs_wrapper">
-                  <Har_viewer/>
-                </div>}
-              {show_logs===false &&
-                <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>}
-              <Modal id="sync_config_modal" ok_btn_title="Yes"
-                click_ok={()=>this.set_sync_config(true)}
-                cancel_clicked={()=>this.set_sync_config(false)}
-                title={<T>Do you want to enable configuration
-                    synchronization?</T>}>
-                <p>
-                  <T>
-                    Synchronizing your Proxy Manager configuration gives you
-                    reliable backup, single configuration across all instances
-                    which propagates automatically and central control via
-                    control panel.
-                  </T>
-                </p>
-                <p><T>You can always change it later in settings.</T></p>
-              </Modal>
-            </div>;
+          <div className="warnings">
+            {!this.state.embedded &&
+              <React.Fragment>
+                <Upgrade/>
+                <Upgrade_warning/>
+              </React.Fragment>
+            }
+            <Tls_warning show={this.state.tls_warning}/>
+            <Whitelist_warning/>
+            <Warnings warnings={this.state.warnings}/>
+          </div>
+          <div className="proxies nav_header">
+            <h3>{title}</h3>
+            <Toolbar/>
+          </div>
+          <div className="panels" style={panels_style}>
+            <div className="proxies proxies_wrapper">
+              <Proxies/>
+            </div>
+            {!zagent &&
+              <Logs_context.Provider value={!!show_logs}>
+                <Stats/>
+              </Logs_context.Provider>
+            }
+          </div>
+          {show_logs===null &&
+            <Loader_small show loading_msg="Loading..."/>
+          }
+          {show_logs &&
+            <div className="logs_wrapper">
+              <Har_viewer/>
+            </div>}
+          {show_logs===false &&
+            <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>
+          }
+          <Modal id="sync_config_modal" ok_btn_title="Yes"
+            click_ok={()=>this.set_sync_config(true)}
+            cancel_clicked={()=>this.set_sync_config(false)}
+            title={<T>Do you want to enable configuration
+                synchronization?</T>}>
+            <p>
+              <T>
+                Synchronizing your Proxy Manager configuration gives you
+                reliable backup, single configuration across all instances
+                which propagates automatically and central control via
+                control panel.
+              </T>
+            </p>
+            <p><T>You can always change it later in settings.</T></p>
+          </Modal>
+        </div>;
     }
 }
 
@@ -130,13 +132,13 @@ const Toolbar = ()=>
 const Add_proxy_btn = ()=>{
   const open_modal = ()=>$('#add_new_proxy_modal').modal('show');
   return <T>{t=>
-      <Tooltip title={t('Add new port')}>
-        <button onClick={open_modal}
-          className="btn btn_lpm btn_lpm_primary toolbar_item">
-          Add new port
-        </button>
-      </Tooltip>
-    }</T>;
+    <Tooltip title={t('Add new port')}>
+      <button onClick={open_modal}
+        className="btn btn_lpm btn_lpm_primary toolbar_item">
+        Add new port
+      </button>
+    </Tooltip>
+  }</T>;
 };
 
 const Nav_icon = withRouter(props=>{
@@ -145,15 +147,15 @@ const Nav_icon = withRouter(props=>{
       props.history.push({pathname: path});
   };
   return <T>{t=>
-      <Tooltip title={t(props.tooltip)}>
-          <div className="toolbar_item">
-            <div className='toolbar_icon_bg'>
-            <div className={classes}
-              onClick={()=>navigate_to(props.link_to)}/>
-            </div>
+    <Tooltip title={t(props.tooltip)}>
+        <div className="toolbar_item">
+          <div className='toolbar_icon_bg'>
+          <div className={classes}
+            onClick={()=>navigate_to(props.link_to)}/>
           </div>
-      </Tooltip>
-    }</T>;
+        </div>
+    </Tooltip>
+  }</T>;
 });
 
 const Logs_off_btn = props=>
@@ -168,16 +170,16 @@ const Tls_warning = with_www_api(props=>{
     if (!props.show)
         return null;
     return <Warning id="tls_warning">
-          <span>
-            <strong>TLS errors have been detected. </strong>
-            <span>
-              Your browser or crawler has to install the certificate. </span>
-            <a target="_blank" rel="noopener noreferrer" className="link"
-              onClick={()=>perr('tls.check_instructions')} href={faq_url}>
-              Check the instructions.
-            </a>
-          </span>
-        </Warning>;
+      <span>
+        <strong>TLS errors have been detected. </strong>
+        <span>
+          Your browser or crawler has to install the certificate. </span>
+        <a target="_blank" rel="noopener noreferrer" className="link"
+          onClick={()=>perr('tls.check_instructions')} href={faq_url}>
+          Check the instructions.
+        </a>
+      </span>
+    </Warning>;
 });
 
 class Upgrade extends Pure_component {
@@ -208,28 +210,31 @@ class Upgrade extends Pure_component {
         const major = versions.some(v=>v.type=='dev');
         const upgrade_type = major ? 'major' : 'minor';
         return <Warning tooltip={tooltip} id={this.state.ver_last.version}>
+          <div>
+            <T>lpm_new_ver</T>{' '}
+            <strong><T>{'lpm_new_ver_'+upgrade_type}</T></strong>{' '}
+            <T>lpm_new_ver_version</T>{' '}
+            <strong>{this.state.ver_last.version}</strong>{' '}
+            <T>is available. You are</T>{' '}
+            <strong>{versions.length}</strong>{' '}
+            <T>releases behind the newest version.</T>
+          </div>
+          <div className="buttons buttons_upgrade">
+            <button className="btn btn_lpm btn_upgrade"
+              onClick={this.upgrade} disabled={disabled}>
+              <T>
+                {upgrading ? 'Upgrading...' :
+                  upgrade_error ? 'Error' : 'Upgrade'
+                }
+              </T>
+            </button>
+          </div>
+          {ver_node && !ver_node.satisfied && !electron &&
             <div>
-              <T>lpm_new_ver</T>{' '}
-              <strong><T>{'lpm_new_ver_'+upgrade_type}</T></strong>{' '}
-              <T>lpm_new_ver_version</T>{' '}
-              <strong>{this.state.ver_last.version}</strong>{' '}
-              <T>is available. You are</T>{' '}
-              <strong>{versions.length}</strong>{' '}
-              <T>releases behind the newest version.</T>
+              To upgrade Proxy Manager, you need to update Node.js
+              to version {this.state.ver_node.recommended}.
             </div>
-            <div className="buttons buttons_upgrade">
-              <button className="btn btn_lpm btn_upgrade"
-                onClick={this.upgrade} disabled={disabled}>
-                <T>{upgrading ? 'Upgrading...' :
-                    upgrade_error ? 'Error' : 'Upgrade'}</T>
-              </button>
-            </div>
-            {ver_node && !ver_node.satisfied && !electron &&
-              <div>
-                To upgrade Proxy Manager, you need to update Node.js
-                to version {this.state.ver_node.recommended}.
-              </div>
-            }
+          }
         </Warning>;
     }
 }
@@ -249,14 +254,14 @@ class Upgrade_warning extends Pure_component {
         if (!is_upgraded||!ver)
             return null;
         return <Warning id={'upgrade_alert'+ver}>
-              <span>
-                <strong><T>Proxy Manager was upgraded in the background. </T>
-                </strong>
-                <T>Click here to </T>
-                <a className="link"
-                  onClick={this.on_click.bind(this)}><T>downgrade.</T></a>
-              </span>
-            </Warning>;
+          <span>
+            <strong><T>Proxy Manager was upgraded in the background. </T>
+            </strong>
+            <T>Click here to </T>
+            <a className="link"
+              onClick={this.on_click.bind(this)}><T>downgrade.</T></a>
+          </span>
+        </Warning>;
     }
 }
 
@@ -277,14 +282,14 @@ class Whitelist_warning extends Pure_component {
         if (!not_whitelisted)
             return null;
         return <Warning id="not_whitelisted_warning">
-              <span>
-                <strong><T>Security issues found. Proxy Manager accepts
-                connections from all the IPs</T></strong>{' '}
-                <T>Click here to</T>{' '}
-                <a className="link" onClick={this.on_click.bind(this)}><T>see
-                  whitelisted IPs.</T></a>
-              </span>
-            </Warning>;
+          <span>
+            <strong><T>Security issues found. Proxy Manager accepts
+            connections from all the IPs</T></strong>{' '}
+            <T>Click here to</T>{' '}
+            <a className="link" onClick={this.on_click.bind(this)}><T>see
+              whitelisted IPs.</T></a>
+          </span>
+        </Warning>;
     }
 });
 

@@ -55,7 +55,7 @@ E.is_static_proxy = (zone_name, zones)=>{
 
 E.is_unblocker = (zone_name, zones)=>{
     const plan = get_plan(zone_name, zones);
-    return plan.type=='unblocker' || plan.unblocker;
+    return plan.type=='unblocker' || !!plan.unblocker;
 };
 
 E.is_mobile = (zone_name, zones)=>{

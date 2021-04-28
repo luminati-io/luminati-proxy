@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.232.896",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed updating flags when setting or unsetting unblocker"
+            }
+        ]
+    },
+    {
         "ver": "1.231.909",
         "type": "stable",
         "changes": [

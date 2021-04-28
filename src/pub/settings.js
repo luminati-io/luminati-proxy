@@ -194,14 +194,16 @@ class Form extends Pure_component {
               on_change_wrapper={this.on_change_handler('whitelist_ips')}
             />
           </Labeled_controller>
-          <Labeled_controller
-            val={s.request_stats}
-            type="yes_no"
-            on_change_wrapper={this.on_change_handler('request_stats')}
-            label="Enable recent stats"
-            default={true}
-            tooltip={tooltips.request_stats}
-          />
+          {!s.zagent &&
+            <Labeled_controller
+              val={s.request_stats}
+              type="yes_no"
+              on_change_wrapper={this.on_change_handler('request_stats')}
+              label="Enable recent stats"
+              default={true}
+              tooltip={tooltips.request_stats}
+            />
+          }
           <Labeled_controller
             val={s.logs}
             type="select_number"

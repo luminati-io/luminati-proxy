@@ -209,7 +209,6 @@ export const get_troubleshoot = (body, status_code, headers)=>{
     return {title, info: ''};
 };
 
-
 export const status_codes = {
     101: 'Switching Protocols',
     200: 'OK',

@@ -1459,5 +1459,8 @@
   "SLA": "SLA",
   "FOOTER - END": "FOOTER - END",
   "Enter the code provided by the Google Authenticator app to attach a device":
-  "기기 를 연결 하려면 Google OTP 앱 에서 제공 한 코드 를 입력 하세요."
+  "기기 를 연결 하려면 Google OTP 앱 에서 제공 한 코드 를 입력 하세요.",
+  "The admin removed this user from account": "관리자가이 사용자를 계정에서 제거했습니다",
+  "To create a new account": "새 계정을 만들려면",
+  "click here": "여기를 클릭하세요"
 }

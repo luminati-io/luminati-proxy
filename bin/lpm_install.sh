@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.231.909"
+VERSION="1.232.896"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -105,9 +105,9 @@ usage()
     echo "  --no-perr     - don't send perrs to server"
     echo "  --print-perr  - print perrs to console"
     echo "ACTION:"
-    echo "  setup         - setup lpm (DEFAULT)"
-    echo "  clean         - clean cache and lpm related files"
-    echo "  dev-setup     - attempt to clean any traces of lpm and it's"
+    echo "  setup         - setup pmgr (DEFAULT)"
+    echo "  clean         - clean cache and pmgr related files"
+    echo "  dev-setup     - attempt to clean any traces of pmgr and it's"
     echo "                  dependencies"
     echo "                  WARNING: be careful, attempts to delete"
     echo "                           - several system packages"
@@ -589,7 +589,7 @@ deps_install()
 
 lpm_clean()
 {
-    echo "cleaning lpm related node packages and npm cache..."
+    echo "cleaning pmgr related node packages and npm cache..."
     local clean_cmd=(
         "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
         "rm -rf $(npm root -g)/{@luminati-io,luminati-proxy}"
@@ -749,12 +749,12 @@ main()
         setup
         ;;
     clean)
-        if prompt "Clean lpm related files and packages?" n; then
+        if prompt "Clean pmgr related files and packages?" n; then
             lpm_clean
         fi
         ;;
     dev-setup)
-        if prompt "Clean machine from lpm install and setup again?" n; then
+        if prompt "Clean machine from pmgr install and setup again?" n; then
            dev_setup
         fi
         ;;

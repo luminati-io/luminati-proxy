@@ -12,7 +12,7 @@ import {Infinite_chrome_table} from '../chrome_widgets.js';
 import conv from '../../../util/conv.js';
 import zcountry from '../../../util/country.js';
 import {flag_with_title} from '../common.js';
-import {Filter} from '../har/viewer.js';
+import {Filter} from '/www/util/pub/har.js';
 
 export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -309,13 +309,20 @@ export default class Alloc_modal extends Pure_component {
             title={sub_title}
             toolbar={<React.Fragment>
               <div className="search_box">
-                <input value={this.state.ip_filter} placeholder="IP filter"
-                  onChange={e=>this.on_filter_change(e, 'ip_filter')}/>
+                <input
+                  value={this.state.ip_filter}
+                  placeholder="IP filter"
+                  onChange={e=>this.on_filter_change(e, 'ip_filter')}
+                />
               </div>
-              <Filter vals={this.state.countries} val={this.state.cn_filter}
-                format_text={zcountry.code2label} tooltip="Countries"
+              <Filter
+                vals={this.state.countries}
+                val={this.state.cn_filter}
+                format_text={zcountry.code2label}
+                tooltip="Countries"
                 default_value="All countries"
-                set={e=>this.on_filter_change(e, 'cn_filter')}/>
+                set={e=>this.on_filter_change(e, 'cn_filter')}
+              />
             </React.Fragment>}
             class_name="in_modal_table"
             selectable

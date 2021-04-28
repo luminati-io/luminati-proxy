@@ -554,6 +554,7 @@ class Client extends WS {
             this.emit('out_of_retries');
             return false;
         }
+        this.emit('reconnecting');
         let delay = this.next_retry;
         if (typeof delay=='function')
             delay = delay();
@@ -1190,6 +1191,8 @@ class Mux {
                     if (stream._writableState)
                         stream._writableState.errorEmitted = true;
                 });
+                if (zfin_pending)
+                    zfin_pending.continue();
                 if (err) // don't try to end/finish stream gracefully if error
                     yield zfinish(false, false);
                 else

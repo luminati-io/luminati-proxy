@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.232.896 Stable
+- :sparkles: UI improvements
+- :bug: Fixed updating flags when setting or unsetting unblocker
+
 ## 1.231.909 Stable
 - :sparkles: Added links to FAQ pages with the instrucitons
 - :bug: Fixed banning IPs feature

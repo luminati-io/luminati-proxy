@@ -10,7 +10,8 @@ import date from '../../util/date.js';
 import {Loader, Warnings, with_proxy_ports, Add_icon, No_zones,
     Remove_icon} from './common.js';
 import {Input} from './common/controls.js';
-import {Preview} from './har/viewer.js';
+import {Preview, Pane_headers, Pane_preview, Pane_response,
+    Pane_timing} from '/www/util/pub/har.js';
 import Proxy_blank from './proxy_blank.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
@@ -24,13 +25,21 @@ export default class Proxy_tester extends Pure_component {
     update_response = response=>this.setState({response});
     clear_response = ()=>this.setState({response: undefined});
     render(){
+        const panes = [
+            Pane_headers,
+            Pane_preview,
+            Pane_response,
+            Pane_timing,
+        ];
         return <div className="proxy_tester vbox">
           <Request update_response={this.update_response}
             no_labels={this.props.no_labels}
             port={this.props.port}
             hide_port={!!this.props.port}
           />
-          <Preview cur_preview={this.state.response}
+          <Preview
+            panes={panes}
+            cur_preview={this.state.response}
             close={this.clear_response}
           />
         </div>;

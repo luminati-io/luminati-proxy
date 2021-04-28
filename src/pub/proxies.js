@@ -403,6 +403,7 @@ const columns = [
             +'request is considered as successful if the server of the '
             +'destination website responded',
         render: Success_rate_cell,
+        calc_available: settings=>settings && settings.request_stats,
         default: true,
         ext: true,
         dynamic: true,
@@ -416,6 +417,7 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
+        calc_available: settings=>settings && settings.request_stats,
         width: 90,
     },
     {
@@ -426,6 +428,7 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
+        calc_available: settings=>settings && settings.request_stats,
         width: 90,
     },
     {
@@ -438,6 +441,7 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
+        calc_available: settings=>settings && settings.request_stats,
         width: 90,
     },
     {
@@ -450,6 +454,7 @@ const columns = [
         dynamic: true,
         grow: 1,
         width: 60,
+        calc_available: settings=>settings && settings.request_stats,
     },
     {
         key: 'browser',
@@ -470,6 +475,11 @@ const columns_obj = Object.keys(columns)
 class Columns_modal extends Pure_component {
     state = {selected_cols: []};
     componentDidMount(){
+        this.setdb_on('head.settings', settings=>{
+            if (!settings)
+                return;
+            this.setState({settings});
+        });
         const selected_cols = this.props.selected_cols.reduce((acc, e)=>
             Object.assign(acc, {[e]: true}), {});
         this.setState({selected_cols, saved_cols: selected_cols});
@@ -499,27 +509,30 @@ class Columns_modal extends Pure_component {
     };
     render(){
         const header = <div className="header_buttons">
-              <button onClick={this.select_all} className="btn btn_lpm">
-                <T>Check all</T></button>
-              <button onClick={this.select_none} className="btn btn_lpm">
-                <T>Uncheck all</T></button>
-              <button onClick={this.select_default} className="btn btn_lpm">
-                <T>Default</T></button>
-            </div>;
+          <button onClick={this.select_all} className="btn btn_lpm">
+            <T>Check all</T></button>
+          <button onClick={this.select_none} className="btn btn_lpm">
+            <T>Uncheck all</T></button>
+          <button onClick={this.select_default} className="btn btn_lpm">
+            <T>Default</T></button>
+        </div>;
         return <Modal id="edit_columns" custom_header={header}
-              click_ok={this.click_ok} cancel_clicked={this.click_cancel}>
-              <div className="row columns">
-                {columns.filter(col=>!col.sticky).map(col=>
-                  <div key={col.key} className="col-md-6">
-                    <T>{t=>
-                      <Checkbox text={t(col.title)} value={col.key}
-                        on_change={this.on_change}
-                        checked={!!this.state.selected_cols[col.key]}/>
-                    }</T>
-                  </div>
-                )}
+          click_ok={this.click_ok} cancel_clicked={this.click_cancel}>
+          <div className="row columns">
+            {columns.filter(col=>!col.sticky).map(col=>
+              <div key={col.key} className="col-md-6">
+                <T>{t=>
+                  <Checkbox
+                    text={t(col.title)}
+                    value={col.key}
+                    on_change={this.on_change}
+                    checked={!!this.state.selected_cols[col.key]}
+                  />
+                }</T>
               </div>
-            </Modal>;
+            )}
+          </div>
+        </Modal>;
     }
 }
 
@@ -564,6 +577,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             const countries = locations.countries_by_code;
             this.setState({countries});
+        });
+        this.setdb_on('head.settings', settings=>{
+            if (!settings)
+                return;
+            this.setState({settings});
         });
         this.setdb_on('ws.zones', zones=>{
             if (!zones)
@@ -715,9 +733,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return <div className="cp_td"></div>;
         const {selected_proxies} = this.state;
         const checked = !!selected_proxies[props.rowData.port];
-        return <Checkbox checked={checked}
+        return <Checkbox
+          checked={checked}
           on_change={()=>this.on_row_select(props.rowData)}
-          on_click={e=>e.stopPropagation()}/>;
+          on_click={e=>e.stopPropagation()}
+        />;
     };
     on_row_select = proxy=>{
         const {selected_proxies} = this.state;
@@ -757,9 +777,15 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             const actions_idx = columns.findIndex(col=>col.key=='actions');
             columns[actions_idx].width = 60;
         }
-        return columns.filter(col=>this.state.selected_cols.includes(col.key)
-            || col.sticky || col.calc_show && col.calc_show(
-                this.state.visible_proxies||[]));
+        return columns.filter(col=>{
+            if (col.sticky)
+                return true;
+            if (col.calc_show && col.calc_show(this.state.visible_proxies||[]))
+                return true;
+            if (col.calc_available && !col.calc_available(this.state.settings))
+                return false;
+            return this.state.selected_cols.includes(col.key);
+        });
     };
     open_delete_dialog = proxies=>{
         this.setState({delete_proxies: proxies, open_delete_dialog: true});
@@ -839,8 +865,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                           visible_proxies[index]||'filler'}>
                         <Column key="select"
                           cellRenderer={this.select_renderer.bind(this)}
-                          label={<Checkbox checked={this.state.checked_all}
-                            on_change={()=>null}/>}
+                          label={
+                            <Checkbox
+                              checked={this.state.checked_all}
+                              on_change={()=>null}
+                            />
+                          }
                           dataKey="select"
                           className="cp_td"
                           flexGrow={0}

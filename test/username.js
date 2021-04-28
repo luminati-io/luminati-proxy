@@ -69,6 +69,19 @@ describe('username', ()=>{
                 {country: 'us', ua: false, unblock: true, preset: 'unblocker'},
                 'lum-country-us');
         });
+        describe('unblocker', ()=>{
+            const t = (name, opt, expected)=>it(name, ()=>{
+                const res = username.calculate_username(opt);
+                assert.equal(res.username, expected);
+            });
+            t('should skip unblocker when is false', {unblocker: false},
+                'lum');
+            t('should skip unblocker when is empty', {unblocker: ''}, 'lum');
+            t('should skip unblocker when is undefined',
+                {unblocker: undefined}, 'lum');
+            t('should set unblocker when is true', {unblocker: true},
+                'lum-unblocker');
+        });
         describe('state', ()=>{
             const t = (name, opt, expected)=>it(name, ()=>{
                 const res = username.calculate_username(opt);

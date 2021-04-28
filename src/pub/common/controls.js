@@ -112,36 +112,47 @@ export class Pins extends Pure_component {
         const {pending, disabled, pins} = this.state;
         const pending_btn_title = `Add recent IPs (${pending.length})`;
         const has_any = pins.find(p=>p.val==ANY_IP);
+        const shown_pins = pins.filter(p=>!has_any || p.val==ANY_IP);
         return <div className="pins_field">
-              <div className="pins">
-                {pins.map(p=>
-                  <Pin key={p.id} update_pin={this.update_pin} id={p.id}
-                    set_edit={this.set_edit} edit={p.edit}
-                    exact={this.props.exact} save_pin={this.save_pin}
-                    show_any={!this.props.no_any && !has_any}
-                    remove={this.remove} disabled={p.disabled}>
-                    {p.val}
-                  </Pin>
-                )}
-              </div>
-              <T>{t=><Pin_btn title={t('Add IP')}
-                tooltip={t('Add new IP to the list')}
-                on_click={this.add_empty_pin} disabled={disabled}/>}</T>
-              {!!pending.length && !disabled &&
-                <Pin_btn on_click={this.open_modal} title={pending_btn_title}/>
-              }
-              <Modal_dialog title="Add recent IPs"
-                open={this.state.modal_open}
-                ok_clicked={this.dismiss_modal} no_cancel_btn>
-                {pending.map(ip=>
-                  <Add_pending_btn key={ip} ip={ip}
-                    add_pin={this.add_pin}/>
-                )}
-                {!pending.length &&
-                  <span>No more pending IPs to whitelist</span>
-                }
-              </Modal_dialog>
-            </div>;
+          <div className="pins">
+            {shown_pins.map(p=>
+              <Pin
+                key={p.id}
+                update_pin={this.update_pin}
+                id={p.id}
+                set_edit={this.set_edit}
+                edit={p.edit}
+                exact={this.props.exact}
+                save_pin={this.save_pin}
+                show_any={!this.props.no_any && !has_any}
+                remove={this.remove} disabled={p.disabled}>
+                {p.val}
+              </Pin>
+            )}
+          </div>
+          <T>{t=>
+            <Pin_btn
+              title={t('Add IP')}
+              tooltip={t('Add new IP to the list')}
+              on_click={this.add_empty_pin}
+              disabled={disabled||has_any}
+            />
+          }</T>
+          {!!pending.length && !disabled &&
+            <Pin_btn on_click={this.open_modal} title={pending_btn_title}/>
+          }
+          <Modal_dialog title="Add recent IPs"
+            open={this.state.modal_open}
+            ok_clicked={this.dismiss_modal} no_cancel_btn>
+            {pending.map(ip=>
+              <Add_pending_btn key={ip} ip={ip}
+                add_pin={this.add_pin}/>
+            )}
+            {!pending.length &&
+              <span>No more pending IPs to whitelist</span>
+            }
+          </Modal_dialog>
+        </div>;
     }
 }
 
@@ -199,28 +210,28 @@ class Pin extends Pure_component {
         const {children, edit, disabled, show_any} = this.props;
         const input_classes = classnames({hidden: !edit});
         return <div className={classnames('pin', {active: edit, disabled})}
-            onBlur={this.on_blur}>
-              {!disabled &&
-                <div className="x" onClick={this.remove}>
-                <div className="glyphicon glyphicon-remove"/>
-              </div>}
-              <div className="content" onClick={this.edit}>
-                {!edit && this.get_label(children)}
-                <input ref={this.input} type="text" value={children}
-                  onChange={this.on_change} className={input_classes}
-                  onKeyUp={this.key_up}/>
-              </div>
-              {edit && show_any &&
-                <button className="any" onClick={this.on_any_click}>
-                    <T>any</T>
-                </button>
-              }
-              {edit &&
-                <div className="v">
-                  <div className="glyphicon glyphicon-ok"/>
-                </div>
-              }
-            </div>;
+          onBlur={this.on_blur}>
+          {!disabled &&
+            <div className="x" onClick={this.remove}>
+            <div className="glyphicon glyphicon-remove"/>
+          </div>}
+          <div className="content" onClick={this.edit}>
+            {!edit && this.get_label(children)}
+            <input ref={this.input} type="text" value={children}
+              onChange={this.on_change} className={input_classes}
+              onKeyUp={this.key_up}/>
+          </div>
+          {edit && show_any &&
+            <button className="any" onClick={this.on_any_click}>
+                <T>any</T>
+            </button>
+          }
+          {edit &&
+            <div className="v">
+              <div className="glyphicon glyphicon-ok"/>
+            </div>
+          }
+        </div>;
     }
 }
 
@@ -242,12 +253,14 @@ export class Select_status extends Pure_component {
     };
     on_change = e=>this.props.on_change_wrapper(e && e.value || '');
     render(){
-        return <T>{t=><Select_multiple {...this.props}
-              class_name="status"
-              options={this.status_types.map(v=>this.value_to_option(t, v))}
-              on_change={this.on_change}
-              validation={v=>!!v}
-              value_to_option={this.value_to_option.bind(this, t)}/>}</T>;
+        return <T>{t=><Select_multiple
+          {...this.props}
+          class_name="status"
+          options={this.status_types.map(v=>this.value_to_option(t, v))}
+          on_change={this.on_change}
+          validation={v=>!!v}
+          value_to_option={this.value_to_option.bind(this, t)}
+        />}</T>;
     }
 }
 
@@ -292,12 +305,14 @@ export class Select_number extends Pure_component {
     render(){
         const data = this._get_data();
         const options = data.map(this.value_to_option);
-        return <Select_multiple {...this.props}
-              options={options}
-              on_change={this.on_change}
-              validation={this.validation}
-              value_to_option={this.value_to_option}
-              no_options_message={()=>'You can use only numbers here'}/>;
+        return <Select_multiple
+          {...this.props}
+          options={options}
+          on_change={this.on_change}
+          validation={this.validation}
+          value_to_option={this.value_to_option}
+          no_options_message={()=>'You can use only numbers here'}
+        />;
     }
 }
 
@@ -333,19 +348,21 @@ export class Select_multiple extends Pure_component {
         }),
     };
     render(){
-        return <React_select styles={this.styles}
-            className={classnames('select_multiple', this.props.class_name)}
-            isClearable
-            noOptionsMessage={this.props.no_options_message}
-            classNamePrefix="react_select"
-            value={this.props.value_to_option(this.props.val)}
-            onChange={this.props.on_change}
-            options={this.props.options}
-            isValidNewOption={this.props.validation}
-            pageSize={9}
-            placeholder={this.props.placeholder}
-            blurInputOnSelect={true}
-            isDisabled={this.props.disabled}/>;
+        return <React_select
+          styles={this.styles}
+          className={classnames('select_multiple', this.props.class_name)}
+          isClearable
+          noOptionsMessage={this.props.no_options_message}
+          classNamePrefix="react_select"
+          value={this.props.value_to_option(this.props.val)}
+          onChange={this.props.on_change}
+          options={this.props.options}
+          isValidNewOption={this.props.validation}
+          pageSize={9}
+          placeholder={this.props.placeholder}
+          blurInputOnSelect={true}
+          isDisabled={this.props.disabled}
+        />;
     }
 }
 
@@ -355,9 +372,10 @@ export class Yes_no extends Pure_component {
     };
     render(){
         return <Toggle_on_off
-            val={this.props.val}
-            on_click={this.toggle_active}
-            disabled={this.props.disabled}/>;
+          val={this.props.val}
+          on_click={this.toggle_active}
+          disabled={this.props.disabled}
+        />;
     }
 }
 
@@ -578,15 +596,17 @@ export const Input = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val, props.id);
     };
-    return <T>{t=><input style={props.style}
-          type={props.type}
-          value={props.val}
-          disabled={props.disabled}
-          onChange={e=>update(e.target.value)}
-          className={props.className}
-          placeholder={t(props.placeholder)}
-          onBlur={props.on_blur}
-          onKeyUp={props.on_key_up}/>}</T>;
+    return <T>{t=><input
+      style={props.style}
+      type={props.type}
+      value={props.val}
+      disabled={props.disabled}
+      onChange={e=>update(e.target.value)}
+      className={props.className}
+      placeholder={t(props.placeholder)}
+      onBlur={props.on_blur}
+      onKeyUp={props.on_key_up}
+    />}</T>;
 };
 
 export const Select_zone = withRouter(
