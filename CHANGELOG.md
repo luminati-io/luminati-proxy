@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.233.836 Stable
+- :bug: Fixed updating disabled zones
+
 ## 1.232.896 Stable
 - :sparkles: UI improvements
 - :bug: Fixed updating flags when setting or unsetting unblocker

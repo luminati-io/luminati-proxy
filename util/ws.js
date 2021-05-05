@@ -120,7 +120,7 @@ class WS extends events.EventEmitter {
                 mux: opt.mux
             });
         }
-        this.mux = opt.mux ? new Mux(this, opt.backpressuring) : undefined;
+        this.mux = opt.mux ? new Mux(this) : undefined;
         if (this.zc && !zcounter)
             zcounter = require('./zcounter.js');
     }
@@ -320,15 +320,15 @@ class WS extends events.EventEmitter {
         try {
             if (typeof msg=='string')
             {
+                let parsed;
                 if (this._events.zjson)
                 {
-                    let parsed;
                     if (this.zc && this.time_parse)
                     {
-                        let started = Date.now();
+                        const t = Date.now();
                         parsed = conv.JSON_parse(msg, this.zjson_opt_receive);
                         zcounter.inc(`${this.zc}_parse_zjson_ms`,
-                            Date.now()-started);
+                            Date.now()-t);
                     }
                     else
                         parsed = conv.JSON_parse(msg, this.zjson_opt_receive);
@@ -337,15 +337,14 @@ class WS extends events.EventEmitter {
                 }
                 if (this._events.json)
                 {
-                    let parsed, started;
-                    if (this.zc && this.time_parse)
-                        started = Date.now();
-                    parsed = JSON.parse(msg);
                     if (this.zc && this.time_parse)
                     {
-                        zcounter.inc(`${this.zc}_parse_json_ms`,
-                            Date.now()-started);
+                        const t = Date.now();
+                        parsed = parsed||JSON.parse(msg);
+                        zcounter.inc(`${this.zc}_parse_json_ms`, Date.now()-t);
                     }
+                    else
+                        parsed = parsed||JSON.parse(msg);
                     this.emit('json', parsed);
                     handled = true;
                 }
@@ -1037,9 +1036,8 @@ class IPC_server {
 
 // XXX vladislavl: remove _bp methods once ack version tested and ready
 class Mux {
-    constructor(zws, backpressuring=false){
+    constructor(zws){
         this.ws = zws;
-        this.backpressuring = backpressuring;
         this.streams = new Map();
         this.ws.on('bin', this._on_bin.bind(this));
         this.ws.on('json', this._on_json.bind(this));
@@ -1088,11 +1086,6 @@ class Mux {
         let _stacktrace = (new Error()).stack;
         stream.create_ts = Date.now();
         stream.prependListener('data', function(chunk){
-            if (_this.backpressuring &&
-                this.readableLength<=this.readableHighWaterMark>>1)
-            {
-                _this.remote_write_resume(vfd);
-            }
             this.last_use_ts = Date.now();
             if (!this._httpMessage || this.parser && this.parser.socket===this
                 || is_rn)
@@ -1405,26 +1398,6 @@ class Mux {
         }
         return true;
     }
-    remote_write_pause(id){
-        const stream = this.streams.get(id);
-        if (!stream || stream.remote_write_paused)
-            return;
-        this.ws.json({stream_id: id, backpressure_cmd: 'write_pause',
-            log: this.backpressuring.log});
-        stream.remote_write_paused = true;
-        if (this.ws.zc)
-            zcounter.inc('mux_remote_write_pause');
-    }
-    remote_write_resume(id){
-        const stream = this.streams.get(id);
-        if (!stream || !stream.remote_write_paused)
-            return;
-        this.ws.json({stream_id: id, backpressure_cmd: 'write_resume',
-            log: this.backpressuring.log});
-        stream.remote_write_paused = false;
-        if (this.ws.zc)
-            zcounter.inc('mux_remote_write_resume');
-    }
     _on_bin(buf){
         if (buf.length<vfd_sz)
             return zerr(`${this.ws}: malformed binary message`);
@@ -1434,16 +1407,8 @@ class Mux {
         let stream = this.streams.get(vfd);
         if (!stream)
             return zerr(`${this.ws}: unexpected stream vfd ${vfd}`);
-        if (stream.on_ack)
-            this._on_bin_ack(stream, buf);
-        else
-            this._on_bin_bp(stream, buf, vfd);
-    }
-    _on_bin_bp(stream, buf, vfd){
-        if (!stream.push(buf.slice(vfd_sz)) && this.backpressuring)
-            this.remote_write_pause(vfd);
-    }
-    _on_bin_ack(stream, buf){
+        if (!stream.on_ack)
+            return stream.push(buf.slice(vfd_sz));
         try {
             stream.send_win_size();
             stream.push(buf.slice(vfd_sz));
@@ -1453,24 +1418,6 @@ class Mux {
         }
     }
     _on_json(msg){
-        if (msg && msg.backpressure_cmd)
-            this._on_json_bp(msg);
-        else
-            this._on_json_ack(msg);
-    }
-    _on_json_bp(msg){
-        const stream = this.streams.get(msg.stream_id);
-        if (!stream || !msg.backpressure_cmd)
-            return;
-        if (msg.log)
-            zerr.notice(`${this.ws}: ${msg.backpressure_cmd}`);
-        switch (msg.backpressure_cmd)
-        {
-        case 'write_pause': return stream.allow(0);
-        case 'write_resume': return stream.allow();
-        }
-    }
-    _on_json_ack(msg){
         if (!msg || msg.vfd===undefined)
             return;
         const stream = this.streams.get(msg.vfd);

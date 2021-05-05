@@ -37,24 +37,26 @@ export default class Zone_description extends Pure_component {
             c = flag_with_title(static_country, static_country.toUpperCase());
         const plan_type = get_plan_product(plan);
         return <T>{t=><div className="zone_settings">
-              <ul className="bullets">
-                <Zone_bullet atr="Network type"
-                  tip="The network accessible by this zone">
-                  <Tooltip title={t(network_types[plan_type].tooltip)}>
-                    {t(network_types[plan_type].label)}
-                  </Tooltip>
-                </Zone_bullet>
-                <Zone_domains_bullet atr="IP exclusivity" plan={plan}
-                  show={plan.ips_type!==undefined} t={t}/>
-                <Zone_bullet atr="Country" tip="Allowed country">
-                  {t(c)}</Zone_bullet>
-                <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
-                  {plan.ips}</Zone_bullet>
-                <Zone_bullet atr="Permissions" tip="Set of permissions">
-                  <Perm_icons perm_list={zone.perm.split(' ')} plan={plan}/>
-                </Zone_bullet>
-              </ul>
-            </div>}</T>;
+          <ul className="bullets">
+            <Zone_bullet atr="Network type"
+              tip="The network accessible by this zone">
+              <Tooltip title={t(network_types[plan_type].tooltip)}>
+                {t(network_types[plan_type].label)}
+              </Tooltip>
+            </Zone_bullet>
+            <Zone_domains_bullet atr="IP exclusivity" plan={plan}
+              show={plan.ips_type!==undefined} t={t}/>
+            <Zone_bullet atr="Country" tip="Allowed country">
+              {t(c)}
+            </Zone_bullet>
+            <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
+              {plan.ips}
+            </Zone_bullet>
+            <Zone_bullet atr="Permissions" tip="Set of permissions">
+              <Perm_icons perm_list={zone.perm.split(' ')} plan={plan}/>
+            </Zone_bullet>
+          </ul>
+        </div>}</T>;
     }
 }
 
@@ -68,17 +70,17 @@ class Zone_domains_bullet extends Pure_component {
         const {atr, show, plan, t} = this.props;
         const domains = (plan.domain_whitelist||'').split(' ').filter(Boolean);
         return <React.Fragment>
-              <Zone_bullet atr={atr} show={show}>
-                {t(this.ips_types[plan.ips_type])}
-              </Zone_bullet>
-              {!!domains.length &&
-                <div className="domains_list">{domains.map(d=>
-                  <Tooltip key={d} title={d}>
-                    <span className="domain">{d}</span>
-                  </Tooltip>)}
-                </div>
-              }
-            </React.Fragment>;
+          <Zone_bullet atr={atr} show={show}>
+            {t(this.ips_types[plan.ips_type])}
+          </Zone_bullet>
+          {!!domains.length &&
+            <div className="domains_list">{domains.map(d=>
+              <Tooltip key={d} title={d}>
+                <span className="domain">{d}</span>
+              </Tooltip>)}
+            </div>
+          }
+        </React.Fragment>;
     }
 }
 
@@ -112,12 +114,12 @@ class Perm_icons extends Pure_component {
         else if (perm.route_dedicated)
             icons.unshift('data_center');
         return <T>{t=>
-              <div>{icons.map(_perm=>
-                <Tooltip key={_perm} title={t(this.prem_tooltips[_perm])}>
-                  <div className={'perm_icon '+_perm}/>
-                </Tooltip>)}
-              </div>
-            }</T>;
+          <div>{icons.map(_perm=>
+            <Tooltip key={_perm} title={t(this.prem_tooltips[_perm])}>
+              <div className={'perm_icon '+_perm}/>
+            </Tooltip>)}
+          </div>
+        }</T>;
     }
 }
 
@@ -127,11 +129,11 @@ const Zone_bullet = ({tip, show, atr, children})=>{
     if (!show)
         return null;
     return <T>{t=>
-          <li className="pair">
-            <Tooltip title={t(tip)}>
-              <span className="title">{t(atr)}:</span>
-            </Tooltip>
-            <span className="val">{children}</span>
-          </li>
-        }</T>;
+      <li className="pair">
+        <Tooltip title={t(tip)}>
+          <span className="title">{t(atr)}:</span>
+        </Tooltip>
+        <span className="val">{children}</span>
+      </li>
+    }</T>;
 };

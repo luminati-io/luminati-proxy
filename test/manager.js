@@ -109,7 +109,9 @@ describe('manager', function(){
             customers: ['test_cust'],
             logins: [],
         });
-        manager.lpm_f.get_server_conf = ()=>({client: {}});
+        manager.lpm_f.get_server_conf = ()=>{
+            manager.lpm_f.emit('server_conf', {client: {}});
+        };
         if (start_manager!==false)
             yield manager.start();
         return {manager};

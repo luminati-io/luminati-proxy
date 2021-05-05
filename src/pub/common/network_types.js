@@ -4,6 +4,8 @@
 // XXX azamat/krzysztof: copy pasted from lum/pub/plans.js, fix webpack loader
 // and import it as a whole module
 export const get_plan_product = plan=>{
+    if (plan.disable)
+        return 'disable';
     if (plan.type=='static')
         return plan.pool_ip_type=='static_res' && 'res_static' || 'dc';
     if ((plan.type=='resident' || plan.type=='unblocker') && plan.serp)
@@ -42,5 +44,10 @@ export const network_types = {
     serp: {
         label: 'SERP',
         tooltip: 'Send Google search requests',
+    },
+    disable: {
+        label: 'Disabled',
+        tooltip: 'Disabled from control panel. Cannot be used for sending '
+            +'traffic',
     },
 };

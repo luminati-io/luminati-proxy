@@ -30,6 +30,7 @@ import {Modal} from './common/modals.js';
 import {report_exception} from './util.js';
 import {createGlobalStyle} from 'styled-components';
 import './css/app.less';
+import '../../www/util/pub/css/har.less';
 
 window.setdb = setdb;
 setdb.setMaxListeners(50);

@@ -10,8 +10,8 @@ import date from '../../util/date.js';
 import {Loader, Warnings, with_proxy_ports, Add_icon, No_zones,
     Remove_icon} from './common.js';
 import {Input} from './common/controls.js';
-import {Preview, Pane_headers, Pane_preview, Pane_response,
-    Pane_timing} from '/www/util/pub/har.js';
+import {Preview, Pane_headers} from '/www/util/pub/har.js';
+import {Pane_response, Pane_preview, Pane_timing} from './har_viewer.js';
 import Proxy_blank from './proxy_blank.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';

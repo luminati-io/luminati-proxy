@@ -242,6 +242,12 @@ function copy_file(src, dst, opt){
         }
         throw FileError(`file already exists: ${dst}`, 'EEXIST');
     }
+    if (opt.if_newer && E.exists(dst) && stat.mtime<=E.mtime(dst))
+    {
+        if (opt.verbose)
+            console.log(`Skipping copy (src is not newer): ${src}->${dst}`);
+        return true;
+    }
     check_file(dst, opt);
     mode = 'mode' in opt ? opt.mode : stat.mode & 0o777;
     fdw = fs.openSync(dst, 'w', mode);

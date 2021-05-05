@@ -4,6 +4,7 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 import {Route, Link, withRouter} from 'react-router-dom';
+import {Waypoint} from 'react-waypoint';
 import classnames from 'classnames';
 import moment from 'moment';
 import React_tooltip from 'react-tooltip';
@@ -14,12 +15,16 @@ import zescape from '../../util/escape.js';
 import setdb from '../../util/setdb.js';
 import zutil from '../../util/util.js';
 import Tooltip from './common/tooltip.js';
-import {Har_viewer, Pane_headers, Pane_preview, Pane_response,
-    Pane_timing, Pane_info} from '/www/util/pub/har.js';
+import {Har_viewer, Pane_headers, Pane_info, JSON_viewer,
+    Img_viewer} from '/www/util/pub/har.js';
 import {Tooltip_bytes} from './common.js';
 import {get_troubleshoot} from './util.js';
 import {trigger_types, action_types} from '../../util/rules_util.js';
 import ws from './ws.js';
+import codemirror from 'codemirror/lib/codemirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/htmlmixed/htmlmixed';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
@@ -53,6 +58,248 @@ const table_cols = [
     {title: 'Troubleshooting', data: 'details.troubleshoot'},
     {title: 'Date', sort_by: 'timestamp', data: 'details.timestamp'},
 ];
+
+class Codemirror_wrapper extends Pure_component {
+    componentDidMount(){
+        this.cm = codemirror.fromTextArea(this.textarea, {
+            readOnly: true,
+            lineNumbers: true,
+        });
+        this.cm.setSize('100%', '100%');
+        let text = this.props.req.response.content.text||'';
+        try { text = JSON.stringify(JSON.parse(text), null, '\t'); }
+        catch(e){}
+        this.cm.doc.setValue(text);
+        this.set_ct();
+    }
+    componentDidUpdate(){
+        this.cm.doc.setValue(this.props.req.response.content.text||'');
+        this.set_ct();
+    }
+    set_ct(){
+        const content_type = this.props.req.details.content_type;
+        let mode;
+        if (!content_type||content_type=='xhr')
+            mode = 'javascript';
+        if (content_type=='html')
+            mode = 'htmlmixed';
+        this.cm.setOption('mode', mode);
+    }
+    set_textarea = ref=>{ this.textarea = ref; };
+    render(){
+        return <div className="codemirror_wrapper">
+          <textarea ref={this.set_textarea}/>
+        </div>;
+    }
+}
+
+const is_json_str = str=>{
+    let resp;
+    try { resp = JSON.parse(str); }
+    catch(e){ return false; }
+    return resp;
+};
+
+const Encrypted_response_data = withRouter(
+class Encrypted_response_data extends Pure_component {
+    goto_ssl = ()=>{
+        this.props.history.push({
+            pathname: `/proxy/${this.props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    render(){
+        return <Pane_info>
+          <div>This request is using SSL encryption.</div>
+          <div>
+            <span>You need to turn on </span>
+            <a className="link" onClick={this.goto_ssl}>
+              SSL analyzing</a>
+            <span> to read the response here.</span>
+          </div>
+        </Pane_info>;
+    }
+});
+
+const Enable_https = withRouter(props=>{
+    const click = ()=>{
+        props.history.push({
+            pathname: `/proxy/${props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    return <div className="footer_link">
+      <a className="devtools_link"
+        role="link"
+        tabIndex="0"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={click}
+        style={{display: 'inline', cursor: 'pointer'}}
+      >
+        Enable HTTPS logging
+      </a> to view this timeline
+    </div>;
+});
+
+class Single_timeline extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        const sections = ['Resource Scheduling', 'Request/Response'];
+        const perc = [
+            {label: 'Queueing', id: 'blocked', section: 0},
+            {label: 'Connected', id: 'wait', section: 1},
+            {label: 'Time to first byte', id: 'ttfb', section: 1},
+            {label: 'Response', id: 'receive', section: 1},
+        ].reduce((acc, el)=>{
+            const cur_time = this.props.timeline[el.id];
+            const left = acc.offset;
+            const dur = Number((cur_time/this.props.time).toFixed(4));
+            const right = 1-acc.offset-dur;
+            return {offset: acc.offset+dur, data: [...acc.data,
+                {...el, left: `${left*100}%`, right: `${right*100}%`}]};
+        }, {offset: 0, data: []}).data
+        .reduce((acc, el)=>{
+            if (el.section!=acc.last_section)
+                return {last_section: el.section, data: [...acc.data, [el]]};
+            return {
+                last_section: el.section,
+                data: [
+                    ...acc.data.slice(0, -1),
+                    [...acc.data.slice(-1)[0], el],
+                ],
+            };
+        }, {last_section: -1, data: []}).data;
+        const children_classes = classnames('children', 'timeline',
+            {open: this.state.open});
+        const {timeline} = this.props;
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              Proxy port: {timeline.port}, session: {timeline.session}
+            </li>,
+            <ol key="ol" className={children_classes}>
+              <table>
+                <colgroup>
+                  <col className="labels"/>
+                  <col className="bars"/>
+                  <col className="duration"/>
+                </colgroup>
+                <tbody>
+                  {perc.map((s, i)=>
+                    <Timing_header key={i} title={sections[s[0].section]}>
+                      {s.map(p=>
+                        <Timing_row
+                          title={p.label}
+                          id={p.id}
+                          left={p.left}
+                          key={p.id}
+                          right={p.right}
+                          time={this.props.timeline[p.id]}
+                        />
+                      )}
+                    </Timing_header>
+                  )}
+                </tbody>
+              </table>
+            </ol>,
+        ];
+    }
+}
+
+const Timing_header = ({title, children})=>[
+    <tr key="timing_header" className="table_header">
+      <td>{title}</td>
+      <td></td>
+      <td>TIME</td>
+    </tr>,
+    ...children,
+];
+
+const Timing_row = ({title, id, left, right, time})=>
+    <tr className="timing_row">
+      <td>{title}</td>
+      <td>
+        <div className="timing_bar_wrapper">
+          <span className={classnames('timing_bar', id)} style={{left, right}}>
+            &#8203;</span>
+        </div>
+      </td>
+      <td><div className="timing_bar_title">{time} ms</div></td>
+    </tr>;
+
+export const Pane_timing = class Pane_timing extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.recent_stats', stats=>this.setState({stats}));
+    }
+    render(){
+        const {startedDateTime} = this.props.req;
+        const started_at = moment(new Date(startedDateTime)).format(
+            'YYYY-MM-DD HH:mm:ss');
+        return <div className="timing_view_wrapper">
+          <div className="timeline_info">Started at {started_at}</div>
+          <ol className="tree_outline">
+            {this.props.req.details.timeline.map((timeline, idx)=>
+              <Single_timeline key={idx} timeline={timeline}
+                time={this.props.req.time} req={this.props.req}/>
+            )}
+          </ol>
+          <div className="timeline_info total">
+            Total: {this.props.req.time} ms</div>
+          {this.props.req.request.url.endsWith('443') &&
+            this.state.stats && this.state.stats.ssl_enable &&
+            <Enable_https port={this.props.req.details.port}/>
+          }
+        </div>;
+    }
+};
+Pane_timing.width = 57;
+Pane_timing.id = 'timing';
+
+export const Pane_preview = class Pane_preview extends Pure_component {
+    render(){
+        const content_type = this.props.req.details.content_type;
+        const text = this.props.req.response.content.text;
+        const port = this.props.req.details.port;
+        let json;
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
+        if (content_type=='xhr' && (json = is_json_str(text)))
+            return <JSON_viewer json={json}/>;
+        if (content_type=='img')
+            return <Img_viewer img={this.props.req.request.url}/>;
+        if (content_type=='html')
+            return <Codemirror_wrapper req={this.props.req}/>;
+        return <div className="pane_preview"></div>;
+    }
+};
+Pane_preview.width = 63;
+Pane_preview.id = 'preview';
+
+const No_response_data = ()=>
+    <div className="empty_view">
+      <div className="block">This request has no response data available.</div>
+    </div>;
+
+export const Pane_response = class Pane_response extends Pure_component {
+    render(){
+        const req = this.props.req;
+        const {port, content_type} = req.details;
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
+        if (!content_type||['xhr', 'css', 'js', 'font', 'html', 'other']
+            .includes(content_type))
+        {
+            return <Codemirror_wrapper req={req}/>;
+        }
+        return <No_response_data/>;
+    }
+};
+Pane_response.width = 72;
+Pane_response.id = 'response';
 
 class Pane_troubleshoot extends Pure_component {
     render(){
@@ -436,7 +683,7 @@ class Lpm_har_viewer extends Pure_component {
             save_settings({logs: 0});
     };
     render(){
-        const show = this.state.logs>0;
+        const show = this.state.proxies && this.state.logs>0;
         if (!show)
         {
             return <Route
@@ -457,7 +704,6 @@ class Lpm_har_viewer extends Pure_component {
           panes={panes}
           Cell_value={Cell_value}
           table_cols={table_cols}
-          proxies={this.state.proxies}
           clear_logs={this.clear_logs}
           disable_logs={this.disable_logs}
           stats={this.state.stats}
@@ -472,6 +718,7 @@ class Lpm_har_viewer extends Pure_component {
           set_filter={this.set_filter}
           filters={this.state.filters}
           toolbar
+          Waypoint={Waypoint}
         >
           {this.props.children}
         </Har_viewer>;

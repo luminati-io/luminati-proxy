@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.233.836",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed updating disabled zones"
+            }
+        ]
+    },
+    {
         "ver": "1.232.896",
         "type": "stable",
         "changes": [
