@@ -17,7 +17,7 @@ import './css/config.less';
 class Config extends Pure_component {
     state = {editable: false, changed: false, persisted_config: ''};
     title = 'Manual configuration';
-    subtitle = 'Edit or export your ports configuration as JSON file';
+    subtitle = 'Edit your port configuration and export as a JSON file.';
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea,
             {mode: 'javascript', readOnly: 'nocursor'});

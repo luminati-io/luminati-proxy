@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.234.135",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved text and explanations"
+            }
+        ]
+    },
+    {
         "ver": "1.233.836",
         "type": "stable",
         "changes": [

@@ -43,7 +43,7 @@ E.proxy_fields = {
     state: {type: 'string', desc: 'State'},
     city: {type: 'string', desc: 'City'},
     asn: {type: 'string', desc: 'ASN'},
-    ip: {type: 'string', desc: 'Data center IP'},
+    ip: {type: 'string', desc: 'Data Center IP'},
     vip: {type: 'integer', desc: 'gIP'},
     ext_proxies: {type: 'array', desc: 'A list of proxies from external '
         +'vendors. Format: [username:password@]ip[:port]',

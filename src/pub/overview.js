@@ -64,7 +64,7 @@ class Overview extends Pure_component {
     render(){
         const {show_logs, zagent} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
-        const title = <T>Overview</T>;
+        const title = <T>Proxy Manager Dashboard</T>;
         return <div className="overview_page">
           <div className="warnings">
             {!this.state.embedded &&

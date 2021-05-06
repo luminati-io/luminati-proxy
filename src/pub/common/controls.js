@@ -133,7 +133,6 @@ export class Pins extends Pure_component {
           <T>{t=>
             <Pin_btn
               title={t('Add IP')}
-              tooltip={t('Add new IP to the list')}
               on_click={this.add_empty_pin}
               disabled={disabled||has_any}
             />

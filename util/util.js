@@ -552,4 +552,22 @@ E.flatten_obj = function(obj){
     return res;
 };
 
+E.pairwise = function(coll, opt){
+    if (!Array.isArray(coll) || coll.length<2)
+        return;
+    opt = opt||{};
+    var res = [];
+    for (var i = 0; i < coll.length; i++)
+    {
+        for (var j = i+1; j < coll.length; j++)
+        {
+            if (opt.balanced)
+                res.push((i+j)%2 ? [coll[i], coll[j]] : [coll[j], coll[i]]);
+            else
+                res.push([coll[i], coll[j]]);
+        }
+    }
+    return res;
+};
+
 return E; }); }());

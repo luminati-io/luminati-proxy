@@ -8,8 +8,9 @@ import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
 
 const tooltips = t=>({
-    crawler: t('Your crawler or bot that systematically browses the web. '
-        +'Connect any type of crawler to the Proxy Manager:')
+    crawler: t('Your proxy journey begins with your crawler, which '
+        +'systematically browses the Web. Proxy Manager works with any type '
+        +'of crawler.')
         +`<ul>
           <li>
             <div>${t('Browser and extension based crawlers')}</div>
@@ -26,29 +27,28 @@ const tooltips = t=>({
           </li>
         </ul>`,
     port_numbers: t('Defined proxy ports in Proxy Manager'),
-    lpm: t('Proxy Manager - open-source proxy service that holds '
-        +'valuable features, such as:')
+    lpm: t('Your request next travels through the Proxy Manger, your control '
+        +'center, where you manage:')
         +`<ul>
-          <li>${t('IP rotation control')}</li>
-          <li>${t('auto retry')}</li>
-          <li>${t('speed optimization')}</li>
-          <li>${t('auto blacklist of bad IPs')}</li>
-          <li>${t('powerful debugging options')}</li>
+          <li>${t('IP rotations')}</li>
+          <li>${t('Auto-retries')}</li>
+          <li>${t('Speed optimization')}</li>
+          <li>${t('Automatic blacklisting of bad IPs')}</li>
+          <li>${t('Debugging')}</li>
         </ul>`
-        +t('and more. View full list of features by clicking any proxy port '
-            +'in the')
-        +`<strong> ${t('Proxies')}</strong> ${t('table')}`,
-    super_proxy: t('Load balancing servers that manage the traffic between '
-        +'the Proxy Manager and the peer'),
-    peer: `${t('Exit node (IP) - This might be:')}
+        +t('See the complete list of features by selecting any of your proxy '
+        +'ports.'),
+    super_proxy: t('Super Proxies are load-balancing servers that manage the '
+        +'traffic between the Proxy Manager the peer.'),
+    peer: `${t('Before arriving at your target site, your request travels '
+        +'through a peer, which is an exit node. 3 types of peers are:')}
         <ul>
-          <li>${t('Residential IP - provided through cable modem, DSL or '
-              +'wireless router')}</li>
-          <li>${t('Datacenter IP (static)')}</li>
-          <li>${t('Mobile IP - based on a 3G or 4G cellular network')}</li>
+          <li>${t('Residential')}</li>
+          <li>${t('Data Center')}</li>
+          <li>${t('Mobile')}</li>
         </ul>`,
-    destination: t('The target website that the crawler is collecting data '
-        +'from'),
+    destination: t('The target website that your crawler is collecting data '
+        +'from.'),
 });
 
 class Schema extends Pure_component {

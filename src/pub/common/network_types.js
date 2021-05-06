@@ -19,7 +19,7 @@ export const get_plan_product = plan=>{
 
 export const network_types = {
     dc: {
-        label: 'Data center',
+        label: 'Data Center',
         tooltip: 'Static IPs from various data centers located around '
             +'the globe',
     },

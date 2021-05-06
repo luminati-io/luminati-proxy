@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.234.135 Development Latest
+- :sparkles: Improved text and explanations
+
 ## 1.233.836 Stable
 - :bug: Fixed updating disabled zones
 

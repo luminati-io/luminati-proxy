@@ -26,9 +26,9 @@ const Howto = withRouter(class Howto extends Pure_component {
         this.props.history.push({pathname});
     };
     option_to_text = {
-        code: 'from custom code',
-        browser: 'using browser',
-        proxy_tester: 'instantly from here',
+        code: 'Integrate Proxy Manager with your code',
+        browser: 'Integrate Proxy Manager with your browser',
+        proxy_tester: 'Test Proxy Manager from here',
     };
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
@@ -54,18 +54,25 @@ const Howto = withRouter(class Howto extends Pure_component {
             <div className="cp_panel vbox">
               <div className="cp_panel_header">
                 <Back_btn click={this.back_btn_click}/>
-                <h2>{t('How to use Proxy Manager')} {t(cur_title)}</h2>
+                <h2>{t(cur_title)}</h2>
               </div>
               <div className="panel_inner vbox">
                 <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
-                  <Nav_tab id="code" title="Code"
-                    tooltip="Examples how to use Proxy Manager
-                    programmatically"/>
-                  <Nav_tab id="browser" title="Browser"
-                    tooltip="Examples how to integrate Proxy Manager with the
-                    browser"/>
-                  <Nav_tab id="proxy_tester" title="Web tester"
-                    tooltip="Send example requests from here"/>
+                  <Nav_tab
+                    id="code"
+                    title="Code"
+                    tooltip="Select the coding language you need"
+                  />
+                  <Nav_tab
+                    id="browser"
+                    title="Browser"
+                    tooltip="How to integrate Proxy Manager with browser"
+                  />
+                  <Nav_tab
+                    id="proxy_tester"
+                    title="Web tester"
+                    tooltip="Send example requests from here"
+                  />
                 </Nav_tabs>
                 <Instructions
                   hostname={hostname}

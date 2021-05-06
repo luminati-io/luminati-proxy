@@ -158,10 +158,10 @@ export default with_www_api(class Targeting extends Pure_component {
                     {is_static &&
                       <span>
                       <div>
-                        <T>This port is configured to use Data center IPs.</T>
+                        <T>This port is configured to use Data Center IPs.</T>
                       </div>
                       <span>
-                        <T>To change Data center country visit your</T>{' '}
+                        <T>To change Data Center country visit your</T>{' '}
                       </span>
                       </span>
                     }

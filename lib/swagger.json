@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.233.836",
+        "version": "1.234.135",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1499,7 +1499,7 @@
                 "ip": {
                     "type": "string",
                     "pattern": "^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$",
-                    "description": "Data center IP"
+                    "description": "Data Center IP"
                 },
                 "vip": {
                     "type": "integer",

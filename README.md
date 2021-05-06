@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.233.836/luminati-proxy-manager-v1.233.836-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.234.135/luminati-proxy-manager-v1.234.135-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -164,7 +164,7 @@ Options:
   --state                       State                                   [string]
   --city                        City                                    [string]
   --asn                         ASN                                     [string]
-  --ip                          Data center IP                          [string]
+  --ip                          Data Center IP                          [string]
   --vip                         gIP                                     [number]
   --ext_proxies                 A list of proxies from external vendors. Format:
                                 [username:password@]ip[:port]            [array]

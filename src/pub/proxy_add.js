@@ -150,9 +150,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                       <Step curr_step={this.state.step} step={0}
                         title="Network">
                         <Note>
-                          Choose the network type first. You can configure your
-                          proxy port to work with the Luminati network or you
-                          can use any external vendor
+                          Select your prefered network: Bright Data or an
+                          external vendor?
                         </Note>
                         <Nav_tabs_wrapper set_tab={this.set_tab}
                           cur_tab={this.state.cur_tab}/>
@@ -175,9 +174,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                       <Step curr_step={this.state.step} step={1}
                         title="Configuration">
                         <Note>
-                          How do you want to use this proxy? Choose between
-                          connecting from the browser or the scraper. The main
-                          difference is in the IP rotation.
+                          Using this proxy with a browser or a scraper?
                         </Note>
                         <Nav_tabs set_tab={this.field_changed('preset')}
                           cur_tab={this.state.preset}>
@@ -219,38 +216,38 @@ const Step = ({title, step, curr_step, children})=>{
         fadeIn: step==curr_step,
     });
     return <div>
-          <div className="step_title">{title}</div>
-          <div className={classes}>{children}</div>
-        </div>;
+      <div className="step_title">{title}</div>
+      <div className={classes}>{children}</div>
+    </div>;
 };
 
 const Created_port = ({port, hostname, lpm_token})=>{
     const to_copy = instructions.code(port, lpm_token, hostname).shell;
     const code = prism.highlight(to_copy, prism.languages.clike);
     return <div className="howto">
-          <Note>
-            Congratulation! You just created a port {port}.
-          </Note>
-          <div>
-            <Note>
-              You can start using the port by running the following command:
-            </Note>
-            <div className="well instructions_well">
-              <pre>
-                <Code>
-                  <div dangerouslySetInnerHTML={{__html: code}}/>
-                </Code>
-              </pre>
-            </div>
-          </div>
-        </div>;
+      <Note>
+        Congrats! You've created a new port: {port}.
+      </Note>
+      <div>
+        <Note>
+          Start using the port by running the following command:
+        </Note>
+        <div className="well instructions_well">
+          <pre>
+            <Code>
+              <div dangerouslySetInnerHTML={{__html: code}}/>
+            </Code>
+          </pre>
+        </div>
+      </div>
+    </div>;
 };
 
 class Ext_proxy extends Pure_component {
     state = {consts: {}};
     json_example = '[\'1.1.1.2\', \'my_username:my_password@1.2.3.4:8888\']';
-    placeholder = 'List of IPs to the external proxies in the following '
-        +'format: [username:password@]ip[:port]';
+    placeholder = 'List the IPs for the external proxies that you\'d like to '
+        +'connect to.\nUse format: [username:password@]ip[:port]';
     componentDidMount(){
         this.setdb_on('head.consts', ({consts})=>
             consts && this.setState({consts}));
@@ -301,29 +298,32 @@ const Lum_proxy = with_www_api(props=>{
     const {zone, def_zone, on_field_change} = props;
     const zone_tip = `Zone that will be used by this proxy port`;
     return <div className="lum_proxy">
-          <Field icon_class="zone_icon" title="Zone">
-            <Select_zone val={zone} tooltip={zone_tip}
-              on_change_wrapper={on_field_change('zone')}/>
-          </Field>
-          <Preview title={zone||def_zone}>
-            <Zone_description zone_name={zone}/>
-            <a className="link" href={`${props.www_api}/cp/zones`}
-              target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
-          </Preview>
-        </div>;
+      <Field icon_class="zone_icon" title="Zone">
+        <Select_zone val={zone} tooltip={zone_tip}
+          on_change_wrapper={on_field_change('zone')}/>
+      </Field>
+      <Preview title={zone||def_zone}>
+        <Zone_description zone_name={zone}/>
+        <a className="link" href={`${props.www_api}/cp/zones`}
+          target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
+      </Preview>
+    </div>;
 });
 
 const Preset_nav_tab = ({id, ...props})=>{
     const preset = presets.get(id);
-    return <Nav_tab title={preset.new_title} id={id}
-      tooltip={preset.subtitle} {...props}/>;
+    return <Nav_tab
+      title={preset.new_title}
+      id={id}
+      {...props}
+    />;
 };
 
 const Preview = ({title, children})=>{
     return <div className="preview">
-          <div className="header">{title}</div>
-          {children}
-        </div>;
+      <div className="header">{title}</div>
+      {children}
+    </div>;
 };
 
 const Nav_tabs_wrapper = ({set_tab, cur_tab})=>
@@ -369,10 +369,10 @@ const Footer = props=>{
     const classes = classnames('btn', 'btn_lpm', 'btn_lpm_primary',
         {disabled: props.disabled});
     return <div className="footer">
-          <button onClick={btn_clicked} className={classes}>
-            {btn_labels[props.step]}
-          </button>
-        </div>;
+      <button onClick={btn_clicked} className={classes}>
+        {btn_labels[props.step]}
+      </button>
+    </div>;
 };
 
 export default Proxy_add;

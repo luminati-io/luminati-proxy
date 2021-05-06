@@ -90,7 +90,7 @@ class Perm_icons extends Pure_component {
         residential: 'Residential IPs',
         country: 'Country resolution',
         state: 'Residential IPs - State resolution',
-        data_center: 'Data center IPs',
+        data_center: 'Data Center IPs',
         static_res: 'Static residential IPs',
         asn: 'Residential IPs - "Autonomous System Number" (ASN) resolution',
         city: 'Residential IPs - City resolution',

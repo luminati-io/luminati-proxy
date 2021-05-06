@@ -121,7 +121,7 @@ export default class General extends Pure_component {
                   id="whitelist_ips"
                   disabled_ips={disabled_wl}
                   no_any={zagent}
-                  faq_id="pmgr-whitelist-port"
+                  faq_id="pmgr-whitelist-proxy"
                 />
                 <T>{t=><Config type="select"
                   disabled={zagent}
