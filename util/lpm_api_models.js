@@ -97,7 +97,6 @@ E.manager_fields = {
     www: {type: 'integer', desc: 'HTTP and WebSocket port used for browser '
         +'admin UI and request logs'},
     config: {type: 'string', desc: 'Config file containing proxy definitions'},
-    cookie: {type: 'string', desc: 'Cookie Jar file'},
     mode: {type: 'string', desc: 'Defines a set of permissible operations '
         +'within the UI/API'},
     dropin: {type: 'boolean', desc: 'Create dropin mode proxy port (default: '

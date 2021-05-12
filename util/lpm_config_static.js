@@ -26,7 +26,6 @@ const conf = {
         added_descriptions: {
             'no-www': 'Disable local web',
             'no-config': 'Working without a config file',
-            'no-cookie': 'Working without a cookie file',
             daemon: 'Start as a daemon',
             'restart-daemon': 'Restart running daemon',
             'stop-daemon': 'Stop running daemon',

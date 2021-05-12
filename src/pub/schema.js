@@ -39,7 +39,7 @@ const tooltips = t=>({
         +t('See the complete list of features by selecting any of your proxy '
         +'ports.'),
     super_proxy: t('Super Proxies are load-balancing servers that manage the '
-        +'traffic between the Proxy Manager the peer.'),
+        +'traffic between the Proxy Manager and the peer.'),
     peer: `${t('Before arriving at your target site, your request travels '
         +'through a peer, which is an exit node. 3 types of peers are:')}
         <ul>

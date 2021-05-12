@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.235.67 Stable
+- :bug: Fixed memory leaks
+
 ## 1.234.135 Development Latest
 - :sparkles: Improved text and explanations
 

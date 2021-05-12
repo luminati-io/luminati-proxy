@@ -33,7 +33,7 @@ const error_desc = [
         description: <span/>,
     },
     {
-        regex: /Request is not allowed from peers and sent from super proxy/,
+        regex: /Target site not set as an exclusive domain in zone, request sent from super proxy/,
         description: <span/>,
     },
     {

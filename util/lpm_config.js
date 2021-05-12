@@ -18,8 +18,6 @@ Object.assign(conf.manager_default, {
         '.luminati.json'.substr(conf.is_win ? 1 : 0)),
     loki: lpm_file.get_file_path(
         '.luminati.db'.substr(conf.is_win ? 1 : 0)),
-    cookie: lpm_file.get_file_path(
-        '.luminati.jar'.substr(conf.is_win ? 1 : 0)),
 });
 
 Object.assign(module.exports, conf);

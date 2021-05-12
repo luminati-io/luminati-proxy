@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.234.135",
+        "version": "1.235.67",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1310,10 +1310,6 @@
                 "config": {
                     "type": "string",
                     "description": "Config file containing proxy definitions"
-                },
-                "cookie": {
-                    "type": "string",
-                    "description": "Cookie Jar file"
                 },
                 "mode": {
                     "type": "string",

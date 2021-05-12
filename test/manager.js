@@ -59,8 +59,6 @@ describe('manager', function(){
                 args = args.concat(['--password', password]);
             if (!get_param(args, '--dropin')&&!get_param(args, '--no-dropin'))
                 args = args.concat(['--no-dropin']);
-            if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
-                args.push('--no-cookie');
             if (!get_param(args, '--local_login') &&
                 !get_param(args, '--no-local_login'))
             {
