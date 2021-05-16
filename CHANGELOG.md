@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.235.456 Stable
+- :bug: Fixed connectivity issues from China
+
 ## 1.235.67 Stable
 - :bug: Fixed memory leaks
 

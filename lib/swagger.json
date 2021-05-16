@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.235.67",
+        "version": "1.235.456",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",

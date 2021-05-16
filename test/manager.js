@@ -520,19 +520,25 @@ describe('manager', function(){
                 it('updates password in place', etask._fn(function*(_this){
                     const proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {});
+                    const lpm_f_stub = sinon.stub(app.manager.lpm_f,
+                        'proxy_update_in_place').returns(true);
                     const body = {proxy: {zone: 'foo'}};
                     const res = yield api_json('api/proxies/24000',
                         {method: 'put', body});
                     assert.equal(res.body.data.password, 'pass2');
+                    sinon.assert.calledOnce(lpm_f_stub);
                 }));
                 it('updates password no zone passed',
                 etask._fn(function*(_this){
                     const proxies = [{port: 24000, zone: 'foo'}];
                     app = yield app_with_proxies(proxies, {});
+                    const lpm_f_stub = sinon.stub(app.manager.lpm_f,
+                        'proxy_update_in_place').returns(true);
                     const body = {proxy: {ssl: true}};
                     const res = yield api_json('api/proxies/24000',
                         {method: 'put', body});
                     assert.equal(res.body.data.password, 'pass2');
+                    sinon.assert.calledOnce(lpm_f_stub);
                 }));
             });
             describe('delete', ()=>{
@@ -744,6 +750,8 @@ describe('manager', function(){
         it('return value format is consistent', etask._fn(function*(_this){
             const [p1, p2] = [{port: 24000}, {port: 24001}];
             app = yield app_with_proxies([p1, p2]);
+            const lpm_f_stub = sinon.stub(app.manager.lpm_f,
+                'proxy_update_in_place').returns(true);
             const recreate = yield app.manager.proxy_update(p1, {port: 24500});
             const in_place = yield app.manager.proxy_update(p2,
                 {port: 24001, ssl: true});
@@ -751,6 +759,7 @@ describe('manager', function(){
                 assert.equal(Object.keys(res).length, 1);
                 assert.ok(res.proxy_port);
             });
+            sinon.assert.calledOnce(lpm_f_stub);
         }));
     });
     describe('flags', ()=>{
@@ -768,6 +777,8 @@ describe('manager', function(){
         beforeEach(()=>etask(function*(){
             const now_stub = sinon.stub(Date, 'now').returns(5000);
             app = yield app_with_proxies([{port: 24000}]);
+            const lpm_f_stub = sinon.stub(app.manager.lpm_f,
+                'proxy_update_in_place').returns(true);
             port = app.manager.proxy_ports[24000];
             const {banlist} = port;
             const ms_left = 100;
@@ -781,6 +792,7 @@ describe('manager', function(){
             sinon.assert.calledOnce(update_spy);
             new_banlist = app.manager.proxy_ports[24000].banlist.cache;
             now_stub.restore();
+            sinon.assert.calledOnce(lpm_f_stub);
         }));
         it('sends updated banlist instance to workers via ipc', ()=>{
             assert.equal(new_banlist.size, 2);
@@ -857,11 +869,14 @@ describe('manager', function(){
             w_cli);
         it('updates proxy', ()=>etask(function*(){
             app = yield app_with_proxies(p);
+            const lpm_f_stub = sinon.stub(app.manager.lpm_f,
+                'proxy_update_in_place').returns(true);
             const whitelist_ips = ['1.1.1.1', '2.2.2.2', '3.0.0.0/8'];
             const new_proxy = Object.assign({}, p[0], {whitelist_ips});
             const {proxy_port} = yield app.manager.proxy_update(p[0],
                 new_proxy);
             assert.deepEqual(proxy_port.whitelist_ips, whitelist_ips);
+            sinon.assert.calledOnce(lpm_f_stub);
         }));
         t = (name, def, default_calls, expected)=>
         it(name, etask._fn(function*(_this){
