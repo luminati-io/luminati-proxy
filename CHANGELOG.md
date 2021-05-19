@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.236.100 Stable
+- :sparkles: Added more details to the logs at debug level
+
 ## 1.235.456 Stable
 - :bug: Fixed connectivity issues from China
 

@@ -13,17 +13,10 @@ const assert = require('assert');
 const cli = require('./cli.js');
 const exec = require('./exec.js');
 const os = require('os');
-const semver = require('semver');
 const E = exports;
 const env = process.env, qw = string.qw, KB = 1024, MB = KB*KB;
-var ffi_napi;
-if (semver.lt(process.version, '14.0.0'))
-{
-    try { ffi_napi = require('ffi-napi'); }
-    catch(e){}
-}
-const libc = ffi_napi && !file.is_darwin ? ffi_napi.Library('libc',
-    {fallocate: ['int', ['int', 'int', 'long', 'long']]}) : undefined;
+let fallocate;
+try { fallocate = require('fallocate-uint32'); } catch(e){}
 const BIN_IP = '/bin/ip';
 
 var distro_release;
@@ -158,13 +151,13 @@ E.is_release = function(releases, no_cache){
 };
 
 E.fallocate = function(fd, len, offset, mode){
-    if (libc.fallocate(fd, mode||0, offset||0, len)!=0)
+    let ret = fallocate(fd, mode||0, offset||0, len);
+    if (ret)
     {
-        let errno = ffi_napi.errno();
-        if (errno==95) // EOPNOTSUPP
+        if (ret == -95) // EOPNOTSUPP
             fs.ftruncateSync(fd, len);
         else
-            throw new Error(`fallocate failed: ${errno}`);
+            throw new Error(`fallocate failed: ${ret}`);
     }
 };
 

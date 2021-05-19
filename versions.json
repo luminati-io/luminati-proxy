@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.236.100",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added more details to the logs at debug level"
+            }
+        ]
+    },
+    {
         "ver": "1.235.456",
         "type": "stable",
         "changes": [
