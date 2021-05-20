@@ -53,6 +53,7 @@ const presets = {
         subtitle: 'Unblocker handles IP management automatically',
         set: opt=>{
             opt.rotate_session = true;
+            opt.ssl = true;
         },
         clean: opt=>{
             opt.rotate_session = false;
@@ -69,6 +70,7 @@ const presets = {
             dns: true,
             reverse_lookup: true,
             smtp: true,
+            ssl: true,
         },
         hidden: true,
     },

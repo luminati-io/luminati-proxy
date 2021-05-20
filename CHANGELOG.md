@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.236.237 Stable
+- :bug: Fixed bandwidth calculation when using unblocker zone
+
 ## 1.236.100 Stable
 - :sparkles: Added more details to the logs at debug level
 

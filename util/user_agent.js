@@ -202,7 +202,7 @@ E.guess = function(ua, platform){
     if (/Macintosh/.exec(ua))
     {
         if (is_ipad_os(ua))
-            return {os: 'ios', mobile: true};
+            return {os: 'ios', mobile: true, desktop_mode: !/Mobile/.test(ua)};
         if (res = /Macintosh.*; (?:Intel|PPC) Mac OS X (\d+[._]\d+)/.exec(ua))
         {
             return {os: 'macos', version: res[1].replace('_', '.'),
