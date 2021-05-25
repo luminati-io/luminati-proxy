@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.236.925",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed in place updates only when synchronization is turned on"
+            }
+        ]
+    },
+    {
         "ver": "1.236.237",
         "type": "stable",
         "changes": [

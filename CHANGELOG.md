@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.236.925 Stable
+- :bug: Fixed in place updates only when synchronization is turned on
+
 ## 1.236.237 Stable
 - :bug: Fixed bandwidth calculation when using unblocker zone
 
