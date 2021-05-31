@@ -688,3 +688,9 @@ const parse_pid_stat = stat=>{
 const proc_mem = pid=>parse_pid_stat(cyg_read('/proc/'+pid+'/stat'));
 
 E.ps_mem = ()=>E.ps().map(p=>proc_mem(p));
+
+E.conntrack = function(){
+    const count = +cyg_read('/proc/sys/net/netfilter/nf_conntrack_count');
+    const max = +cyg_read('/proc/sys/net/netfilter/nf_conntrack_max');
+    return {count, max, use: Math.round(count*100/max)};
+};

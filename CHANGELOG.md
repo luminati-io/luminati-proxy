@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.237.854 Stable
+- :bug: Fixed bandwidth calculation when using unblocker zone
+- :bug: Stop redirections when using bypass rule
+
 ## 1.236.925 Stable
 - :bug: Fixed in place updates only when synchronization is turned on
 

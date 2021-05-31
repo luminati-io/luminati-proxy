@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.237.854",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed bandwidth calculation when using unblocker zone"
+            },
+            {
+                "type": "bug",
+                "text": "Stop redirections when using bypass rule"
+            }
+        ]
+    },
+    {
         "ver": "1.236.925",
         "type": "stable",
         "changes": [
