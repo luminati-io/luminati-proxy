@@ -79,6 +79,12 @@ E.flatten = function(a){
     }
     return _a;
 };
+E.flat_map = function(a, cb){
+    if (a.flatMap)
+        return a.flatMap(cb);
+    return Array.prototype.concat.apply([], a.map(cb));
+};
+
 E.unique = function(a){
     var _a = [];
     for (var i=0; i<a.length; i++)

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.239.207 Stable
+- :bug: Improved stability
+
 ## 1.237.854 Stable
 - :bug: Fixed bandwidth calculation when using unblocker zone
 - :bug: Stop redirections when using bypass rule

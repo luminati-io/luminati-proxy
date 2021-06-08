@@ -16,6 +16,9 @@ E.select_rules = (all_rules, selector, overrides=[])=>{
 E.matches_rule = (match, selector)=>{
     for (let k in match)
     {
+        let preprocessor;
+        if (k=='hostname')
+            preprocessor = unify_hostnames;
         if (k=='version_min')
         {
             if ((match[k]||0)>(selector.version||0))
@@ -26,24 +29,57 @@ E.matches_rule = (match, selector)=>{
             if (match[k]/100<Math.random())
                 return false;
         }
-        else if (!E.rule_value_match(match[k], selector[k]))
+        else if (!E.rule_value_match(match[k], selector[k], preprocessor))
             return false;
     }
     return true;
 };
 
-E.rule_value_match = (rule_v, v)=>{
+E.rule_value_match = (rule_v, v, preprocessor)=>{
     if (Array.isArray(rule_v))
-        return rule_v.some(_rule_v=>E.rule_value_match(_rule_v, v));
+    {
+        return rule_v.some(_rule_v=>E.rule_value_match(_rule_v, v,
+            preprocessor));
+    }
     if (!_.isObject(rule_v))
-        return rule_v==v;
+    {
+        if (typeof v!='string')
+            return rule_v==v;
+        if (preprocessor)
+            [rule_v, v] = preprocessor(rule_v, v);
+        if (rule_v.length!=v.length)
+            return false;
+        for (let i=0; i<v.length; i++)
+        {
+            if (rule_v[i].toLowerCase() !== v[i].toLowerCase())
+                return false;
+        }
+        return true;
+    }
     if (rule_v.test)
-        return rule_v.test(v||'');
+    {
+        // XXX vladislavp: move this logic (insensitive case for regex) in
+        // method for rules config update
+        return new RegExp(rule_v, rule_v.flags.replace('i', '')+'i')
+            .test(v||'');
+    }
     return _.every(rule_v,
-        (_rule_v, k)=>E.rule_value_match(_rule_v, v && v[k]));
+        (_rule_v, k)=>E.rule_value_match(_rule_v, v && v[k], preprocessor));
 };
 
 E.rule_merge_customizer = (dest, src)=>{
     if (Array.isArray(src))
         return src;
 };
+
+function unify_hostnames(hostname, selector){
+    const hostname_len = hostname.split('.').length;
+    const selector_len = selector.split('.').length;
+    if (hostname_len<selector_len)
+        hostname='www.'+hostname;
+    else if (selector_len<hostname_len)
+        selector='www.'+selector;
+    return [hostname, selector];
+}
+
+E.t = {unify_hostnames};

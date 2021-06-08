@@ -261,7 +261,7 @@ var zerr_format = function(args){
 var __zerr = function(level, args){
     var msg = zerr_format(args);
     var k = Object.keys(L);
-    var prefix = E.hide_timestamp ? '' : E.prefix+date.to_sql_ms()+' ';
+    var prefix = E.prefix+(E.hide_timestamp ? '' : date.to_sql_ms()+' ');
     if (env.CURRENT_SYSTEMD_UNIT_NAME)
         prefix = '<'+level+'>'+prefix;
     var res = prefix+k[level]+': '+msg;

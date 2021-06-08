@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.239.207",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Improved stability"
+            }
+        ]
+    },
+    {
         "ver": "1.237.854",
         "type": "stable",
         "changes": [

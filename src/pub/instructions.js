@@ -71,7 +71,7 @@ class Example
     {
         ServicePointManager.ServerCertificateValidationCallback =
             delegate { return true; };
-        var client = new WebClient();
+        let client = new WebClient();
         client.Proxy = new WebProxy("${hostname}:${proxy}");${!is_local() &&
             lpm_token? `
         client.Proxy.Credentials = new NetworkCredential("lum-auth-token", "${lpm_token}");` : ''};
