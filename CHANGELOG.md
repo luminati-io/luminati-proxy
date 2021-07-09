@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.245.259 Stable
+- :bug: Fixed using new IP on 'Retry with same IP' rule
+
 ## 1.239.207 Stable
 - :bug: Improved stability
 

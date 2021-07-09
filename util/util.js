@@ -496,9 +496,15 @@ E.ensure_array = function(v, split){
     return [v];
 };
 
-E.reduce_obj = function(coll, key_cb, val_cb){
+E.reduce_obj = function(coll, key_cb, val_cb, merge_cb){
     if (coll==null)
         return {};
+    if (val_cb===undefined && key_cb!=null && (key_cb.key||key_cb.value))
+    {
+        merge_cb = key_cb.merge;
+        val_cb = key_cb.value;
+        key_cb = key_cb.key;
+    }
     if (key_cb==null)
         key_cb = function(it){ return it; };
     else if (typeof key_cb=='string')
@@ -518,16 +524,22 @@ E.reduce_obj = function(coll, key_cb, val_cb){
     {
         coll.forEach(function(item, i){
             var k = key_cb(item, i), v = val_cb(item, i);
-            if (k!==undefined && v!==undefined)
-                obj[k] = v;
+            if (k===undefined || v===undefined)
+                return;
+            if (obj[k]!==undefined && merge_cb)
+                v = merge_cb(v, obj[k]);
+            obj[k] = v;
         });
     }
     else if (typeof coll=='object')
     {
         Object.keys(coll).forEach(function(i){
             var k = key_cb(coll[i], i), v = val_cb(coll[i], i);
-            if (k!==undefined && v!==undefined)
-                obj[k] = v;
+            if (k===undefined || v===undefined)
+                return;
+            if (obj[k]!==undefined && merge_cb)
+                v = merge_cb(v, obj[k]);
+            obj[k] = v;
         });
     }
     return obj;

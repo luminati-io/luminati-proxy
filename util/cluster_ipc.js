@@ -10,6 +10,10 @@ const VERBOSE_IPC = +process.env.VERBOSE_IPC;
 let current_cookie = 1;
 let handlers = {}, waiting = {}, incoming_pending = {};
 
+(function(){
+if (process.env && process.env.ASYNC_TUNNEL==1)
+    return Object.assign(E, require('./p_cluster_ipc.js'));
+
 let send = (to, msg, sock)=>{
     if (to=='master')
         process.send(msg);
@@ -257,3 +261,4 @@ E.master_remove_all_listeners = function(){
 };
 
 init();
+})();

@@ -205,7 +205,9 @@ E.is_valid_url = function(url){
 E.is_valid_domain = function(domain){
     return /^([a-z0-9]([a-z0-9-_]*[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain); };
 
-// XXX josh: move to email.js:is_valid
+// XXX josh: migrate callers to email.js:is_valid and drop
+// XXX josh: is_signup is a nonsense flag for this fn, migrate callers to using
+// email.js:is_valid_signup_email()
 E.is_valid_email = function(email, is_signup){
     if (!email || typeof email!='string')
         return false;
@@ -499,6 +501,11 @@ E.qs_remove = function(url, qs){
 
 E.qs_parse_url = function(url){
     return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, ''));
+};
+
+var INVALID_PATH_REGEX = /[^\u0021-\u00ff]/;
+E.escape_path = function(path){
+    return INVALID_PATH_REGEX.test(path) ? encodeURI(path) : path;
 };
 
 return E; }); }());

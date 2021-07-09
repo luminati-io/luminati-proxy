@@ -55,8 +55,15 @@ E.set = (path, curr, opt)=>{
     if (!opt.force_emit && _.get(E.state, path)===curr)
         return;
     _.set(E.state, path, curr);
-    E.emit_path(path);
-    // XXX colin/ilgiz: add recurisve notify when using recursive flag
+    let depth = opt.recursive ? Number.POSITIVE_INFINITY : opt.depth||0;
+    let _path;
+    do {
+        _path = path;
+        E.emit_path(_path);
+        if (depth--<=0)
+            return;
+        path = path.replace(/\.[^.]+$/, '');
+    } while (_path!=path);
 };
 
 E.delete = path=>E.set(path, undefined);

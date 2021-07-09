@@ -50,6 +50,10 @@ else if (!is_node)
 else
     define = require('./require_node.js').define(module, '../');
 next_tick = next_tick || process.nextTick;
+if (is_node && +process.env.ASYNC_TUNNEL==1)
+   define(['/util/p_ws.js'], function(p_ws){ return p_ws; });
+else
+    // eslint-disable-next-line
 define(['/util/conv.js', '/util/etask.js', '/util/events.js',
     '/util/string.js', '/util/zerr.js'],
     function(conv, etask, events, string, zerr){
@@ -66,9 +70,9 @@ const default_user_agent = is_node ? (()=>{
 })() : undefined;
 const debug_str_len = 4096;
 const default_win_size = 1048576;
-const SEC = 1000, MIN = 60000, vfd_sz = 8;
+const SEC = 1000, MIN = 60000, vfd_sz = 8, vfd_bin_sz = 12;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
-const net = is_node ? require('net') : null;
+const net = is_node ? require('net') : null, BUFFER_CONTENT = 10;
 
 function noop(){}
 
@@ -110,6 +114,7 @@ class WS extends events.EventEmitter {
             ? new IPC_client(this, opt.ipc_client, {zjson: opt.ipc_zjson,
                 mux: opt.mux})
             : undefined;
+        this.bin_methods = this.ipc && this.ipc.bin_methods;
         this.time_parse = opt.time_parse;
         if (opt.ipc_server)
         {
@@ -304,6 +309,16 @@ class WS extends events.EventEmitter {
         let msg = event.data, handled = false;
         if (msg instanceof ArrayBuffer)
             msg = Buffer.from(Buffer.from(msg)); // make a copy
+        let is_bin, bin_event;
+        if (this.bin_methods && msg instanceof Buffer &&
+            msg.readUInt32BE(0)===0 && msg.readUInt32BE(4)==BUFFER_CONTENT)
+        {
+            is_bin = true;
+            let bin_event_len = msg.readUInt32BE(vfd_sz);
+            bin_event = JSON.parse(msg.slice(vfd_bin_sz,
+                vfd_bin_sz+bin_event_len).toString());
+            bin_event.msg = msg.slice(vfd_bin_sz+bin_event_len);
+        }
         if (zerr.is.debug())
         {
             zerr.debug(typeof msg=='string'
@@ -318,6 +333,11 @@ class WS extends events.EventEmitter {
             zcounter.max(`${this.zc}_rx_bytes_per_msg_max`, msg.length);
         }
         try {
+            if (is_bin)
+            {
+                this.emit('json', bin_event);
+                handled = true;
+            }
             if (typeof msg=='string')
             {
                 let parsed;
@@ -402,7 +422,7 @@ class WS extends events.EventEmitter {
     _ping(){
         // workaround for ws library: the socket is already closing,
         // but a notification has not yet been emitted
-        if (this.ws.readyState==2) // ws.CLOSING
+        if (!this.connected || this.ws.readyState==2) // ws.CLOSING
             return;
         this.ws.ping();
         this.ping_timer = setTimeout(this._ping_expire.bind(this),
@@ -783,6 +803,9 @@ class IPC_client {
                 if (typeof spec=='string')
                     spec = {type: spec};
                 let _opt = assign({}, opt, spec);
+                // ability to transfer Buffer as is, without JSON conversion
+                if (_opt.bin)
+                    this.bin_methods = 1;
                 switch (_opt.type||'call')
                 {
                 case 'call':
@@ -807,7 +830,7 @@ class IPC_client {
         let send_retry_timeout = 3*SEC;
         return etask(function*IPC_client_call(){
             let req = {type: opt.type=='mux' && 'ipc_mux' || 'ipc_call', cmd,
-                cookie: ++IPC_client._cookie};
+                cookie: ++IPC_client._cookie, bin: opt.bin ? 1 : undefined};
             if (arg.length==1)
                 req.msg = arg[0];
             else if (arg)
@@ -873,7 +896,7 @@ class IPC_client {
             throw new Error('Mux is not defined');
         let _this = this;
         let vfd = this.mux.dec_vfd ? --this._vfd : ++this._vfd;
-        return etask(function*(){
+        return etask(function*IPC_client__mux(){
             let stream = _this._ws.mux.open(vfd, _this.mux.bytes_allowed,
                 _this.mux);
             stream.close = ()=>_this._ws.mux.close(vfd);
@@ -963,6 +986,20 @@ class IPC_server {
                 cookie: msg.cookie,
                 msg: rv,
             };
+            if (msg.bin && rv instanceof Buffer)
+            {
+                res.msg = undefined;
+                let res_buf = Buffer.from(JSON.stringify(res));
+                // [0|BUFFER_CONTENT|cmd length|...cmd bin|...cmd result bin]
+                let buf = Buffer.allocUnsafe(rv.length+vfd_bin_sz+res_buf
+                    .length);
+                buf.writeUInt32BE(0, 0);
+                buf.writeUInt32BE(BUFFER_CONTENT, 4);
+                buf.writeUInt32BE(res_buf.length, vfd_sz);
+                res_buf.copy(buf, vfd_bin_sz);
+                rv.copy(buf, vfd_bin_sz+res_buf.length);
+                return this.ws.send(buf);
+            }
             if (this.zjson)
                 this.ws.zjson(res);
             else
@@ -1163,13 +1200,13 @@ class Mux {
                 }
                 if (!buf_pending)
                     return void cb();
-                pending = etask(function*(){
+                pending = etask(function*_mux_stream_pending(){
                     yield this.wait();
                     pending = null;
                     stream._write(buf_pending, encoding, cb);
                 });
             },
-            destroy(err, cb){ return etask(function*(){
+            destroy(err, cb){ return etask(function*_mux_stream_destroy(){
                 if (stream.zdestroy)
                 {
                     yield this.wait_ext(stream.zdestroy);
@@ -1340,7 +1377,7 @@ class Mux {
             stream.fin_got = true;
             const fn = ()=>next_tick(()=>zfin_pending ?
                 zfin_pending.continue() : zfinish(true, false));
-            etask(function*(){
+            etask(function*_mux_stream_on_fin(){
                 stream.once('end', this.continue_fn());
                 try {
                     stream.push(null);
@@ -1355,7 +1392,7 @@ class Mux {
         };
         stream.set_timeout = timeout=>{
             clearTimeout(stream._unused_tm);
-            if (!timeout)
+            if (!timeout || stream.zdestroy)
                 return;
             stream._unused_tm_fn = ()=>{
                 const delta = Date.now()-(stream.last_use_ts||0);
@@ -1399,6 +1436,11 @@ class Mux {
         return true;
     }
     _on_bin(buf){
+        if (this.ws.bin_methods && buf.readUInt32BE(0)===0 &&
+            buf.readUInt32BE(4)==BUFFER_CONTENT)
+        {
+            return;
+        }
         if (buf.length<vfd_sz)
             return zerr(`${this.ws}: malformed binary message`);
         let vfd = buf.readUInt32BE(0);
