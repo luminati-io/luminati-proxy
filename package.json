@@ -419,7 +419,7 @@
   "scripts": {
     "electron": "electron .",
     "start": "bin/index.js",
-    "test": "./node_modules/mocha/bin/mocha",
+    "test": "./node_modules/mocha/bin/mocha --timeout 4000",
     "test-win": "node node_modules/mocha/bin/mocha",
     "stress-test": "node scripts/stress_test.js",
     "build": "webpack --env production",
