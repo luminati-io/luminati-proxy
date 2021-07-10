@@ -73,13 +73,23 @@ E.rule_merge_customizer = (dest, src)=>{
 };
 
 function unify_hostnames(hostname, selector){
-    const hostname_len = hostname.split('.').length;
-    const selector_len = selector.split('.').length;
+    const hostname_len = char_count(hostname, '.')+1;
+    const selector_len = char_count(selector, '.')+1;
     if (hostname_len<selector_len)
         hostname='www.'+hostname;
     else if (selector_len<hostname_len)
         selector='www.'+selector;
     return [hostname, selector];
+}
+
+function char_count(str, char){
+    let count = 0;
+    for (let i=0; i<str.length; i++)
+    {
+        if (str[i]==char)
+            count++;
+    }
+    return count;
 }
 
 E.t = {unify_hostnames};

@@ -328,8 +328,8 @@ const Preview = ({title, children})=>{
 
 const Nav_tabs_wrapper = ({set_tab, cur_tab})=>
     <Nav_tabs set_tab={set_tab} cur_tab={cur_tab}>
-      <Nav_tab title="Luminati" id="proxy_lum"
-        tooltip="Proxy port using your Luminati account"/>
+      <Nav_tab title="Bright Data" id="proxy_lum"
+        tooltip="Proxy port using your Bright Data account"/>
       <Nav_tab title="External" id="proxy_ext"
         tooltip="Proxy port configured with external IP and credentials"/>
     </Nav_tabs>;

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.245.259",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed using new IP on 'Retry with same IP' rule"
+            }
+        ]
+    },
+    {
         "ver": "1.239.207",
         "type": "stable",
         "changes": [
