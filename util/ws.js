@@ -50,10 +50,6 @@ else if (!is_node)
 else
     define = require('./require_node.js').define(module, '../');
 next_tick = next_tick || process.nextTick;
-if (is_node && +process.env.ASYNC_TUNNEL==1)
-   define(['/util/p_ws.js'], function(p_ws){ return p_ws; });
-else
-    // eslint-disable-next-line
 define(['/util/conv.js', '/util/etask.js', '/util/events.js',
     '/util/string.js', '/util/zerr.js'],
     function(conv, etask, events, string, zerr){
@@ -1006,9 +1002,9 @@ class IPC_server {
                 this.ws.json(res);
         };
         const err_process = e=>{
-            if (type=='ipc_call' && this.call_zerr)
+            if (this.call_zerr && (type=='ipc_call'||type=='ipc_mux'))
                 zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
-            if (type=='ipc_post' || type=='ipc_mux')
+            if (type=='ipc_post')
                 return zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
             this.ws.json({
                 type: 'ipc_error',

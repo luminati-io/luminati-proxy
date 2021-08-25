@@ -163,8 +163,7 @@ function Etask(opt, states){
     for (var i=0; i<states.length; i++)
     {
         var pstate = states[i], t;
-        if (typeof pstate!='function')
-            assert(0, 'invalid state type');
+        assert(typeof pstate=='function', 'invalid state type');
         t = this._get_func_type(pstate);
         var state = {f: pstate, label: t.label, try_catch: t.try_catch,
             catch: t.catch, finally: t.finally, cancel: t.cancel,
@@ -619,20 +618,19 @@ E.prototype._get_child_running = function(){
     }
 };
 E.prototype._set_wait_child = function(wait_retval){
-    var _this = this, child = wait_retval.child;
-    var cond = wait_retval.cond, wait_on;
+    let {child, cond, rethrow} = wait_retval;
     assert(!cond || child=='any', 'condition supported only for "any" '+
         'option, you can add support if needed');
     if (child=='any')
     {
         if (!this._get_child_running())
             return true;
-        wait_on = function(){
-            _this.once('child', function(_child){
+        let wait_on = ()=>{
+            this.once('child', _child=>{
                 if (!cond || cond.call(_child, _child.retval))
-                    return _this._got_retval(wait_retval, {child: _child});
-                if (!_this._get_child_running())
-                    return _this._got_retval(wait_retval);
+                    return this._got_retval(wait_retval, {child: _child});
+                if (!this._get_child_running())
+                    return this._got_retval(wait_retval);
                 wait_on();
             });
         };
@@ -640,18 +638,18 @@ E.prototype._set_wait_child = function(wait_retval){
     }
     else if (child=='all')
     {
-        let child_et = this._get_child_running();
-        if (!child_et)
+        if (!this._get_child_running())
             return true;
-        wait_on = function(){
-            _this.once('child', function(){
-                let ch_child_et = _this._get_child_running();
-                if (!ch_child_et)
-                    return _this._got_retval(wait_retval);
-                wait_on(ch_child_et);
+        let wait_on = ()=>{
+            this.once('child', _child=>{
+                if (rethrow && E.is_err(_child))
+                    return this._got_retval(wait_retval, _child);
+                if (!this._get_child_running())
+                    return this._got_retval(wait_retval);
+                wait_on();
             });
         };
-        wait_on(child_et);
+        wait_on();
     }
     else
     {
@@ -659,8 +657,7 @@ E.prototype._set_wait_child = function(wait_retval){
         assert(this===child.parent, 'child does not belong to parent');
         if (child.tm_completed)
             return true;
-        child.once('finally', function(){
-            return _this._got_retval(wait_retval, {child: child}); });
+        child.once('finally', ()=>this._got_retval(wait_retval, {child}));
     }
     this.emit_safe('wait_on_child');
 };
@@ -784,11 +781,15 @@ E.prototype.alarm = function(ms, cb){
         this.once('sig_alarm', cb);
 };
 
-function Etask_wait(et, op, timeout){
-    this.timeout = timeout;
+function Etask_wait(et, op, opt = {}){
+    this.timeout = opt.timeout;
     this.et = et;
     this.op = op;
-    this.child = this.at_child = this.cond = undefined;
+    this.child = opt.child;
+    this.at_child = opt.at_child;
+    this.cond = opt.cond;
+    // XXX: rethrow==true should probably be the default behavir
+    this.rethrow = opt.rethrow;
     this.ready = this.completed = undefined;
 }
 Etask_wait.prototype.continue = function(res){
@@ -807,18 +808,22 @@ Etask_wait.prototype.throw = function(err){
 Etask_wait.prototype.throw_fn = function(){
     return this.throw.bind(this); };
 E.prototype.wait = function(timeout){
-    return new Etask_wait(this, 'wait', timeout); };
-E.prototype.wait_child = function(child, timeout, cond){
+    return new Etask_wait(this, 'wait', {timeout}); };
+E.prototype.wait_child = function(child, timeout, cond, opt){
     if (typeof timeout=='function')
     {
         cond = timeout;
+        opt = cond;
         timeout = 0;
     }
-    var wait = new Etask_wait(this, 'wait_child', timeout);
-    wait.child = child;
-    wait.at_child = null;
-    wait.cond = cond;
-    return wait;
+    else if (typeof timeout=='object')
+    {
+        cond = undefined;
+        opt = timeout;
+        timeout = 0;
+    }
+    return new Etask_wait(this, 'wait_child', {timeout, child,
+        at_child: null, cond, rethrow: opt&&opt.rethrow});
 };
 
 E.prototype.throw_fn = function(err){
@@ -1286,12 +1291,17 @@ E.all_limit = function(limit, arr_iter, cb){
         var next;
         if (!(next = iter.call(this)))
             return this.goto('done');
+        if (E.is_err(next))
+            return this.throw(next.error);
+        var _this = this;
+        if (typeof next.catch=='function')
+            next.catch(function(e){ _this.throw(e); });
         this.spawn(next);
         this.loop();
         if (this.child.size>=limit)
             return this.wait_child('any');
     }, function done(){
-        return this.wait_child('all');
+        return this.wait_child('all', {rethrow: true});
     }]);
 };
 

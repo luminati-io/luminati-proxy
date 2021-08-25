@@ -59,7 +59,9 @@ function guess_dryrun(args){
         args.push(['', 'real-run', 'actually run commands']);
 }
 
-E.getopt = function(args, usage, commands){
+E.getopt = function(args, usage, commands, lock_key){
+    if (global.zcli_getopt_lock_key && global.zcli_getopt_lock_key!=lock_key)
+        return;
     if (find_opt('h', args)<0)
         args.push(['h', 'help', 'show usage']);
     if (find_opt('v', args)<0)

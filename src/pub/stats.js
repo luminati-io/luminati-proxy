@@ -2,13 +2,16 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import {withRouter} from 'react-router-dom';
-import {status_codes} from './util.js';
+import filesaver from 'file-saver';
+import {status_codes, bytes_format} from './util.js';
 import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import {Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
 import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
+import {capitalize} from '../../util/string.js';
+import {to_blob} from '../../util/csv.js';
 import {T} from './common/i18n.js';
 import React_tooltip from 'react-tooltip';
 
@@ -275,12 +278,36 @@ class Toolbar extends Pure_component {
             setdb.emit_path('head.har_viewer.reset_reqs');
         });
     };
+    download_csv = key=>{
+        if (typeof key!='string' || !key)
+        {
+            this.download_csv('status_code');
+            this.download_csv('hostname');
+            this.download_csv('protocol');
+            return;
+        }
+        const stats = this.props.stats[key] || [];
+        if (key=='hostname')
+            key = 'domain';
+        else if (key=='status_code')
+            key = 'code';
+        const titles = [[capitalize(key), 'Total BW', 'Saved BW', 'Requests']];
+        const data = titles.concat(stats.map(s=>[
+            s.key,
+            bytes_format(s.in_bw+s.out_bw),
+            s.bypass_bw||'–',
+            s.reqs||'–'
+        ]));
+        filesaver.saveAs(to_blob(data), 'pm_stats_'+key+'.csv');
+    };
     render(){
         return <div className="toolbar">
               <Success_ratio total={this.props.stats.total}
                 success={this.props.stats.success}/>
               <Toolbar_button id="remove" tooltip="Clear"
                 on_click={this.clear}/>
+              <Toolbar_button id="download" tooltip="Download CSV"
+                on_click={this.download_csv}/>
               <Toolbar_button id="arrow_down" tooltip="Disable"
                 placement="left" on_click={this.props.disable_stats}/>
             </div>;

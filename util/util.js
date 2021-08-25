@@ -582,4 +582,12 @@ E.pairwise = function(coll, opt){
     return res;
 };
 
+E.make_error_wo_stack = function(msg, extra){
+    var stack_trace_limit = Error.stackTraceLimit;
+    Error.stackTraceLimit = -1;
+    var e = Object.assign(new Error(msg), extra);
+    Error.stackTraceLimit = stack_trace_limit;
+    return e;
+};
+
 return E; }); }());

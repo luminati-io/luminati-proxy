@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.252.735 Stable
+- :sparkles: Download CSV button for proxy manager stats
+
 ## 1.245.259 Stable
 - :bug: Fixed using new IP on 'Retry with same IP' rule
 

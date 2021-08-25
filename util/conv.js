@@ -111,9 +111,9 @@ E.inet_ntoa_t = function(ip){
 E.inet_addr = function(ip){
     var code, res = 0, shift = 24, num = undefined;
     ip = ''+ip;
-    for (var i = 0, l = ip.length; i < l; ++i)
+    for (var i = 0, l = ip.length; i<l; ++i)
     {
-            code = ip.charCodeAt(i);
+        code = ip.charCodeAt(i);
         if (code>47&&code<58)
         {
             num = (num||0)*10+code-48;

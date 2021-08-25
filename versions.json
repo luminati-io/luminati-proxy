@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.252.735",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Download CSV button for proxy manager stats"
+            }
+        ]
+    },
+    {
         "ver": "1.245.259",
         "type": "stable",
         "changes": [

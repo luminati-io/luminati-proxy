@@ -11,6 +11,12 @@ define(['/util/util.js', '/util/array.js'], function(zutil, zarray){
 var E = {};
 var assign = Object.assign;
 
+function make_csv_error(msg){
+    var e = new Error(msg);
+    e.code = 'csv_error';
+    return e;
+}
+
 // Returns an array of arrays:
 // [['field1', 'field2', 'field3'], ['1','2','3'], [..], ..]
 E.to_arr = function(data, opt){
@@ -49,7 +55,10 @@ E.to_arr = function(data, opt){
                 }
             } while (c && (c!=quote || data[i+1]==quote));
             if (!c)
-                throw 'Unexpected end of data, no closing quote found';
+            {
+                throw make_csv_error(
+                    'Unexpected end of data, no closing quote found');
+            }
             c = data[++i];
         }
         else
@@ -76,7 +85,7 @@ E.to_arr = function(data, opt){
         else if (c==line)
             row++;
         else if (c)
-            throw 'Delimiter expected after character '+i;
+            throw make_csv_error('Delimiter expected after character '+i);
         c = data[++i];
     }
     if (i && data[i-1]==field)
@@ -92,12 +101,12 @@ E.to_obj = function(data, opt){
         return arr;
     var i, result = [], headers = arr[0];
     if ((i = headers.indexOf(''))!=-1)
-        throw new Error('Field '+i+' has unknown name');
+        throw make_csv_error('Field '+i+' has unknown name');
     for (i=1; i<arr.length; i++)
     {
         var obj = {};
         if (arr[i].length > headers.length)
-            throw new Error('Line '+i+' has more fields than header');
+            throw make_csv_error('Line '+i+' has more fields than header');
         for (var j=0; j<arr[i].length; j++)
             obj[headers[j]] = arr[i][j];
         result.push(obj);
