@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.253.120",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed change default settings"
+            }
+        ]
+    },
+    {
         "ver": "1.252.735",
         "type": "stable",
         "changes": [

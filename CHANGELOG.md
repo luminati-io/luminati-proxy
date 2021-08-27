@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.253.120 Stable
+- :bug: Fixed change default settings
+
 ## 1.252.735 Stable
 - :sparkles: Download CSV button for proxy manager stats
 

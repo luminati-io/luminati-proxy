@@ -95,6 +95,13 @@ E.get_path = function(url){
     return n ? n[1] : '';
 };
 
+E.to_path = function(str){
+    var url = str;
+    if (url[0] != '/' && !str.startsWith('http'))
+        url = '/' + url;
+    return E.parse(url).pathname;
+};
+
 E.get_proto = function(url){
     var n = url.match(/^([a-z0-9]+):\/\//);
     return n ? n[1] : '';
