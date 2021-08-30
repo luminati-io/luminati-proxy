@@ -1,5 +1,7 @@
 Proxy manager - Change Log
 
+## 1.253.382 
+
 ## 1.253.120 Stable
 - :bug: Fixed change default settings
 

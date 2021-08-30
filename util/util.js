@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true, es6:true*/
 (function(){
 var define, node_util;
 var is_node = typeof module=='object' && module.exports && module.children;
@@ -589,5 +589,8 @@ E.make_error_wo_stack = function(msg, extra){
     Error.stackTraceLimit = stack_trace_limit;
     return e;
 };
+
+E.omit_falsy_props = o=>Object.fromEntries(Object.entries(o).filter(
+    ([, v])=>![null, undefined, ''].includes(v)));
 
 return E; }); }());

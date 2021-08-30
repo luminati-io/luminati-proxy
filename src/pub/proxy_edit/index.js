@@ -185,7 +185,8 @@ const Index = withRouter(class Index extends Pure_component {
         if (last_preset && last_preset.key!=preset && last_preset.clean)
             last_preset.clean(form_upd);
         form_upd.preset = preset;
-        presets.get(preset).set(form_upd, form);
+        presets.get(preset)
+            .set(form_upd, form, !last_preset || last_preset.key!=preset);
         const disabled_fields = presets.get(preset).disabled||{};
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this.apply_rules(form);

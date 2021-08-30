@@ -23,14 +23,14 @@ const presets = {
         subtitle: `Use the Scraper preset for a new IP with each single
             request. This preset also automatically rotates the User-Agent
             header. Best for scraping API without loading full pages.`,
-        set: (opt, old_opt)=>{
+        set: (opt, old_opt, is_new)=>{
             opt.session = '';
             opt.rotate_session = true;
             opt.sticky_ip = false;
             opt.headers = (old_opt||opt).headers||[];
             const rand_header = opt.headers.find(h=>
                 h.name=='user-agent'&&h.value=='random_desktop');
-            if (!rand_header)
+            if (is_new && !rand_header)
             {
                 opt.headers.push({name: 'user-agent',
                     value: 'random_desktop'});
