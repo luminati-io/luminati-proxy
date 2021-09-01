@@ -1,6 +1,10 @@
 Proxy manager - Change Log
 
-## 1.253.382 
+## 1.253.757 Stable
+- :bug: Fixed too many setdb listeners bug
+
+## 1.253.382 Stable
+- :bug: Fixed inability to remove rotating ip preset header
 
 ## 1.253.120 Stable
 - :bug: Fixed change default settings

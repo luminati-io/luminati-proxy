@@ -1,8 +1,23 @@
 [
     {
+        "ver": "1.253.757",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed too many setdb listeners bug"
+            }
+        ]
+    },
+    {
         "ver": "1.253.382",
-        "type": "stable/dev",
-        "changes": []
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed inability to remove rotating ip preset header"
+            }
+        ]
     },
     {
         "ver": "1.253.120",

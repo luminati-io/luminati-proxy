@@ -7,6 +7,8 @@ import Ru from '/www/lum/pub/locale/ru.json';
 import En from '/www/lum/pub/locale/en.json';
 import setdb from '../../../util/setdb.js';
 
+export const TranslationContext = React.createContext('en');
+
 const t = (key, translation)=>{
     if (!key || !translation)
         return key;
@@ -18,16 +20,9 @@ const t = (key, translation)=>{
 
 // XXX krzysztof: try to reuse T from /www/locale/pub
 export class T extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('i18n.translation', translation=>{
-            if (translation===undefined)
-                return;
-            this.setState({translation});
-        });
-    }
+    static contextType = TranslationContext;
     render(){
-        const {translation} = this.state;
+        const translation = get_lang(this.context);
         const {children} = this.props;
         if (typeof children=='function')
             return children(key=>t(key, translation));
@@ -38,16 +33,9 @@ export class T extends Pure_component {
 }
 
 export const with_tt = (keys, Component)=>class extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('i18n.translation', translation=>{
-            if (translation===undefined)
-                return;
-            this.setState({translation});
-        });
-    }
+    static contextType = TranslationContext;
     render(){
-        const {translation} = this.state;
+        const translation = get_lang(this.context);
         const {...props} = this.props;
         const translations = keys.reduce((acc, k)=>{
             const translated = t(k.replace(/\s+/g, ' '), translation);
@@ -63,8 +51,9 @@ export const langs = {
     cn: {name: '简体中文', flag: 'cn', t: Cn},
 };
 
+export const get_lang = lang=>langs[lang] && langs[lang].t || null;
 export const set_lang = lang=>{
-    setdb.set('i18n.translation', langs[lang].t || null);
+    setdb.set('i18n.translation', langs[lang].flag || null);
 };
 
 export class Language extends Pure_component {

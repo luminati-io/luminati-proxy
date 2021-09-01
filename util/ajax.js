@@ -14,7 +14,8 @@ var assign = Object.assign;
 var E = function(){ return E.send.apply(this, arguments); };
 
 E.send = function(opt){
-    var timeout = opt.timeout||20*date.ms.SEC, slow = opt.slow||2*date.ms.SEC;
+    var timeout = typeof opt.timeout=='number' ? opt.timeout : 20*date.ms.SEC;
+    var slow = opt.slow||2*date.ms.SEC;
     var retry = opt.retry, data = opt.data, qs = zescape.qs(opt.qs);
     var url = zescape.uri(opt.url, qs), perr = opt.perr;
     // opt.type is deprecated

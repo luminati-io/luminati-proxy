@@ -29,6 +29,7 @@ import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
 import {report_exception} from './util.js';
 import {createGlobalStyle} from 'styled-components';
+import {TranslationContext} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
 
@@ -90,6 +91,11 @@ const App = withRouter(class App extends Pure_component {
         });
         this.setdb_on('head.settings', settings=>
             settings && this.setState({settings}));
+        this.setdb_on('i18n.translation', translation=>{
+          if (translation===undefined)
+            return;
+          this.setState({translation});
+        });
     }
     load_data = ()=>this.etask(function*(){
         const errors = [];
@@ -162,7 +168,8 @@ const App = withRouter(class App extends Pure_component {
       });
     };
     render(){
-        return <div className="page_wrapper">
+      return <TranslationContext.Provider value={this.state.translation}>
+        <div className="page_wrapper">
           <Global_styles_brd/>
           <Enable_ssl_modal/>
           <Api_url_modal/>
@@ -173,7 +180,8 @@ const App = withRouter(class App extends Pure_component {
             <Route path="/dock_logs" exact component={Dock_logs}/>
             <Route path="/" component={Page}/>
           </Switch>
-        </div>;
+        </div>
+      </TranslationContext.Provider>;
     }
 });
 
