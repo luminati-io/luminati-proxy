@@ -176,6 +176,7 @@ E.init = argv=>{
     E.shutdowning = false;
     E.manager = null;
     E.on_upgrade_finished = null;
+    util.init_shared_cache();
     E.init_traps();
 };
 

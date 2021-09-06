@@ -872,28 +872,28 @@ describe('proxy', ()=>{
         }));
         it('check post_need_body', ()=>etask(function*(){
             l = yield lum({rules: [{url: 'test'}]});
-            const t = (req, expected)=>{
-                const r = l.rules.post_need_body(req);
+            const t = (req, expected)=>etask(function*(){
+                const r = yield l.rules.post_need_body(req);
                 assert.equal(r, expected);
-            };
-            t({ctx: {url: 'invalid'}}, false);
-            t({ctx: {url: 'test'}}, false);
+            });
+            yield t({ctx: {url: 'invalid'}}, false);
+            yield t({ctx: {url: 'test'}}, false);
             yield l.stop(true);
             l = yield lum({rules: [{type: 'after_body', body: '1',
                 url: 'test'}]});
-            t({ctx: {url: 'test'}}, true);
+            yield t({ctx: {url: 'test'}}, true);
         }));
         it('check post', ()=>etask(function*(){
             l = yield lum({rules: [{url: 'test'}]});
-            const t = (req, _res, expected)=>{
+            const t = (req, _res, expected)=>etask(function*(){
                 req.ctx = Object.assign({skip_rule: ()=>false}, req.ctx);
-                const r = l.rules.post(req, {}, {}, _res||{});
+                const r = yield l.rules.post(req, {}, {}, _res||{});
                 assert.equal(r, expected);
-            };
-            t({ctx: {h_context: 'STATUS CHECK'}});
-            t({ctx: {url: 'invalid'}});
+            });
+            yield t({ctx: {h_context: 'STATUS CHECK'}});
+            yield t({ctx: {url: 'invalid'}});
             sinon.stub(l.rules, 'action').returns(true);
-            t({ctx: {url: 'test'}}, {}, undefined);
+            yield t({ctx: {url: 'test'}}, {}, undefined);
         }));
         describe('action', ()=>{
             it('retry_port should update context port', ()=>etask(function*(){
@@ -918,7 +918,7 @@ describe('proxy', ()=>{
                 const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
                 const req = {ctx: {}};
                 const opt = {_res: {hola_headers: {'x-luminati-ip': 'ip'}}};
-                const r = l.rules.action(req, {}, {},
+                const r = yield l.rules.action(req, {}, {},
                     {action: {refresh_ip: true}}, opt);
                 assert.ok(r);
                 assert.ok(ref_stub.called);
@@ -932,7 +932,7 @@ describe('proxy', ()=>{
                     const req = {ctx: {}};
                     const opt = {_res: {
                         hola_headers: {'x-luminati-ip': '1.2.3.4'}}};
-                    const retried = l.rules.action(req, {}, {},
+                    const retried = yield l.rules.action(req, {}, {},
                         {action: {ban_ip: 1000}}, opt);
                     assert.ok(!retried);
                     assert.ok(add_stub.called);
@@ -979,39 +979,39 @@ describe('proxy', ()=>{
                 afterEach(()=>{
                     req_stub.restore();
                 });
-                it('does nothing on invalid urls', ()=>{
-                    const r = l.rules.action(req, {}, {},
+                it('does nothing on invalid urls', ()=>etask(function*(){
+                    const r = yield l.rules.action(req, {}, {},
                         {action: {request_url: {url: 'blabla'}}}, {});
                     assert.ok(!r);
                     sinon.assert.notCalled(req_stub);
-                });
-                it('sends request with http', ()=>{
+                }));
+                it('sends request with http', ()=>etask(function*(){
                     const url = 'http://lumtest.com';
-                    const r = l.rules.action(req, {}, {},
+                    const r = yield l.rules.action(req, {}, {},
                         {action: {request_url: {url}}}, {});
                     assert.ok(!r);
                     sinon.assert.calledWith(req_stub, sinon.match({url}));
-                });
-                it('sends request with https', ()=>{
+                }));
+                it('sends request with https', ()=>etask(function*(){
                     const url = 'https://lumtest.com';
-                    const r = l.rules.action(req, {}, {},
+                    const r = yield l.rules.action(req, {}, {},
                         {action: {request_url: {url}}}, {});
                     assert.ok(!r);
                     sinon.assert.calledWith(req_stub, sinon.match({url}));
-                });
-                it('sends request with custom method', ()=>{
+                }));
+                it('sends request with custom method', ()=>etask(function*(){
                     const url = 'http://lumtest.com';
-                    const r = l.rules.action(req, {}, {},
+                    const r = yield l.rules.action(req, {}, {},
                         {action: {request_url: {url, method: 'POST'}}}, {});
                     assert.ok(!r);
                     sinon.assert.calledWith(req_stub, sinon.match({url}));
-                });
-                it('sends request with custom payload', ()=>{
+                }));
+                it('sends request with custom payload', ()=>etask(function*(){
                     const url = 'http://lumtest.com';
                     const payload = {a: 1, b: 'str'};
                     const payload_str = JSON.stringify(payload);
                     const rule = {url, method: 'POST', payload};
-                    const r = l.rules.action(req, {}, {},
+                    const r = yield l.rules.action(req, {}, {},
                         {action: {request_url: rule}}, {});
                     assert.ok(!r);
                     const headers = {
@@ -1024,26 +1024,28 @@ describe('proxy', ()=>{
                         headers,
                         body: payload_str
                     }));
-                });
-                it('does not send payload in GET requests', ()=>{
+                }));
+                it('does not send payload in GET requests', ()=>
+                   etask(function*(){
                     const url = 'http://lumtest.com';
                     const payload = {a: 1, b: 'str'};
                     const rule = {url, method: 'GET', payload};
-                    const r = l.rules.action(req, {}, {},
+                    const r = yield l.rules.action(req, {}, {},
                         {action: {request_url: rule}}, {});
                     assert.ok(!r);
                     sinon.assert.calledWith(req_stub, sinon.match({
                         url,
                         method: 'GET'
                     }));
-                });
-                it('sends request with custom payload with IP', ()=>{
+                }));
+                it('sends request with custom payload with IP', ()=>
+                   etask(function*(){
                     const url = 'http://lumtest.com';
                     const payload = {a: 1, b: '$IP'}, ip = '1.1.1.1';
                     const actual_payload = {a: 1, b: ip};
                     const payload_str = JSON.stringify(actual_payload);
                     const rule = {url, method: 'POST', payload};
-                    const r = l.rules.action(req, {}, {},
+                    const r = yield l.rules.action(req, {}, {},
                         {action: {request_url: rule}},
                         {_res: {headers: {'x-luminati-ip': ip}}});
                     assert.ok(!r);
@@ -1057,7 +1059,7 @@ describe('proxy', ()=>{
                         headers,
                         body: payload_str
                     }));
-                });
+                }));
             });
             describe('retry', ()=>{
                 it('retry should refresh the session', ()=>etask(function*(){
@@ -1285,10 +1287,11 @@ describe('proxy', ()=>{
                         trigger_type: 'status', url: domain}]});
                     ban_spy = sinon.spy(l, 'banip');
                 }));
-                const t = (name, url, ban_count=0)=>it(name, ()=>{
+                const t = (name, url, ban_count=0)=>it(name,
+                    etask._fn(function*(){
                     const session = {session: 'sess1'};
                     const req = {ctx: {url, skip_rule: ()=>false, session}};
-                    l.rules.post(req, {}, {}, {status_code: 200,
+                    yield l.rules.post(req, {}, {}, {status_code: 200,
                         headers: {'x-luminati-ip': ip}});
                     sinon.assert.callCount(ban_spy, ban_count);
                     if (ban_count)
@@ -1296,7 +1299,7 @@ describe('proxy', ()=>{
                         sinon.assert.calledWith(ban_spy, ip, ban_period,
                             session, domain);
                     }
-                });
+                }));
                 t('does not trigger on diff domains',
                     'http://lumtest.com/test');
                 t('triggers', `http://${domain}/test`, 1);
@@ -1310,7 +1313,7 @@ describe('proxy', ()=>{
                     init_stats: ()=>null,
                 }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
-                const r = l.rules.pre(_req, _res, {});
+                const r = yield l.rules.pre(_req, _res, {});
                 assert.equal(r.status_code, 200);
                 assert.equal(r.status_message, 'NULL');
             }));
@@ -1321,7 +1324,7 @@ describe('proxy', ()=>{
                     init_stats: ()=>null,
                 }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
-                const r = l.rules.pre(_req, _res, {});
+                const r = yield l.rules.pre(_req, _res, {});
                 assert.equal(r, undefined);
                 assert.ok(_req.ctx.is_direct);
             }));

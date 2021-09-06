@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.254.277 Stable
+- :bug: Moved cache to single parent process
+
 ## 1.253.757 Stable
 - :bug: Fixed too many setdb listeners bug
 

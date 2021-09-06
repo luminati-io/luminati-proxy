@@ -20,6 +20,7 @@ const tasklist = require('tasklist');
 const taskkill = require('taskkill');
 const pkg = require('../package.json');
 const logger = require('../lib/logger.js');
+const util = require('../lib/util.js');
 const E = module.exports;
 
 let manager, upgrade_available, can_upgrade, is_upgrading, upgrade_cb;
@@ -165,6 +166,7 @@ const _run = argv=>etask(function*(){
         yield etask.sleep(2000);
     }
     yield check_conflicts();
+    util.init_shared_cache();
     manager = new Manager(argv);
     auto_updater.logger = manager.log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
