@@ -18,7 +18,7 @@ import React_tooltip from 'react-tooltip';
 export const Logs_context = React.createContext(true);
 
 export class Stats extends Pure_component {
-    state = {stats: {}, toggling: false};
+    state = {stats: {}};
     componentDidMount(){
         this.setdb_on('head.recent_stats', stats=>{
             if (stats)
@@ -26,45 +26,25 @@ export class Stats extends Pure_component {
         });
         this.setdb_on('head.settings', s=>{
             if (s)
-                this.setState({request_stats: s.request_stats});
-        });
-        this.setdb_on('head.save_settings', save_settings=>{
-            this.save_settings = save_settings;
-            if (typeof this.saved_stats=='boolean')
-            {
-                this.toggle_stats(this.saved_stats);
-                delete this.saved_stats;
-            }
+                this.setState({show: s.request_stats});
         });
     }
-    toggle_stats = val=>{
-        if (!this.save_settings)
-        {
-            this.saved_stats = val;
-            return;
-        }
-        const _this = this;
-        this.setState({toggling: true});
-        this.etask(function*(){
-            this.on('finally', ()=>_this.setState({toggling: false}));
-            yield _this.save_settings({request_stats: val});
-        });
-    };
+    toggle_stats = show=>this.setState({show});
     render(){
-        const {toggling, request_stats, stats} = this.state;
-        if (request_stats!==undefined && !request_stats)
+        const {show, stats} = this.state;
+        if (show!==undefined && !show)
         {
-            return <Stats_off_btn turn_on_stats={()=>this.toggle_stats(true)}
-              disabled={toggling}/>;
+            return <Stats_off_btn
+              turn_on_stats={()=>this.toggle_stats(true)}/>;
         }
         return <div className="stats_wrapper">
               <div className="stats_panel cp_panel vbox">
                 <Header_panel stats={stats}
                   disable_stats={()=>this.toggle_stats(false)}/>
-                {!request_stats &&
+                {!show &&
                   <Loader_small show loading_msg="Loading..."/>
                 }
-                {request_stats && <React.Fragment>
+                {show && <React.Fragment>
                   <Stat_table stats={stats} tooltip="Status code"
                     style={{flex: 1, overflowY: 'auto'}}
                     row_key="status_code" logs="code" title="Code"/>
@@ -88,7 +68,7 @@ const Header_panel = props=>
   </div>;
 
 const Stats_off_btn = props=>
-  <Tooltip title="Recent stats are disabled. Click here to turn it on again"
+  <Tooltip title="Show recent stats"
     placement="left">
     <button className="enable_btn enable_btn_stats" disabled={props.disabled}
       onClick={props.turn_on_stats}>
@@ -308,7 +288,7 @@ class Toolbar extends Pure_component {
                 on_click={this.clear}/>
               <Toolbar_button id="download" tooltip="Download CSV"
                 on_click={this.download_csv}/>
-              <Toolbar_button id="arrow_down" tooltip="Disable"
+              <Toolbar_button id="arrow_down" tooltip="Hide"
                 placement="left" on_click={this.props.disable_stats}/>
             </div>;
     }

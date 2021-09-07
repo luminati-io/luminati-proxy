@@ -25,6 +25,7 @@ class Overview extends Pure_component {
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
         this.state = {
             show_logs: null,
+            request_stats: null,
             tls_warning: false,
             embedded: qs_o.embedded=='true' || window.self!=window.top,
         };
@@ -34,19 +35,37 @@ class Overview extends Pure_component {
             if (!settings)
                 return;
             this.setState({show_logs: settings.logs>0,
-                zagent: settings.zagent});
+                zagent: settings.zagent,
+                request_stats: settings.request_stats});
             if (settings.ask_sync_config&&!settings.zagent)
                 $('#sync_config_modal').modal();
         });
         this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&
             this.setState({tls_warning}));
-        this.setdb_on('head.save_settings', save_settings=>
-            this.save_settings = save_settings);
+        this.setdb_on('head.save_settings', save_settings=>{
+            this.save_settings = save_settings;
+            if (typeof this.saved_stats=='boolean')
+            {
+                this.toggle_stats(this.saved_stats);
+                delete this.saved_stats;
+            }
+        });
     }
     toggle_logs = val=>{
         const _this = this;
         this.setState({show_logs: null});
         this.etask(function*(){ yield _this.save_settings({logs: val}); });
+    };
+    toggle_stats = val=>{
+        if (!this.save_settings)
+        {
+            this.saved_stats = val;
+            return;
+        }
+        const _this = this;
+        this.etask(function*(){
+            yield _this.save_settings({request_stats: val});
+        });
     };
     set_sync_config = val=>{
         const _this = this;
@@ -62,7 +81,7 @@ class Overview extends Pure_component {
         });
     };
     render(){
-        const {show_logs, zagent} = this.state;
+        const {show_logs, zagent, request_stats} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
         const title = <T>Proxy Manager Dashboard</T>;
         return <div className="overview_page">
@@ -79,7 +98,8 @@ class Overview extends Pure_component {
           </div>
           <div className="proxies nav_header">
             <h3>{title}</h3>
-            <Toolbar/>
+            <Toolbar request_stats={request_stats}
+              toggle_stats={this.toggle_stats}/>
           </div>
           <div className="panels" style={panels_style}>
             <div className="proxies proxies_wrapper">
@@ -120,12 +140,15 @@ class Overview extends Pure_component {
     }
 }
 
-const Toolbar = ()=>
+const Toolbar = ({request_stats, toggle_stats})=>
   <div className="toolbar">
     <Nav_icon id='how_to' link_to='/howto'
       tooltip='How to use the Proxy Manager'/>
     <Nav_icon id='general_settings' link_to='/settings'
       tooltip='General settings'/>
+    <Nav_icon id='stats' filled={request_stats}
+      tooltip={`Recent stats are ${request_stats ? 'enabled' : 'disabled'}`}
+      onClick={()=>toggle_stats(!request_stats)}/>
     <Add_proxy_btn/>
   </div>;
 
@@ -142,16 +165,20 @@ const Add_proxy_btn = ()=>{
 };
 
 const Nav_icon = withRouter(props=>{
-  const classes = classNames('toolbar_icon', 'cp_icon ', props.id);
+  const icon_classes = classNames('toolbar_icon', 'cp_icon ', props.id,
+      props.filled ? 'filled' : '');
+  const bg_classes = classNames('toolbar_icon_bg',
+      props.filled ? 'btn_lpm_primary' : '');
   const navigate_to = path=>{
       props.history.push({pathname: path});
   };
+  const on_click_navigate = {onClick: ()=>navigate_to(props.link_to)};
   return <T>{t=>
     <Tooltip title={t(props.tooltip)}>
         <div className="toolbar_item">
-          <div className='toolbar_icon_bg'>
-          <div className={classes}
-            onClick={()=>navigate_to(props.link_to)}/>
+          <div className={bg_classes} onClick={props.onClick}
+            {...(props.link_to && on_click_navigate)}>
+            <div className={icon_classes}/>
           </div>
         </div>
     </Tooltip>

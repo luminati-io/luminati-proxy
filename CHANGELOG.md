@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.254.439 Stable
+- :sparkles: Separate button for collecting recent stats
+
 ## 1.254.277 Stable
 - :bug: Moved cache to single parent process
 

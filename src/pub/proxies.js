@@ -403,7 +403,6 @@ const columns = [
             +'request is considered as successful if the server of the '
             +'destination website responded',
         render: Success_rate_cell,
-        calc_available: settings=>settings && settings.request_stats,
         default: true,
         ext: true,
         dynamic: true,
@@ -417,7 +416,6 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
-        calc_available: settings=>settings && settings.request_stats,
         width: 90,
     },
     {
@@ -428,7 +426,6 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
-        calc_available: settings=>settings && settings.request_stats,
         width: 90,
     },
     {
@@ -441,7 +438,6 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
-        calc_available: settings=>settings && settings.request_stats,
         width: 90,
     },
     {
@@ -454,7 +450,6 @@ const columns = [
         dynamic: true,
         grow: 1,
         width: 60,
-        calc_available: settings=>settings && settings.request_stats,
     },
     {
         key: 'browser',

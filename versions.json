@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.254.439",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Separate button for collecting recent stats"
+            }
+        ]
+    },
+    {
         "ver": "1.254.277",
         "type": "stable",
         "changes": [

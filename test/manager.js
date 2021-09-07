@@ -32,7 +32,7 @@ const api_base = 'https://'+pkg.api_domain;
 const {SEC} = date.ms;
 
 describe('manager', function(){
-    this.timeout(2500);
+    this.timeout(5000);
     let app, temp_files, logger_stub, sb;
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;

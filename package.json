@@ -244,6 +244,7 @@
       "bin/pub/img/state.svg",
       "bin/pub/img/static_res.svg",
       "bin/pub/img/stats.svg",
+      "bin/pub/img/stats_white.svg",
       "bin/pub/img/target.svg",
       "bin/pub/img/tester.svg",
       "bin/pub/img/tools.svg",
@@ -393,7 +394,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "22217008e94e4be9bb76d812f37b2538"
+    "md5": "5cd103b33017f315b9793977231c42f1"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -425,5 +426,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.254.277"
+  "version": "1.254.439"
 }

@@ -80,8 +80,9 @@ E.hash = function(buf, hash_len, encoding, type){
     .digest('hex').slice(0, hash_len);
 };
 
-E.encode_base64_shift = function(data){
-    data = Buffer.from(data, 'ascii').toString('base64');
+E.encode_base64_shift = function(data, charset){
+    charset = charset||'ascii';
+    data = Buffer.from(data, charset).toString('base64');
     if (!data.endsWith('='))
         data = data.substr(3)+data.substr(0, 3);
     else
