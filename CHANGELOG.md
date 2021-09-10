@@ -1,6 +1,6 @@
 Proxy manager - Change Log
 
-## 1.254.686 Stable
+## 1.254.777 Stable
 - :bug: Async rules post check on retry request
 
 ## 1.254.439 Stable
