@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.255.171 Stable
+- :sparkles: Updated version of react-tooltip
+
 ## 1.254.777 Stable
 - :bug: Async rules post check on retry request
 

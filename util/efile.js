@@ -72,15 +72,19 @@ E.rename_e = (old_path, new_path)=>
     etask.nfn_apply(fs.rename, [old_path, new_path]);
 E.unlink_e = path=>etask.nfn_apply(fs.unlink, [path]);
 E.mkdir_e = (path, mode)=>etask.nfn_apply(fs.mkdir, [path, mode]);
-E.mkdirp_e = p=>etask(function*mkdirp_e(){
-    let mode = 0o777 & ~(process.umask&&process.umask());
+E.mkdirp_e = (p, mode)=>etask(function*mkdirp_e(){
+    if (mode!==undefined && process.umask)
+    {
+        let oldmask = process.umask(0);
+        this.finally(()=>process.umask(oldmask));
+    }
     try { yield E.mkdir_e(p, mode); }
     catch(e){ ef(e);
         if (e.code=='EEXIST')
             return;
         if (e.code!='ENOENT')
             throw e;
-        yield E.mkdirp_e(path.dirname(p));
+        yield E.mkdirp_e(path.dirname(p), mode);
         try { yield E.mkdir_e(p, mode); }
         catch(e){ ef(e);
             if (e.code=='EEXIST')

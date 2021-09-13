@@ -100,7 +100,7 @@
     "react-bootstrap-typeahead": "4.1.0",
     "react-waypoint": "9.0.2",
     "react-select": "3.0.8",
-    "react-tooltip": "3.11.1",
+    "react-tooltip": "4.2.21",
     "react-virtualized": "9.21.2",
     "file-saver": "2.0.2",
     "lum_crontab": "1.0.0",
@@ -394,7 +394,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "7f97fbb0cf42632fb5d2f9d227d0c52e"
+    "md5": "67799ed3100f462f3fd73fa26eec3bfc"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -426,5 +426,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.254.777"
+  "version": "1.255.171"
 }
