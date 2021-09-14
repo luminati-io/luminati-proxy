@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.255.419",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix HAR logs for caching css and js"
+            }
+        ]
+    },
+    {
         "ver": "1.255.171",
         "type": "stable",
         "changes": [
