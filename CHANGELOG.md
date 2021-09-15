@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.255.592 Stable
+- :star: Enable request stats in Cloud Proxy Manager
+
 ## 1.255.419 Stable
 - :bug: Fix HAR logs for caching css and js
 

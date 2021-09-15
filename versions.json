@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.255.592",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Enable request stats in Cloud Proxy Manager"
+            }
+        ]
+    },
+    {
         "ver": "1.255.419",
         "type": "stable",
         "changes": [
