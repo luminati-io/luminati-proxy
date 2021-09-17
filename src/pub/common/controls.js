@@ -562,8 +562,9 @@ export const Select = props=>{
             props.on_change_wrapper(val);
     };
     const conf = (props.data||[]).find(c=>c.value==props.val);
-    return <Tooltip key={props.val} title={conf&&conf.tooltip||''}>
-      <T>{t=><select value={''+props.val}
+    const val = props.val||props.default;
+    return <Tooltip key={val} title={conf&&conf.tooltip||''}>
+        <T>{t=><select value={''+val}
         onChange={e=>update(e.target.value)}
         disabled={props.disabled}>
         {props.with_categories && props.data.map(i=>

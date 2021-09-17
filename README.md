@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.255.592/luminati-proxy-manager-v1.255.592-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.255.850/luminati-proxy-manager-v1.255.850-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -192,7 +192,8 @@ Options:
   --override_headers                                                   [boolean]
   --os                          Operating System of the Peer IP         [string]
   --headers                     Request headers                          [array]
-  --debug                       Request debug info    [string] [default: "full"]
+  --debug                       Request debug info default value
+                                                      [string] [default: "full"]
   --socket_inactivity_timeout                         [number] [default: 120000]
   --multiply_ips                                      [boolean] [default: false]
   --multiply_vips                                     [boolean] [default: false]

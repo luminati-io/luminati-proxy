@@ -31,10 +31,10 @@ describe('username', ()=>{
             assert.equal(res.username, 'lum-country-us-ip-1.1.1.1');
         });
         describe('debug', ()=>{
-            it('should skip debug if default', ()=>{
+            it('should apply debug if default', ()=>{
                 const opt = {country: 'us', debug: 'full'};
                 const res = username.calculate_username(opt);
-                assert.equal(res.username, 'lum-country-us');
+                assert.equal(res.username, 'lum-country-us-debug-full');
             });
             it('should apply debug if not default', ()=>{
                 const opt = {country: 'us', debug: 'none'};

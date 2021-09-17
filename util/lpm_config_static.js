@@ -52,7 +52,6 @@ conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
     'version', 'ask_sync_config');
 conf.proxy_params = Object.keys(lpm_api_models.proxy_fields);
 conf.server_default = {
-    debug: 'full',
     port: 24000,
     zone: 'static',
     customer: process.env.LUMINATI_CUSTOMER,
@@ -93,6 +92,7 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     request_stats: true,
     logs: 1000,
     har_limit: 1024,
+    debug: 'full',
     ports_limit: 10000,
     ui_ws: true,
     reverse_lookup_dns: false,

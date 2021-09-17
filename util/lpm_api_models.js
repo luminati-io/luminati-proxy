@@ -117,6 +117,7 @@ E.manager_fields = {
     log: {type: 'string', desc: 'Log level'},
     logs: {type: 'number', desc: 'Number of request logs to store'},
     har_limit: {type: 'number', desc: 'Number of bytes to store'},
+    debug: {type: 'string', desc: 'Request debug info default value'},
     ports_limit: {type: 'integer', desc: 'Limit the numer of open proxy ports '
         +'at the same time'},
     ui_ws: {type: 'boolean', desc: 'Enable live logs preview and other live '

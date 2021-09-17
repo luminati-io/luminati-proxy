@@ -15,7 +15,7 @@ const route_err_opt = [
 ];
 
 const debug_opt = [
-    {key: 'Yes (default)', value: 'full'},
+    {key: 'Yes', value: 'full'},
     {key: 'No', value: 'none'},
 ];
 

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.255.850 Stable
+- :sparkles: Option to change default debug value in General Settings
+
 ## 1.255.592 Stable
 - :star: Enable request stats in Cloud Proxy Manager
 

@@ -612,7 +612,7 @@ describe('proxy', ()=>{
         });
         describe('request IP choice', ()=>{
             it('should use IP sent in x-lpm-ip header', ()=>etask(function*(){
-                l = yield lum();
+                l = yield lum({debug: 'full'});
                 const ip = '1.2.3.4';
                 const r = yield l.test({headers: {'x-lpm-ip': ip}});
                 assert.ok(
@@ -635,7 +635,7 @@ describe('proxy', ()=>{
         describe('request country choice', ()=>{
             it('should use country sent in x-lpm-country header',
                 ()=>etask(function*(){
-                    l = yield lum();
+                    l = yield lum({debug: 'full'});
                     const country = 'us';
                     const r = yield l.test({headers:
                         {'x-lpm-country': country}});
@@ -646,7 +646,7 @@ describe('proxy', ()=>{
         describe('request state choice', ()=>{
             it('should use state sent in x-lpm-state header',
                 ()=>etask(function*(){
-                    l = yield lum({state_perm: true});
+                    l = yield lum({state_perm: true, debug: 'full'});
                     const state = 'us';
                     const r = yield l.test({headers: {'x-lpm-state': state}});
                     assert.ok(r.headers['x-lpm-authorization']
@@ -656,7 +656,7 @@ describe('proxy', ()=>{
         describe('request city choice', ()=>{
             it('should use city sent in x-lpm-city header',
                 ()=>etask(function*(){
-                    l = yield lum();
+                    l = yield lum({debug: 'full'});
                     const city = 'washington';
                     const r = yield l.test({headers: {'x-lpm-city': city}});
                     assert.ok(r.headers['x-lpm-authorization']
@@ -664,7 +664,7 @@ describe('proxy', ()=>{
                 }));
             it('should use escaped city sent in x-lpm-city header',
                 ()=>etask(function*(){
-                    l = yield lum();
+                    l = yield lum({debug: 'full'});
                     const city = 'New-York';
                     const r = yield l.test({headers: {'x-lpm-city': city}});
                     assert.ok(r.headers['x-lpm-authorization']
@@ -1140,7 +1140,7 @@ describe('proxy', ()=>{
                 }));
             });
             describe('retry_port combined with unblocker', ()=>{
-                const has_unblocker_flag = u=>u.endsWith('-unblocker');
+                const has_unblocker_flag = u=>u.includes('-unblocker');
                 const sessions_are_unique = (...users)=>{
                     const sess_id = u=>u.match(/(?<=session-)(.*?)(?=$|-)/)[1];
                     return new Set(users.map(sess_id)).size==users.length;

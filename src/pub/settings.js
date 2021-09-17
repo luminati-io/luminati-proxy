@@ -5,6 +5,7 @@ import React from 'react';
 import {Labeled_controller, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import etask from '../../util/etask.js';
 import {report_exception} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
@@ -44,6 +45,8 @@ const tooltips = {
         limit may be set as a number or maximum database size.`,
     har_limit: `Define the limit for the size of the response body to save in
         the logs`,
+    debug: `Default value for luminati request details like response timeline
+        or peer IP that was used to send a final request`,
     log_level: `Define how much log you want to see in the terminal</br>
         <ul>
           <li><strong>error: </strong>only error messages</li>
@@ -75,6 +78,10 @@ class Form extends Pure_component {
         {key: 'megabytes', value: 'megabytes'},
     ];
     log_level_opts = ['error', 'warn', 'notice', 'info', 'debug'];
+    default_debug_opts = [
+        {key: 'No', value: 'none'},
+        {key: 'Yes', value: 'full'}
+    ];
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
             if (!settings)
@@ -140,6 +147,10 @@ class Form extends Pure_component {
                 return _this.setState({api_error: [{msg: save_res.err}]}, ()=>
                     $('#upd_settings_error').modal('show'));
             }
+            etask(function*(){
+                const defaults = yield ajax.json({url: '/api/defaults'});
+                setdb.set('head.defaults', defaults);
+            });
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('ws.zones', zones);
             if (_this.state.settings.sync_config)
@@ -221,6 +232,14 @@ class Form extends Pure_component {
             label="Response limit to save"
             default={1024}
             tooltip={tooltips.har_limit}
+          />
+          <Labeled_controller
+            val={s.debug}
+            type="select"
+            on_change_wrapper={this.on_change_handler('debug')}
+            data={this.default_debug_opts}
+            label="Default requests details"
+            tooltip={tooltips.debug}
           />
           <Labeled_controller
             val={s.log}

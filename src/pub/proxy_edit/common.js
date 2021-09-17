@@ -46,15 +46,15 @@ export const Config = withRouter(class Config extends Pure_component {
             return null;
         const id = this.props.id;
         let _default;
-        if (this.props.type=='yes_no')
+        if (this.props.default!==undefined)
+            _default = this.props.default;
+        else if (this.state.defaults[id]!==undefined)
         {
-            if (this.props.default!==undefined)
-                _default = this.props.default;
-            else if (this.state.defaults[id]!==undefined)
-                _default = this.state.defaults[id];
-            else
-                _default = false;
+            _default = id=='debug' ? `default-${this.state.defaults[id]}`
+                : this.state.defaults[id];
         }
+        else if (this.props.type=='yes_no')
+            _default = false;
         const tab_id = this.context;
         const disabled = this.props.disabled||!this.is_valid_field(id)||
             this.state.disabled_fields[id];
@@ -62,11 +62,19 @@ export const Config = withRouter(class Config extends Pure_component {
         let animated = false;
         if ((state = this.props.location.state)&&state.field)
             animated = state.field==id;
+        const data = [];
+        if (id=='debug')
+        {
+            const default_option = this.props.data.find(d=>
+                d.value==this.state.defaults[id]);
+            data.push({key: `Default (${default_option.key})`,
+                value: `default-${default_option.value}`});
+        }
         return <Labeled_controller
               id={id}
               animated={animated}
               sufix={this.props.sufix}
-              data={this.props.data}
+              data={data.concat(this.props.data)}
               type={this.props.type}
               on_key_up={this.on_key_up}
               on_input_change={this.on_input_change}

@@ -100,7 +100,7 @@ E.send = function(opt){
             xhr.getResponseHeader('X-Hola-Error');
         throw err;
     }, function(_data){
-        var t = Date.now()-t0;
+        var res, t = Date.now()-t0;
         zerr[t>slow ? 'err' : 'debug'](
             'ajax('+data_type+') '+(t>slow ? 'SLOW ' : 'ok ')+t+'ms url '+url);
         if (t>slow && perr)
@@ -109,7 +109,19 @@ E.send = function(opt){
             E.do_op(_data&&_data.do_op);
         if (opt.restore_dates)
             restore_dates(_data);
-        return this.return(_data);
+        if (Array.isArray(opt.return_headers))
+        {
+            res = {
+                data: _data,
+                headers: opt.return_headers.reduce(function(obj, h){
+                    obj[h] = xhr.getResponseHeader(h);
+                    return obj;
+                }, {}),
+            };
+        }
+        else
+            res = _data;
+        return this.return(res);
     }, function abort(){
         // reachable only via E.abort
         xhr.abort();
