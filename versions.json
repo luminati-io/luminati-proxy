@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.255.903",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Keep session proxy setting"
+            }
+        ]
+    },
+    {
         "ver": "1.255.850",
         "type": "stable",
         "changes": [

@@ -321,6 +321,11 @@ export const tabs = {
                 tooltip: `Luminati request details like response timeline or
                     peer IP that was used to send a final request`,
             },
+            const: {
+                label: 'Keep session',
+                tooltip: `Keep same session even if an error during tunnel
+                    setup occurs`,
+            },
         },
     },
 };

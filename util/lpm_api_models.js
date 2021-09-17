@@ -78,6 +78,7 @@ E.proxy_fields = {
         params: {name: {type: 'string'}, value: {type: 'string'}}},
     debug: {type: 'string', desc: 'Request debug info',
         values: 'full|none'},
+    const: {type: 'boolean'},
     socket_inactivity_timeout: {type: 'integer'},
     multiply_ips: {type: 'boolean'},
     multiply_vips: {type: 'boolean'},

@@ -176,6 +176,7 @@ export default class General extends Pure_component {
             />
             <Config type="pins" id="smtp" exact no_any/>
             <Config type="select" id="debug" data={debug_opt}/>
+            <Config type="yes_no" id="const" />
           </Tab_context.Provider>
         </div>;
     }

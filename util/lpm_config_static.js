@@ -80,6 +80,7 @@ conf.server_default = {
     ua: false,
     throttle: '',
     info: false,
+    const: false,
 };
 conf.manager_default = Object.assign({}, conf.server_default, {
     www: 22999,
