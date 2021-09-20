@@ -7,6 +7,8 @@ const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 const lpm_util = require('../util/lpm_util.js');
 const util = require('../lib/util.js');
+const get_cache = require('../lib/cache.js');
+const cluster_ipc = require('../util/cluster_ipc.js');
 // XXX krzysztof: is perr.run() needed here?
 const perr = require('../lib/perr.js');
 perr.run({});
@@ -84,6 +86,16 @@ const add_alias_for_whitelist_ips = ()=>{
         child_process.execSync(func);
         child_process.execSync(alias);
     } catch(e){ logger.warn(`Failed to install ${name}: ${e.message}`); }
+};
+
+const init_shared_cache = ()=>{
+    try {
+        const cache = get_cache();
+        cluster_ipc.master_on('cache_set', msg=>
+            cache.set(msg.url, msg.res_data, msg.headers));
+        cluster_ipc.master_on('cache_get', msg=>cache.get(msg.url));
+        cluster_ipc.master_on('cache_has', msg=>cache.has(msg.url));
+    } catch(e){ console.log('SETTING CACHE ERROR: '+e.message); }
 };
 
 E.run = (argv, run_config)=>{
@@ -176,7 +188,7 @@ E.init = argv=>{
     E.shutdowning = false;
     E.manager = null;
     E.on_upgrade_finished = null;
-    util.init_shared_cache();
+    init_shared_cache();
     E.init_traps();
 };
 

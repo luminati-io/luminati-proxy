@@ -73,8 +73,14 @@ let on_response = (sender, msg)=>{
     let handler = zutil.obj_pluck(waiting[sender], key);
     if (!handler)
     {
-        zerr.zexit('cluster_on_response: no handler: '+key
-            +' ['+(sender.id||sender)+']');
+        let err = 'cluster_on_response: no handler: '+key
+            +' ['+(sender.id||sender)+']';
+        if (process.listeners('message')
+            .filter(l=>l.name=='ipc_msg_handler').length>1)
+        {
+            err += ' Duplicate ipc_msg_handler listeners!';
+        }
+        zerr.zexit(err);
     }
     if (VERBOSE_IPC)
     {
@@ -96,7 +102,7 @@ let worker_fail_fn = (worker, ev)=>(...arg)=>{
     }
 };
 
-let message_fn = sender=>(msg, sock)=>{
+let message_fn = sender=>function ipc_msg_handler(msg, sock){
     switch (msg.type)
     {
     case 'ipc_result': case 'ipc_error': return on_response(sender, msg);

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.256.139 Stable
+- :bug: Fixed multiple listeners caching error
+
 ## 1.255.903 Stable
 - :star: Keep session proxy setting
 

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.256.139",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed multiple listeners caching error"
+            }
+        ]
+    },
+    {
         "ver": "1.255.903",
         "type": "stable",
         "changes": [

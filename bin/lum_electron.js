@@ -20,7 +20,8 @@ const tasklist = require('tasklist');
 const taskkill = require('taskkill');
 const pkg = require('../package.json');
 const logger = require('../lib/logger.js');
-const util = require('../lib/util.js');
+const get_cache = require('../lib/cache.js');
+const cluster_ipc = require('../util/cluster_ipc.js');
 const E = module.exports;
 
 let manager, upgrade_available, can_upgrade, is_upgrading, upgrade_cb;
@@ -158,6 +159,16 @@ const check_conflicts = ()=>etask(function*(){
     restart();
 });
 
+const init_shared_cache = ()=>{
+    try {
+        const cache = get_cache();
+        cluster_ipc.master_on('cache_set', msg=>
+            cache.set(msg.url, msg.res_data, msg.headers));
+        cluster_ipc.master_on('cache_get', msg=>cache.get(msg.url));
+        cluster_ipc.master_on('cache_has', msg=>cache.has(msg.url));
+    } catch(e){ console.log('SETTING CACHE ERROR: '+e.message); }
+};
+
 const _run = argv=>etask(function*(){
     if (process.send)
     {
@@ -166,7 +177,7 @@ const _run = argv=>etask(function*(){
         yield etask.sleep(2000);
     }
     yield check_conflicts();
-    util.init_shared_cache();
+    init_shared_cache();
     manager = new Manager(argv);
     auto_updater.logger = manager.log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
