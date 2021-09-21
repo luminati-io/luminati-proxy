@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.256.271 Stable
+- :bug: Abort unnecessary proxy status requests
+
 ## 1.256.139 Stable
 - :bug: Fixed multiple listeners caching error
 

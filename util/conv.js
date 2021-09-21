@@ -375,6 +375,8 @@ E.JSON_stringify = function(obj, opt){
         var ignore_circular = opt.circular=='ignore';
         var orig_replacer = replacer, keys, objects, stack;
         replacer = function(k, v){
+            if (k=='__Ref__')
+                return v;
             if (!k)
             {
                 keys = [];

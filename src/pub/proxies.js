@@ -1017,11 +1017,16 @@ class Actions extends Pure_component {
         if (!this.props.proxy.status)
             this.get_status();
     }
+    componentWillUnmount(){
+        if (this.status_req)
+            ajax.abort(this.status_req);
+    }
     // XXX krzysztof: this logic is a mess, rewrite it
     get_status = (opt={})=>{
         const proxy = this.props.proxy;
         if (!opt.force && proxy.status=='ok')
             return;
+        const _this = this;
         return this.etask(function*(){
             this.on('uncaught', e=>{
                 proxy.status = 'error';
@@ -1040,7 +1045,15 @@ class Actions extends Pure_component {
                 setdb.emit_path('head.proxies_running');
             const uri = '/api/proxy_status/'+proxy.port;
             const url = zescape.uri(uri, params);
-            const res = yield ajax.json({url, timeout: 25000});
+            _this.status_req = ajax.json({url, timeout: 25000});
+            const res = yield _this.status_req;
+            delete _this.status_req;
+            if (res===undefined)
+            {
+                delete proxy.status;
+                setdb.emit_path('head.proxies_running');
+                return;
+            }
             if (res.status!='ok')
             {
                 const errors = res.status_details||[];
