@@ -47,6 +47,7 @@ const tooltips = {
         the logs`,
     debug: `Default value for luminati request details like response timeline
         or peer IP that was used to send a final request`,
+    lpm_auth: 'Default value for "Set x-lpm-authorization header" setting',
     log_level: `Define how much log you want to see in the terminal</br>
         <ul>
           <li><strong>error: </strong>only error messages</li>
@@ -78,7 +79,7 @@ class Form extends Pure_component {
         {key: 'megabytes', value: 'megabytes'},
     ];
     log_level_opts = ['error', 'warn', 'notice', 'info', 'debug'];
-    default_debug_opts = [
+    default_yes_no_select_opts = [
         {key: 'No', value: 'none'},
         {key: 'Yes', value: 'full'}
     ];
@@ -237,9 +238,17 @@ class Form extends Pure_component {
             val={s.debug}
             type="select"
             on_change_wrapper={this.on_change_handler('debug')}
-            data={this.default_debug_opts}
+            data={this.default_yes_no_select_opts}
             label="Default requests details"
             tooltip={tooltips.debug}
+          />
+          <Labeled_controller
+            val={s.lpm_auth}
+            type="select"
+            on_change_wrapper={this.on_change_handler('lpm_auth')}
+            data={this.default_yes_no_select_opts}
+            label="Default LPM auth. header"
+            tooltip={tooltips.lpm_auth}
           />
           <Labeled_controller
             val={s.log}

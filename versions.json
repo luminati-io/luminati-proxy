@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.256.472",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "X-lpm-authorization header to separate setting"
+            }
+        ]
+    },
+    {
         "ver": "1.256.271",
         "type": "stable",
         "changes": [

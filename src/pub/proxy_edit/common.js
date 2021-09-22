@@ -8,6 +8,7 @@ import {Labeled_controller, Ext_tooltip} from '../common.js';
 import {withRouter} from 'react-router-dom';
 
 export const Tab_context = React.createContext('logs');
+const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
 
 export const Config = withRouter(class Config extends Pure_component {
     state = {disabled_fields: {}};
@@ -50,8 +51,8 @@ export const Config = withRouter(class Config extends Pure_component {
             _default = this.props.default;
         else if (this.state.defaults[id]!==undefined)
         {
-            _default = id=='debug' ? `default-${this.state.defaults[id]}`
-                : this.state.defaults[id];
+            _default = mgr_proxy_shared_fields.includes(id) ?
+                `default-${this.state.defaults[id]}` : this.state.defaults[id];
         }
         else if (this.props.type=='yes_no')
             _default = false;
@@ -63,7 +64,7 @@ export const Config = withRouter(class Config extends Pure_component {
         if ((state = this.props.location.state)&&state.field)
             animated = state.field==id;
         const data = [];
-        if (id=='debug')
+        if (mgr_proxy_shared_fields.includes(id))
         {
             const default_option = this.props.data.find(d=>
                 d.value==this.state.defaults[id]);

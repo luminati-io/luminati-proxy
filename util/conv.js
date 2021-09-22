@@ -401,9 +401,12 @@ E.JSON_stringify = function(obj, opt){
             if (!found)
             {
                 keys.push(k);
-                stack.unshift(v);
                 objects.push({keys: keys.join('.'), value: v});
-                return orig_replacer ? orig_replacer.call(this, k, v) : v;
+                var ret;
+                if (orig_replacer)
+                    ret = orig_replacer.call(this, k, v);
+                stack.unshift(orig_replacer ? ret : v);
+                return orig_replacer ? ret : v;
             }
             if (!ignore_circular)
                 return {__Ref__: found.keys};

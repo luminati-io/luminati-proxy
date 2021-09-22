@@ -326,6 +326,10 @@ export const tabs = {
                 tooltip: `Keep same session even if an error during tunnel
                     setup occurs`,
             },
+            lpm_auth: {
+                label: 'Set x-lpm-authorization header',
+                tooltip: `Set x-lpm-authorization header on responses`,
+            },
         },
     },
 };

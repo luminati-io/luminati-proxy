@@ -94,6 +94,7 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     logs: 1000,
     har_limit: 1024,
     debug: 'full',
+    lpm_auth: 'none',
     ports_limit: 10000,
     ui_ws: true,
     reverse_lookup_dns: false,
@@ -118,5 +119,6 @@ conf.log_levels = {
     info: 3,
     debug: 4,
 };
+conf.mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
 
 Object.assign(module.exports, conf);

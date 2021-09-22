@@ -78,6 +78,7 @@ E.proxy_fields = {
         params: {name: {type: 'string'}, value: {type: 'string'}}},
     debug: {type: 'string', desc: 'Request debug info',
         values: 'full|none'},
+    lpm_auth: {type: 'string', desc: 'x-lpm-authorization header'},
     const: {type: 'boolean'},
     socket_inactivity_timeout: {type: 'integer'},
     multiply_ips: {type: 'boolean'},
@@ -119,6 +120,7 @@ E.manager_fields = {
     logs: {type: 'number', desc: 'Number of request logs to store'},
     har_limit: {type: 'number', desc: 'Number of bytes to store'},
     debug: {type: 'string', desc: 'Request debug info default value'},
+    lpm_auth: {type: 'string', desc: 'x-lpm-authorization header'},
     ports_limit: {type: 'integer', desc: 'Limit the numer of open proxy ports '
         +'at the same time'},
     ui_ws: {type: 'boolean', desc: 'Enable live logs preview and other live '

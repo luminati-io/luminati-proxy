@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.256.472 Stable
+- :star: X-lpm-authorization header to separate setting
+
 ## 1.256.271 Stable
 - :bug: Abort unnecessary proxy status requests
 

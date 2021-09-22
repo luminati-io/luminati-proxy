@@ -612,7 +612,7 @@ describe('proxy', ()=>{
         });
         describe('request IP choice', ()=>{
             it('should use IP sent in x-lpm-ip header', ()=>etask(function*(){
-                l = yield lum({debug: 'full'});
+                l = yield lum({debug: 'full', lpm_auth: 'full'});
                 const ip = '1.2.3.4';
                 const r = yield l.test({headers: {'x-lpm-ip': ip}});
                 assert.ok(
@@ -622,7 +622,7 @@ describe('proxy', ()=>{
         describe('request details', ()=>{
             const debug_headers = ['x-lpm-authorization', 'x-lpm-port'];
             it('includes debug response headers', ()=>etask(function*(){
-                l = yield lum({debug: 'full'});
+                l = yield lum({debug: 'full', lpm_auth: 'full'});
                 const r = yield l.test();
                 debug_headers.forEach(hdr=>assert.ok(r.headers[hdr]));
             }));
@@ -635,7 +635,7 @@ describe('proxy', ()=>{
         describe('request country choice', ()=>{
             it('should use country sent in x-lpm-country header',
                 ()=>etask(function*(){
-                    l = yield lum({debug: 'full'});
+                    l = yield lum({debug: 'full', lpm_auth: 'full'});
                     const country = 'us';
                     const r = yield l.test({headers:
                         {'x-lpm-country': country}});
@@ -646,7 +646,8 @@ describe('proxy', ()=>{
         describe('request state choice', ()=>{
             it('should use state sent in x-lpm-state header',
                 ()=>etask(function*(){
-                    l = yield lum({state_perm: true, debug: 'full'});
+                    l = yield lum({state_perm: true, debug: 'full',
+                        lpm_auth: 'full'});
                     const state = 'us';
                     const r = yield l.test({headers: {'x-lpm-state': state}});
                     assert.ok(r.headers['x-lpm-authorization']
@@ -656,7 +657,7 @@ describe('proxy', ()=>{
         describe('request city choice', ()=>{
             it('should use city sent in x-lpm-city header',
                 ()=>etask(function*(){
-                    l = yield lum({debug: 'full'});
+                    l = yield lum({debug: 'full', lpm_auth: 'full'});
                     const city = 'washington';
                     const r = yield l.test({headers: {'x-lpm-city': city}});
                     assert.ok(r.headers['x-lpm-authorization']
@@ -664,7 +665,7 @@ describe('proxy', ()=>{
                 }));
             it('should use escaped city sent in x-lpm-city header',
                 ()=>etask(function*(){
-                    l = yield lum({debug: 'full'});
+                    l = yield lum({debug: 'full', lpm_auth: 'full'});
                     const city = 'New-York';
                     const r = yield l.test({headers: {'x-lpm-city': city}});
                     assert.ok(r.headers['x-lpm-authorization']

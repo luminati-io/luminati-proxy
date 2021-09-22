@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.256.271/luminati-proxy-manager-v1.256.271-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.256.472/luminati-proxy-manager-v1.256.472-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -194,6 +194,8 @@ Options:
   --headers                     Request headers                          [array]
   --debug                       Request debug info default value
                                                       [string] [default: "full"]
+  --lpm_auth                    x-lpm-authorization header
+                                                      [string] [default: "none"]
   --const                                             [boolean] [default: false]
   --socket_inactivity_timeout                         [number] [default: 120000]
   --multiply_ips                                      [boolean] [default: false]
