@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.258.249 Stable
+- :bug: Fix duplicate cache events listeners
+
 ## 1.256.472 Stable
 - :star: X-lpm-authorization header to separate setting
 

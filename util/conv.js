@@ -373,43 +373,31 @@ E.JSON_stringify = function(obj, opt){
     if (opt.circular)
     {
         var ignore_circular = opt.circular=='ignore';
-        var orig_replacer = replacer, keys, objects, stack;
+        var orig_replacer = replacer, keys = [], stack = [];
         replacer = function(k, v){
-            if (k=='__Ref__')
-                return v;
-            if (!k)
+            if (stack.length)
             {
-                keys = [];
-                stack = [];
-                objects = [{keys: '', value: v}];
-                return orig_replacer ? orig_replacer.call(this, k, v) : v;
-            }
-            while (stack.length && this!==stack[0])
-            {
-                stack.shift();
-                keys.pop();
-            }
-            var found;
-            for (var i = 0; i<objects.length; i++)
-            {
-                if (objects[i].value===v)
+                var pos = stack.indexOf(this);
+                if (pos>=0)            
                 {
-                    found = objects[i];
-                    break;
+                    stack.splice(pos+1);
+                    keys.splice(pos, keys.length, k);
+                }
+                else
+                {
+                    stack.push(this);
+                    keys.push(k);
+                }
+                pos = stack.indexOf(v);
+                if (pos>=0)
+                {
+                    v = ignore_circular ? undefined :
+                        {__Ref__: keys.slice(0, pos).join('.')};
                 }
             }
-            if (!found)
-            {
-                keys.push(k);
-                objects.push({keys: keys.join('.'), value: v});
-                var ret;
-                if (orig_replacer)
-                    ret = orig_replacer.call(this, k, v);
-                stack.unshift(orig_replacer ? ret : v);
-                return orig_replacer ? ret : v;
-            }
-            if (!ignore_circular)
-                return {__Ref__: found.keys};
+            else
+                stack.push(v);
+            return orig_replacer ? orig_replacer.call(this, k, v) : v;
         };
     }
     try { s = JSON.stringify(obj, replacer, opt.spaces); }

@@ -394,7 +394,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "2f8bad26c4f67c90fc8155ed8d6e0329"
+    "md5": "7af24d55a9914e0cf307d1ebc38b4f11"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -426,5 +426,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.256.472"
+  "version": "1.258.249"
 }

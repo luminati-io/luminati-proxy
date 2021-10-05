@@ -105,7 +105,7 @@ const error_desc = [
         regex: /No matching fallback IP/,
         description: <span/>,
     },
-    // zone_util.js disabled_reasons_names
+    // zone_util.js unavail_reasons
     {
         regex: /Wrong customer name/,
         description: <span/>,

@@ -556,7 +556,7 @@ E.flatten_obj = function(obj){
             res[k] = obj[k];
         else
         {
-            var o = E.flatten_obj(obj[keys[i]]), _keys = Object.keys(o);
+            var o = E.flatten_obj(obj[k]), _keys = Object.keys(o);
             for (var j = 0; j < _keys.length; j++)
                 res[k+'_'+_keys[j]] = o[_keys[j]];
         }

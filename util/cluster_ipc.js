@@ -73,12 +73,12 @@ let on_response = (sender, msg)=>{
     let handler = zutil.obj_pluck(waiting[sender], key);
     if (!handler)
     {
-        let err = 'cluster_on_response: no handler: '+key
-            +' ['+(sender.id||sender)+']';
+        let err = `cluster_on_response: no handler: ${key} [${sender}]`;
         if (process.listeners('message')
             .filter(l=>l.name=='ipc_msg_handler').length>1)
         {
             err += ' Duplicate ipc_msg_handler listeners!';
+            return void zerr.err(err);
         }
         zerr.zexit(err);
     }
@@ -94,11 +94,18 @@ let on_response = (sender, msg)=>{
 };
 
 let worker_fail_fn = (worker, ev)=>(...arg)=>{
-    for (let key in waiting[worker])
+    for (let key in waiting[worker.id])
     {
-        let handler = zutil.obj_pluck(waiting[worker], key);
+        let handler = zutil.obj_pluck(waiting[worker.id], key);
         if (handler)
-            handler.throw(worker+' worker '+ev+': '+arg.join(', '));
+        {
+            handler.throw(`${worker.id} worker ${ev}: ${arg.join(', ')}`);
+            // it can be that the worker exits and we get an IPC result right
+            // after. This ensures we will not zexit due to missing handler
+            // when the worker exit was expected
+            if (ev=='exit' && worker.zexpected_exit)
+                waiting[worker.id][key] = etask.wait();
+        }
     }
 };
 
@@ -118,7 +125,7 @@ let init_worker = worker=>{
     waiting[worker.id] = {};
     worker.on('message', message_fn(worker.id));
     for (let ev of ['error', 'disconnect', 'exit'])
-        worker.on(ev, worker_fail_fn(worker.id, ev));
+        worker.on(ev, worker_fail_fn(worker, ev));
 };
 
 let init = ()=>{
@@ -135,7 +142,7 @@ let init = ()=>{
     }
 };
 
-let call = (to, name, args, sock)=>etask(function*ipc_call(){
+let call = (to, name, args, sock, timeout)=>etask(function*ipc_call(){
     this.info.to = to;
     this.info.msg = name;
     let cookie = current_cookie++, key = name+'-'+cookie;
@@ -150,7 +157,7 @@ let call = (to, name, args, sock)=>etask(function*ipc_call(){
         }
         let msg = {type: 'ipc_call', handler: name, msg: args, cookie: cookie};
         send(to, msg, sock);
-        return yield this.wait();
+        return yield this.wait(timeout);
     } catch(e){ ef(e);
         zerr.err(`cluster_ipc.call to ${to} ${name}(${args}): `+zerr.e2s(e));
         throw e;
@@ -179,10 +186,10 @@ let add_handler = (name, fn)=>{
     }
 };
 
-E.call_master = function(name, args, send_handle){
+E.call_master = function(name, args, send_handle, timeout){
     if (cluster.isMaster)
         throw new Error('call_master called from Cluster master');
-    return call('master', name, args, send_handle);
+    return call('master', name, args, send_handle, timeout);
 };
 
 E.master_on = function(name, fn){
@@ -196,18 +203,21 @@ E.master_once = (name, fn)=>E.master_on(name, function(){
     fn(...arguments);
 });
 
-E.call_worker = function(worker, name, args, send_handle){
+E.call_worker = function(worker, name, args, send_handle, timeout){
     if (!cluster.isMaster)
         throw new Error('call_worker called not from Cluster master');
-    return call(worker.id||worker, name, args, send_handle);
+    return call(worker.id||worker, name, args, send_handle, timeout);
 };
 
-E.call_all_workers = function(message, args){
+E.call_all_workers = function(message, args, timeout){
     if (!cluster.isMaster)
         throw new Error('call_all_workers called not from Cluster master');
     let tasks = [];
     for (let id in cluster.workers)
-        tasks[id] = E.call_worker(cluster.workers[id], message, args);
+    {
+        tasks[id] = E.call_worker(cluster.workers[id], message, args,
+            undefined, timeout);
+    }
     return tasks;
 };
 
