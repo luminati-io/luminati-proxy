@@ -316,7 +316,7 @@ E.prototype._next = function(rv){
     {
         if (zerr.on_exception)
             zerr.on_exception(rv.err);
-        if (this.run_state.try_catch)
+        if (this.run_state && this.run_state.try_catch)
         {
             this.use_retval = true;
             for (; state<states.length && states[state].sig; state++);
@@ -627,6 +627,8 @@ E.prototype._set_wait_child = function(wait_retval){
             return true;
         let wait_on = ()=>{
             this.once('child', _child=>{
+                if (rethrow && E.is_err(_child))
+                    return this._got_retval(wait_retval, _child);
                 if (!cond || cond.call(_child, _child.retval))
                     return this._got_retval(wait_retval, {child: _child});
                 if (!this._get_child_running())
@@ -1299,7 +1301,7 @@ E.all_limit = function(limit, arr_iter, cb){
         this.spawn(next);
         this.loop();
         if (this.child.size>=limit)
-            return this.wait_child('any');
+            return this.wait_child('any', {rethrow: true});
     }, function done(){
         return this.wait_child('all', {rethrow: true});
     }]);

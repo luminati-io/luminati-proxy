@@ -217,6 +217,9 @@ function log_tail_push(msg){
         E.log.splice(0, E.log.length - E.log.max_size/2);
 }
 
+var zerr_format = function(args){
+    return args.length<=1 ? args[0] : sprintf.apply(null, args); };
+
 if (is_node)
 { // zerr-node
 E.ZEXIT_LOG_DIR = env.ZEXIT_LOG_DIR||'/tmp/zexit_logs';
@@ -256,8 +259,6 @@ var init = function(){
 };
 init();
 
-var zerr_format = function(args){
-    return args.length<=1 ? args[0] : sprintf.apply(null, args); };
 var __zerr = function(level, args){
     var msg = zerr_format(args);
     var k = Object.keys(L);
@@ -366,6 +367,8 @@ var console_method = function(l){
         l<=L.INFO ? 'info' : 'debug';
 };
 
+var logger_fn;
+
 _zerr = function(l, args){
     var s;
     try {
@@ -381,6 +384,8 @@ _zerr = function(l, args){
         {
             Function.prototype.apply.bind(console[console_method(l)],
                 console)([prefix+fmt].concat(fmt_args));
+            if (logger_fn)
+                logger_fn(l, zerr_format(args));
         }
         log_tail_push(prefix+s);
     } catch(err){
@@ -391,6 +396,10 @@ _zerr = function(l, args){
         throw new Error(s);
 };
 E._zerr = _zerr;
+
+E.set_logger = function(logger){
+    logger_fn = logger;
+};
 
 var post = function(url, data){
     var use_xdr = typeof XDomainRequest=='function' &&

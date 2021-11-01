@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.263.145 Stable
+- :star: Reduce net load on port update
+
 ## 1.258.249 Stable
 - :bug: Fix duplicate cache events listeners
 

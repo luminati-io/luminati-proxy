@@ -97,13 +97,17 @@ class WS extends events.EventEmitter {
         this.remote_port = undefined;
         this.remote_forwarded = false;
         this.status = 'disconnected';
-        this.ping = is_node && opt.ping!=false;
-        this.ping_interval = typeof opt.ping_interval=='function'
-            ? opt.ping_interval() : opt.ping_interval || 60000;
-        this.ping_timeout = typeof opt.ping_timeout=='function'
-            ? opt.ping_timeout() : opt.ping_timeout || 10000;
-        this.ping_timer = undefined;
-        this.ping_last = undefined;
+        if (this.ping = is_node && opt.ping!=false)
+        {
+            this.ping_interval = typeof opt.ping_interval=='function'
+                ? opt.ping_interval() : opt.ping_interval || 60000;
+            this.ping_timeout = typeof opt.ping_timeout=='function'
+                ? opt.ping_timeout() : opt.ping_timeout || 10000;
+            this.ping_timer = undefined;
+            this.ping_last = undefined;
+            this.ping_expire_fn = this._ping_expire.bind(this);
+            this.ping_fn = this._ping.bind(this);
+        }
         this.idle_timeout = opt.idle_timeout;
         this.idle_timer = undefined;
         this.ipc = opt.ipc_client
@@ -274,10 +278,7 @@ class WS extends events.EventEmitter {
         }
         zerr.notice(`${this}: connected`);
         if (this.ping)
-        {
-            this.ping_timer = setTimeout(this._ping.bind(this),
-                this.ping_interval);
-        }
+            this.ping_timer = setTimeout(this.ping_fn, this.ping_interval);
         this._check_status();
     }
     _on_close(event){
@@ -397,18 +398,24 @@ class WS extends events.EventEmitter {
         if (!handled)
             this.abort(1003, 'Unexpected message');
         this._update_idle();
-        if (this.ping_last)
+        if (this.ping_timer)
         {
-            clearTimeout(this.ping_timer);
-            this.ping_timer = setTimeout(this._ping_expire.bind(this),
-                this.ping_timeout);
+            // refresh() was added in node 10, we need to support node 8 too
+            if (this.ping_timer.refresh)
+                this.ping_timer.refresh();
+            else
+            {
+                clearTimeout(this.ping_timer);
+                this.ping_timer = setTimeout(this.ping_expire_fn,
+                    this.ping_timeout);
+            }
         }
     }
     _on_pong(){
         clearTimeout(this.ping_timer);
         let rtt = Date.now()-this.ping_last;
         this.ping_last = undefined;
-        this.ping_timer = setTimeout(this._ping.bind(this),
+        this.ping_timer = setTimeout(this.ping_fn,
             Math.max(this.ping_interval-rtt, 0));
         if (zerr.is.debug())
             zerr.debug(`${this}< pong (rtt ${rtt}ms)`);
@@ -421,8 +428,7 @@ class WS extends events.EventEmitter {
         if (!this.connected || this.ws.readyState==2) // ws.CLOSING
             return;
         this.ws.ping();
-        this.ping_timer = setTimeout(this._ping_expire.bind(this),
-            this.ping_timeout);
+        this.ping_timer = setTimeout(this.ping_expire_fn, this.ping_timeout);
         this.ping_last = Date.now();
         if (zerr.is.debug())
             zerr.debug(`${this}> ping (max ${this.ping_timeout}ms)`);

@@ -100,6 +100,13 @@ E.clock_set = function(opt){
     opt.to_fake = opt.to_fake||[];
     is_auto_inc = opt.auto_inc;
     clock = sinon.useFakeTimers.apply(null, [opt.now].concat(opt.to_fake));
+    var _cst = clock.setTimeout;
+    clock.setTimeout = function(){
+        var r = _cst.apply(clock, arguments);
+        if (r instanceof Object) // support node ver>10
+            r.refresh = function(){};
+        return r;
+    };
     clock_restore = clock.restore;
     clock_tick = clock.tick;
     var _monotonic = opt.date.monotonic;

@@ -116,6 +116,8 @@ E.exec_in_zon_tree = (filename, exe_in_tree, args, opt)=>{
         }
     }
     let exe = `${root}/${exe_in_tree}`;
+    if (!file.exists(exe))
+        return;
     let cmd = [exe, ...args];
     // XXX pavelp: don't try to execute .js files directly (windows only)
     if (file.is_win && /.js$/.test(exe))

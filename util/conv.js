@@ -378,7 +378,7 @@ E.JSON_stringify = function(obj, opt){
             if (stack.length)
             {
                 var pos = stack.indexOf(this);
-                if (pos>=0)            
+                if (pos>=0)
                 {
                     stack.splice(pos+1);
                     keys.splice(pos, keys.length, k);

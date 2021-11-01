@@ -103,6 +103,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             }));
             this.finally(()=>{
                 _this.setState({show_loader: false});
+                if (resp && resp.port && !resp.errors)
+                    _this.next_step();
             });
             _this.setState({show_loader: true});
             const resp = yield _this.persist();
@@ -117,7 +119,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             {
                 const proxies = yield ajax.json({url: '/api/proxies_running'});
                 setdb.set('head.proxies_running', proxies);
-                _this.next_step();
             }
         });
     };

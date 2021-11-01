@@ -983,7 +983,7 @@ E.regions = {
     AO: ['Middle Africa', 'EMEA'],
     AQ: ['Antarctica', 'APAC'],
     AR: ['South America', 'AMER'],
-    AS: ['Polynesia', 'AMER'],
+    AS: ['Polynesia', 'South America', 'AMER'],
     AT: ['Western Europe', 'EMEA'],
     AU: ['Australia and New Zealand', 'APAC'],
     AW: ['Caribbean', 'AMER'],
@@ -1062,7 +1062,7 @@ E.regions = {
     GP: ['Caribbean', 'AMER'],
     GQ: ['Middle Africa', 'EMEA'],
     GR: ['South-Eastern Europe', 'EMEA'],
-    GS: ['Antarctica', 'AMER'],
+    GS: ['Antarctica', 'South America', 'AMER'],
     GT: ['South America', 'AMER'],
     GU: ['Micronesia', 'APAC'],
     GW: ['Western Africa', 'EMEA'],
@@ -2581,5 +2581,24 @@ E.gl2uule = function(gl){
         return 'Macedonia';
     return E.google_list[gl] || gl;
 };
+
+var terr_country = {
+    apac_rest: 'VN SG JP MY KR AU TH ID NP PH AE PK NZ TW SA KW BN AF CX KH '
+    +'IR MM IQ YE OM LA MN PF BH KP NU NC BT VU WS FJ AQ CK CC KI PW TJ TM '
+    +'MP GU MH PG UM AU TL SB FM',
+    east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
+    +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
+    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF',
+    east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
+    +'MK AL AZ KG BA UZ LY SD BI XK SM',
+    in: 'IN BD LK RE MV',
+    uk_ie_dach: 'DE AT CH UK GB IE IM',
+    west_europe: 'FR ES NL IT PT BE AD MT MC MA LU TN DZ GI LI SE DK FI NO AX '
+    +'IS GG JE EU GL VA FX',
+};
+E.country_terr = {};
+Object.entries(terr_country).forEach(function(ct){
+    ct[1].split(' ').forEach(function(c){ E.country_terr[c] = ct[0]; });
+});
 
 return E; }); }());
