@@ -330,6 +330,10 @@ export const tabs = {
                 label: 'Set x-lpm-authorization header',
                 tooltip: `Set x-lpm-authorization header on responses`,
             },
+            bw_limit: {
+                label: 'BW limit',
+                tooltip: `Enable bandwidth limit per day(s)`,
+            },
         },
     },
 };

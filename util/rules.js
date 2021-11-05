@@ -2,10 +2,11 @@
 'use strict'; /*jslint node:true*/
 require('./config.js');
 const _ = require('lodash');
+const zurl = require('./url.js');
 const E = exports;
 
 E.find_matches = (all_rules, selector)=>
-    (all_rules||[]).filter(x=>E.matches_rule(x.match, selector));
+    (all_rules||[]).filter(x=>E.matches_rule(x.match, selector, x.opts));
 
 E.select_rules = (all_rules, selector, overrides=[])=>{
     let matches = E.find_matches(all_rules, selector);
@@ -13,12 +14,17 @@ E.select_rules = (all_rules, selector, overrides=[])=>{
         E.rule_merge_customizer);
 };
 
-E.matches_rule = (match, selector)=>{
+E.matches_rule = (match, selector, opts)=>{
     for (let k in match)
     {
-        let preprocessor;
+        let preprocessor, comparator;
         if (k=='hostname')
-            preprocessor = unify_hostnames;
+        {
+            if (opts && opts.use_host_lookup)
+                comparator = hostname_lookup;
+            else
+                preprocessor = unify_hostnames;
+        }
         if (k=='version_min')
         {
             if ((match[k]||0)>(selector.version||0))
@@ -29,24 +35,29 @@ E.matches_rule = (match, selector)=>{
             if (match[k]/100<Math.random())
                 return false;
         }
-        else if (!E.rule_value_match(match[k], selector[k], preprocessor))
+        else if (!E.rule_value_match(match[k], selector[k],
+            {preprocessor, comparator}))
+        {
             return false;
+        }
     }
     return true;
 };
 
-E.rule_value_match = (rule_v, v, preprocessor)=>{
+E.rule_value_match = (rule_v, v, opts)=>{
+    if (opts && opts.comparator)
+        return !!opts.comparator(rule_v, v);
     if (Array.isArray(rule_v))
     {
         return rule_v.some(_rule_v=>E.rule_value_match(_rule_v, v,
-            preprocessor));
+            opts));
     }
     if (!_.isObject(rule_v))
     {
         if (typeof v!='string')
             return rule_v==v;
-        if (preprocessor)
-            [rule_v, v] = preprocessor(rule_v, v);
+        if (opts && opts.preprocessor)
+            [rule_v, v] = opts.preprocessor(rule_v, v);
         if (rule_v.length!=v.length)
             return false;
         for (let i=0; i<v.length; i++)
@@ -64,7 +75,7 @@ E.rule_value_match = (rule_v, v, preprocessor)=>{
             .test(v||'');
     }
     return _.every(rule_v,
-        (_rule_v, k)=>E.rule_value_match(_rule_v, v && v[k], preprocessor));
+        (_rule_v, k)=>E.rule_value_match(_rule_v, v && v[k], opts));
 };
 
 E.rule_merge_customizer = (dest, src)=>{
@@ -90,6 +101,10 @@ function char_count(str, char){
             count++;
     }
     return count;
+}
+
+function hostname_lookup(haystack, v){
+    return typeof haystack=='object' && zurl.host_lookup(haystack, v);
 }
 
 E.t = {unify_hostnames};

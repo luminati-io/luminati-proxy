@@ -7,7 +7,9 @@ import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
 import Users_modal from './users_modal.js';
+import Bw_limit_modal from './bw_limit_modal.js';
 import {with_www_api, Note} from '../common.js';
+import conv from '../../../util/conv.js';
 
 const route_err_opt = [
     {key: 'pass_dyn (default)', value: 'pass_dyn'},
@@ -63,11 +65,21 @@ export default class General extends Pure_component {
         this.setdb_on('head.settings', settings=>{
             settings && this.setState({settings});
         });
+        this.setdb_on('head.proxy_edit.form.bw_limit', ()=>this.forceUpdate());
     }
     multiply_users_changed = val=>{
-        console.log('mult users changed');
         if (val)
             this.open_users_modal();
+    };
+    bw_limit_changed = val=>{
+        if (val)
+            return this.open_bw_limit_modal();
+        this.set_field('bw_limit', false);
+    };
+    bw_limit_hide = ()=>{
+        if (this.state.form.bw_limit!==true)
+            return;
+        this.set_field('bw_limit', false);
     };
     multiply_static_changed = val=>{
         const {form} = this.state;
@@ -85,6 +97,7 @@ export default class General extends Pure_component {
     ssl_changed = val=>!val && this.set_field('tls_lib', 'open_ssl');
     open_static_modal = ()=>$('#allocated_ips').modal('show');
     open_users_modal = ()=>$('#users_modal').modal('show');
+    open_bw_limit_modal = ()=>$('#bw_limit_modal').modal('show');
     render(){
         if (!this.state.form || !this.state.proxy || !this.state.settings)
             return null;
@@ -111,9 +124,25 @@ export default class General extends Pure_component {
             <a className="link" onClick={this.open_users_modal}>
               <T>Select users</T>
             </a> : null;
+        const get_bw_limit_str = ({bytes, days}={})=>{
+            if (!+bytes || !+days)
+                return '';
+            return conv.scaled_bytes(bytes)+'B/'
+                +(days>1 ? `${days} days` : 'day');
+        };
+        const bw_limit_str = get_bw_limit_str(form.bw_limit);
+        const bw_limit_prefix = zagent && bw_limit_str ?
+            <span className="bw_limit_str"><T>{bw_limit_str}</T></span> : null;
+        console.log(bw_limit_prefix);
+        const note_bw_limit = form.bw_limit ?
+            <a className="link" onClick={this.open_bw_limit_modal}>
+                <T>Set limit</T>
+            </a> : null;
         return <div className="general">
           <Tab_context.Provider value="general">
             <Users_modal form={this.state.form}/>
+            <Bw_limit_modal form={this.state.form}
+              on_hide={this.bw_limit_hide}/>
             <Config type="text" id="internal_name"/>
             <Config type="number" id="port"/>
             <Config
@@ -178,6 +207,15 @@ export default class General extends Pure_component {
             <Config type="select" id="debug" data={yes_no_select_opt}/>
             <Config type="select" id="lpm_auth" data={yes_no_select_opt}/>
             <Config type="yes_no" id="const" />
+            <Config
+              type="yes_no"
+              id="bw_limit"
+              on_change={this.bw_limit_changed}
+              prefix={bw_limit_prefix}
+              disabled={!zagent}
+              note={!zagent && <Limit_zagent_note/> || note_bw_limit}
+              skip_save={true}
+            />
           </Tab_context.Provider>
         </div>;
     }

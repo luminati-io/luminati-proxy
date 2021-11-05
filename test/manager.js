@@ -249,7 +249,7 @@ describe('manager', function(){
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
         function*(_this){
-            _this.timeout(6000);
+            _this.timeout(20000);
             app = yield app_with_config(config);
             const proxies = yield json('api/proxies_running');
             assert.equal(proxies.length, expected.length);
@@ -345,6 +345,39 @@ describe('manager', function(){
             assert(argv_spy.calledOnce);
             assert_has(mgr._defaults,
                 Object.assign({}, cloud_conf._defaults, cli));
+        }));
+    });
+    describe('bw limit', ()=>{
+        let config_save_spy;
+        beforeEach(()=>etask(function*(){
+            app = yield app_with_proxies([{port: 24000}, {port: 24001}]);
+            config_save_spy = sb.spy(app.manager.config, 'save');
+        }));
+        it('missing limits', etask._fn(function*(_this){
+            yield app.manager.apply_bw_limits();
+            assert.equal(app.manager.proxies[0].bw_limit, undefined);
+            assert.equal(app.manager.proxies[1].bw_limit, undefined);
+            sinon.assert.notCalled(config_save_spy);
+        }));
+        it('wrong limits type', etask._fn(function*(_this){
+            yield app.manager.apply_bw_limits({test: 1});
+            assert.equal(app.manager.proxies[0].bw_limit, undefined);
+            assert.equal(app.manager.proxies[1].bw_limit, undefined);
+            sinon.assert.notCalled(config_save_spy);
+        }));
+        it('wrong port', etask._fn(function*(_this){
+            yield app.manager.apply_bw_limits([{port: 24003}]);
+            assert.equal(app.manager.proxies[0].bw_limit, undefined);
+            assert.equal(app.manager.proxies[1].bw_limit, undefined);
+            sinon.assert.notCalled(config_save_spy);
+        }));
+        it('set expires', etask._fn(function*(_this){
+            let expires = '2021-04-22T15:06:14.691Z';
+            let ts = '2021-04-22T15:06:14.692Z';
+            yield app.manager.apply_bw_limits([{port: 24000, expires, ts}]);
+            assert.deepEqual(app.manager.proxies[0].bw_limit, {expires, ts});
+            assert.equal(app.manager.proxies[1].bw_limit, undefined);
+            sinon.assert.calledOnce(config_save_spy);
         }));
     });
     describe('report_bug', ()=>{
@@ -467,14 +500,28 @@ describe('manager', function(){
                 }));
                 t('external', 200);
                 t('external, backend is down', 500);
-                it('external over the limit', etask._fn(function*(_this){
-                    app = yield app_with_proxies([{port: 24000}]);
+                it('external over the limit in cloud', etask._fn(
+                function*(_this){
+                    const cli = {zagent: true};
+                    app = yield app_with_proxies([{port: 24000}], cli);
                     const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
                         .map((_, i)=>`${++i}`);
                     const res = yield api_json('api/proxies', {method: 'post',
                         body: {proxy: {port: 24001, ext_proxies}}});
                     assert.equal(res.statusCode, 400);
                     assert.ok(!!res.body.errors.length);
+                }));
+                it('external over the limit on premice', etask._fn(
+                function*(_this){
+                    app = yield app_with_proxies([{port: 24000}]);
+                    const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
+                        .map((_, i)=>`${++i}`);
+                    const res = yield api_json('api/proxies', {method: 'post',
+                        body: {proxy: {port: 24001, ext_proxies}}});
+                    assert.equal(res.statusCode, 200);
+                    assert.ok(!res.body.errors);
+                    assert.ok(!!res.body.data.ext_proxies.length);
+                    assert.deepEqual(res.body.data.ext_proxies, ext_proxies);
                 }));
             });
             describe('put', ()=>{
@@ -522,6 +569,7 @@ describe('manager', function(){
                     app = yield app_with_proxies(proxies, {});
                     const lpm_f_stub = sinon.stub(app.manager.lpm_f,
                         'proxy_update_in_place').returns(true);
+                    app.manager._defaults.sync_config = true;
                     const body = {proxy: {zone: 'foo'}};
                     const res = yield api_json('api/proxies/24000',
                         {method: 'put', body});
@@ -534,6 +582,7 @@ describe('manager', function(){
                     app = yield app_with_proxies(proxies, {});
                     const lpm_f_stub = sinon.stub(app.manager.lpm_f,
                         'proxy_update_in_place').returns(true);
+                    app.manager._defaults.sync_config = true;
                     const body = {proxy: {ssl: true}};
                     const res = yield api_json('api/proxies/24000',
                         {method: 'put', body});
@@ -604,9 +653,9 @@ describe('manager', function(){
                 const t = (name, opt, eq)=>it(name, etask.fn(function*(){
                     const proxy = Object.assign({port: 24000}, opt);
                     app = yield app_with_proxies([proxy], {});
-                    const {statusCode, body} =
+                    const {statusCode: status_code, body} =
                         yield api_json(`api/refresh_sessions/${proxy.port}`);
-                    assert.equal(statusCode, eq.code);
+                    assert.equal(status_code, eq.code);
                     assert.deepEqual(body, eq.body);
                 }));
                 t('returns session_id when not rotating', null,
@@ -752,6 +801,7 @@ describe('manager', function(){
             app = yield app_with_proxies([p1, p2]);
             const lpm_f_stub = sinon.stub(app.manager.lpm_f,
                 'proxy_update_in_place').returns(true);
+            app.manager._defaults.sync_config = true;
             const recreate = yield app.manager.proxy_update(p1, {port: 24500});
             const in_place = yield app.manager.proxy_update(p2,
                 {port: 24001, ssl: true});
@@ -779,6 +829,7 @@ describe('manager', function(){
             app = yield app_with_proxies([{port: 24000}]);
             const lpm_f_stub = sinon.stub(app.manager.lpm_f,
                 'proxy_update_in_place').returns(true);
+            app.manager._defaults.sync_config = true;
             port = app.manager.proxy_ports[24000];
             const {banlist} = port;
             const ms_left = 100;
@@ -871,6 +922,7 @@ describe('manager', function(){
             app = yield app_with_proxies(p);
             const lpm_f_stub = sinon.stub(app.manager.lpm_f,
                 'proxy_update_in_place').returns(true);
+            app.manager._defaults.sync_config = true;
             const whitelist_ips = ['1.1.1.1', '2.2.2.2', '3.0.0.0/8'];
             const new_proxy = Object.assign({}, p[0], {whitelist_ips});
             const {proxy_port} = yield app.manager.proxy_update(p[0],

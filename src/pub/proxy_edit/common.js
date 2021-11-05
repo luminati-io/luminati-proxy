@@ -25,7 +25,7 @@ export const Config = withRouter(class Config extends Pure_component {
     };
     on_change_wrapper = (value, _id)=>{
         const opt = {};
-        if (this.props.save_on_blur)
+        if (this.props.save_on_blur||this.props.skip_save)
             opt.skip_save = true;
         const curr_id = _id||this.props.id;
         if (this.props.on_change)
@@ -74,6 +74,7 @@ export const Config = withRouter(class Config extends Pure_component {
         return <Labeled_controller
               id={id}
               animated={animated}
+              prefix={this.props.prefix}
               sufix={this.props.sufix}
               data={data.concat(this.props.data)}
               type={this.props.type}

@@ -87,6 +87,7 @@ export class Modal extends React.Component {
                   ok_href={this.props.ok_href}
                   ok_clicked={this.click_ok.bind(this)}
                   ok_btn_title={this.props.ok_btn_title}
+                  ok_disabled={this.props.ok_disabled}
                   ok_btn_classes={this.props.ok_btn_classes}
                   cancel_btn_title={this.props.cancel_btn_title}
                   no_cancel_btn={this.props.no_cancel_btn}

@@ -93,12 +93,21 @@ describe('config', ()=>{
             sinon.assert.notCalled(logger.warn);
             assert.deepEqual(proxy.rules, [1, 2]);
         });
-        it('should remove ext proxies when exceeding the limit', ()=>{
+        it('should remove ext proxies when exceeding the limit in cloud', ()=>{
             const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
                 .map((_, i)=>`${++i}`);
+            conf_mgr = new Config(new Manager({zagent: true}),
+                Manager.default);
             const proxy = conf_mgr._prepare_proxy({ext_proxies});
             sinon.assert.called(logger.warn);
             assert.ok(!proxy.ext_proxies);
+        });
+        it('should not touch ext proxies if exceeding the limit in pmgr', ()=>{
+            const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
+                .map((_, i)=>`${++i}`);
+            const proxy = conf_mgr._prepare_proxy({ext_proxies});
+            sinon.assert.notCalled(logger.warn);
+            assert.deepEqual(proxy.ext_proxies, ext_proxies);
         });
         it('should not touch ext proxies if within the limit', ()=>{
             const proxy = conf_mgr._prepare_proxy({ext_proxies: ['1.2.3.4']});

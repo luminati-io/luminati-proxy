@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.263.145/luminati-proxy-manager-v1.263.145-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.264.173/luminati-proxy-manager-v1.264.173-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -206,6 +206,7 @@ Options:
   --timezone                    Timezone ID to be used by the browser   [string]
   --resolution                  Browser screen size                     [string]
   --webrtc                      WebRTC plugin behavior in the browser   [string]
+  --bw_limit                    BW limit params                     [default: 0]
   --whitelist_ips               Default for all proxies whitelist ip list for
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser
@@ -273,7 +274,6 @@ Options:
   --stop-upgrader               Removes CRON process that checks upgrades
   --insecure-http-parser        Disables the strict checks
   --proxy_country                                                  [default: ""]
-  --bw_limit                                                        [default: 0]
   --info                                                        [default: false]
   --cn                                                          [default: false]
   --api_body_limit                                              [default: "2mb"]

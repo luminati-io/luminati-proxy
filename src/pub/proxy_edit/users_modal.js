@@ -41,7 +41,6 @@ export default class Users_modal extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'users_modal.Users_modal.load');
             }));
-            console.log('loading');
             const users = yield ajax.json({url});
             _this.setState({users});
         });

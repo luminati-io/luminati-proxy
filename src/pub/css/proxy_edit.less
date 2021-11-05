@@ -73,6 +73,7 @@
         .rotation .desc { width: 135px; }
         .browser .desc { width: 145px; }
         .general .desc { width: 195px; }
+        .general .bw_limit_str { font-weight: 500; }
         .rules {
             max-width: 100%;
             .desc { width: 200px; min-width: 200px; }
@@ -212,6 +213,7 @@
             padding-right: 10px;
         }
         align-items: center;
+        .prefix { margin-right: 10px; }
         .sufix { margin-left: 10px; }
         .double_field {
             input { width: 109px; }
@@ -228,6 +230,17 @@
             margin-right: 0;
             top: unset;
             margin-top: 2.5px;
+        }
+    }
+    .bw_limit_modal {
+        .inputs_container {
+            display: flex;
+            input { width: 100%; }
+            .bytes_input {
+                flex: 1;
+                margin-right: 10px;
+            }
+            .days_input { flex: 1; }
         }
     }
     .regex_field {

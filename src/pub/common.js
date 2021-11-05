@@ -356,6 +356,7 @@ export const Labeled_controller = props=>
         </div>
         <div>
           <div className="field" data-tip data-for={props.id+'tip'}>
+            {props.prefix && <span className="prefix">{t(props.prefix)}</span>}
             {props.children ||
               <Form_controller disabled={props.disabled} {...props}/>
             }

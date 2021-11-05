@@ -355,6 +355,7 @@
       "src/pub/proxy_blank.js",
       "src/pub/proxy_edit/alloc_modal.js",
       "src/pub/proxy_edit/browser.js",
+      "src/pub/proxy_edit/bw_limit_modal.js",
       "src/pub/proxy_edit/common.js",
       "src/pub/proxy_edit/fields.js",
       "src/pub/proxy_edit/general.js",
@@ -394,7 +395,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "f01b71d552c31aa866ae5687eb2708b4"
+    "md5": "d7e5353a04f8e3110d63651903c914ac"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -426,5 +427,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.263.145"
+  "version": "1.264.173"
 }

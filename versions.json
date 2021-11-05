@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.264.173",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Removed max ext proxy limitation for on premise pmgr"
+            }
+        ]
+    },
+    {
         "ver": "1.263.145",
         "type": "stable",
         "changes": [

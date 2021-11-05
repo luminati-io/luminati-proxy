@@ -89,6 +89,8 @@ E.proxy_fields = {
     timezone: {type: 'string', desc: 'Timezone ID to be used by the browser'},
     resolution: {type: 'string', desc: 'Browser screen size'},
     webrtc: {type: 'string', desc: 'WebRTC plugin behavior in the browser'},
+    bw_limit: {type: 'object', desc: 'BW limit params',
+        params: {days: {type: 'integer'}, bytes: {type: 'integer'}}},
 };
 
 E.manager_fields = {

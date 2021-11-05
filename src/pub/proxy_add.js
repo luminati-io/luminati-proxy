@@ -167,7 +167,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                           <Ext_proxy
                             parse_error={this.state.parse_error}
                             ips_list={this.state.ips_list}
-                            on_field_change={this.field_changed}/>
+                            on_field_change={this.field_changed}
+                            zagent={zagent}/>
                         }
                       </Step>
                     </Li>
@@ -254,7 +255,7 @@ class Ext_proxy extends Pure_component {
             consts && this.setState({consts}));
     }
     on_change_list = val=>{
-        const {on_field_change} = this.props;
+        const {on_field_change, zagent} = this.props;
         const {consts: {MAX_EXT_PROXIES}} = this.state;
         on_field_change('ips_list')(val);
         try {
@@ -263,7 +264,8 @@ class Ext_proxy extends Pure_component {
                 throw {message: 'Proxies list has to be an array'};
             if (!parsed.length)
                 throw {message: 'Proxies list array can not be empty'};
-            if (MAX_EXT_PROXIES!==undefined && parsed.length>MAX_EXT_PROXIES)
+            if (zagent && MAX_EXT_PROXIES!==undefined &&
+                parsed.length>MAX_EXT_PROXIES)
             {
                 throw {message: `Maximum external proxies size is `
                     +MAX_EXT_PROXIES};

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.264.173 Stable
+- :star: Removed max ext proxy limitation for on premise pmgr
+
 ## 1.263.145 Stable
 - :star: Reduce net load on port update
 

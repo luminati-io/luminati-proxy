@@ -427,7 +427,11 @@ class WS extends events.EventEmitter {
         // but a notification has not yet been emitted
         if (!this.connected || this.ws.readyState==2) // ws.CLOSING
             return;
-        this.ws.ping();
+        try { this.ws.ping(); }
+        catch(e){ // rarer case: don't crash - post more logs
+            return zerr('Ping attempt fail, for'
+                +` ${JSON.stringify(this.inspect())} ${zerr.e2s(e)}`);
+        }
         this.ping_timer = setTimeout(this.ping_expire_fn, this.ping_timeout);
         this.ping_last = Date.now();
         if (zerr.is.debug())
