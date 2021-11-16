@@ -2399,6 +2399,108 @@ E.currency = {
     XK: 'EUR', YE: 'YER', YT: 'EUR', ZA: 'ZAR', ZM: 'ZMW', ZW: 'USD',
 };
 
+var gs1_countries_list = {
+    AL: '530',
+    DZ: '613',
+    AR: '778-779',
+    AM: '485',
+    AU: '930-939',
+    AT: '900-919',
+    AZ: '476',
+    BH: '608',
+    BY: '481',
+    BO: '777',
+    BA: '387',
+    BR: '789-790',
+    BN: '623',
+    BG: '380',
+    KH: '884',
+    CA: '754-755',
+    CL: '780',
+    CN: '690-699',
+    CO: '770-771',
+    CR: '744',
+    HR: '385',
+    CU: '850',
+    CY: '529',
+    CZ: '859',
+    DK: '570-579',
+    DO: '746',
+    EC: '786',
+    EG: '622',
+    SV: '741',
+    EE: '474',
+    FI: '640-649',
+    GE: '486',
+    DE: '400-440',
+    GH: '603',
+    GR: '520-521',
+    GL: '570-579',
+    GT: '740',
+    HN: '742',
+    HK: '489',
+    HU: '599',
+    IS: '569',
+    IN: '890',
+    ID: '899',
+    IR: '626',
+    IL: '729',
+    CI: '618',
+    JP: '450-459',
+    JO: '625',
+    KE: '616',
+    KW: '627',
+    KG: '470',
+    LV: '475',
+    LB: '528',
+    LT: '477',
+    MK: '531',
+    MY: '955',
+    MT: '535',
+    MU: '609',
+    MX: '750',
+    MD: '484',
+    MN: '865',
+    MA: '611',
+    NL: '870-879',
+    NZ: '940-949',
+    NI: '743',
+    NG: '615',
+    KP: '867',
+    NO: '700-709',
+    PK: '896',
+    PA: '745',
+    PY: '784',
+    PE: '775',
+    PH: '480',
+    PL: '590',
+    PT: '560',
+    RO: '594',
+    SA: '628',
+    SN: '604',
+    RS: '860',
+    SG: '888',
+    SK: '858',
+    SI: '383',
+    ZA: '600-601',
+    KR: '880',
+    SY: '621',
+    TJ: '488',
+    TZ: '620',
+    TH: '885',
+    TN: '619',
+    TR: '868-869',
+    TM: '483',
+    UA: '482',
+    AE: '629',
+    UK: '500-509',
+    US: '000-139',
+    UY: '773',
+    UZ: '478',
+    VE: '759',
+    VN: '893'
+};
+
 E.us_states = {
     AK: 'Alaska',
     AL: 'Alabama',
@@ -2588,9 +2690,9 @@ var terr_country = {
     +'MP GU MH PG UM AU TL SB FM',
     east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
     +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
-    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF',
+    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY',
     east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
-    +'MK AL AZ KG BA UZ LY SD BI XK SM',
+    +'MK AL AZ KG BA UZ SD BI XK SM',
     in: 'IN BD LK RE MV',
     uk_ie_dach: 'DE AT CH UK GB IE IM',
     west_europe: 'FR ES NL IT PT BE AD MT MC MA LU TN DZ GI LI SE DK FI NO AX '
@@ -2600,5 +2702,25 @@ E.country_terr = {};
 Object.entries(terr_country).forEach(function(ct){
     ct[1].split(' ').forEach(function(c){ E.country_terr[c] = ct[0]; });
 });
+
+var gs1_countries_rlist = {};
+Object.entries(gs1_countries_list).forEach(function(entry){
+    var value = entry[1];
+    if (value.includes('-'))
+    {
+        var ranges = value.split('-');
+        for (var i = +ranges[0]; i <= +ranges[1]; i++)
+            gs1_countries_rlist[i.toString().padStart(3, '0')] = entry[0];
+    }
+    else
+        gs1_countries_rlist[value.toString().padStart(3, '0')] = entry[0];
+});
+E.gtin_to_country = function(gtin){
+    if (gtin.length > 14 || gtin.length < 13)
+        return;
+    if (gtin.length == 14 && gtin.charAt(0) == '0')
+        gtin = gtin.substring(1);
+    return gs1_countries_rlist[gtin.slice(0, 3)];
+};
 
 return E; }); }());

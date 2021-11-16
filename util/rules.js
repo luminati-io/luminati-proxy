@@ -3,6 +3,7 @@
 require('./config.js');
 const _ = require('lodash');
 const zurl = require('./url.js');
+const zerr = require('./zerr.js');
 const E = exports;
 
 E.find_matches = (all_rules, selector)=>
@@ -58,7 +59,7 @@ E.rule_value_match = (rule_v, v, opts)=>{
             return rule_v==v;
         if (opts && opts.preprocessor)
             [rule_v, v] = opts.preprocessor(rule_v, v);
-        if (rule_v.length!=v.length)
+        if (!rule_v || rule_v.length!=v.length)
             return false;
         for (let i=0; i<v.length; i++)
         {
@@ -87,13 +88,15 @@ function unify_hostnames(hostname, selector){
     const hostname_len = char_count(hostname, '.')+1;
     const selector_len = char_count(selector, '.')+1;
     if (hostname_len<selector_len)
-        hostname='www.'+hostname;
+        hostname = 'www.'+hostname;
     else if (selector_len<hostname_len)
-        selector='www.'+selector;
+        selector = 'www.'+selector;
     return [hostname, selector];
 }
 
 function char_count(str, char){
+    if (!str)
+        return 0;
     let count = 0;
     for (let i=0; i<str.length; i++)
     {

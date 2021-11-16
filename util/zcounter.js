@@ -207,7 +207,9 @@ E.group_max = (name, value, agg_srv)=>E.max(name, value, agg_srv, 'avg');
 E.group_set_level = E.set_level;
 if (env.ZCOUNTER_GROUP!==undefined)
 {
-    let groups = ['', '_g_'+env.ZCOUNTER_GROUP];
+    let groups = [''];
+    if (env.ZCOUNTER_GROUP!='')
+        groups.push('_g_'+env.ZCOUNTER_GROUP);
     if (env.AGENT_DC)
         groups.push('_g_'+env.AGENT_COUNTRY+'_'+env.AGENT_DC);
     E.group_inc = (name, inc, agg_srv)=>groups.forEach(g=>

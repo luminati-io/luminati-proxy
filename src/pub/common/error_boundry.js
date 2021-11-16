@@ -5,9 +5,16 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import {perr} from '../util.js';
 
 export default class Error_boundry extends Pure_component {
-    state = {error: false};
+    state = {error: false, msg: null};
     static getDerivedStateFromError(error){
-        return {error: true};
+        let msg = null;
+        switch (error)
+        {
+        case 'duplicate_port_number':
+            msg = 'Multiple port configuration detected - please check port '
+                +'set up and delete duplicated port.';
+        }
+        return {error: true, msg};
     }
     componentDidCatch(error, info){
         this.log_error(error, info);
@@ -18,7 +25,12 @@ export default class Error_boundry extends Pure_component {
     };
     render(){
         if (this.state.error)
-            return <h1>Error</h1>;
+        {
+            return <React.Fragment>
+                <h1>Error</h1>
+                {this.state.msg && <h4>{this.state.msg}</h4>}
+            </React.Fragment>;
+        }
         return this.props.children;
     }
 }

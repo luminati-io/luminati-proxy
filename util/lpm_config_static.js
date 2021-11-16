@@ -75,7 +75,6 @@ conf.server_default = {
     multiply: 0,
     rotate_session: false,
     session: true,
-    bw_limit: 0,
     log: 'notice',
     ua: false,
     throttle: '',

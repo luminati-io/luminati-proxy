@@ -347,10 +347,11 @@ describe('manager', function(){
                 Object.assign({}, cloud_conf._defaults, cli));
         }));
     });
-    describe('bw limit', ()=>{
+    describe('bw_limit', ()=>{
         let config_save_spy;
         beforeEach(()=>etask(function*(){
-            app = yield app_with_proxies([{port: 24000}, {port: 24001}]);
+            app = yield app_with_proxies([{port: 24000}, {port: 24001,
+                multiply: 3}]);
             config_save_spy = sb.spy(app.manager.config, 'save');
         }));
         it('missing limits', etask._fn(function*(_this){
@@ -366,18 +367,39 @@ describe('manager', function(){
             sinon.assert.notCalled(config_save_spy);
         }));
         it('wrong port', etask._fn(function*(_this){
-            yield app.manager.apply_bw_limits([{port: 24003}]);
+            yield app.manager.apply_bw_limits([{port: 24010}]);
             assert.equal(app.manager.proxies[0].bw_limit, undefined);
             assert.equal(app.manager.proxies[1].bw_limit, undefined);
             sinon.assert.notCalled(config_save_spy);
         }));
         it('set expires', etask._fn(function*(_this){
-            let expires = '2021-04-22T15:06:14.691Z';
+            let expires_2400 = {24000: '2021-04-22T15:06:14.691Z'};
+            let expires_2401 = {24001: '2021-04-22T15:07:14.691Z'};
             let ts = '2021-04-22T15:06:14.692Z';
-            yield app.manager.apply_bw_limits([{port: 24000, expires, ts}]);
-            assert.deepEqual(app.manager.proxies[0].bw_limit, {expires, ts});
+            yield app.manager.apply_bw_limits([{port: 24000,
+                expires: expires_2400, ts}]);
+            assert.deepEqual(app.manager.proxies[0].bw_limit, {
+                expires: expires_2400, ts});
             assert.equal(app.manager.proxies[1].bw_limit, undefined);
-            sinon.assert.calledOnce(config_save_spy);
+            assert.equal(app.manager.proxy_ports[24001].opt.bw_limit,
+                undefined);
+            assert.equal(app.manager.proxy_ports[24002].opt.bw_limit,
+                undefined);
+            assert.equal(app.manager.proxy_ports[24003].opt.bw_limit,
+                undefined);
+            yield app.manager.apply_bw_limits([{port: 24001,
+                expires: expires_2401, ts}]);
+            assert.deepEqual(app.manager.proxies[0].bw_limit, {
+                expires: expires_2400, ts});
+            assert.deepEqual(app.manager.proxies[1].bw_limit, {
+                expires: expires_2401, ts});
+            assert.deepEqual(app.manager.proxy_ports[24001].opt.bw_limit, {
+                expires: expires_2401, ts});
+            assert.deepEqual(app.manager.proxy_ports[24002].opt.bw_limit, {
+                expires: expires_2401, ts});
+            assert.deepEqual(app.manager.proxy_ports[24003].opt.bw_limit, {
+                expires: expires_2401, ts});
+            sinon.assert.calledTwice(config_save_spy);
         }));
     });
     describe('report_bug', ()=>{

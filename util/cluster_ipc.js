@@ -4,15 +4,11 @@ require('./config.js');
 const cluster = require('cluster');
 const etask = require('./etask.js');
 const zerr = require('./zerr.js');
-const zcounter = require('./zcounter.js');
-const date = require('./date.js');
 const zutil = require('./util.js');
 const assign = Object.assign, ef = etask.ef, E = exports;
 const VERBOSE_IPC = +process.env.VERBOSE_IPC;
 let current_cookie = 1;
 let handlers = {}, waiting = {}, incoming_pending = {};
-// XXX denis: remove measure_performance after debugging zs-bank-limit
-E.measure_performance = false;
 
 let send = (to, msg, sock)=>{
     if (to=='master')
@@ -66,13 +62,7 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
             zerr.notice(`cluster_ipc: sending ${response.type} `
                 +`to ${sender}.${msg.handler} cookie ${msg.cookie}`);
         }
-        let start = E.measure_performance==msg.handler && date.monotonic();
         send(sender, response);
-        if (start)
-        {
-            zcounter.avg(`cluster_ipc.respond_${msg.handler}_ms`,
-                date.monotonic()-start);
-        }
     } catch(e){ ef(e); zerr.err(`cluster_ipc.on_call ${sender}: ${e}`); }
 });
 
@@ -167,20 +157,8 @@ let call = (to, name, args, sock, timeout)=>etask(function*ipc_call(){
                 +`cookie ${cookie}`);
         }
         let msg = {type: 'ipc_call', handler: name, msg: args, cookie: cookie};
-        let start = E.measure_performance==name && date.monotonic();
         send(to, msg, sock);
-        if (start)
-        {
-            zcounter.avg(`cluster_ipc.send_${name}_ms`,
-                date.monotonic()-start);
-        }
-        let value = yield this.wait(timeout);
-        if (start)
-        {
-            zcounter.avg(`cluster_ipc.receive_${name}_ms`,
-                date.monotonic()-start);
-        }
-        return value;
+        return yield this.wait(timeout);
     } catch(e){ ef(e);
         zerr.err(`cluster_ipc.call to ${to} ${name}(${args}): `+zerr.e2s(e));
         throw e;

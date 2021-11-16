@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.266.175",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added alert message on port number conflict"
+            }
+        ]
+    },
+    {
         "ver": "1.264.173",
         "type": "stable",
         "changes": [

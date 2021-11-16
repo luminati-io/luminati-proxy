@@ -486,3 +486,33 @@ for (let m in err_retval)
     E[m] = function(){
         return call_safe(m, E[m+'_e'], err_retval[m], arguments); };
 }
+
+E.Concurrent_file_writer = etask._class(class Concurrent_file_writer {
+    constructor(file, append_opt){
+        this.file = file;
+        this.append_opt = append_opt;
+        this.buffer = [];
+    }
+    *write(_this, data){
+        let et = etask.wait();
+        _this.buffer.push({et, data});
+        if (!_this.write_et)
+            _this._write();
+        return yield et;
+    }
+    *_write(_this){
+        _this.write_et = this;
+        this.finally(()=>{
+            delete _this.write_et;
+            if (_this.buffer.length)
+                _this._write();
+        });
+        let curr = _this.buffer;
+        _this.buffer = [];
+        try {
+            yield E.append_e(_this.file, curr.map(el=>el.data).join(''),
+                _this.append_opt);
+            curr.forEach(el=>el.et.return());
+        } catch(e){ curr.forEach(el=>el.et.throw(e)); }
+    }
+});

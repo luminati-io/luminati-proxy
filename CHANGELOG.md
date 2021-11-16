@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.266.175 Stable
+- :sparkles: Added alert message on port number conflict
+
 ## 1.264.173 Stable
 - :star: Removed max ext proxy limitation for on premise pmgr
 

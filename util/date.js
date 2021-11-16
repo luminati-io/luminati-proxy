@@ -188,6 +188,8 @@ function date_get(d, _new){
     throw new TypeError('invalid date '+d);
 }
 
+E.is_valid = function(d){ return d instanceof Date && !isNaN(d); };
+
 E.to_sql_ms = function(d){
     d = E.get(d);
     if (isNaN(d))

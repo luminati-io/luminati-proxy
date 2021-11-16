@@ -610,6 +610,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             {
                 return false;
             }
+            if (p.master_port && !master_ports_idx.has(p.master_port))
+                throw 'duplicate_port_number';
             if (p.proxy_type=='duplicate')
                 return master_ports_idx.get(p.master_port).expanded;
             return true;

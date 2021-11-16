@@ -83,8 +83,8 @@ class WS extends events.EventEmitter {
         this.zc_tx = opt.zcounter=='tx' || opt.zcounter=='all';
         this.msg_log = assign({}, {treshold_size: null, print_size: 100},
             opt.msg_log);
-        this.zc = opt.zcounter
-            ? opt.label ? `${opt.label}_ws` : 'ws' : undefined;
+        this.zc = opt.zc_label ||
+            (opt.zcounter ? opt.label ? `${opt.label}_ws` : 'ws' : undefined);
         this.zjson_opt = assign({}, zjson_opt, opt.zjson_opt);
         this.zjson_opt_send = assign({}, this.zjson_opt, opt.zjson_opt_send);
         this.zjson_opt_receive = assign({}, this.zjson_opt,
@@ -1230,7 +1230,7 @@ class Mux {
                 if (zfin_pending)
                     zfin_pending.continue();
                 if (err) // don't try to end/finish stream gracefully if error
-                    yield zfinish(false, false);
+                    yield zfinish(false, false, err);
                 else
                 {
                     yield zfinish(true, false);
@@ -1266,7 +1266,7 @@ class Mux {
             data.copy(buf_pending, 0, bytes);
             return {buf, buf_pending};
         };
-        const zfinish = (end_write, wait_rmt)=>etask(function*_zfinish(){
+        const zfinish = (end_write, wait_rmt, err)=>etask(function*_zfinish(){
             if (stream.zfin)
                 return yield this.wait_ext(stream.zfin);
             stream.zfin = this;
@@ -1297,7 +1297,7 @@ class Mux {
                 } catch(e){ w_log(e, 'destroy write pending'); }
                 stream.emit('error', new Error('Fail to write pending data'));
             }
-            stream.send_fin();
+            stream.send_fin(opt.emit_socket_error ? err : undefined);
             if (wait_rmt && !stream.fin_got)
             {
                 try { yield zfin_pending = this.wait(2*opt.fin_timeout); }
@@ -1375,18 +1375,21 @@ class Mux {
             if (pending)
                 pending.continue();
         };
-        stream.send_fin = ()=>{
-            _this.ws.json({vfd, fin: 1});
+        stream.send_fin = error=>{
+            _this.ws.json({vfd, fin: 1, error});
             stream.fin_sent = true;
         };
-        stream.on_fin = ()=>{
+        stream.on_fin = msg=>{
             stream.fin_got = true;
             const fn = ()=>next_tick(()=>zfin_pending ?
                 zfin_pending.continue() : zfinish(true, false));
             etask(function*_mux_stream_on_fin(){
                 stream.once('end', this.continue_fn());
                 try {
-                    stream.push(null);
+                    if (opt.emit_socket_error && msg && msg.error)
+                        stream.emit('error', msg.error);
+                    else
+                        stream.push(null);
                     const state = stream._readableState;
                     // XXX vladislavl: use readableEnded from node v12
                     if (!stream.readableLength || state && state.endEmitted)
@@ -1476,7 +1479,7 @@ class Mux {
         if (msg.win_size && stream.on_win_size)
             return void stream.on_win_size(msg.win_size);
         if (msg.fin && stream.on_fin)
-            return void stream.on_fin();
+            return void stream.on_fin(msg);
         stream.emit('unexpected_ack', msg);
         zerr(`${this.ws}: unexpected json_ack %O`, msg);
         if (this.ws.zc)
