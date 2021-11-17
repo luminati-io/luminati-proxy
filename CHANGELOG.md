@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.266.433 Stable
+- :star: Updated dependencies
+
 ## 1.266.175 Stable
 - :sparkles: Added alert message on port number conflict
 
