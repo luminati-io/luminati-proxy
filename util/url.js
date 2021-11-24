@@ -212,6 +212,9 @@ E.is_valid_url = function(url){
 E.is_valid_domain = function(domain){
     return /^([a-z0-9]([a-z0-9-_]*[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain); };
 
+E.is_http_url = function(url){
+    return /^https?:\/\//.test(url) && E.is_valid_url(url); };
+
 // XXX josh: migrate callers to email.js:is_valid and drop
 // XXX josh: is_signup is a nonsense flag for this fn, migrate callers to using
 // email.js:is_valid_signup_email()

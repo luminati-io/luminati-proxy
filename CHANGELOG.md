@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.267.718 Stable
+- :bug: Fix ports not working in docker container
+
 ## 1.266.433 Stable
 - :star: Updated dependencies
 

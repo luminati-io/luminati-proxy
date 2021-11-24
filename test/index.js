@@ -718,6 +718,47 @@ describe('proxy', ()=>{
             }));
             // XXX krzysztof: add https with tests first support fake requests
         });
+        // XXX mikhailpo: bw limit tests
+        describe('reseller', ()=>{
+            const debug_headers = ['x-lpm-authorization', 'x-lpm-port'];
+            const opts = {debug: 'full', lpm_auth: 'full', user: 't1',
+                user_password: 't2', zagent: 1, reseller: 1};
+            it('lpm_user_hide_headers', ()=>etask(function*(){
+                l = yield lum(opts);
+                const auth = 'Basic '+Buffer.from('t1:t2').toString('base64');
+                let r = yield l.test({headers: {'proxy-authorization': auth}});
+                assert.equal(r.statusCode, 200);
+                debug_headers.forEach(hdr=>assert.ok(!r.headers[hdr]));
+            }));
+            it('non_reseller_lpm_user_show_headers', ()=>etask(function*(){
+                l = yield lum(Object.assign({}, opts, {reseller: 0}));
+                const auth = 'Basic '+Buffer.from('t1:t2').toString('base64');
+                let r = yield l.test({headers: {'proxy-authorization': auth}});
+                assert.equal(r.statusCode, 200);
+                debug_headers.forEach(hdr=>assert.ok(r.headers[hdr]));
+            }));
+            it('lum_user_hide_headers', ()=>etask(function*(){
+                l = yield lum(opts);
+                const auth = 'Basic '+Buffer
+                    .from('lum-customer-c_xx-zone-z1:t2').toString('base64');
+                let r = yield l.test({headers: {'proxy-authorization': auth}});
+                assert.equal(r.statusCode, 200);
+                debug_headers.forEach(hdr=>assert.ok(!r.headers[hdr]));
+            }));
+            it('wrong_auth_hide_headers', ()=>etask(function*(){
+                l = yield lum(opts);
+                sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
+                let r = yield l.test({url: test_url.http, no_usage: true});
+                assert.equal(r.statusCode, 407);
+                debug_headers.forEach(hdr=>assert.ok(!r.headers[hdr]));
+            }));
+            it('ip_auth_show_headers', ()=>etask(function*(){
+                l = yield lum(opts);
+                let r = yield l.test();
+                assert.equal(r.statusCode, 200);
+                debug_headers.forEach(hdr=>assert.ok(r.headers[hdr]));
+            }));
+        });
     });
     describe('ext_proxies', ()=>{
         it('should use host and proxy from config', ()=>etask(function*(){

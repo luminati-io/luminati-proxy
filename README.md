@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.266.433/luminati-proxy-manager-v1.266.433-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.267.718/luminati-proxy-manager-v1.267.718-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -211,6 +211,7 @@ Options:
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser
                                 admin UI                   [array] [default: []]
+  --reverse_proxy_ips                                      [array] [default: []]
   --www                         HTTP and WebSocket port used for browser admin
                                 UI and request logs             [default: 22999]
   --config                      Config file containing proxy definitions[string]
@@ -224,6 +225,7 @@ Options:
   --lpm_token                   An authorization token                  [string]
   --high_perf                                         [boolean] [default: false]
   --zagent                                            [boolean] [default: false]
+  --reseller                                          [boolean] [default: false]
   --cluster                                             [string] [default: true]
   --sync_config                 Synchronize Proxy Manager configuration with the
                                 cloud                 [boolean] [default: false]

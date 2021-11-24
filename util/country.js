@@ -2684,6 +2684,16 @@ E.gl2uule = function(gl){
     return E.google_list[gl] || gl;
 };
 
+var uule_to_gl_map = {};
+Object.entries(E.google_list).forEach(function(entry){
+    return uule_to_gl_map[entry[1]] = entry[0];
+});
+E.uule2gl = function(uule){
+    if (uule =='Macedonia')
+        return 'MK';
+    return E.code2www(uule_to_gl_map[uule]);
+};
+
 var terr_country = {
     apac_rest: 'VN SG JP MY KR AU TH ID NP PH AE PK NZ TW SA KW BN AF CX KH '
     +'IR MM IQ YE OM LA MN PF BH KP NU NC BT VU WS FJ AQ CK CC KI PW TJ TM '

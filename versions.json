@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.267.718",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix ports not working in docker container"
+            }
+        ]
+    },
+    {
         "ver": "1.266.433",
         "type": "stable",
         "changes": [

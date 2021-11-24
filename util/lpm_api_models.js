@@ -98,6 +98,7 @@ E.manager_fields = {
         +'ip list for granting access to them'},
     www_whitelist_ips: {type: 'array', desc: 'Whitelist ip list for granting '
         +'access to browser admin UI'},
+    reverse_proxy_ips: {type: 'array'},
     www: {type: 'integer', desc: 'HTTP and WebSocket port used for browser '
         +'admin UI and request logs'},
     config: {type: 'string', desc: 'Config file containing proxy definitions'},
@@ -111,6 +112,7 @@ E.manager_fields = {
     lpm_token: {type: 'string', desc: 'An authorization token'},
     high_perf: {type: 'boolean'},
     zagent: {type: 'boolean'},
+    reseller: {type: 'boolean'},
     cluster: {type: 'string'},
     sync_config: {type: 'boolean', desc: 'Synchronize Proxy Manager '
         +'configuration with the cloud'},

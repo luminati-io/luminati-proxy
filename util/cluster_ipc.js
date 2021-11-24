@@ -265,3 +265,5 @@ E.master_remove_listener = function(name){
 };
 
 init();
+
+E.reset_incoming_pending = ()=>incoming_pending = {};
