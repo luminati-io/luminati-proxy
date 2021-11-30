@@ -511,7 +511,6 @@ class Nav extends Pure_component {
         this.set_field('multiply_ips', false);
         this.set_field('multiply_vips', false);
         this.set_field('multiply_users', false);
-        this.set_field('multiply', 0);
     };
     update_preset = val=>{
         this.props.on_change_preset(this.props.form, val);

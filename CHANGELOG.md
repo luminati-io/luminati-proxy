@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.268.704 Stable
+- :bug: Fix multiply setting drop on port preset change
+
 ## 1.267.718 Stable
 - :bug: Fix ports not working in docker container
 
