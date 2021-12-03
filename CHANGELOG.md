@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.269.473 Stable
+- :star: x-lpm-ports header support
+
 ## 1.268.704 Stable
 - :bug: Fix multiply setting drop on port preset change
 
