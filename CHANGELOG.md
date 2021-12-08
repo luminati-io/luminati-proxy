@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.270.370 Stable
+- :bug: Use different superproxy on long session
+- :star: Increased superproxy hosts update frequency
+
 ## 1.269.473 Stable
 - :star: x-lpm-ports header support
 

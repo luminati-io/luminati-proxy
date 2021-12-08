@@ -54,7 +54,10 @@ E.send = function(opt){
         xhr = $.ajax(ajopt);
         var _this = this;
         xhr.done(function(v){
-            _this.continue(v); });
+            if (opt.restore_dates && v && typeof v=='object')
+                restore_dates(v);
+            _this.continue(v);
+        });
         xhr.fail(function(_xhr, status_text, err){
             if (data_type=='json' && _xhr && _xhr.status==200 &&
                 ['', 'ok', 'OK'].includes(_xhr.responseText))
@@ -81,6 +84,9 @@ E.send = function(opt){
             E.events.emit('unauthorized', this, xhr);
         if (xhr.status==500)
             E.events.emit('unhandledException', this, xhr);
+        var xhr_data = get_res_data(xhr);
+        if (opt.restore_dates && xhr_data && typeof xhr_data=='object')
+            restore_dates(xhr_data);
         if (opt.no_throw)
         {
             return {
@@ -88,14 +94,14 @@ E.send = function(opt){
                 url: url,
                 method: method,
                 status: +xhr.status || 0,
-                data: get_res_data(xhr),
+                data: xhr_data,
                 xhr: xhr,
                 // legacy
                 error: xhr.statusText||'no_status', message: xhr.responseText,
             };
         }
         err.xhr_info = {url: url, method: method, status: xhr.status,
-            data: get_res_data(xhr), response_text: xhr.responseText};
+            data: xhr_data, response_text: xhr.responseText};
         err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
         throw err;
@@ -107,8 +113,6 @@ E.send = function(opt){
             perr({id: 'be_ajax_slow', info: t+'ms '+url});
         if (E.do_op)
             E.do_op(_data&&_data.do_op);
-        if (opt.restore_dates)
-            restore_dates(_data);
         if (Array.isArray(opt.return_headers))
         {
             res = {
@@ -168,15 +172,28 @@ function get_res_data(xhr){
 function restore_dates(data){
     if (!data || typeof data!='object')
         return;
-    for (var key in data)
+    var stack = new Array(100), len = 0;
+    stack[len++] = data;
+    while (len>0)
     {
-        if (!data.hasOwnProperty(key))
-            continue;
-        var val = data[key];
-        if (typeof val=='string' && date_rx.test(val))
-            data[key] = new Date(val);
-        else if (val && typeof val=='object')
-            restore_dates(val);
+        var obj = stack[--len];
+        for (var k in obj)
+        {
+            var v = obj[k];
+            if (typeof v=='string')
+            {
+                var strlen = v.length;
+                if (strlen>=20 && strlen<30 && date_rx.test(v))
+                    obj[k] = new Date(v);
+            }
+            else if (typeof v=='object' && v!=null)
+            {
+                if (!v.constructor || v.constructor==Object)
+                    stack[len++] = v;
+                else if (v.length && Array.isArray(v))
+                    stack[len++] = v;
+            }
+        }
     }
 }
 var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;

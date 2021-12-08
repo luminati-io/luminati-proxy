@@ -66,6 +66,7 @@ conf.server_default = {
     proxy_retry: 2,
     proxy_country: '',
     socket_inactivity_timeout: 120000,
+    resolve_proxies_interval: 10000,
     preset: 'session_long',
     route_err: 'pass_dyn',
     multiply_ips: false,

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.270.370",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Use different superproxy on long session"
+            },
+            {
+                "type": "star",
+                "text": "Increased superproxy hosts update frequency"
+            }
+        ]
+    },
+    {
         "ver": "1.269.473",
         "type": "stable",
         "changes": [

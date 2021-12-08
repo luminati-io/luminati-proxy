@@ -124,7 +124,10 @@ E.un_sh = function(s, keep_esc){
 
 E.regex = function(s){ return s.replace(/[[\]{}()*+?.\\^$|/]/g, '\\$&'); };
 
-E.uri_comp = function(s){ return encodeURIComponent(s).replace(/%20/g, '+'); };
+E.uri_comp = function(s){
+    try { return encodeURIComponent(s).replace(/%20/g, '+'); }
+    catch(e){ return ''; }
+};
 
 var http_escape_chars = [];
 (function(){
@@ -143,8 +146,13 @@ E.encodeURIComponent_bin = function(s_or_b){
     var esc = '';
     // critical perf only for 0<=code<256: encodeURIComponent() will not be
     // called in these cases
+    var c;
     for (var i = 0; i < s.length; i++)
-        esc += http_escape_chars[s.charCodeAt(i)] || encodeURIComponent(s[i]);
+    {
+        c = s.charCodeAt(i);
+        try { esc += http_escape_chars[c]||encodeURIComponent(s[i]); }
+        catch(e){}
+    }
     return esc;
 };
 
