@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.271.471 Development Latest
+- :star: Real time language updates
+
 ## 1.270.370 Stable
 - :bug: Use different superproxy on long session
 - :star: Increased superproxy hosts update frequency

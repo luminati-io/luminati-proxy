@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.271.471",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Real time language updates"
+            }
+        ]
+    },
+    {
         "ver": "1.270.370",
         "type": "stable",
         "changes": [

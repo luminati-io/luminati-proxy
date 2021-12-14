@@ -546,7 +546,7 @@ function run(){
         lum.forEach(h=>ws_client('lum', `ws://${h}:${port}`));
         stats.forEach(h=>ws_client('stats', `ws://${h}:${port}`));
     }
-    etask.interval({ms: interval, mode: 'smart'}, function*zcounter_run(){
+    etask.interval(interval, function*zcounter_run(){
         let data = yield prepare();
         for (let world of ['lum', 'stats'])
         {

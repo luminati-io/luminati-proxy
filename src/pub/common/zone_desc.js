@@ -5,7 +5,7 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import Tooltip from './tooltip.js';
 import {get_static_country} from '../util.js';
 import {flag_with_title, any_flag} from '../common.js';
-import {T} from './i18n.js';
+import {t} from './i18n.js';
 import {get_plan_product, network_types} from './network_types.js';
 import '../css/zone_desc.less';
 
@@ -32,11 +32,11 @@ export default class Zone_description extends Pure_component {
         if (plan.pool_ip_type)
             plan.type = plan.pool_ip_type;
         const static_country = get_static_country({zone: zone_name}, zones);
-        let c = any_flag;
+        let c = any_flag();
         if (static_country && static_country!='any' && static_country!='*')
             c = flag_with_title(static_country, static_country.toUpperCase());
         const plan_type = get_plan_product(plan);
-        return <T>{t=><div className="zone_settings">
+        return <div className="zone_settings">
           <ul className="bullets">
             <Zone_bullet atr="Network type"
               tip="The network accessible by this zone">
@@ -47,7 +47,7 @@ export default class Zone_description extends Pure_component {
             <Zone_domains_bullet atr="IP exclusivity" plan={plan}
               show={plan.ips_type!==undefined} t={t}/>
             <Zone_bullet atr="Country" tip="Allowed country">
-              {t(c)}
+              {c}
             </Zone_bullet>
             <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
               {plan.ips}
@@ -56,7 +56,7 @@ export default class Zone_description extends Pure_component {
               <Perm_icons perm_list={zone.perm.split(' ')} plan={plan}/>
             </Zone_bullet>
           </ul>
-        </div>}</T>;
+        </div>;
     }
 }
 
@@ -67,7 +67,7 @@ class Zone_domains_bullet extends Pure_component {
         selective: 'Exclusive domains',
     };
     render(){
-        const {atr, show, plan, t} = this.props;
+        const {atr, show, plan} = this.props;
         const domains = (plan.domain_whitelist||'').split(' ').filter(Boolean);
         return <React.Fragment>
           <Zone_bullet atr={atr} show={show}>
@@ -113,13 +113,11 @@ class Perm_icons extends Pure_component {
             icons.unshift('residential');
         else if (perm.route_dedicated)
             icons.unshift('data_center');
-        return <T>{t=>
-          <div>{icons.map(_perm=>
-            <Tooltip key={_perm} title={t(this.prem_tooltips[_perm])}>
-              <div className={'perm_icon '+_perm}/>
-            </Tooltip>)}
-          </div>
-        }</T>;
+        return <div>{icons.map(_perm=>
+              <Tooltip key={_perm} title={t(this.prem_tooltips[_perm])}>
+                <div className={'perm_icon '+_perm}/>
+              </Tooltip>)}
+            </div>;
     }
 }
 
@@ -128,12 +126,10 @@ const Zone_bullet = ({tip, show, atr, children})=>{
         show = true;
     if (!show)
         return null;
-    return <T>{t=>
-      <li className="pair">
+    return <li className="pair">
         <Tooltip title={t(tip)}>
           <span className="title">{t(atr)}:</span>
         </Tooltip>
         <span className="val">{children}</span>
-      </li>
-    }</T>;
+      </li>;
 };

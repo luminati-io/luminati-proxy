@@ -158,7 +158,7 @@ const Add_proxy_btn = ()=>{
     <Tooltip title={t('Add new port')}>
       <button onClick={open_modal}
         className="btn btn_lpm btn_lpm_primary toolbar_item">
-        Add new port
+        <T>Add new port</T>
       </button>
     </Tooltip>
   }</T>;
@@ -238,9 +238,9 @@ class Upgrade extends Pure_component {
         const upgrade_type = major ? 'major' : 'minor';
         return <Warning tooltip={tooltip} id={this.state.ver_last.version}>
           <div>
-            <T>lpm_new_ver</T>{' '}
-            <strong><T>{'lpm_new_ver_'+upgrade_type}</T></strong>{' '}
-            <T>lpm_new_ver_version</T>{' '}
+            <T>A new</T>{' '}
+            <strong><T>{upgrade_type}</T></strong>{' '}
+            <T>version</T>{' '}
             <strong>{this.state.ver_last.version}</strong>{' '}
             <T>is available. You are</T>{' '}
             <strong>{versions.length}</strong>{' '}

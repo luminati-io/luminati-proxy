@@ -1,101 +1,119 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 import React from 'react';
-import Pure_component from '/www/util/pub/pure_component.js';
-import Cn from '/www/lum/pub/locale/zh-hans.json';
-import Ru from '/www/lum/pub/locale/ru.json';
-import En from '/www/lum/pub/locale/en.json';
 import setdb from '../../../util/setdb.js';
+
+const E = {};
 
 export const TranslationContext = React.createContext('en');
 
-const t = (key, translation)=>{
-    if (!key || !translation)
-        return key;
-    // warn only for non-english translations
-    if (!translation[key] && translation.Actions!='Actions')
-        console.info('missing translation for \'%s\'', key);
+const target_origins = [
+    'brightdata.com',
+    'luminati-china.biz',
+    'luminati.io',
+];
+const missing_cache = {};
+let top_origin;
+let notify = true;
+const notify_missing_key = (key, lang)=>{
+    if (window == window.parent || !notify)
+        return void (missing_cache[lang][key] = 1);
+    console.info('missing translation for \'%s\'', key);
+    let lpm_token = setdb.get('head.settings.lpm_token');
+    if (!lpm_token)
+    {
+        const sp = new URLSearchParams(window.location.search);
+        lpm_token = sp.get('lpm_token');
+    }
+    const msg = JSON.parse(JSON.stringify({
+        type: 'pmgr.i18n_missing_key',
+        key,
+        lang,
+        path: window.location.pathname,
+        token: lpm_token.split('|')[0],
+    }));
+    if (top_origin)
+        window.parent.postMessage(msg, top_origin);
+    else
+    {
+        target_origins.some(to=>{
+            try { // throws exception for invalid domain
+                window.parent.postMessage(msg, `https://${to}`);
+                top_origin = `https://${to}`;
+                return true;
+            } catch(e){}
+        });
+        if (!top_origin)
+            notify = false;
+    }
+    missing_cache[lang][key] = 1;
+};
+
+export const t = (key, translation)=>{
+    const curr_lang = get_curr_lang();
+    if (!translation)
+        translation = get_translations(curr_lang);
+    if (curr_lang != 'en' && !missing_cache[curr_lang][key] &&
+        !translation[key])
+    {
+        notify_missing_key(key, curr_lang);
+    }
     return translation[key]||key;
 };
+E.t = t;
 
 // XXX krzysztof: try to reuse T from /www/locale/pub
-export class T extends Pure_component {
-    static contextType = TranslationContext;
-    render(){
-        const translation = get_lang(this.context);
-        const {children} = this.props;
-        if (typeof children=='function')
-            return children(key=>t(key, translation));
-        if (typeof children=='string')
-            return t(children.replace(/\s+/g, ' '), translation);
-        return null;
-    }
-}
-
-export const with_tt = (keys, Component)=>class extends Pure_component {
-    static contextType = TranslationContext;
-    render(){
-        const translation = get_lang(this.context);
-        const {...props} = this.props;
-        const translations = keys.reduce((acc, k)=>{
-            const translated = t(k.replace(/\s+/g, ' '), translation);
-            return {...acc, [k]: translated};
-        }, {});
-        return React.createElement(Component, {...props, t: translations});
-    }
+export const T = props=>{
+    React.useContext(TranslationContext);
+    const {children} = props;
+    if (typeof children=='function')
+        return children(t);
+    if (typeof children=='string')
+        return t(children.replace(/\s+/g, ' '));
+    return null;
 };
+E.T = T;
 
 export const langs = {
-    en: {name: 'English', flag: 'gb', t: En},
-    ru: {name: 'русский', flag: 'ru', t: Ru},
-    cn: {name: '简体中文', flag: 'cn', t: Cn},
+    en: {name: 'English', flag: 'gb', t: {}},
+    ru: {name: 'русский', flag: 'ru', t: {}},
+    'zh-hans': {name: '简体中文', flag: 'cn', t: {}},
 };
+E.langs = langs;
+Object.keys(langs).forEach(l=>missing_cache[l] = {});
 
-export const get_lang = lang=>langs[lang] && langs[lang].t || null;
-export const set_lang = lang=>{
-    setdb.set('i18n.translation', langs[lang].flag || null);
+export const get_translations = lang=>langs[lang] && langs[lang].t || null;
+export const get_curr_lang = ()=>window.localStorage.getItem('lang')||'en';
+export const set_curr_lang = lang=>{
+    lang = langs[lang] ? lang : 'en';
+    window.localStorage.setItem('lang', lang);
+    setdb.set('i18n.curr_lang', lang);
 };
+E.get_translations = get_translations;
+E.get_curr_lang = get_curr_lang;
+E.set_curr_lang = set_curr_lang;
 
-export class Language extends Pure_component {
-    state = {};
-    componentDidMount(){
-        let lang = window.localStorage.getItem('lang');
-        if (lang)
-            return this.set_lang(lang);
-        this.setdb_on('head.conn', conn=>{
-            if (!conn)
-                return;
-            if (Object.keys(langs).includes(conn.current_country))
-                lang = conn.current_country;
-            else
-                lang = 'en';
-            this.set_lang(lang);
-        });
-    }
-    set_lang = lang=>{
-        this.setState({lang});
-        set_lang(lang);
-        let curr = window.localStorage.getItem('lang');
-        if (curr!=lang)
-            window.localStorage.setItem('lang', lang);
-    };
-    render(){
-        if (!this.state.lang)
-            return null;
-        if (this.props.hidden)
-            return null;
-        return <div className="dropdown">
+// so all customers before the lang code change
+// transit without loss of the lang setting
+if (get_curr_lang() == 'cn')
+    set_curr_lang('zh-hans');
+
+export const Language = props=>{
+    const curr_lang = React.useContext(TranslationContext);
+    if (!curr_lang || props.hidden)
+        return null;
+    return <div className="dropdown">
               <a className="link dropdown-toggle" data-toggle="dropdown">
-                <Lang_cell lang={this.state.lang}/>
+                <Lang_cell lang={curr_lang}/>
               </a>
               <ul className="dropdown-menu dropdown-menu-right">
                 {Object.keys(langs).map(lang=>
-                  <Lang_row set_lang={this.set_lang} key={lang} lang={lang}/>
+                  <Lang_row set_lang={set_curr_lang} key={lang} lang={lang}/>
                 )}
               </ul>
             </div>;
-    }
-}
+};
+E.Language = Language;
 
 const Lang_row = ({lang, set_lang})=>
     <li onClick={set_lang.bind(this, lang)}>
@@ -107,3 +125,5 @@ const Lang_cell = ({lang})=>
       <span className={`flag-icon flag-icon-${langs[lang].flag}`}/>
       {langs[lang].name}
     </React.Fragment>;
+
+export default E;

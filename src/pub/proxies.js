@@ -19,7 +19,7 @@ import {Checkbox, any_flag, flag_with_title, No_zones,
     Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
-import {T} from './common/i18n.js';
+import {T, t} from './common/i18n.js';
 import {Search_box} from './chrome_widgets.js';
 import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
@@ -45,7 +45,7 @@ class Targeting_cell extends Pure_component {
         }
         let val = proxy.country;
         if (!val||val=='any'||val=='*')
-            return any_flag;
+            return any_flag();
         val = val.toUpperCase();
         const state = proxy.state&&proxy.state.toUpperCase();
         if (!state)
@@ -115,7 +115,7 @@ class Type_cell extends React.Component {
             val = 'Luminati';
             tip = 'Proxy port using your Luminati account';
         }
-        return <T>{t=><Tooltip title={t(tip)}>{t(val)}</Tooltip>}</T>;
+        return <Tooltip title={t(tip)}>{t(val)}</Tooltip>;
     }
 }
 
@@ -133,10 +133,10 @@ class Browser_cell extends Pure_component {
     render(){
         const class_names = 'btn btn_lpm btn_lpm_small';
         const tooltip = 'Open browser configured with this port';
-        return is_local() && <T>{t=><Tooltip title={t(tooltip)}>
+        return is_local() && <Tooltip title={t(tooltip)}>
               <button className={class_names}
                 onClick={this.open_browser}>Browser</button>
-            </Tooltip>}</T>;
+            </Tooltip>;
     }
 }
 
@@ -187,10 +187,8 @@ class Port_cell extends Pure_component {
 const Success_rate_cell = ({proxy})=>{
     const val = !proxy.reqs ? '—' :
         (proxy.success/proxy.reqs*100).toFixed(2)+'%';
-    return <T>{t=>
-          <Tooltip title={`${t('Total')}: ${proxy.reqs||0}, ${
-            t('Success')}: ${proxy.success||0}`}>{val}</Tooltip>
-        }</T>;
+    return <Tooltip title={`${t('Total')}: ${proxy.reqs||0}, ${
+            t('Success')}: ${proxy.success||0}`}>{val}</Tooltip>;
 };
 
 const Reqs_cell = ({proxy})=>{
@@ -222,13 +220,13 @@ const Zone_cell = ({proxy, mgr, scrolling})=>{
 const Rules_cell = ({proxy: {rules=[]}})=>{
     const tip = 'Number of defined rules for this proxy port';
     const val = rules.length;
-    return !!val && <T>{t=><Tooltip title={t(tip)}>{t(val)}</Tooltip>}</T>;
+    return !!val && <Tooltip title={t(tip)}>{t(val)}</Tooltip>;
 };
 
 const columns = [
     {
         key: 'actions',
-        title: 'lpm_ports_actions',
+        title: 'Actions',
         tooltip: `Delete/duplicate/refresh sessions/open browser`,
         ext: true,
         sticky: true,
@@ -516,14 +514,12 @@ class Columns_modal extends Pure_component {
           <div className="row columns">
             {columns.filter(col=>!col.sticky).map(col=>
               <div key={col.key} className="col-md-6">
-                <T>{t=>
                   <Checkbox
                     text={t(col.title)}
                     value={col.key}
                     on_change={this.on_change}
                     checked={!!this.state.selected_cols[col.key]}
                   />
-                }</T>
               </div>
             )}
           </div>
@@ -842,7 +838,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                   <div className="main_panel flex">
                   <AutoSizer>
                     {({height, width})=>
-                      <T>{t=><Table width={width}
+                      <Table width={width}
                         height={height}
                         onRowClick={this.on_row_click}
                         onHeaderClick={({dataKey})=>dataKey=='select' &&
@@ -884,7 +880,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                               col.shrink : 1}
                             width={col.width||100}/>
                         )}
-                      </Table>}</T>
+                      </Table>
                     }
                   </AutoSizer>
                   </div>
@@ -1126,9 +1122,9 @@ const Action_icon = props=>{
         {invisible});
     if (scrolling)
         return <div className={classes}/>;
-    return <T>{t=><Tooltip title={t(tooltip)}>
+    return <Tooltip title={t(tooltip)}>
           <div onClick={on_click} className={classes}/>
-        </Tooltip>}</T>;
+        </Tooltip>;
 };
 
 export default Proxies;

@@ -29,7 +29,7 @@ import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
 import {report_exception} from './util.js';
 import {createGlobalStyle} from 'styled-components';
-import {TranslationContext} from './common/i18n.js';
+import i18n, {TranslationContext} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
 
@@ -37,7 +37,7 @@ window.setdb = setdb;
 setdb.setMaxListeners(50);
 
 const App = withRouter(class App extends Pure_component {
-    state = {};
+    state = {i18n_loaded: false};
     componentDidMount(){
         setdb.set('head.save_settings', this.save_settings);
         const _this = this;
@@ -89,12 +89,26 @@ const App = withRouter(class App extends Pure_component {
                 search: _this.props.location.search,
             });
         });
+        this.setdb_on('i18n_loaded', i18n_loaded=>{
+            if (!i18n_loaded)
+                return;
+            this.setState({i18n_loaded});
+        });
         this.setdb_on('head.settings', settings=>
             settings && this.setState({settings}));
-        this.setdb_on('i18n.translation', translation=>{
-          if (translation===undefined)
-            return;
-          this.setState({translation});
+        this.setdb_on('i18n.curr_lang', curr_lang=>
+            curr_lang && this.setState({curr_lang}));
+        this.setdb_on('head.conn', conn=>{
+            let lang = window.localStorage.getItem('lang');
+            if (lang)
+                return void i18n.set_curr_lang(lang);
+            if (!conn)
+                return;
+            if (Object.keys(i18n.langs).includes(conn.current_country))
+                lang = conn.current_country;
+            else
+                lang = 'en';
+            i18n.set_curr_lang(lang);
         });
     }
     load_data = ()=>this.etask(function*(){
@@ -113,6 +127,15 @@ const App = withRouter(class App extends Pure_component {
             const carriers = yield ajax.json({url: '/api/all_carriers'});
             setdb.set('head.carriers', carriers);
         }));
+        etask(function*(){
+            this.on('uncaught', err_handler('Error fetching lang data'));
+            this.finally(()=>setdb.set('i18n_loaded', true));
+            const res = yield ajax.json({url: '/api/i18n'});
+            Object.keys(res).forEach(lang_code=>{
+                if (i18n.langs[lang_code])
+                    i18n.langs[lang_code].t = res[lang_code];
+            });
+        });
         etask(function*(){
             const settings = yield ajax.json({url: '/api/settings'});
             setdb.set('head.settings', settings);
@@ -168,7 +191,10 @@ const App = withRouter(class App extends Pure_component {
       });
     };
     render(){
-      return <TranslationContext.Provider value={this.state.translation}>
+      const {i18n_loaded, curr_lang} = this.state;
+      if (!i18n_loaded)
+          return null;
+      return <TranslationContext.Provider value={curr_lang}>
         <div className="page_wrapper">
           <Global_styles_brd/>
           <Enable_ssl_modal/>

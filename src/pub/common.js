@@ -13,7 +13,7 @@ import presets from './common/presets.js';
 import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
     Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
-import {T, with_tt, Language} from './common/i18n.js';
+import {T, t, Language} from './common/i18n.js';
 import conv from '../../util/conv.js';
 
 export const Tooltip_bytes = props=>{
@@ -111,16 +111,13 @@ export const Loader_small = props=>{
 };
 
 // XXX krzysztof: refactoring: reuse Copy_btn component
-export const Code = with_tt(['Copy to clipboard', 'Copy', 'Copied!'],
-class Code extends Pure_component {
+export class Code extends Pure_component {
     componentDidMount(){
-        const {t} = this.props;
         $(this.ref).find('.btn_copy').tooltip('show')
-        .attr('title', t['Copy to clipboard']).tooltip('fixTitle');
+        .attr('title', t('Copy to clipboard')).tooltip('fixTitle');
     }
     set_ref(e){ this.ref = e; }
     copy(){
-        const {t} = this.props;
         if (this.props.on_click)
             this.props.on_click();
         const area = $(this.ref).children('textarea')[0];
@@ -129,9 +126,9 @@ class Code extends Pure_component {
         area.select();
         try {
             document.execCommand('copy');
-            $(this.ref).find('.btn_copy').attr('title', t['Copied!'])
+            $(this.ref).find('.btn_copy').attr('title', t('Copied!'))
             .tooltip('fixTitle')
-            .tooltip('show').attr('title', t['Copy to clipboard'])
+            .tooltip('show').attr('title', t('Copy to clipboard'))
             .tooltip('fixTitle');
         } catch(e){
             this.etask(function*(){
@@ -140,17 +137,16 @@ class Code extends Pure_component {
         }
     }
     render(){
-        const {t} = this.props;
         return <code ref={this.set_ref.bind(this)}>
           <span className="source">{this.props.children}</span>
           <textarea style={{position: 'fixed', top: '-1000px'}}/>
           <button onClick={this.copy.bind(this)} data-container="body"
             className="btn btn_lpm btn_lpm_small btn_copy">
-            {t['Copy']}
+            {t('Copy')}
           </button>
         </code>;
     }
-});
+}
 
 export const with_proxy_ports = Component=>{
     const port_select = data=>function port_select_inner(props){
@@ -239,27 +235,25 @@ export const Form_controller = props=>{
     return <Input {...props}/>;
 };
 
-export const Copy_btn = with_tt(['Copy to clipboard', 'Copy', 'Copied!'],
-class Copy_btn extends Pure_component {
+export class Copy_btn extends Pure_component {
     textarea = React.createRef();
     btn = React.createRef();
     refreshTooltip(){
         $(this.btn.current)
-        .attr('title', this.props.t['Copy to clipboard']).tooltip('fixTitle');
+        .attr('title', t('Copy to clipboard')).tooltip('fixTitle');
     }
     componentDidMount(){ this.refreshTooltip(); }
     componentDidUpdate(){ this.refreshTooltip(); }
     copy = ()=>{
-        const {t} = this.props;
         const txt = this.textarea.current;
         const area = $(txt)[0];
         area.value = this.props.val;
         area.select();
         try {
             document.execCommand('copy');
-            $(this.btn.current).attr('title', t['Copied!'])
+            $(this.btn.current).attr('title', t('Copied!'))
             .tooltip('fixTitle')
-            .tooltip('show').attr('title', t['Copy to clipboard'])
+            .tooltip('show').attr('title', t('Copy to clipboard'))
             .tooltip('fixTitle');
         } catch(e){
             this.etask(function*(){
@@ -280,7 +274,7 @@ class Copy_btn extends Pure_component {
             style={{position: 'fixed', top: '-1000px'}}/>
         </div>;
     }
-});
+}
 
 export class Cm_wrapper extends Pure_component {
     componentDidMount(){
@@ -319,11 +313,11 @@ export const Faq_link = with_www_api(props=>{
         const url = `${props.www_api}/faq/#${props.id}`;
         window.open(url, '_blank');
     };
-    return <T>{t=><Tooltip title={t('Read more')}>
+    return <Tooltip title={t('Read more')}>
       <span
         onClick={click}
         className="glyphicon glyphicon-question-sign faq_link"/>
-    </Tooltip>}</T>;
+    </Tooltip>;
 });
 
 export const Note = props=>
@@ -349,7 +343,6 @@ export const Labeled_controller = props=>
       disabled={props.disabled}
       animated={props.animated}
       inner_style={props.field_row_inner_style}>
-      <T>{t=><React.Fragment>
         <div className="desc" style={props.desc_style}>
           <Tooltip title={t(props.tooltip)}>{t(props.label)}</Tooltip>
           {props.faq_id && <Faq_link id={props.faq_id}/>}
@@ -370,7 +363,6 @@ export const Labeled_controller = props=>
           </div>
           {props.note && <Note>{t(props.note)}</Note>}
         </div>
-      </React.Fragment>}</T>
     </Field_row_raw>;
 
 export const Checkbox = props=>
@@ -415,12 +407,12 @@ export const Link_icon = props=>{
         ? <div className="img_icon"
             style={{backgroundImage: `url(${img})`}}></div>
         : <i className={classnames('glyphicon', 'glyphicon-'+id)}/>;
-    return <T>{t=><Tooltip title={t(tooltip)} key={id}>
+    return <Tooltip title={t(tooltip)} key={id}>
       <span className={classnames('link', 'icon_link', classes)}
         onClick={on_click}>
         {icon}
       </span>
-    </Tooltip>}</T>;
+    </Tooltip>;
 };
 
 export const Add_icon = ({click, tooltip})=>
@@ -454,14 +446,12 @@ export const Logo = with_www_api(class Logo extends Pure_component {
     }
 });
 
-export const any_flag = <T>{t=>
-      <Tooltip title={t('Any')}>
-        <span>
-          <img src="/img/flag_any_country.svg" style={{height: 18}}/>
-          <span className="lit" style={{marginLeft: 2}}>{t('Any')}</span>
-        </span>
-      </Tooltip>
-    }</T>;
+export const any_flag = props=><Tooltip title={t('Any')}>
+    <span>
+      <img src="/img/flag_any_country.svg" style={{height: 18}}/>
+        <span className="lit" style={{marginLeft: 2}}>{t('Any')}</span>
+      </span>
+    </Tooltip>;
 
 export const flag_with_title = (country, title, tooltip)=>{
     return <Tooltip title={tooltip||country.toUpperCase()}>

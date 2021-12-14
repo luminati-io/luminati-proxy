@@ -44,7 +44,7 @@ export default Logs;
 const Nav = ({set_tab, cur_tab})=>
     <Nav_tabs narrow set_tab={set_tab} cur_tab={cur_tab}>
       <Nav_tab id="har" title="HAR viewer"/>
-      <Nav_tab id="banned_ips" title="lpm_banned_ip"/>
+      <Nav_tab id="banned_ips" title="Banned IPs"/>
     </Nav_tabs>;
 
 const banned_ips_cols = [
@@ -105,7 +105,7 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
                     <i className="chrome_icon clear unban_all"/>
                   </button>
                 </Tooltip>
-                <T>{t=>t('lpm_banned_ip')+` (${ips.length})`}</T>
+                <T>{t=>t('Banned IPs')+` (${ips.length})`}</T>
               </React.Fragment>}
             cols={banned_ips_cols} class_name="banned_ips_panel">
               {ips.map(d=>
