@@ -62,6 +62,8 @@ const App = withRouter(class App extends Pure_component {
                     body: JSON.stringify({lpm_token: qs_o.lpm_token}),
                 });
             }
+            if (qs_o.lang)
+                i18n.set_curr_lang(qs_o.lang);
             const mode = yield window.fetch('/api/mode');
             let block_ip;
             if (block_ip = mode.headers.get('x-lpm-block-ip'))

@@ -135,7 +135,7 @@ class Browser_cell extends Pure_component {
         const tooltip = 'Open browser configured with this port';
         return is_local() && <Tooltip title={t(tooltip)}>
               <button className={class_names}
-                onClick={this.open_browser}>Browser</button>
+                onClick={this.open_browser}><T>Browser</T></button>
             </Tooltip>;
     }
 }
@@ -899,7 +899,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
 
 const Header_panel = props=>
     <div className="cp_panel_header">
-      <h2>Proxy ports</h2>
+      <h2><T>Proxy ports</T></h2>
       <Toolbar {...props}/>
     </div>;
 

@@ -19,7 +19,7 @@ import Tooltip from './common/tooltip.js';
 import {Textarea, Select_zone} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal} from './common/modals.js';
-import {T} from './common/i18n.js';
+import {T, t} from './common/i18n.js';
 import {Instructions, Li} from '/www/util/pub/bullets.js';
 import './css/proxy_add.less';
 
@@ -149,10 +149,10 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                   <Instructions>
                     <Li>
                       <Step curr_step={this.state.step} step={0}
-                        title="Network">
+                        title={t('Network')}>
                         <Note>
-                          Select your prefered network: Bright Data or an
-                          external vendor?
+                          <T>Select your prefered network: Bright Data or an
+                          external vendor?</T>
                         </Note>
                         <Nav_tabs_wrapper set_tab={this.set_tab}
                           cur_tab={this.state.cur_tab}/>
@@ -174,9 +174,9 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                     </Li>
                     <Li>
                       <Step curr_step={this.state.step} step={1}
-                        title="Configuration">
+                        title={t('Configuration')}>
                         <Note>
-                          Using this proxy with a browser or a scraper?
+                          <T>Using this proxy with a browser or a scraper?</T>
                         </Note>
                         <Nav_tabs set_tab={this.field_changed('preset')}
                           cur_tab={this.state.preset}>
@@ -191,7 +191,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                     </Li>
                     <Li>
                       <Step curr_step={this.state.step} step={2}
-                        title="Example">
+                        title={t('Example')}>
                         <Created_port
                           port={this.state.created_port}
                           lpm_token={lpm_token.split('|')[0]}
@@ -228,11 +228,11 @@ const Created_port = ({port, hostname, lpm_token})=>{
     const code = prism.highlight(to_copy, prism.languages.clike);
     return <div className="howto">
       <Note>
-        Congrats! You've created a new port: {port}.
+        <T>Congrats! You've created a new port</T>: {port}.
       </Note>
       <div>
         <Note>
-          Start using the port by running the following command:
+          <T>Start using the port by running the following command</T>:
         </Note>
         <div className="well instructions_well">
           <pre>
@@ -287,10 +287,10 @@ class Ext_proxy extends Pure_component {
     render(){
         return <div className="ext_proxy">
           <Textarea rows={6} val={this.props.ips_list}
-            placeholder={this.placeholder}
+            placeholder={t(this.placeholder)}
             on_change_wrapper={this.on_change_list}/>
           <div className="json_example">
-            <strong>Example: </strong>{this.json_example}
+            <strong><T>Example</T>: </strong>{this.json_example}
           </div>
           <div className="json_error">{this.props.parse_error}</div>
         </div>;
@@ -338,25 +338,23 @@ const Nav_tabs_wrapper = ({set_tab, cur_tab})=>
     </Nav_tabs>;
 
 const Field = props=>
-    <T>{t=>
-      <div className="field">
-        <div className="field_header">
-          <div className={classnames('icon', props.icon_class)}/>
-          <h4>{t(props.title)}:</h4>
-        </div>
-        {props.children ||
-          <Tooltip title={t(props.tooltip)}>
-            <select onChange={e=>props.on_change(e.target.value)}
-              value={props.val}>
-              {props.options.map((o, i)=>
-                <option key={i} value={o.value}>
-                  {props.i18n ? t(o.key) : o.key}
-                </option>)}
-            </select>
-          </Tooltip>
-        }
+    <div className="field">
+      <div className="field_header">
+        <div className={classnames('icon', props.icon_class)}/>
+        <h4>{t(props.title)}:</h4>
       </div>
-    }</T>;
+      {props.children ||
+        <Tooltip title={t(props.tooltip)}>
+          <select onChange={e=>props.on_change(e.target.value)}
+            value={props.val}>
+            {props.options.map((o, i)=>
+              <option key={i} value={o.value}>
+                {props.i18n ? t(o.key) : o.key}
+              </option>)}
+          </select>
+        </Tooltip>
+      }
+    </div>;
 
 const Footer = props=>{
     const btn_labels = ['Next', 'Create proxy port', 'Close'];
@@ -373,7 +371,7 @@ const Footer = props=>{
         {disabled: props.disabled});
     return <div className="footer">
       <button onClick={btn_clicked} className={classes}>
-        {btn_labels[props.step]}
+        <T>{btn_labels[props.step]}</T>
       </button>
     </div>;
 };

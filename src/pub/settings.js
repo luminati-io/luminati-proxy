@@ -13,6 +13,7 @@ import {Select_zone, Pins} from './common/controls.js';
 import Warnings_modal from './common/warnings_modal.js';
 import {Back_btn} from './proxy_edit/index.js';
 import './css/settings.less';
+import {T} from './common/i18n.js';
 
 export default function Settings(props){
     const btn_click = ()=>props.history.push({pathname: '/overview'});
@@ -20,7 +21,7 @@ export default function Settings(props){
           <div className="cp_panel">
             <div className="cp_panel_header">
               <Back_btn click={btn_click}/>
-              <h2>General settings</h2>
+              <h2><T>General settings</T></h2>
             </div>
             <Form/>
           </div>

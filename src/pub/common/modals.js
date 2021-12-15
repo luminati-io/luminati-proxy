@@ -5,6 +5,7 @@ import $ from 'jquery';
 import classnames from 'classnames';
 import etask from '../../../util/etask.js';
 import Pure_component from '/www/util/pub/pure_component.js';
+import {T} from './i18n.js';
 
 export class Modal_dialog extends Pure_component {
     componentDidMount(){
@@ -131,7 +132,7 @@ const Footer_default = props=>{
           {!props.no_cancel_btn &&
             <button onClick={props.cancel_clicked}
               className="btn btn_lpm cancel">
-              {cancel_title}
+              <T>{cancel_title}</T>
             </button>
           }
           {props.ok_href &&
@@ -141,7 +142,7 @@ const Footer_default = props=>{
           {!props.ok_href &&
             <button onClick={props.ok_clicked} className={ok_classes}
               disabled={props.ok_disabled}>
-              {ok_title}
+              <T>{ok_title}</T>
             </button>
           }
         </div>;

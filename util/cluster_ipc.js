@@ -5,8 +5,10 @@ const cluster = require('cluster');
 const etask = require('./etask.js');
 const zerr = require('./zerr.js');
 const zutil = require('./util.js');
+const zcounter = require('./zcounter.js');
 const assign = Object.assign, ef = etask.ef, E = exports;
 const VERBOSE_IPC = +process.env.VERBOSE_IPC;
+const METRICS_IPC = +process.env.METRICS_IPC;
 let current_cookie = 1;
 let handlers = {}, waiting = {}, incoming_pending = {};
 
@@ -156,6 +158,11 @@ let call = (to, name, args, sock, timeout)=>etask(function*ipc_call(){
             zerr.notice(`cluster_ipc: sending ipc_call to ${to}.${name} `
                 +`cookie ${cookie}`);
         }
+        if (METRICS_IPC)
+        {
+            zcounter.inc(`cluster_ipc.call.${to}.all`);
+            zcounter.inc(`cluster_ipc.call.${to}.${name}`);
+        }
         let msg = {type: 'ipc_call', handler: name, msg: args, cookie: cookie};
         send(to, msg, sock);
         return yield this.wait(timeout);
@@ -168,6 +175,11 @@ let call = (to, name, args, sock, timeout)=>etask(function*ipc_call(){
 let post = (to, name, args, sock)=>{
     if (VERBOSE_IPC)
         zerr.notice(`cluster_ipc: sending ipc_post to ${to}.${name}`);
+    if (METRICS_IPC)
+    {
+        zcounter.inc(`cluster_ipc.post.${to}.all`);
+        zcounter.inc(`cluster_ipc.post.${to}.${name}`);
+    }
     let msg = {type: 'ipc_post', handler: name, msg: args};
     send(to, msg, sock);
 };

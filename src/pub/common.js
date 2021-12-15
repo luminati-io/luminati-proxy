@@ -467,7 +467,7 @@ export const Preset_description = ({preset, rule_clicked})=>{
         return null;
     const desc = presets.get(preset).subtitle.replace(/ +(?= )/g, '')
         .replace(/\n /g, '\n');
-    return <div><div className="desc">{desc}</div></div>;
+    return <div><div className="desc"><T>{desc}</T></div></div>;
 };
 
 export const Ext_tooltip = with_www_api(props=>

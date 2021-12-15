@@ -447,7 +447,7 @@ export class Back_btn extends Pure_component {
         return <div className={classnames('back_wrapper', {lock})}
           onClick={this.props.click}>
           <div className="cp_icon back"/>
-          <span>Back to overview</span>
+          <span><T>Back to overview</T></span>
         </div>;
     }
 }

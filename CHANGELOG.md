@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.271.782 Development Latest
+- :star: Sync LPM language with CP current language for cloud instances
+- :bug: Added missing translation tags
+- :star: Use local server for API calls from CN
+
 ## 1.271.471 Development Latest
 - :star: Real time language updates
 

@@ -1,22 +1,35 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 import React from 'react';
+import _ from 'lodash';
 import setdb from '../../../util/setdb.js';
 
 const E = {};
 
 export const TranslationContext = React.createContext('en');
 
-const target_origins = [
-    'brightdata.com',
-    'luminati-china.biz',
-    'luminati.io',
-];
+let top_origin, notify;
+const origins = {
+    cn: 'luminati-china.biz',
+    lum: 'luminati.io',
+    rest: 'brightdata.com',
+};
+if (window != window.parent)
+{
+    if (!(top_origin = window.localStorage.getItem('cp_host'))) // dev purpose
+    {
+        const host = window.location.host;
+        if (host.includes(origins.cn))
+            top_origin = `https://${origins.cn}`;
+        else if (host.includes(origins.lum) || host.includes(origins.rest))
+            top_origin = `https://${origins.rest}`;
+    }
+    notify = !!top_origin;
+}
+const msgs = [];
 const missing_cache = {};
-let top_origin;
-let notify = true;
 const notify_missing_key = (key, lang)=>{
-    if (window == window.parent || !notify)
+    if (!notify)
         return void (missing_cache[lang][key] = 1);
     console.info('missing translation for \'%s\'', key);
     let lpm_token = setdb.get('head.settings.lpm_token');
@@ -25,29 +38,27 @@ const notify_missing_key = (key, lang)=>{
         const sp = new URLSearchParams(window.location.search);
         lpm_token = sp.get('lpm_token');
     }
-    const msg = JSON.parse(JSON.stringify({
+    msgs.push(JSON.parse(JSON.stringify({
         type: 'pmgr.i18n_missing_key',
         key,
         lang,
         path: window.location.pathname,
         token: lpm_token.split('|')[0],
-    }));
-    if (top_origin)
-        window.parent.postMessage(msg, top_origin);
-    else
-    {
-        target_origins.some(to=>{
-            try { // throws exception for invalid domain
-                window.parent.postMessage(msg, `https://${to}`);
-                top_origin = `https://${to}`;
-                return true;
-            } catch(e){}
-        });
-        if (!top_origin)
-            notify = false;
-    }
+    })));
     missing_cache[lang][key] = 1;
+    flushMessages();
 };
+
+let flushInterval = null;
+const flushMessages = _.debounce(()=>{
+    clearInterval(flushInterval);
+    let msg;
+    flushInterval = setInterval(()=>{
+        if (!(msg = msgs.pop()))
+            return clearInterval(flushInterval);
+        window.parent.postMessage(msg, top_origin);
+    }, 100);
+}, 250);
 
 export const t = (key, translation)=>{
     const curr_lang = get_curr_lang();

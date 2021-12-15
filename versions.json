@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.271.782",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Sync LPM language with CP current language for cloud instances"
+            },
+            {
+                "type": "bug",
+                "text": "Added missing translation tags"
+            },
+            {
+                "type": "star",
+                "text": "Use local server for API calls from CN"
+            }
+        ]
+    },
+    {
         "ver": "1.271.471",
         "type": "dev",
         "changes": [
