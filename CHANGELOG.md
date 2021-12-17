@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.272.43 Stable
+- :star: API domain fallback for CN
+
 ## 1.271.782 Development Latest
 - :star: Sync LPM language with CP current language for cloud instances
 - :bug: Added missing translation tags
