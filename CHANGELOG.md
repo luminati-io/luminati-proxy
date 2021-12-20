@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.272.573 Stable
+- :star: Preserve request headers order in HAR log
+
 ## 1.272.43 Stable
 - :star: API domain fallback for CN
 
