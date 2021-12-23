@@ -14,6 +14,7 @@ const origins = {
     lum: 'luminati.io',
     rest: 'brightdata.com',
 };
+const except_paths = ['/whitelist_ips'];
 if (window != window.parent)
 {
     if (!(top_origin = window.localStorage.getItem('cp_host'))) // dev purpose
@@ -100,9 +101,11 @@ export const set_curr_lang = lang=>{
     window.localStorage.setItem('lang', lang);
     setdb.set('i18n.curr_lang', lang);
 };
+export const is_except_path = path=>except_paths.includes(path);
 E.get_translations = get_translations;
 E.get_curr_lang = get_curr_lang;
 E.set_curr_lang = set_curr_lang;
+E.is_except_path = is_except_path;
 
 // so all customers before the lang code change
 // transit without loss of the lang setting

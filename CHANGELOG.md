@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.273.170 Stable
+- :bug: Fix lpm UI doesnt show Forbidden page if IP is not whitelisted
+- :star: Fix Readme
+
 ## 1.272.573 Stable
 - :star: Preserve request headers order in HAR log
 

@@ -559,7 +559,7 @@ class Client extends WS {
             }
         }
         if (this.zc)
-            zcounter.set_level(`${this.zc}_fallback`, url==this.url ? 0 : 1);
+            zcounter.inc(`${this.zc}_fallback`, url==this.url ? 0 : 1);
         zerr.notice(`${this}: connecting to ${url}`);
         this._assign(new this.impl(url, undefined, opt));
         if (this.handshake_timeout)
@@ -1126,7 +1126,6 @@ class Mux {
                 next_tick(cb, err);
             }
         }, opt));
-        let _stacktrace = (new Error()).stack;
         stream.create_ts = Date.now();
         stream.prependListener('data', function(chunk){
             this.last_use_ts = Date.now();
@@ -1140,10 +1139,8 @@ class Mux {
             // instead of processing data return error, this will close socket
             // and emit error on request object
             const {parsers} = require('_http_common');
-            zcounter.inc(`mux_no_parser`);
             zerr('\n--- assert failed, socketinfo:\n'+
                 `DEBUG HEADER: ${this._httpMessage._header}\n`+
-                `DEBUG mux.open(): ${_stacktrace}\n`+
                 `DEBUG WS: ${_this.ws.remote_addr}:${_this.ws.remote_port}`);
             const old_parser = this.parser;
             const parser = this.parser = parsers.alloc();
@@ -1245,11 +1242,8 @@ class Mux {
         // XXX vladislavl: support legacy version for peer side old mux streams
         // remove once no events
         stream.allow = size=>{
-            if (stream.win_size_got)
-                return;
-            stream.win_size = size||Infinity;
-            if (!size && _this.ws.zc)
-                zcounter.inc('mux_legacy_allow_call');
+            if (!stream.win_size_got)
+                stream.win_size = size||Infinity;
         };
         stream.process_data = data=>{
             let bytes = Math.min(stream.win_size-(stream.sent-stream.ack),
@@ -1325,11 +1319,8 @@ class Mux {
             // instead of processing data return error, this will close socket
             // and emit error on request object
             const {parsers} = require('_http_common');
-            const _stacktrace = (new Error()).stack;
-            zcounter.inc(`mux_ack_no_parser`);
             zerr('\n--- assert failed, socketinfo:\n'+
                 `DEBUG HEADER: ${this._httpMessage._header}\n`+
-                `DEBUG mux.open(): ${_stacktrace}\n`+
                 `DEBUG WS: ${_this.ws.remote_addr}:${_this.ws.remote_port}`);
             const old_parser = this.parser;
             const parser = this.parser = parsers.alloc();
@@ -1420,13 +1411,13 @@ class Mux {
                 zerr.info(`${this.ws}: vfd ${vfd} closed`);
             let zc = this.ws.zc;
             if (zc)
-                zcounter.inc_level(`level_${zc}_mux_ack_vfd`, -1, 'sum');
+                zcounter.inc_level(`level_${zc}_mux`, -1, 'sum');
         });
         this.streams.set(vfd, stream);
         if (zerr.is.info())
             zerr.info(`${this.ws}: vfd ${vfd} open`);
         if (this.ws.zc)
-            zcounter.inc_level(`level_${this.ws.zc}_mux_ack_vfd`, 1, 'sum');
+            zcounter.inc_level(`level_${this.ws.zc}_mux`, 1, 'sum');
         return stream;
     }
     close(vfd){

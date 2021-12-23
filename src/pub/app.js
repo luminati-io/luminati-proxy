@@ -29,7 +29,7 @@ import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
 import {report_exception} from './util.js';
 import {createGlobalStyle} from 'styled-components';
-import i18n, {TranslationContext} from './common/i18n.js';
+import i18n, {TranslationContext, is_except_path} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
 
@@ -194,7 +194,7 @@ const App = withRouter(class App extends Pure_component {
     };
     render(){
       const {i18n_loaded, curr_lang} = this.state;
-      if (!i18n_loaded)
+      if (!i18n_loaded && !is_except_path(this.props.location.pathname))
           return null;
       return <TranslationContext.Provider value={curr_lang}>
         <div className="page_wrapper">

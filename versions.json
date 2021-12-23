@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.273.170",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix lpm UI doesnt show Forbidden page if IP is not whitelisted"
+            },
+            {
+                "type": "star",
+                "text": "Fix Readme"
+            }
+        ]
+    },
+    {
         "ver": "1.272.573",
         "type": "stable",
         "changes": [
