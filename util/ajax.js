@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
@@ -55,7 +55,7 @@ E.send = function(opt){
         var _this = this;
         xhr.done(function(v){
             if (opt.restore_dates && v && typeof v=='object')
-                restore_dates(v);
+                E.restore_dates(v);
             _this.continue(v);
         });
         xhr.fail(function(_xhr, status_text, err){
@@ -86,7 +86,7 @@ E.send = function(opt){
             E.events.emit('unhandledException', this, xhr);
         var xhr_data = get_res_data(xhr);
         if (opt.restore_dates && xhr_data && typeof xhr_data=='object')
-            restore_dates(xhr_data);
+            E.restore_dates(xhr_data);
         if (opt.no_throw)
         {
             return {
@@ -135,17 +135,17 @@ E.send = function(opt){
 E.abort = function(aj){ aj.goto('abort'); };
 
 ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(m){
-    E[m.toLowerCase()] = function(url, opt){
+    E[m.toLowerCase()] = function(url, params, opt){
         url = typeof url=='string' ? {url: url} : url;
-        opt = assign({method: m, json: 1}, url, opt);
-        if (!{get: 1, delete: 1}[opt.method.toLowerCase()]
-            && opt.data!=null && typeof opt.data!='string')
+        var send_opt = assign({method: m, json: 1}, url, params, opt);
+        if (!{get: 1, delete: 1}[send_opt.method.toLowerCase()]
+            && send_opt.data!=null && typeof send_opt.data!='string')
         {
-            opt.content_type = opt.content_type||'application/json';
-            if (opt.content_type.startsWith('application/json'))
-                opt.data = JSON.stringify(opt.data);
+            send_opt.content_type = send_opt.content_type||'application/json';
+            if (send_opt.content_type.startsWith('application/json'))
+                send_opt.data = JSON.stringify(send_opt.data);
         }
-        return E.send(opt);
+        return E.send(send_opt);
     };
 });
 
@@ -169,7 +169,7 @@ function get_res_data(xhr){
     return xhr.responseText||'';
 }
 
-function restore_dates(data){
+E.restore_dates = function(data){
     if (!data || typeof data!='object')
         return;
     var stack = new Array(100), len = 0;
@@ -195,7 +195,7 @@ function restore_dates(data){
             }
         }
     }
-}
+};
 var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;
 
 return E; }); }());

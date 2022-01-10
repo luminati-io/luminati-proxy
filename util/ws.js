@@ -1418,6 +1418,15 @@ class Mux {
             zerr.info(`${this.ws}: vfd ${vfd} open`);
         if (this.ws.zc)
             zcounter.inc_level(`level_${this.ws.zc}_mux`, 1, 'sum');
+        if (opt.compress || opt.decompress)
+        {
+            const {SnappyStream, UnsnappyStream} = require('snappystream');
+            const snappy_s = opt.compress ? new SnappyStream() :
+                new UnsnappyStream();
+            stream.pipe(snappy_s).pipe(stream);
+            snappy_s.once('close', ()=>this.ws.mux.close(vfd));
+            return snappy_s;
+        }
         return stream;
     }
     close(vfd){

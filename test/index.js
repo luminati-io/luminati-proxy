@@ -285,14 +285,14 @@ describe('proxy', ()=>{
                 l = yield lum({pool_size: 3});
                 const res = yield l.test({headers: {
                     'proxy-authorization': 'Basic '+
-                        Buffer.from('lum-customer-user-zone-zzz:pass')
+                        Buffer.from('lum-customer-abc-zone-static:xyz')
                         .toString('base64'),
                 }});
                 assert.ok(!l.sessions);
                 assert.equal(proxy.history.length, 1);
-                assert.equal(res.body.auth.customer, 'user');
-                assert.equal(res.body.auth.password, 'pass');
-                assert.equal(res.body.auth.zone, 'zzz');
+                assert.equal(res.body.auth.customer, 'abc');
+                assert.equal(res.body.auth.password, 'xyz');
+                assert.equal(res.body.auth.zone, 'static');
             }));
         });
         describe('password is optional', ()=>{
@@ -740,7 +740,7 @@ describe('proxy', ()=>{
             it('lum_user_hide_headers', ()=>etask(function*(){
                 l = yield lum(opts);
                 const auth = 'Basic '+Buffer
-                    .from('lum-customer-c_xx-zone-z1:t2').toString('base64');
+                .from('lum-customer-abc-zone-static:t2').toString('base64');
                 let r = yield l.test({headers: {'proxy-authorization': auth}});
                 assert.equal(r.statusCode, 200);
                 debug_headers.forEach(hdr=>assert.ok(!r.headers[hdr]));
@@ -1157,28 +1157,6 @@ describe('proxy', ()=>{
                     assert.equal(usage_start_counter, 1);
                     assert.equal(usage_counter, 1);
                     assert.equal(usage_abort_counter, 0);
-                }));
-                it('should not use auth headers after retrying',
-                ()=>etask(function*(){
-                    l = yield lum({rules: [get_retry_rule()]});
-                    const l2 = yield lum({port: 24001});
-                    l.on('retry', opt=>{
-                        l2.lpm_request(opt.req, opt.res, opt.head, opt.post);
-                    });
-                    const cred_spies = [l, l2].map(make_cred_spy);
-                    const proxy_auth_hdr = 'Basic '+
-                        Buffer.from('lum-customer-user-zone-zzz:pass')
-                        .toString('base64');
-                    yield l.test({
-                        no_usage: 1,
-                        headers: {'proxy-authorization': proxy_auth_hdr},
-                    });
-                    l2.stop(true);
-                    const [u1, u2] = cred_spies.map(get_username);
-                    assert.equal(u1,
-                        'lum-customer-user-zone-zzz-session-24000_0');
-                    assert.equal(u2,
-                        'lum-customer-abc-zone-static-session-24001_0');
                 }));
             });
             describe('retry_port combined with unblocker', ()=>{

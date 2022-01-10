@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.275.824 Stable
+- :bug: Pin colors@1.4.0
+
 ## 1.273.170 Stable
 - :bug: Fix lpm UI doesnt show Forbidden page if IP is not whitelisted
 - :star: Fix Readme

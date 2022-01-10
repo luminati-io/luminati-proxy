@@ -1258,8 +1258,8 @@ var extend_regions = function(regions){
     }
     regions.push('All');
 };
-for (var country in E.regions)
-    extend_regions(E.regions[country]);
+for (var region_country in E.regions)
+    extend_regions(E.regions[region_country]);
 
 E.unallowed_list = {
     SY: 1,
@@ -2626,8 +2626,8 @@ E.code2timezone = function(code){
     return E.timezone[code] || code;
 };
 
-E.state_code2timezone = function(_country, state){
-    if (_country!='US')
+E.state_code2timezone = function(ts_country, state){
+    if (ts_country!='US')
         return;
     state = state.toUpperCase();
     return E.us_states_timezone[state];
@@ -2685,13 +2685,17 @@ E.gl2uule = function(gl){
 };
 
 var uule_to_gl_map = {};
-Object.entries(E.google_list).forEach(function(entry){
-    return uule_to_gl_map[entry[1]] = entry[0];
-});
+for (var gl_code in E.google_list)
+{
+    gl_code = E.www2code(gl_code);
+    var uule_country = E.google_list[gl_code].toLowerCase();
+    uule_to_gl_map[uule_country] = gl_code;
+}
 E.uule2gl = function(uule){
-    if (uule =='Macedonia')
+    uule = uule.toLowerCase();
+    if (uule=='macedonia')
         return 'MK';
-    return E.code2www(uule_to_gl_map[uule]);
+    return E.www2code(uule_to_gl_map[uule]);
 };
 
 var terr_country = {
@@ -2700,7 +2704,7 @@ var terr_country = {
     +'MP GU MH PG UM AU TL SB FM',
     east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
     +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
-    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY',
+    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB',
     east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
     +'MK AL AZ KG BA UZ SD BI XK SM',
     in: 'IN BD LK RE MV',

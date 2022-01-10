@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, node_ios, be_ff*/
+'use strict'; /*jslint node:true, browser:true*/
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
     (typeof navigator=='object' && navigator.product=='ReactNative');

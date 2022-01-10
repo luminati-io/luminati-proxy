@@ -107,7 +107,7 @@ function char_count(str, char){
 }
 
 function hostname_lookup(haystack, v){
-    return typeof haystack=='object' && zurl.host_lookup(haystack, v);
+    return v && typeof haystack=='object' && zurl.host_lookup(haystack, v);
 }
 
 E.t = {unify_hostnames};

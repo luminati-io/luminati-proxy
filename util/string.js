@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
@@ -36,13 +36,9 @@ E.split_crlf = function(s){
 E.split_nl = function(s){
     return E.rm_empty_last(s.split('\n')); };
 E.to_array_buffer = function(s){
-    var buf = new ArrayBuffer(s.length), buf_view = new Uint8Array(buf), i;
-    for (i=0; i<s.length; i++)
-        buf_view[i] = s.charCodeAt(i);
-    return buf;
-};
-E.from_array_buffer = function(buf){
-    return String.fromCharCode.apply(null, new Uint8Array(buf)); };
+    return (new TextEncoder()).encode(s).buffer; };
+E.from_array_buffer = function(buf, enc){
+    return (new TextDecoder(enc||'utf8')).decode(buf); };
 E.capitalize = function(s){
     s = ''+s;
     return (s[0]||'').toUpperCase()+s.slice(1);

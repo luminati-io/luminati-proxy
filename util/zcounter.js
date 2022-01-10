@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON
-'use strict'; /*zlint node*/
+'use strict'; /*jslint node:true*/
 require('./config.js');
 const cluster = require('cluster');
 const cluster_ipc = require('./cluster_ipc.js');

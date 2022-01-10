@@ -15,6 +15,7 @@ const assign = Object.assign, ef = etask.ef;
 const E = exports;
 E.dry_run = false;
 E.opt = {};
+E.ext_opt = {verbose: true};
 const L = E.L = {
     require: function(name, lib){
         this.__defineGetter__(name, function(){
@@ -64,7 +65,7 @@ E.getopt = function(args, usage, commands, lock_key){
         return;
     if (find_opt('h', args)<0)
         args.push(['h', 'help', 'show usage']);
-    if (find_opt('v', args)<0)
+    if (E.ext_opt.verbose && find_opt('v', args)<0)
         args.push(['v', 'verbose+', 'verbose output (-vv* to control level)']);
     guess_dryrun(args);
     if (commands)

@@ -133,7 +133,6 @@ export default class General extends Pure_component {
         const bw_limit_str = get_bw_limit_str(form.bw_limit);
         const bw_limit_prefix = zagent && bw_limit_str ?
             <span className="bw_limit_str"><T>{bw_limit_str}</T></span> : null;
-        console.log(bw_limit_prefix);
         const note_bw_limit = form.bw_limit ?
             <a className="link" onClick={this.open_bw_limit_modal}>
                 <T>Set limit</T>

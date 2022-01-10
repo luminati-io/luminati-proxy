@@ -49,6 +49,7 @@
     "productName": "Proxy Manager"
   },
   "dependencies": {
+    "colors": "1.4.0",
     "body-parser": "1.19.0",
     "check-node-version": "4.0.1",
     "electron-updater": "4.3.1",
@@ -107,7 +108,7 @@
     "lum_crontab": "1.0.0",
     "js-cookie": "2.2.1",
     "styled-components": "5.2.1",
-    "cli-progress": "3.4.0"
+    "cli-progress": "3.10.0"
   },
   "description": "A configurable local proxy for brightdata.com",
   "devDependencies": {
@@ -397,7 +398,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "a6eec0f8c485d9d3e885e9b5a28f6919"
+    "md5": "8e2875da8c876760e9ba2164b4ae8f3d"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -429,5 +430,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.273.170"
+  "version": "1.275.824"
 }

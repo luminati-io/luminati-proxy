@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.275.824",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Pin colors@1.4.0"
+            }
+        ]
+    },
+    {
         "ver": "1.273.170",
         "type": "stable",
         "changes": [

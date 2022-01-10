@@ -90,7 +90,14 @@ E.proxy_fields = {
     resolution: {type: 'string', desc: 'Browser screen size'},
     webrtc: {type: 'string', desc: 'WebRTC plugin behavior in the browser'},
     bw_limit: {type: 'object', desc: 'BW limit params',
-        params: {days: {type: 'integer'}, bytes: {type: 'integer'}}},
+        params: {
+            days: {type: 'integer'},
+            bytes: {type: 'integer'},
+            renewable: {type: 'boolean', desc: 'Renew limit of bytes each '
+                +'period or use single period and stop usage once last day '
+                +'of period is reached. Default is true'}
+        }
+    },
 };
 
 E.manager_fields = {
