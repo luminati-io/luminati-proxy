@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.277.863 Stable
+- :star: Use random session id for rotating IPs
+
 ## 1.275.824 Stable
 - :bug: Pin colors@1.4.0
 

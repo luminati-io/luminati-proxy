@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.275.824"
+VERSION="1.277.863"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -435,7 +435,7 @@ install_nave()
     perr "install_nave"
     run_cmd "mkdir -p ~/.nave"
     local nave_path="$HOME/.nave/nave.sh"
-    download_script "http://github.com/isaacs/nave/raw/master/nave.sh" \
+    download_script "http://github.com/isaacs/nave/raw/main/nave.sh" \
         "$nave_path"
     run_cmd "chmod +x $nave_path"
     sudo_cmd "ln -s $nave_path /usr/local/bin/nave"

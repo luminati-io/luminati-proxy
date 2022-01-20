@@ -1577,4 +1577,32 @@ E.shutdown = function(){
     }
 };
 
+E.race = function(ets){
+    return etask(function race(){
+        if (!Array.isArray(ets))
+            zerr.zexit('provided argument is not an array');
+        if (!ets.length)
+            return;
+        var race_et = etask.wait();
+        var _this = this;
+        var _race = etask([
+            function(){
+                return E.for_each(ets, function(){
+                    var et = this.iter.val;
+                    _this.spawn(etask([
+                        function(){
+                            this.on('uncaught', race_et.throw_fn());
+                            return et;
+                        },
+                        function(res){ race_et.continue(res); },
+                    ]));
+                });
+            },
+            function(){ return race_et; },
+        ]);
+        _race.finally(function(){ _this.return_child(); });
+        return _race;
+    });
+};
+
 return Etask; }); }());

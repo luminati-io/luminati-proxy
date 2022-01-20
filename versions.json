@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.277.863",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Use random session id for rotating IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.275.824",
         "type": "stable",
         "changes": [

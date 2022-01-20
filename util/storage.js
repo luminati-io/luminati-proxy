@@ -54,7 +54,7 @@ E.set = function(key, val){
 };
 
 E.set_auto = function(key, val){
-    if (val==null)
+    if (val==null || val==='')
         return storage.removeItem(key);
     var str_val;
     if (typeof val=='string')
