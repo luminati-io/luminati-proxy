@@ -1249,7 +1249,26 @@ var supraregions = {
     'Northern Africa': ['Africa'],
     'Middle Africa': ['Africa'],
 };
-var extend_regions = function(regions){
+E.country_terr = {};
+var terr_country = {
+    apac_rest: 'VN SG JP MY KR AU TH ID NP PH AE PK NZ TW SA KW BN AF CX KH '
+    +'IR MM IQ YE OM LA MN PF BH KP NU NC BT VU WS FJ AQ CK CC KI PW TJ TM '
+    +'MP GU MH PG UM AU TL SB FM',
+    east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
+    +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
+    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB',
+    east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
+    +'MK AL AZ KG BA UZ SD BI XK SM',
+    in: 'IN BD LK RE MV',
+    uk_ie_dach: 'DE AT CH UK GB IE IM',
+    west_europe: 'FR ES NL IT PT BE AD MT MC MA LU TN DZ GI LI SE DK FI NO AX '
+    +'IS GG JE EU GL VA FX',
+};
+Object.entries(terr_country).forEach(function(ct){
+    ct[1].split(' ').forEach(function(c){ E.country_terr[c] = ct[0]; });
+});
+
+var extend_regions = function(regions, country_code){
     for (var i = 0; i<regions.length; i++)
     {
         (supraregions[regions[i]]||[])
@@ -1257,9 +1276,11 @@ var extend_regions = function(regions){
         .forEach(function(extra){ regions.push(extra); });
     }
     regions.push('All');
+    if (regions.includes('China')||E.country_terr[country_code]=='east_europe')
+        regions.push('China_ee');
 };
 for (var region_country in E.regions)
-    extend_regions(E.regions[region_country]);
+    extend_regions(E.regions[region_country], region_country);
 
 E.unallowed_list = {
     SY: 1,
@@ -2697,25 +2718,6 @@ E.uule2gl = function(uule){
         return 'MK';
     return E.www2code(uule_to_gl_map[uule]);
 };
-
-var terr_country = {
-    apac_rest: 'VN SG JP MY KR AU TH ID NP PH AE PK NZ TW SA KW BN AF CX KH '
-    +'IR MM IQ YE OM LA MN PF BH KP NU NC BT VU WS FJ AQ CK CC KI PW TJ TM '
-    +'MP GU MH PG UM AU TL SB FM',
-    east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
-    +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
-    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB',
-    east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
-    +'MK AL AZ KG BA UZ SD BI XK SM',
-    in: 'IN BD LK RE MV',
-    uk_ie_dach: 'DE AT CH UK GB IE IM',
-    west_europe: 'FR ES NL IT PT BE AD MT MC MA LU TN DZ GI LI SE DK FI NO AX '
-    +'IS GG JE EU GL VA FX',
-};
-E.country_terr = {};
-Object.entries(terr_country).forEach(function(ct){
-    ct[1].split(' ').forEach(function(c){ E.country_terr[c] = ct[0]; });
-});
 
 var gs1_countries_rlist = {};
 Object.entries(gs1_countries_list).forEach(function(entry){

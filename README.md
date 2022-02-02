@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.277.863/luminati-proxy-manager-v1.277.863-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.280.385/luminati-proxy-manager-v1.280.385-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -253,6 +253,7 @@ Options:
   --api                         Alternative url to luminati API         [string]
   --api_domain                  Alternative domain url to luminati API
                                                [string] [default: "lum-lpm.com"]
+  --pmgr_domain                 Alternative domain url to Proxy Manager [string]
   --local_login                 Requires each browser to authenticate against
                                 Proxy Manager         [boolean] [default: false]
   --read_only                   Avoid saving current config in the config file

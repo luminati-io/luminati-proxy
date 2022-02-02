@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.280.385 Stable
+- :star: Add render option for unblocker and serp zones
+
 ## 1.277.863 Stable
 - :star: Use random session id for rotating IPs
 

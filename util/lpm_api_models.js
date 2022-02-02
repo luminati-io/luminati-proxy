@@ -144,6 +144,8 @@ E.manager_fields = {
     api: {type: 'string', desc: 'Alternative url to luminati API'},
     api_domain: {type: 'string', desc: 'Alternative domain url to luminati '
         +'API'},
+    pmgr_domain: {type: 'string', desc: 'Alternative domain url to Proxy '
+        +'Manager'},
     local_login: {type: 'boolean', desc: 'Requires each browser to '
         +'authenticate against Proxy Manager'},
     read_only: {type: 'boolean', desc: 'Avoid saving current config in the '

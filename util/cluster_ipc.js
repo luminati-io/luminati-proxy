@@ -53,8 +53,11 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
     let response = {cookie: msg.cookie, handler: msg.handler};
     if (handler_error)
     {
-        assign(response, {type: 'ipc_error',
-            msg: handler_error.message || String(handler_error)});
+        assign(response, {
+            type: 'ipc_error',
+            msg: handler_error.message || String(handler_error),
+            code: handler_error.code,
+        });
     }
     else
         assign(response, {type: 'ipc_result', msg: value});
@@ -92,7 +95,7 @@ let on_response = (sender, msg)=>{
     if (msg.type=='ipc_result')
         handler.continue(msg.msg);
     if (msg.type=='ipc_error')
-        handler.throw(new Error(msg.msg));
+        handler.throw(assign(new Error(msg.msg), {code: msg.code}));
 };
 
 let worker_fail_fn = (worker, ev)=>(...arg)=>{

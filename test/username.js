@@ -81,6 +81,10 @@ describe('username', ()=>{
                 {unblocker: undefined}, 'lum');
             t('should set unblocker when is true', {unblocker: true},
                 'lum-unblocker');
+            t('should set render if unblocker is true', {unblocker: true,
+                render: true}, 'lum-unblocker-render');
+            t('should not set render if unblocker is false', {render: true},
+                'lum');
         });
         describe('state', ()=>{
             const t = (name, opt, expected)=>it(name, ()=>{

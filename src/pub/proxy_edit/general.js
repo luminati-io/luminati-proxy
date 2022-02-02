@@ -26,6 +26,8 @@ const tls_lib_opt = [
     {key: 'BoringSSL', value: 'flex_tls'},
 ];
 
+const render_zones = ['unblocker', 'serp'];
+
 const Limit_zagent_note = with_www_api(({www_api})=>{
     const path = '/cp/lpm';
     const href = www_api+path;
@@ -39,6 +41,16 @@ const Limit_zagent_note = with_www_api(({www_api})=>{
       </Note>
     }</T>;
 });
+
+const Limit_zone_note = ({zones})=>{
+  return <T>{t=>
+    <Note>
+      <span>
+          {t(`This option is available only for ${zones.join(' or ')} zone`)}
+      </span>
+    </Note>
+  }</T>;
+};
 
 export default class General extends Pure_component {
     state = {defaults: {}};
@@ -104,6 +116,7 @@ export default class General extends Pure_component {
         const {zagent} = this.state.settings;
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
+        const is_render_plan = curr_plan.type=='unblocker' || !!curr_plan.serp;
         let type;
         if (curr_plan && (curr_plan.type||'').startsWith('static'))
             type = 'ips';
@@ -214,6 +227,12 @@ export default class General extends Pure_component {
               disabled={!zagent}
               note={!zagent && <Limit_zagent_note/> || note_bw_limit}
               skip_save={true}
+            />
+            <Config
+              type="yes_no"
+              id="render"
+              disabled={!is_render_plan}
+              note={!is_render_plan && <Limit_zone_note zones={render_zones}/>}
             />
           </Tab_context.Provider>
         </div>;

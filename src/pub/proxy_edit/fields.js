@@ -334,6 +334,11 @@ export const tabs = {
                 label: 'BW limit',
                 tooltip: `Enable bandwidth limit per day(s)`,
             },
+            render: {
+                label: 'Render',
+                tooltip: 'Add -render- flag to the request, to process'
+                    +' scripts from HTML pages',
+            }
         },
     },
 };

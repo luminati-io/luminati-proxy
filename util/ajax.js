@@ -82,6 +82,8 @@ E.send = function(opt){
             E.events.emit('timeout', this);
         if (xhr.status==403)
             E.events.emit('unauthorized', this, xhr);
+        if (xhr.status==406)
+            E.events.emit('maintenance', this, xhr);
         if (xhr.status==500)
             E.events.emit('unhandledException', this, xhr);
         var xhr_data = get_res_data(xhr);
