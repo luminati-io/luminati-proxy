@@ -693,4 +693,50 @@ E.timezone_offset = function(tz, dt){
     return offset/ms.MIN;
 };
 
+E.min = function(v1, v2){
+    var min;
+    for (var i=0; i<arguments.length; i++)
+    {
+        var v = arguments[i];
+        if (!E.is_date_like(v))
+            continue;
+        v = date_get(v);
+        if (min==null || v<min)
+            min = v;
+    }
+    return min;
+};
+
+E.max = function(v1, v2){
+    var max;
+    for (var i=0; i<arguments.length; i++)
+    {
+        var v = arguments[i];
+        if (!E.is_date_like(v))
+            continue;
+        v = date_get(v);
+        if (max==null || v>max)
+            max = v;
+    }
+    return max;
+};
+
+E.is_date_like = function(v){
+    if (v instanceof Date)
+        return true;
+    if (Number.isFinite(v))
+        return true;
+    if (typeof v=='string')
+    {
+        return date_like_regexes.some(function(re){ return re.test(v); })
+            && Number.isFinite(Date.parse(v));
+    }
+    return false;
+};
+var date_like_regexes = [
+    /^\d{2}(\d{2})?[ /-](\d{2}|[a-z]{3,10})[ /-]\d{2}/i, // yy(yy)?-mm-dd
+    /^\d{2}[ /-](\d{2}|[a-z]{3,10})[ /-]\d{2}(\d{2})?/i, // dd-mm-yy(yy)?
+    /^(\d{2}|[a-z]{3,10})[ /-]\d{2}[ /-]\d{2}(\d{2})?/i, // mm-dd-yy(yy)?
+];
+
 return E; }); }());

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.282.255",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add nodejs version check"
+            }
+        ]
+    },
+    {
         "ver": "1.280.385",
         "type": "stable",
         "changes": [

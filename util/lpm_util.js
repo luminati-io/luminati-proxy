@@ -2,6 +2,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const yargs = require('yargs');
+const semver = require('semver');
 const pkg = require('../package.json');
 const perr = require('../lib/perr.js');
 const lpm_config = require('./lpm_config.js');
@@ -105,4 +106,14 @@ E.init_args = args=>{
     }, {});
     perr.enabled = !argv.no_usage_stats;
     return argv;
+};
+
+E.check_node_version = ()=>{
+    let anv = process.versions.node;
+    let {min_node: cmn, max_node: cmx} = lpm_config;
+    let valid = semver.satisfies(anv, `${cmn} - ${cmx}`);
+    let msg = 'Your nodejs version does not match the requirements.'
+        +`\nMin: ${cmn}, Max: ${cmx}, Actual: ${anv}. Proxy Manager may`
+        +' work unstable.';
+    return !valid ? msg : null;
 };

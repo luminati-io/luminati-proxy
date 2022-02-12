@@ -2348,6 +2348,7 @@ E.bing_list = {
     'en-tj': 'Tajikistan',
     'en-tz': 'Tanzania',
     'th-th': 'Thailand',
+    'pt-tl': 'Timor-Leste',
     'fr-tg': 'Togo',
     'en-tk': 'Tokelau',
     'en-to': 'Tonga',

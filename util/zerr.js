@@ -137,12 +137,17 @@ E.perr_install = function(install_fn){
 function err_has_stack(err){ return err instanceof Error && err.stack; }
 
 E.e2s = function(err){
+    var str;
     if (!is_node && err_has_stack(err))
     {
         var e_str = ''+err, e_stack = ''+err.stack;
-        return e_stack.startsWith(e_str) ? e_stack : e_str+' '+e_stack;
+        str = e_stack.startsWith(e_str) ? e_stack : e_str+' '+e_stack;
     }
-    return err_has_stack(err) ? ''+err.stack : ''+err;
+    else
+        str = err_has_stack(err) ? ''+err.stack : ''+err;
+    if (err && err.code)
+        str = '[code='+err.code+'] '+str;
+    return str;
 };
 
 E.on_exception = undefined;

@@ -11,6 +11,8 @@ const conf = {
     is_lum: undefined,
     daemon_name: 'luminati_proxy_manager',
     work_dir: '',
+    min_node: '12.18.3',
+    max_node: '14.18.1',
     is_electron: process.versions && !!process.versions.electron,
     proxy_fields: Object.assign({}, lpm_api_models.proxy_fields,
         lpm_api_models.manager_fields),

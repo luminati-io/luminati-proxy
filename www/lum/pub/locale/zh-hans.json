@@ -1802,6 +1802,15 @@
   "While using the Bright Data Proxy means an additional hop (ie. 3 hops) per request, it also means having the ability to run unlimited concurrent sessions with an exceptionally high success rate, which nullifies the effect of the additional hop.": "虽然使用Bright Data代理网络就意味着给每个请求增加额外的跃点，但同时也意味它有能力运行无数个并发会话，而且成功率极高，这样一来，这个额外的跃点的作用就会失效。",
   "What is the maximal rate (hits per minute) at which requests can be sent through the network?": "请求通过网络发送出去的最大速率是多少？",
   "There are no limitations. We have customers who send more than 20 million requests per day.": "没有限制。我们有些客户一天能发送2000多万个请求。",
+
+  "Browse Chinese sites by using Chinese residential IPs": "使用中国住宅 IP 浏览中国网站",
+  "If you are outside China,":"如果您位于中国境外,",
+  "and you are using residential Chinese peers to target Chinese sites, no special settings are required": "使用来自中国的住宅IP访问中国网站时，不需要特殊设置。",
+  "If you are inside China,": "如果您位于中国境内,",
+  "and you are using residential Chinese peers to target Chinese sites, you must use our Chinese Super Proxy": "使用来自中国的住宅IP访问中国网站时，则必须通过我们的中国超级代理，设置如下:",
+
+
+
   "Is crawling an acceptable use case?": "爬虫这一行为能被接受吗？",
   "We allow you to use our service, provided you are using it for legal and legitimate uses and in compliance with our": "我们允许您使用我们的服务，只要您用于正当用途并遵照我们的",
   "license agreement": "许可协议",

@@ -19,6 +19,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const logger = require('../lib/logger.js').child({category: 'lum_node'});
+let version_msg = null;
 
 E.shutdown = (reason, error=null)=>{
     if (E.shutdowning)
@@ -203,6 +204,8 @@ E.uninit = ()=>{
 E.init_cmd();
 if (!process.env.LUM_MAIN_CHILD)
 {
+    if (version_msg = lpm_util.check_node_version())
+        logger.error(version_msg);
     const argv = lpm_util.init_args();
     E.init(argv);
     E.run(argv);

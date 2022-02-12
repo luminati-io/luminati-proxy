@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.282.255 Stable
+- :star: Add nodejs version check
+
 ## 1.280.385 Stable
 - :star: Add render option for unblocker and serp zones
 
