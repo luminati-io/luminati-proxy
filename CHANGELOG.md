@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.283.18 Stable
+- :bug: Fix can't get property 'plan' of undefined error
+
 ## 1.282.255 Stable
 - :star: Add nodejs version check
 

@@ -126,10 +126,12 @@ class WS extends events.EventEmitter {
             });
         }
         this.mux = opt.mux ? new Mux(this) : undefined;
+        if (this.mux)
+            this.mux.no_mask = opt.no_mask;
         if (this.zc && !zcounter)
             zcounter = require('./zcounter.js');
     }
-    send(msg){
+    send(msg, opt){
         if (zerr.is.debug())
         {
             zerr.debug(typeof msg=='string'
@@ -151,7 +153,7 @@ class WS extends events.EventEmitter {
             return false;
         }
         this._update_idle();
-        this.ws.send(msg);
+        this.ws.send(msg, opt);
         if (this.zc_tx)
         {
             zcounter.inc(`${this.zc}_tx_msg`);
@@ -300,6 +302,8 @@ class WS extends events.EventEmitter {
         this.emit('unexpected-response');
     }
     _on_upgrade(resp){
+        if (this.mux)
+            this.mux.no_mask = resp && resp.headers && resp.headers['no-mask'];
         zerr.notice(`${this}: upgrade conn`);
     }
     _on_message(event){
@@ -659,12 +663,15 @@ class Server {
         if (opt.verify)
             ws_opt.verifyClient = opt.verify;
         this.ws_server = new (server_impl(opt))(ws_opt);
+        // XXX igors: test feature to rm mask from Mux buffers
+        this.no_mask = opt.no_mask;
         this.opt = opt;
         this.label = opt.label;
         this.connections = new Set();
         if (opt.zcounter!=false)
             this.zc = opt.label ? `${opt.label}_ws` : 'ws';
         this.ws_server.addListener('connection', this.accept.bind(this));
+        this.ws_server.addListener('headers', this.on_headers.bind(this));
         if (opt.port)
             zerr.notice(`${this}: listening on port ${opt.port}`);
         if (!zcounter)
@@ -677,6 +684,10 @@ class Server {
     upgrade(req, socket, head){
         this.ws_server.handleUpgrade(req, socket, head,
             ws=>this.accept(ws, req));
+    }
+    on_headers(headers){
+        if (this.no_mask)
+            headers.push('No-mask: true');
     }
     accept(ws, req=ws.upgradeReq){
         if (!ws._socket.remoteAddress)
@@ -1185,13 +1196,14 @@ class Mux {
         const w_log = (e, str)=>
             zerr.warn(`${_this.ws}: ${str}: ${vfd}-${zerr.e2s(e)}`);
         let pending, zfin_pending, send_ack_timeout, send_ack_ts = 0;
+        let no_mask = this.no_mask ? {mask: false} : null;
         const stream = new _lib.Duplex(assign({
             read(size){},
             write(data, encoding, cb){
                 const {buf, buf_pending} = stream.process_data(data);
                 if (buf)
                 {
-                    if (!_this.ws.send(buf))
+                    if (!_this.ws.send(buf, no_mask))
                         return cb(new Error(_this.ws.reason||_this.ws.status));
                     stream.sent += buf.length-vfd_sz;
                     stream.last_use_ts = Date.now();

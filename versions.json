@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.283.18",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix can't get property 'plan' of undefined error"
+            }
+        ]
+    },
+    {
         "ver": "1.282.255",
         "type": "stable",
         "changes": [
