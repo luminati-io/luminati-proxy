@@ -46,6 +46,7 @@ describe('proxy', ()=>{
             customer,
             password,
             log: 'none',
+            logs: 1000,
             port: 24000,
         }, opt), new Worker().run().setup({keys}));
         l.test = etask._fn(function*(_this, req_opt){
@@ -1135,8 +1136,8 @@ describe('proxy', ()=>{
             });
             describe('waterfall', ()=>{
                 it('emits usage events once', ()=>etask(function*(){
-                    l = yield lum({rules: [get_retry_rule()]});
-                    const l2 = yield lum({port: 24001});
+                    l = yield lum({rules: [get_retry_rule()], logs: 1});
+                    const l2 = yield lum({port: 24001, logs: 1});
                     let usage_start_counter = 0;
                     let usage_counter = 0;
                     let usage_abort_counter = 0;

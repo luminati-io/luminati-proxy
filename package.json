@@ -265,6 +265,7 @@
       "lib/cache.js",
       "lib/cache_client.js",
       "lib/cities.js",
+      "lib/cloud_mgr.js",
       "lib/cluster_mgr.js",
       "lib/config.js",
       "lib/consts.js",
@@ -398,7 +399,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "869c5538c721f838d3506844b825fea1"
+    "md5": "4b229947dfbb6e13d591a5e1a901c200"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -430,5 +431,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.283.18"
+  "version": "1.293.49"
 }

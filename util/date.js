@@ -267,10 +267,27 @@ E.align = function(d, align){
 E.add = function(d, dur){
     d = E.get(d, 1);
     dur = normalize_dur(dur);
-    if (dur.year)
-        d.setUTCFullYear(d.getUTCFullYear()+dur.year);
-    if (dur.month)
-        d.setUTCMonth(d.getUTCMonth()+dur.month);
+    // manual handling, because of '31-Jan + 1 month'
+    // we are doing same as: momentjs, C# DateTime, Excel EDATE, R Lubridate
+    // see: https://lubridate.tidyverse.org/reference/mplus.html
+    if (dur.year || dur.month)
+    {
+        var year = d.getUTCFullYear() + (dur.year||0);
+        var month = d.getUTCMonth() + (dur.month||0);
+        var day = d.getUTCDate();
+        while (month<0)
+        {
+            year--;
+            month += 12;
+        }
+        while (month>=12)
+        {
+            year++;
+            month -= 12;
+        }
+        day = Math.min(day, last_day_of_month(month, year));
+        d.setUTCFullYear(year, month, day);
+    }
     ['day', 'hour', 'min', 'sec', 'ms'].forEach(function(k){
         if (dur[k])
             d.setTime(+d+dur[k]*ms[k.toUpperCase()]);
@@ -289,6 +306,11 @@ function normalize_dur(dur){
     for (var k in dur)
         norm[aliases[k]||k] = dur[k];
     return norm;
+}
+
+function last_day_of_month(month, year){
+    var ts = Date.UTC(year||2001, month+1, 0); // default to non-leap year
+    return new Date(ts).getUTCDate();
 }
 
 E.describe_interval = function(_ms, decimals){

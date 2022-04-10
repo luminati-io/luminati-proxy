@@ -2,7 +2,8 @@
 'use strict'; /*jslint node:true, browser:true, es6: true*/
 (function(){
 var define, process, zerr, assert;
-var is_node = typeof module=='object' && module.exports && module.children;
+var is_node = typeof module=='object' && module.exports && module.children &&
+    typeof __webpack_require__!='function';
 var is_rn = typeof global=='object' && !!global.nativeRequire ||
     typeof navigator=='object' && navigator.product=='ReactNative';
 if (!is_node)
@@ -1166,6 +1167,7 @@ E.sleep = function(ms){
         timer = setTimeout(this.continue_fn(), ms);
         return this.wait();
     }, function finally$(){
+        '@jsdefender { localDeclarations: false }';
         clearTimeout(timer);
     }]);
 };
@@ -1186,6 +1188,7 @@ E.for = function(cond, inc, opt, states){
     [function loop(){
         return !cond || cond.call(this);
     }, function try_catch$(res){
+        '@jsdefender { localDeclarations: false }';
         if (!res)
             return this.return();
         return etask({name: 'for_iter', cancel: true, init: opt.init},
@@ -1234,6 +1237,7 @@ E.all = function(a_or_o, ao2){
             for (j=0; j<a.length; j++)
                 this.spawn(a[j]);
         }, function try_catch$loop(){
+            '@jsdefender { localDeclarations: false }';
             if (i>=a.length)
                 return this.return(a);
             this.info.at = 'at '+i+'/'+a.length;
@@ -1261,6 +1265,7 @@ E.all = function(a_or_o, ao2){
             for (j=0; j<keys.length; j++)
                 this.spawn(a_or_o[keys[j]]);
         }, function try_catch$loop(){
+            '@jsdefender { localDeclarations: false }';
             if (i>=keys.length)
                 return this.return(o);
             var _i = keys[i], _a = a_or_o[_i];
@@ -1434,6 +1439,7 @@ E.wait = function(timeout){
 };
 E.to_nfn = function(promise, cb, opt){
     return etask({name: 'to_nfn', async: true}, [function try_catch$(){
+        '@jsdefender { localDeclarations: false }';
         return promise;
     }, function(res){
         var ret = [this.error];
@@ -1475,6 +1481,7 @@ E._generator = function(gen, ctor, opt){
         this.generator_ctor = ctor;
         return {ret: undefined, err: undefined};
     }, function try_catch$loop(rv){
+        '@jsdefender { localDeclarations: false }';
         var res;
         try { res = rv.err ? gen.throw(rv.err) : gen.next(rv.ret); }
         catch(e){ return this.return(E.err(e)); }
@@ -1488,6 +1495,7 @@ E._generator = function(gen, ctor, opt){
         return this.goto('loop', this.error ?
             {ret: undefined, err: this.error} : {ret: ret, err: undefined});
     }, function finally$(){
+        '@jsdefender { localDeclarations: false }';
         // https://kangax.github.io/compat-table/es6/#test-generators_%GeneratorPrototype%.return
         // .return() supported only in node>=6.x.x
         if (!done && gen && gen.return)
@@ -1527,6 +1535,7 @@ E.interval = function(opt, states){
         var stopped = false;
         return etask([function loop(){
             etask([function try_catch$(){
+                '@jsdefender { localDeclarations: false }';
                 return etask(states);
             }, function(res){
                 if (!this.error)

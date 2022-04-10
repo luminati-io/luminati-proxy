@@ -199,12 +199,30 @@ E.flags_from_str = function(s, conv){
 };
 
 E.scale_vals = {
-    1000: [{s: '', n: 1}, {s: 'K', n: 1e3}, {s: 'M', n: 1e6},
-        {s: 'G', n: 1e9}, {s: 'T', n: 1e12}, {s: 'P', n: 1e15}],
-    1024: [{s: '', n: 1}, {s: 'K', n: 1024}, {s: 'M', n: Math.pow(1024, 2)},
-        {s: 'G', n: Math.pow(1024, 3)}, {s: 'T', n: Math.pow(1024, 4)},
-        {s: 'P', n: Math.pow(1024, 5)}],
+    si: [
+        {s: '', n: 1},
+        {s: 'K', n: 1e3},
+        {s: 'M', n: 1e6},
+        {s: 'G', n: 1e9},
+        {s: 'T', n: 1e12},
+        {s: 'P', n: 1e15},
+    ],
+    $: [
+        {s: '', n: 1},
+        {s: 'K', n: 1e3},
+        {s: 'M', n: 1e6},
+        {s: 'G', n: 1e9},
+    ],
+    1024: [
+        {s: '', n: 1},
+        {s: 'K', n: 1024},
+        {s: 'M', n: Math.pow(1024, 2)},
+        {s: 'G', n: Math.pow(1024, 3)},
+        {s: 'T', n: Math.pow(1024, 4)},
+        {s: 'P', n: Math.pow(1024, 5)},
+    ],
 };
+E.scale_vals['1000'] = E.scale_vals.si;
 
 E.scaled_number = function(num, opt){
     opt = opt||{};
@@ -252,22 +270,151 @@ E.scaled_bytes = function(num, opt){
     return E.scaled_number(num, Object.assign({base: 1000}, opt)); };
 
 E.fmt_currency = function(amount, digits, currency_sign){
-    if (amount===undefined)
-        return;
-    if (digits===undefined)
-        digits = 2;
-    if (currency_sign===undefined)
-        currency_sign = '$';
-    var sign = amount<0 ? '-' : '';
-    amount = Math.abs(amount);
-    amount = (+amount).toLocaleString('en-GB', {
-        useGrouping: true,
-        maximumFractionDigits: digits,
-        minimumFractionDigits: digits>=2&&2 || null,
-    }) || ''+amount;
-    amount = amount.replace(/\.0+$/, '');
-    return sign+currency_sign+amount;
+    return E.fmt_num(amount, {style: 'currency', max_digits: digits,
+        unit: currency_sign});
 };
+
+// opt:
+// - style:str (default: guessed based on unit, 'decimal' if unable to guess)
+// - unit:str (default: '')
+// - spaced_unit:bool (default: unit.length>3)
+// - scaling:bool (default: style-dependent)
+// - min_digits:int (default: null, or 2 for currencies)
+// - max_digits:int (default: null, or 2 for currencies)
+// - digits:int (default: null)
+// - delta:bool (default: false)
+//   => when true, show '+' sign for positive numbers
+// - rm_digits_all_zero:bool (default: false)
+//   => when true, removes digits that are all zeroes (e.g. 12.000)
+// - grouping:bool (default: true)
+// - nan:str (default:'NaN')
+//   => what to return for non-numbers
+// fmt_num(1234, '$')
+// fmt_num(1234, '$', {digits: 1})
+// fmt_num(1234, {unit: '$', digits: 1})
+E.fmt_num = function(num, unit_or_opt, opt){
+    opt = Object.assign({},
+        typeof unit_or_opt=='string' ? {unit: unit_or_opt} : unit_or_opt, opt);
+    if (num==null)
+        return num;
+    if (typeof num=='string' && num_regex.test(num))
+        num = +num;
+    if (!Number.isFinite(num))
+        return opt.nan||'NaN';
+    // resolve options
+    var style = opt.style;
+    if (style===undefined && opt.unit)
+    {
+        style = Object.keys(num_styles).find(function(s){
+            return num_styles[s].units.includes(opt.unit); });
+    }
+    if (!num_styles[style])
+        style = 'decimal';
+    var unit = opt.unit;
+    if (unit===undefined)
+        unit = num_styles[style].units[0];
+    if (typeof unit!='string')
+        unit = unit==null||unit==false ? '' : ''+unit;
+    var scaling = opt.scaling;
+    if (scaling===undefined)
+        scaling = num_styles[style].default_scaling;
+    if (scaling==true)
+        scaling = num_styles[style].vanilla_scaling;
+    var max_digits = opt.max_digits;
+    if (max_digits===undefined)
+    {
+        if (opt.digits!==undefined)
+            max_digits = opt.digits;
+        else if (style=='currency')
+            max_digits = scaling&&1 || 2;
+        else
+            max_digits = scaling&&2 || 3;
+    }
+    if (max_digits===null || max_digits===false || max_digits>12)
+        max_digits = 12;
+    var min_digits = opt.min_digits;
+    if (min_digits===undefined)
+    {
+        if (opt.digits!==undefined)
+            min_digits = opt.digits;
+        else if (style=='currency')
+            min_digits = max_digits>=2&&2 || undefined;
+    }
+    if (min_digits===null || min_digits===false)
+        min_digits = 0;
+    var rm_digits_all_zero = opt.rm_digits_all_zero;
+    if (rm_digits_all_zero===undefined)
+        rm_digits_all_zero = opt.digits==null && opt.min_digits==null;
+    var plural = opt.plural;
+    if (plural==null && style=='bytes' && unit.endsWith('s'))
+    {
+        unit = unit.slice(0, -1);
+        plural = true;
+    }
+    // apply scaling
+    var scale_str = '';
+    if (scaling=='%')
+        num *= 100;
+    else if (E.scale_vals[scaling])
+    {
+        var scale_vals = E.scale_vals[scaling], i;
+        var abs_num = Math.abs(num), mult = 1;
+        if (style=='bytes' && unit!='B' && unit!='Bs')
+        {
+            var needle = unit.replace(/s$/, '');
+            for (i=0; i<scale_vals.length; i++)
+            {
+                if (scale_vals[i].s+'B'==needle)
+                {
+                    mult *= scale_vals[i].n;
+                    break;
+                }
+            }
+            abs_num *= mult;
+            unit = 'B';
+        }
+        for (i=scale_vals.length-1; i>=0; i--)
+        {
+            if (abs_num>=scale_vals[i].n)
+            {
+                mult /= scale_vals[i].n;
+                scale_str = scale_vals[i].s;
+                break;
+            }
+        }
+        num *= mult;
+    }
+    // render
+    var sign = num<0&&'-' || opt.delta&&'+' || '';
+    var num_str = Math.abs(num).toLocaleString('en-GB', {
+        useGrouping: opt.grouping!=false,
+        maximumFractionDigits: max_digits,
+        minimumFractionDigits: min_digits,
+    });
+    if (rm_digits_all_zero && num_str.endsWith('0'))
+        num_str = num_str.replace(/\.0+$/, '');
+    if (plural==true || plural=='auto'&&!/^1(\.0+)?$/.test(num_str))
+        unit += 's';
+    var unit_sep = '';
+    if (opt.spaced_unit || opt.spaced_unit==null&&unit.length>3)
+        unit_sep = ' ';
+    return style=='currency' ? sign+unit+num_str+scale_str
+        : sign+num_str+unit_sep+scale_str+unit;
+};
+
+var num_styles = {
+    decimal: {units: [''], vanilla_scaling: 'si'},
+    percent: {units: ['%'], vanilla_scaling: '%', default_scaling: 1},
+    currency: {units: ['$'], vanilla_scaling: '$'},
+    bytes: {
+        units: ['B', 'Bs', 'KB', 'KBs', 'MB', 'MBs', 'GB', 'GBs', 'TB', 'TBs',
+            'PB', 'PBs', 'byte', 'bytes'],
+        vanilla_scaling: 'si',
+        default_scaling: 1,
+    },
+};
+
+var num_regex = /^\s*[+-]?((\d+(\.\d*)?)|(\.\d+))\s*$/;
 
 E.fmt_per = function(per){
     if (!per)

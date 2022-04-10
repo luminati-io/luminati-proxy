@@ -1256,7 +1256,7 @@ var terr_country = {
     +'MP GU MH PG UM AU TL SB FM',
     east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
     +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
-    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB',
+    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB GW',
     east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
     +'MK AL AZ KG BA UZ SD BI XK SM',
     in: 'IN BD LK RE MV',
@@ -1297,6 +1297,7 @@ E.is_hidden = function(code){
     return !!{
         EU: 1,
         PS: 1,
+        AQ: 1,
     }[code];
 };
 
@@ -2656,12 +2657,23 @@ E.state_code2timezone = function(ts_country, state){
 };
 
 E.label2code = function(label){
-    for (var i in E.list)
+    var c_list = Object.entries(E.list).concat(Object.entries(E.google_list));
+    for (var i = 0; i<c_list.length; i++)
     {
-        if (E.list[i]===label)
-            return i;
+        var _c = c_list[i];
+        if (_c[1]===label)
+            return _c[0];
     }
-    return '';
+    // XXX sergeim: Åland Islands case
+    for (var k in E.adj_list)
+    {
+        if (E.adj_list[k].name==label)
+            return k;
+    }
+    var exc = {
+        'Macedonia (FYROM)': 'MK',
+    };
+    return exc[label] || '';
 };
 
 E.cnlabel2code = function(label){

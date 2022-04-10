@@ -35,7 +35,7 @@ class Overview extends Pure_component {
             if (!settings)
                 return;
             this.setState({show_logs: settings.logs>0,
-                zagent: settings.zagent,
+                zagent: settings.zagent, reseller: settings.reseller,
                 request_stats: settings.request_stats});
             if (settings.ask_sync_config&&!settings.zagent)
                 $('#sync_config_modal').modal();
@@ -81,7 +81,7 @@ class Overview extends Pure_component {
         });
     };
     render(){
-        const {show_logs, zagent, request_stats} = this.state;
+        const {show_logs, zagent, request_stats, reseller} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
         const title = <T>Proxy Manager Dashboard</T>;
         return <div className="overview_page">
@@ -118,7 +118,7 @@ class Overview extends Pure_component {
             <div className="logs_wrapper">
               <Har_viewer/>
             </div>}
-          {show_logs===false &&
+          {show_logs===false && !reseller &&
             <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>
           }
           <Modal id="sync_config_modal" ok_btn_title="Yes"

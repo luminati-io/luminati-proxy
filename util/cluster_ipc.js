@@ -6,7 +6,7 @@ const etask = require('./etask.js');
 const zerr = require('./zerr.js');
 const zutil = require('./util.js');
 const zcounter = require('./zcounter.js');
-const assign = Object.assign, ef = etask.ef, E = exports;
+const ef = etask.ef, E = exports;
 const VERBOSE_IPC = +process.env.VERBOSE_IPC;
 const METRICS_IPC = +process.env.METRICS_IPC;
 let current_cookie = 1;
@@ -53,14 +53,15 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
     let response = {cookie: msg.cookie, handler: msg.handler};
     if (handler_error)
     {
-        assign(response, {
-            type: 'ipc_error',
-            msg: handler_error.message || String(handler_error),
-            code: handler_error.code,
-        });
+        response.type = 'ipc_error';
+        response.msg = handler_error.message || String(handler_error);
+        response.code = handler_error.code;
     }
     else
-        assign(response, {type: 'ipc_result', msg: value});
+    {
+        response.type = 'ipc_result';
+        response.msg = value;
+    }
     try {
         if (VERBOSE_IPC)
         {
@@ -95,7 +96,11 @@ let on_response = (sender, msg)=>{
     if (msg.type=='ipc_result')
         handler.continue(msg.msg);
     if (msg.type=='ipc_error')
-        handler.throw(assign(new Error(msg.msg), {code: msg.code}));
+    {
+        let error = new Error(msg.msg);
+        error.code = msg.code;
+        handler.throw(error);
+    }
 };
 
 let worker_fail_fn = (worker, ev)=>(...arg)=>{
@@ -257,7 +262,7 @@ E.post_master = function(name, args, send_handle){
 E.post_worker = function(worker, name, args, send_handle){
     if (!cluster.isMaster)
         throw new Error('post_worker called not from Cluster master');
-    return post(worker.id, name, args, send_handle);
+    return post(worker.id||worker, name, args, send_handle);
 };
 
 E.post_all_workers = function(message, args){

@@ -104,7 +104,9 @@ function wrap_perr(perr_fn){
     return function(id, info, opt){
         opt = opt||{};
         var _rate_limit = opt.rate_limit||{};
-        var ms = _rate_limit.ms||date.ms.HOUR, count = _rate_limit.count||10;
+        var default_rate_limit = zutil.is_mocha() ? 100 : 10;
+        var ms = _rate_limit.ms||date.ms.HOUR;
+        var count = _rate_limit.count||default_rate_limit;
         var disable_drop_count = _rate_limit.disable_drop_count;
         var rl_hash = perr_orig.rl_hash = perr_orig.rl_hash||{};
         var rl = rl_hash[id] = rl_hash[id]||{};
@@ -132,6 +134,35 @@ function wrap_perr(perr_fn){
 E.perr_install = function(install_fn){
     E.perr = wrap_perr(install_fn(perr_orig, perr_pending||[]));
     perr_pending = null;
+};
+
+E.make_nodejs_perr_install_fn = function(prefix){
+    var zos = require('os');
+    var wget = require('./wget.js');
+    var zversion = require('./version.js');
+    var perr_send = function(id, info, opt){
+        opt = opt||{};
+        var full_id = prefix+'_'+id;
+        return wget({url: env.PERR_URL+'perr?id='+full_id,
+            method: 'POST', timeout: 10000,
+            json: {
+                timestamp: date.to_sql(),
+                info: info,
+                filehead: opt.filehead,
+                bt: opt.backtrace,
+                host: zos.hostname(),
+                ver: zversion.version,
+            },
+        });
+    };
+    return function(_perr_orig, pending){
+        while (pending.length)
+            perr_send.apply(null, pending.shift());
+        return function(id, info, opt){
+            _perr_orig.apply(null, arguments); // keep stub's print
+            return perr_send(id, info, opt);
+        };
+    };
 };
 
 function err_has_stack(err){ return err instanceof Error && err.stack; }
@@ -437,7 +468,7 @@ var perr_transport = function(id, info, opt){
     return post(zescape.uri(E.conf.url_perr+'/perr', qs), data);
 };
 
-var perr = function(perr_orig, pending){
+var perr = function(_perr_orig, pending){
     while (pending.length)
         perr_transport.apply(null, pending.shift());
     // set the zerr.perr stub to send to the clog server

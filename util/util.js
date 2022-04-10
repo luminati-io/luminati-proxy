@@ -2,9 +2,10 @@
 'use strict'; /*jslint node:true, browser:true, es6:true*/
 (function(){
 var define, node_util;
-var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = typeof global=='object' && !!global.nativeRequire
-    || typeof navigator=='object' && navigator.product=='ReactNative';
+var is_node = typeof module=='object' && module.exports && module.children &&
+    typeof __webpack_require__!='function';
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -92,6 +93,8 @@ function _clone_deep(obj){
         return new Date(obj);
     else if (obj instanceof RegExp)
         return new RegExp(obj);
+    else if (obj instanceof URL)
+        return new URL(obj);
     else if (obj instanceof Function)
         return obj;
     ret = {};
@@ -441,6 +444,19 @@ E.pick = function(obj){
             if (E.own(obj, fields[j]))
                 o[fields[j]] = obj[fields[j]];
         }
+    }
+    return o;
+};
+
+// like _.pickBy
+E.pick_by = function(obj, cb){
+    var k, o = {};
+    for (k in obj)
+    {
+        if (typeof obj[k] == 'object' && !Array.isArray(obj[k]))
+            o[k] = E.pick_by(obj[k], cb);
+        else if (cb(obj[k], k))
+            o[k] = obj[k];
     }
     return o;
 };

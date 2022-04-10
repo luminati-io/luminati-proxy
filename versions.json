@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.293.49",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix can't change default zone with sync config off"
+            }
+        ]
+    },
+    {
         "ver": "1.283.18",
         "type": "stable",
         "changes": [

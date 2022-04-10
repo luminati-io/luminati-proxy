@@ -281,11 +281,11 @@ E.is_ip_local = function(ip){
 };
 
 E.host_lookup = function(lookup, host){
-    var pos;
+    var pos, res;
     while (1)
     {
-        if (host in lookup)
-            return lookup[host];
+        if (res = lookup[host])
+            return res;
         if ((pos = host.indexOf('.'))<0)
             return;
         host = host.slice(pos+1);
@@ -317,7 +317,8 @@ E.parse = function(url, strict){
             m[i] = m[i]===undefined ? null : m[i];
         return m;
     }
-    url = url||location.href;
+    if (!(url = url || !is_node&&location.href))
+        return {};
     var uri = {orig: url};
     url = replace_slashes(url);
     var m, remaining = url;

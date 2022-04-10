@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.293.49 Stable
+- :bug: Fix can't change default zone with sync config off
+
 ## 1.283.18 Stable
 - :bug: Fix can't get property 'plan' of undefined error
 

@@ -64,11 +64,11 @@ const default_user_agent = is_node ? (()=>{
     const conf = require('./conf.js');
     return `Hola ${conf.app}/${zconf.ZON_VERSION}`;
 })() : undefined;
-const debug_str_len = 4096;
-const default_win_size = 1048576;
-const SEC = 1000, MIN = 60000, vfd_sz = 8, vfd_bin_sz = 12;
+const DEBUG_STR_LEN = 4096, DEFAULT_WIN_SIZE = 1048576;
+const SEC = 1000, MIN = 60*SEC, VFD_SZ = 8, VFD_BIN_SZ = 12;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
 const net = is_node ? require('net') : null, BUFFER_CONTENT = 10;
+let SnappyStream, UnsnappyStream;
 
 function noop(){}
 
@@ -126,8 +126,6 @@ class WS extends events.EventEmitter {
             });
         }
         this.mux = opt.mux ? new Mux(this) : undefined;
-        if (this.mux)
-            this.mux.no_mask = opt.no_mask;
         if (this.zc && !zcounter)
             zcounter = require('./zcounter.js');
     }
@@ -135,7 +133,7 @@ class WS extends events.EventEmitter {
         if (zerr.is.debug())
         {
             zerr.debug(typeof msg=='string'
-                ? `${this}> str: ${string.trunc(msg, debug_str_len)}`
+                ? `${this}> str: ${string.trunc(msg, DEBUG_STR_LEN)}`
                 : `${this}> buf: ${msg.length} bytes`);
         }
         if (!this.connected)
@@ -301,11 +299,7 @@ class WS extends events.EventEmitter {
         this._on_error({message: 'unexpected response'});
         this.emit('unexpected-response');
     }
-    _on_upgrade(resp){
-        if (this.mux)
-            this.mux.no_mask = resp && resp.headers && resp.headers['no-mask'];
-        zerr.notice(`${this}: upgrade conn`);
-    }
+    _on_upgrade(resp){ zerr.notice(`${this}: upgrade conn`); }
     _on_message(event){
         let msg = event.data, handled = false;
         if (msg instanceof ArrayBuffer)
@@ -315,15 +309,15 @@ class WS extends events.EventEmitter {
             msg.readUInt32BE(0)===0 && msg.readUInt32BE(4)==BUFFER_CONTENT)
         {
             is_bin = true;
-            let bin_event_len = msg.readUInt32BE(vfd_sz);
-            bin_event = JSON.parse(msg.slice(vfd_bin_sz,
-                vfd_bin_sz+bin_event_len).toString());
-            bin_event.msg = msg.slice(vfd_bin_sz+bin_event_len);
+            let bin_event_len = msg.readUInt32BE(VFD_SZ);
+            bin_event = JSON.parse(msg.slice(VFD_BIN_SZ,
+                VFD_BIN_SZ+bin_event_len).toString());
+            bin_event.msg = msg.slice(VFD_BIN_SZ+bin_event_len);
         }
         if (zerr.is.debug())
         {
             zerr.debug(typeof msg=='string'
-                ? `${this}< str: ${string.trunc(msg, debug_str_len)}`
+                ? `${this}< str: ${string.trunc(msg, DEBUG_STR_LEN)}`
                 : `${this}< buf: ${msg.length} bytes`);
         }
         if (this.zc_rx)
@@ -410,8 +404,9 @@ class WS extends events.EventEmitter {
             else
             {
                 clearTimeout(this.ping_timer);
-                this.ping_timer = setTimeout(this.ping_expire_fn,
-                    this.ping_timeout);
+                this.ping_timer = this.ping_last
+                    ? setTimeout(this.ping_expire_fn, this.ping_timeout)
+                    : setTimeout(this.ping_fn, this.ping_interval);
             }
         }
     }
@@ -505,6 +500,10 @@ class Client extends WS {
             this.headers = assign(
                 {'User-Agent': opt.user_agent||default_user_agent},
                 opt.headers);
+            // XXX vladislavl: for graceful release only: must be always true
+            // once test period is over
+            if (this.client_no_mask_support = opt.client_no_mask_support)
+                this.headers['client-no-mask-support'] = 1;
         }
         this.deflate = !!opt.deflate;
         if (opt.proxy)
@@ -525,6 +524,21 @@ class Client extends WS {
     // we don't want WS to emit 'destroyed', Client controls it by itself,
     // because it supports reconnects
     _on_disconnected(){}
+    send(msg){
+        return super.send(msg,
+            this.client_no_mask_support && this.server_no_mask_support
+            ? {mask: false} : undefined);
+    }
+    _on_message(event){
+        if (this.client_no_mask_support && !this.server_no_mask_support
+            && event.data==='server_no_mask_support')
+        {
+            this.server_no_mask_support = true;
+            this.emit('server_no_mask_support');
+            return;
+        }
+        return super._on_message(event);
+    }
     _assign(ws){
         super._assign(ws);
         if (this.zc)
@@ -540,6 +554,7 @@ class Client extends WS {
     _connect(){
         this.reason = undefined;
         this.reconnect_timer = undefined;
+        this.server_no_mask_support = undefined;
         let opt = {headers: this.headers};
         let url = this.url, lookup_ip = this.lookup_ip, fb = this.fallback, v;
         if (fb && fb.url && this._retry_count%fb.retry_mod>fb.retry_threshold)
@@ -662,16 +677,15 @@ class Server {
             ws_opt.maxPayload = opt.max_payload;
         if (opt.verify)
             ws_opt.verifyClient = opt.verify;
-        this.ws_server = new (server_impl(opt))(ws_opt);
-        // XXX igors: test feature to rm mask from Mux buffers
-        this.no_mask = opt.no_mask;
+        const impl = server_impl(opt);
+        this.ws_server = new impl.Server(ws_opt);
+        this.server_no_mask_support = impl.server_no_mask_support;
         this.opt = opt;
         this.label = opt.label;
         this.connections = new Set();
         if (opt.zcounter!=false)
             this.zc = opt.label ? `${opt.label}_ws` : 'ws';
         this.ws_server.addListener('connection', this.accept.bind(this));
-        this.ws_server.addListener('headers', this.on_headers.bind(this));
         if (opt.port)
             zerr.notice(`${this}: listening on port ${opt.port}`);
         if (!zcounter)
@@ -684,10 +698,6 @@ class Server {
     upgrade(req, socket, head){
         this.ws_server.handleUpgrade(req, socket, head,
             ws=>this.accept(ws, req));
-    }
-    on_headers(headers){
-        if (this.no_mask)
-            headers.push('No-mask: true');
     }
     accept(ws, req=ws.upgradeReq){
         if (!ws._socket.remoteAddress)
@@ -733,6 +743,8 @@ class Server {
         zws.remote_label = m ? m[1] : ua ? 'web' : undefined;
         zws._assign(ws);
         zws._on_open();
+        if (this.server_no_mask_support && headers['client-no-mask-support'])
+            zws.send('server_no_mask_support');
         this.connections.add(zws);
         if (this.zc)
         {
@@ -759,7 +771,7 @@ class Server {
         if (zerr.is.debug())
         {
             zerr.debug(typeof msg=='string'
-                ? `${this}> broadcast str: ${string.trunc(msg, debug_str_len)}`
+                ? `${this}> broadcast str: ${string.trunc(msg, DEBUG_STR_LEN)}`
                 : `${this}> broadcast buf: ${msg.length} bytes`);
         }
         for (let zws of this.connections)
@@ -792,6 +804,7 @@ class Server {
     }
 }
 
+const ERROR_CODES = {bad_ipc_call_attempt: 'bad_ipc_call_attempt'};
 class IPC_client {
     constructor(zws, names, opt={}){
         if (opt.mux)
@@ -864,6 +877,11 @@ class IPC_client {
             });
             let res = {status: _this._ws.status}, prev;
             let send = _this._ws[opt.zjson ? 'zjson' : 'json'].bind(_this._ws);
+            let mk_bad_ipc_call_error = msg=>{
+                let e = new Error(msg);
+                e.code = ERROR_CODES.bad_ipc_call_attempt;
+                return e;
+            };
             while (res.status)
             {
                 let conn_closed_error = _this._ws.reason||'Connection closed';
@@ -871,19 +889,19 @@ class IPC_client {
                 {
                 case 'disconnected':
                     if (opt.retry==false || !_this._ws.reconnect_timer)
-                        throw new Error(conn_closed_error);
+                        throw mk_bad_ipc_call_error(conn_closed_error);
                     break;
                 case 'connecting':
                     if (opt.retry==false)
-                        throw new Error('Connection not ready');
+                        throw mk_bad_ipc_call_error('Connection not ready');
                     break;
                 case 'destroyed':
-                    throw new Error(conn_closed_error);
+                    throw mk_bad_ipc_call_error(conn_closed_error);
                 case 'connected':
                     while (!send(req))
                     {
                         if (opt.retry==false)
-                            throw new Error(conn_closed_error);
+                            throw mk_bad_ipc_call_error(conn_closed_error);
                         yield etask.sleep(send_retry_timeout);
                     }
                     break;
@@ -928,8 +946,10 @@ class IPC_client {
         let task = this._pending.get(msg.cookie);
         if (!task)
         {
-            return zerr.info(`${this._ws}: `
-                +`unexpected IPC cookie ${msg.cookie}`);
+            this._ws.emit('ipc_resp_miss', msg);
+            if (zerr.is.info())
+                zerr.info(`${this._ws}: unexpected IPC cookie ${msg.cookie}`);
+            return;
         }
         if (msg.type=='ipc_result')
             return void task.continue({value: msg.msg});
@@ -1008,13 +1028,13 @@ class IPC_server {
                 res.msg = undefined;
                 let res_buf = Buffer.from(JSON.stringify(res));
                 // [0|BUFFER_CONTENT|cmd length|...cmd bin|...cmd result bin]
-                let buf = Buffer.allocUnsafe(rv.length+vfd_bin_sz+res_buf
+                let buf = Buffer.allocUnsafe(rv.length+VFD_BIN_SZ+res_buf
                     .length);
                 buf.writeUInt32BE(0, 0);
                 buf.writeUInt32BE(BUFFER_CONTENT, 4);
-                buf.writeUInt32BE(res_buf.length, vfd_sz);
-                res_buf.copy(buf, vfd_bin_sz);
-                rv.copy(buf, vfd_bin_sz+res_buf.length);
+                buf.writeUInt32BE(res_buf.length, VFD_SZ);
+                res_buf.copy(buf, VFD_BIN_SZ);
+                rv.copy(buf, VFD_BIN_SZ+res_buf.length);
                 return this.ws.send(buf);
             }
             if (this.zjson)
@@ -1116,10 +1136,10 @@ class Mux {
                 if (zerr.is.debug())
                     zerr.debug(`${_this.ws}> vfd ${vfd}`);
                 bytes_allowed -= data.length;
-                let buf = Buffer.allocUnsafe(data.length+vfd_sz);
+                let buf = Buffer.allocUnsafe(data.length+VFD_SZ);
                 buf.writeUInt32BE(vfd, 0);
                 buf.writeUInt32BE(0, 4);
-                data.copy(buf, vfd_sz);
+                data.copy(buf, VFD_SZ);
                 cb(_this.ws.send(buf) ? undefined
                     : new Error(_this.ws.reason || _this.ws.status));
                 this.last_use_ts = Date.now();
@@ -1196,16 +1216,15 @@ class Mux {
         const w_log = (e, str)=>
             zerr.warn(`${_this.ws}: ${str}: ${vfd}-${zerr.e2s(e)}`);
         let pending, zfin_pending, send_ack_timeout, send_ack_ts = 0;
-        let no_mask = this.no_mask ? {mask: false} : null;
         const stream = new _lib.Duplex(assign({
             read(size){},
             write(data, encoding, cb){
                 const {buf, buf_pending} = stream.process_data(data);
                 if (buf)
                 {
-                    if (!_this.ws.send(buf, no_mask))
+                    if (!_this.ws.send(buf))
                         return cb(new Error(_this.ws.reason||_this.ws.status));
-                    stream.sent += buf.length-vfd_sz;
+                    stream.sent += buf.length-VFD_SZ;
                     stream.last_use_ts = Date.now();
                 }
                 if (zerr.is.debug())
@@ -1262,10 +1281,10 @@ class Mux {
                 data.length);
             if (bytes<=0)
                 return {buf_pending: data};
-            const buf = Buffer.allocUnsafe(bytes+vfd_sz);
+            const buf = Buffer.allocUnsafe(bytes+VFD_SZ);
             buf.writeUInt32BE(vfd, 0);
             buf.writeUInt32BE(0, 4);
-            data.copy(buf, vfd_sz, 0, bytes);
+            data.copy(buf, VFD_SZ, 0, bytes);
             if (bytes==data.length)
                 return {buf};
             const buf_pending = Buffer.allocUnsafe(data.length-bytes);
@@ -1314,7 +1333,7 @@ class Mux {
                 stream.destroy();
         });
         stream.create_ts = Date.now();
-        stream.win_size = default_win_size;
+        stream.win_size = DEFAULT_WIN_SIZE;
         stream.sent = stream.ack = stream.zread = 0;
         stream.prependListener('finish', ()=>zfinish(false, true));
         stream.prependListener('data', function(chunk){
@@ -1369,7 +1388,7 @@ class Mux {
         stream.send_win_size = ()=>{
             if (stream.win_size_sent)
                 return;
-            _this.ws.json({vfd, win_size: opt.win_size||default_win_size});
+            _this.ws.json({vfd, win_size: opt.win_size||DEFAULT_WIN_SIZE});
             stream.win_size_sent = true;
         };
         stream.on_win_size = size=>{
@@ -1432,11 +1451,18 @@ class Mux {
             zcounter.inc_level(`level_${this.ws.zc}_mux`, 1, 'sum');
         if (opt.compress || opt.decompress)
         {
-            const {SnappyStream, UnsnappyStream} = require('snappystream');
+            if (!SnappyStream || !UnsnappyStream)
+                ({SnappyStream, UnsnappyStream} = require('snappystream'));
             const snappy_s = opt.compress ? new SnappyStream() :
                 new UnsnappyStream();
+            const ensure_snappy_destroyed = ()=>{
+                if (snappy_s.destroyed)
+                    return;
+                setTimeout(()=>snappy_s.destroy(), 30*SEC);
+            };
             stream.pipe(snappy_s).pipe(stream);
             snappy_s.once('close', ()=>this.ws.mux.close(vfd));
+            stream.once('close', ensure_snappy_destroyed);
             return snappy_s;
         }
         return stream;
@@ -1462,7 +1488,7 @@ class Mux {
         {
             return;
         }
-        if (buf.length<vfd_sz)
+        if (buf.length<VFD_SZ)
             return zerr(`${this.ws}: malformed binary message`);
         let vfd = buf.readUInt32BE(0);
         if (zerr.is.debug())
@@ -1471,10 +1497,10 @@ class Mux {
         if (!stream)
             return zerr(`${this.ws}: unexpected stream vfd ${vfd}`);
         if (!stream.on_ack)
-            return stream.push(buf.slice(vfd_sz));
+            return stream.push(buf.slice(VFD_SZ));
         try {
             stream.send_win_size();
-            stream.push(buf.slice(vfd_sz));
+            stream.push(buf.slice(VFD_SZ));
         } catch(e){
             zerr(`${this.ws}: ${zerr.e2s(e)}`);
             throw e;
@@ -1533,9 +1559,12 @@ function client_impl(opt){
 function server_impl(opt){
     if (!is_node)
         throw new Error(`WS server is not available`);
-    return lib(opt.impl || (is_win || is_darwin ? 'ws' : 'uws')).Server;
+    const impl = opt.impl || (is_win || is_darwin ? 'ws' : 'uws');
+    const l = lib(impl);
+    l.server_no_mask_support = l.server_no_mask_support || impl=='ws';
+    return l;
 }
 
-return {Client, Server, IPC_client, IPC_server, Mux, t: {WS}};
+return {Client, Server, IPC_client, IPC_server, Mux, t: {WS}, ERROR_CODES};
 
 }); }());

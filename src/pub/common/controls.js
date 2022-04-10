@@ -18,7 +18,7 @@ import {Ext_tooltip} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
 import Toggle_on_off from './toggle_on_off.js';
-import {get_plan_product, network_types} from './network_types.js';
+import {get_plan_network, network_types} from './network_types.js';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 const ANY_IP = '0.0.0.0/0';
 
@@ -630,7 +630,7 @@ class Select_zone extends Pure_component {
         for (let n in network_types)
         {
             const data = this.state.zones.zones
-                .filter(z=>get_plan_product(z.plan)==n).map(format);
+                .filter(z=>get_plan_network(z.plan)==n).map(format);
             if (data.length)
                 items.push({category: network_types[n].label, data});
         }

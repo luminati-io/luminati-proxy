@@ -13,7 +13,6 @@ process.argv.push('--dir', os.tmpdir());
 const Manager = require('../lib/manager.js');
 const cities = require('../lib/cities');
 sinon.stub(cities, 'ensure_data', ()=>null);
-sinon.stub(process, 'exit');
 const logger = require('../lib/logger.js');
 const etask = require('../util/etask.js');
 const zutil = require('../util/util.js');
@@ -270,6 +269,7 @@ describe('manager', function(){
                     zone: 'foo',
                     customer: 'testc1',
                     lpm_token: 'token',
+                    sync_config: true,
                 },
                 proxies: [simple_proxy],
             }}, [Object.assign({zone: 'static'}, simple_proxy)]);
@@ -278,6 +278,7 @@ describe('manager', function(){
                     zone: 'foo',
                     customer: 'testc1',
                     lpm_token: 'token',
+                    sync_config: true,
                 },
                 proxies: [simple_proxy]},
             }, [Object.assign({zone: 'static'}, simple_proxy)]);
@@ -345,6 +346,50 @@ describe('manager', function(){
             assert(argv_spy.calledOnce);
             assert_has(mgr._defaults,
                 Object.assign({}, cloud_conf._defaults, cli));
+        }));
+    });
+    describe('set bw_limit', ()=>{
+        it('set limit', etask._fn(function*(_this){
+            const cli = {zagent: true};
+            app = yield app_with_proxies([{port: 24000},
+                {port: 24001, multiply: 3}], cli);
+            const res = yield api_json('api/bw_limit/24000', {
+                method: 'put', body: {days: 90, bytes: 1000}});
+            const get_res = yield api_json('api/bw_limit/24000',
+                {method: 'get'});
+            assert.equal(res.statusCode, 200);
+            assert.deepEqual(res.body, get_res.body);
+        }));
+        it('zagent false', etask._fn(function*(_this){
+            app = yield app_with_proxies([{port: 24000}, {port: 24001,
+                multiply: 3}]);
+            let res = yield api_json('api/bw_limit/24000', {
+                method: 'put', body: {days: 90, bytes: 1000}});
+            assert.equal(res.body, 'Not allowed to use BW limit in '
+                +'Proxy Manager on premise');
+            assert.equal(res.statusMessage, 'Forbidden');
+            assert.equal(res.statusCode, 403);
+            }));
+        it('false port', etask._fn(function*(_this){
+            const cli = {zagent: true};
+            app = yield app_with_proxies([{port: 24000}, {port: 24001,
+                    multiply: 3}], cli);
+            let res = yield api_json('api/bw_limit/24', {
+                method: 'put', body: {days: 90, bytes: 1000}});
+            assert.equal(res.body, 'Invalid port number');
+            assert.equal(res.statusMessage, 'Bad Request');
+            assert.equal(res.statusCode, 400);
+                }));
+        it('read-only', etask._fn(function*(_this){
+            const cli = {zagent: true};
+            app = yield app_with_proxies([{port: 24000},
+                {port: 24001, multiply: 3}], cli);
+            app.manager.proxies[0].proxy_type = 'duplicate';
+            let res = yield api_json('api/bw_limit/24000', {
+                    method: 'put', body: {days: 90, bytes: 1000}});
+            assert.equal(res.body, 'Proxy is read-only');
+            assert.equal(res.statusMessage, 'Bad Request');
+            assert.equal(res.statusCode, 400);
         }));
     });
     describe('bw_limit', ()=>{
@@ -1138,6 +1183,8 @@ describe('manager', function(){
                     zutil.extend_deep(server_conf, {_defaults, ts});
                 });
                 yield json('api/settings', 'put', {har_limit: 123});
+                const api_settings_pretty = yield json('api/settings?pretty');
+                assert.ok(api_settings_pretty);
                 assert.deepEqual(local_update_ts, mgr.config_ts);
                 let new_server_ts;
                 zutil.extend_deep(server_conf, {

@@ -76,6 +76,9 @@ class Schema extends Pure_component {
             if (zones)
                 this.setState({zones});
         });
+        this.setdb_on('head.settings', settings=>{
+            this.setState({proxy_port: settings.proxy_port});
+        });
         this.setdb_on('head.proxy_edit.form.proxy', proxy=>{
             const country_prefix = 'servercountry-';
             if (proxy && proxy.includes(country_prefix))
@@ -100,7 +103,8 @@ class Schema extends Pure_component {
               <Layer id="lpm" class_names="port active">
                 <T>Proxy Manager</T>
               </Layer>
-              <Layer no_btn id="port_numbers"><T>Port</T> 22225</Layer>
+              <Layer no_btn id="port_numbers"><T>Port</T>{' '
+                  +this.state.proxy_port}</Layer>
               <Layer id="super_proxy">
                 <span className={'flag-icon flag-icon-'+this.state.spcountry}/>
                 <T>Super Proxy</T>

@@ -74,12 +74,18 @@ E.jtest_push = function(s, arr){
 };
 
 E.jtest_init = function(){
+    var i;
     is_jtest = true;
     jtest_vals = {};
+    for (i=0; i<arguments.length; i++)
+        E.jtest_push.apply(E, array.to_array(arguments[i]));
+    return E.jtest_uninit.bind(E);
 };
 
 E.jtest_uninit = function(){
-    is_jtest = false; };
+    is_jtest = false;
+    jtest_vals = {};
+};
 
 E.basic_u32 = function(v){ return (1103515245*v+12345) >>> 0; };
 E.basic_u31 = function(v){ return (1103515245*v+12345) & 0x7fffffff; };

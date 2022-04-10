@@ -2,8 +2,8 @@
 'use strict'; /*jslint node:true*/
 require('./config.js');
 const _ = require('lodash');
+const crypto = require('crypto');
 const zurl = require('./url.js');
-const zerr = require('./zerr.js');
 const E = exports;
 
 E.find_matches = (all_rules, selector)=>
@@ -15,13 +15,42 @@ E.select_rules = (all_rules, selector, overrides=[])=>{
         E.rule_merge_customizer);
 };
 
+const MD5_RAND_MAX = parseInt('f'.repeat(32), 16);
+const str_to_rand = str=>parseInt(crypto.createHash('md5').update(str)
+    .digest('hex'), 16) / MD5_RAND_MAX;
+
+E.make_rules_object = rules=>{
+    return {
+        // this function is the high-loaded place: must be as quick as possible
+        // ONLY dots must be used as props separator
+        get(k, _default){
+            let ret = rules && rules[k];
+            if (ret!=null)
+                return ret;
+            const k_str = typeof k=='string';
+            if (k_str && !k.includes('.'))
+                return _default;
+            // better provide [] since lodash does too common str->[]
+            ret = _.get(rules, k_str ? k.split('.') : k);
+            return ret!=null ? ret : _default;
+        },
+        all: ()=>Object.assign({}, rules),
+        merge: new_rules=>_.merge(rules, new_rules, E.rule_merge_customizer),
+        clone_and_merge: new_rules=>{
+            return E.make_rules_object(_.merge({}, rules, new_rules,
+                E.rule_merge_customizer));
+        },
+    };
+};
+
 E.matches_rule = (match, selector, opts)=>{
+    opts = opts||{};
     for (let k in match)
     {
         let preprocessor, comparator;
         if (k=='hostname')
         {
-            if (opts && opts.use_host_lookup)
+            if (opts.use_host_lookup)
                 comparator = hostname_lookup;
             else
                 preprocessor = unify_hostnames;
@@ -33,7 +62,8 @@ E.matches_rule = (match, selector, opts)=>{
         }
         else if (k=='per')
         {
-            if (match[k]/100<Math.random())
+            let rand = opts.seed ? str_to_rand(opts.seed) : Math.random();
+            if (match[k]/100<rand)
                 return false;
         }
         else if (!E.rule_value_match(match[k], selector[k],

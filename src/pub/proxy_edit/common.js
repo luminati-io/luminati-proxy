@@ -67,7 +67,7 @@ export const Config = withRouter(class Config extends Pure_component {
         if (mgr_proxy_shared_fields.includes(id))
         {
             const default_option = this.props.data.find(d=>
-                d.value==this.state.defaults[id]);
+                d.value==this.state.defaults[id])||{};
             data.push({key: `Default (${default_option.key})`,
                 value: `default-${default_option.value}`});
         }
