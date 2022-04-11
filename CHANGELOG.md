@@ -1,6 +1,6 @@
 Proxy manager - Change Log
 
-## 1.293.49 Stable
+## 1.293.147 Stable
 - :bug: Fix can't change default zone with sync config off
 
 ## 1.283.18 Stable

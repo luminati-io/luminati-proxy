@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM node:14.18.1
+FROM node:14.19.0
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
