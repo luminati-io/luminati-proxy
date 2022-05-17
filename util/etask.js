@@ -1594,17 +1594,68 @@ E.race = function(ets){
             return;
         var race_et = etask.wait();
         var _this = this;
+        function _child_error_handler(e){ race_et.throw(e); }
         var _race = etask([
             function(){
                 return E.for_each(ets, function(){
                     var et = this.iter.val;
                     _this.spawn(etask([
                         function(){
-                            this.on('uncaught', race_et.throw_fn());
+                            this.on('uncaught', _child_error_handler);
                             return et;
                         },
                         function(res){ race_et.continue(res); },
                     ]));
+                });
+            },
+            function(){ return race_et; },
+        ]);
+        _race.finally(function(){ _this.return_child(); });
+        return _race;
+    });
+};
+
+E.any = function(opt, ets){
+    if (!ets)
+    {
+        ets = opt;
+        opt = {};
+    }
+    opt=opt||{};
+    opt.rethrow = opt.rethrow==undefined ? 1 : opt.rethrow;
+    return etask(function race(){
+        if (!Array.isArray(ets))
+            zerr.zexit('provided argument is not an array');
+        var length = ets.length;
+        if (!length)
+            return;
+        var race_et = etask.wait();
+        var errors = [];
+        var _this = this;
+        function _child_error_handler(e){
+            errors.push(e);
+            if (errors.length!=length)
+                return;
+            var err = new Error('aggregation error');
+            err.errors = errors;
+            if (opt.rethrow)
+                race_et.throw(err);
+            else
+                race_et.continue();
+        }
+        var _race = etask([
+            function(){
+                return E.for_each(ets, function(){
+                    var et = this.iter.val;
+                    var child = _this.spawn(etask([
+                        function(){
+                            this.on('uncaught', _child_error_handler);
+                            return et;
+                        },
+                        function(res){ race_et.continue(res); },
+                    ]));
+                    if (opt.timeout)
+                        setTimeout(()=>child.throw('timeout'), opt.timeout);
                 });
             },
             function(){ return race_et; },

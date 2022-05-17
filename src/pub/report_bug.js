@@ -14,7 +14,8 @@ import './css/report_bug.less';
 class Index extends Pure_component {
     success_msg = `Your issue is being handled! We will be in touch as soon as
         possible.`;
-    state = {desc: '', email: '', sending: false, no_upgrade: false};
+    state = {desc: '', email: this.props.username||'', sending: false,
+        no_upgrade: false};
     componentDidMount(){
         this.setdb_on('head.version', version=>this.setState({version}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));

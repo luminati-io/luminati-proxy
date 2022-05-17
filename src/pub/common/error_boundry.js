@@ -3,16 +3,21 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {perr} from '../util.js';
+import {www_api} from '../common.js';
 
 export default class Error_boundry extends Pure_component {
     state = {error: false, msg: null};
     static getDerivedStateFromError(error){
+        const cp_href = www_api+'/cp/lpm';
         let msg = null;
         switch (error)
         {
         case 'duplicate_port_number':
-            msg = 'Multiple port configuration detected - please check port '
-                +'set up and delete duplicated port.';
+            msg = <h4>Multiple port configuration detected -
+                please check port set up and delete duplicated port</h4>;
+        case 'cp_required':
+            msg = <h4>Cloud Proxy Manager can be opened only
+                in <a href={cp_href}>Bright Data control panel</a></h4>;
         }
         return {error: true, msg};
     }
@@ -28,7 +33,7 @@ export default class Error_boundry extends Pure_component {
         {
             return <React.Fragment>
                 <h1>Error</h1>
-                {this.state.msg && <h4>{this.state.msg}</h4>}
+                {this.state.msg && this.state.msg}
             </React.Fragment>;
         }
         return this.props.children;

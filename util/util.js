@@ -521,20 +521,8 @@ E.reduce_obj = function(coll, key_cb, val_cb, merge_cb){
         val_cb = key_cb.value;
         key_cb = key_cb.key;
     }
-    if (key_cb==null)
-        key_cb = function(it){ return it; };
-    else if (typeof key_cb=='string')
-    {
-        var kpath = E.path(key_cb);
-        key_cb = function(it){ return E.get(it, kpath); };
-    }
-    if (val_cb==null)
-        val_cb = function(it){ return it; };
-    else if (typeof val_cb=='string')
-    {
-        var vpath = E.path(val_cb);
-        val_cb = function(it){ return E.get(it, vpath); };
-    }
+    key_cb = get_map_fn(key_cb);
+    val_cb = get_map_fn(val_cb);
     var obj = {};
     if (Array.isArray(coll))
     {
@@ -559,6 +547,13 @@ E.reduce_obj = function(coll, key_cb, val_cb, merge_cb){
         });
     }
     return obj;
+};
+
+E.group_by = function(coll, key_cb, val_cb){
+    var inner_val_cb = get_map_fn(val_cb); 
+    val_cb = function(it){ return [inner_val_cb(it)]; };
+    var merge_cb = function(a, b){ return a.concat(b); };
+    return E.reduce_obj(coll, key_cb, val_cb, merge_cb);
 };
 
 E.flatten_obj = function(obj){
@@ -608,5 +603,18 @@ E.make_error_wo_stack = function(msg, extra){
 
 E.omit_falsy_props = o=>Object.fromEntries(Object.entries(o).filter(
     ([, v])=>![null, undefined, ''].includes(v)));
+
+function get_map_fn(v){
+    if (v==null)
+        return function(it){ return it; };
+    if (typeof v=='function')
+        return v;
+    var path = E.path(v);
+    if (!path.length)
+        return function(it){ return it; };
+    if (path.length==1)
+        return function(it){ return it==null ? it : it[path[0]]; };
+    return function(it){ return E.get(it, path); };
+}
 
 return E; }); }());

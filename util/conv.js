@@ -346,11 +346,10 @@ E.fmt_num = function(num, unit_or_opt, opt){
     if (rm_digits_all_zero===undefined)
         rm_digits_all_zero = opt.digits==null && opt.min_digits==null;
     var plural = opt.plural;
-    if (plural==null && style=='bytes' && unit.endsWith('s'))
-    {
+    if (plural===undefined)
+        plural = num_styles[style].default_plural;
+    if (plural==true && unit.endsWith('s'))
         unit = unit.slice(0, -1);
-        plural = true;
-    }
     // apply scaling
     var scale_str = '';
     if (scaling=='%')
@@ -393,11 +392,11 @@ E.fmt_num = function(num, unit_or_opt, opt){
     });
     if (rm_digits_all_zero && num_str.endsWith('0'))
         num_str = num_str.replace(/\.0+$/, '');
-    if (plural==true || plural=='auto'&&!/^1(\.0+)?$/.test(num_str))
-        unit += 's';
     var unit_sep = '';
     if (opt.spaced_unit || opt.spaced_unit==null&&unit.length>3)
         unit_sep = ' ';
+    if (plural && unit!=='' && !/^1(\.0+)?$/.test(num_str))
+        unit = typeof plural=='string' ? plural : unit+'s';
     return style=='currency' ? sign+unit+num_str+scale_str
         : sign+num_str+unit_sep+scale_str+unit;
 };
@@ -411,6 +410,7 @@ var num_styles = {
             'PB', 'PBs', 'byte', 'bytes'],
         vanilla_scaling: 'si',
         default_scaling: 1,
+        default_plural: 1,
     },
 };
 
@@ -779,6 +779,10 @@ E.utf8bin2str = function(arr, offset, len){
         }
     }
     return out;
+};
+
+E.mask_uuid = function(s){
+    return s.substring(0, s.length-32)+s.substring(s.length-8);
 };
 
 return E; }); }());

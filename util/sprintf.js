@@ -224,7 +224,7 @@ E.parse_fast = function(fmt){
             f += 'out += '+arg_padded+';\n';
         }
         else
-            throw 'sprintf invalid format '+_fmt;
+            throw 'sprintf invalid format '+_fmt+' ('+fmt+')';
     }
     f += 'return out;\n';
     return new Function(['sprintf', 'stringify', 'argv'], f)
@@ -374,7 +374,7 @@ E.parse_slow = function(fmt){
                 });
             }
             else
-                throw 'sprintf invalid format '+_fmt;
+                throw 'sprintf invalid format '+_fmt+' ('+fmt+')';
         })();
     }
     return function(_argv){

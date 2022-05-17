@@ -387,6 +387,7 @@
       "test/username.js",
       "test/util.js",
       "test/ws.js",
+      "util/cert_util.js",
       "util/config.js",
       "util/lpm_api_models.js",
       "util/lpm_config.js",
@@ -399,7 +400,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "a1eae9be6bafac64f214ea7e1c84fd37"
+    "md5": "1d5797f8275bc12af43111591bb6866e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -431,5 +432,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.293.147"
+  "version": "1.300.88"
 }

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.300.88",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Prefill username in report a bug modal"
+            },
+            {
+                "type": "bug",
+                "text": "Fix Ban IP globally rule doesn't unban after 1 minute"
+            }
+        ]
+    },
+    {
         "ver": "1.293.147",
         "type": "stable",
         "changes": [

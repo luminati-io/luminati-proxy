@@ -10,6 +10,7 @@ const sinon = require('sinon');
 const winston = require('winston');
 // needed to make lpm_file.js to set work dir to tmp dir
 process.argv.push('--dir', os.tmpdir());
+const lpm_file = require('../util/lpm_file.js');
 const Manager = require('../lib/manager.js');
 const cities = require('../lib/cities');
 sinon.stub(cities, 'ensure_data', ()=>null);
@@ -198,6 +199,12 @@ describe('manager', function(){
         if (!app)
             return;
         app = null;
+        const cust_crts = [lpm_file.get_file_path('lpm.crt'),
+            lpm_file.get_file_path('lpm.key')];
+        cust_crts.forEach(c=>{
+            if (fs.existsSync(c))
+                fs.unlinkSync(c);
+        });
     }));
     beforeEach(()=>{
         temp_files = [];
@@ -237,7 +244,8 @@ describe('manager', function(){
         it('"error" should not be saved to the proxy', etask._fn(
         function*(_this){
             app = yield app_with_proxies([{port: 24000}]);
-            sinon.stub(app.manager, 'validate_proxy').returns('my_error');
+            sinon.stub(app.manager, 'validate_proxy').returns(
+                {msg: 'my_error', code: 0});
             const new_proxy = {port: 24001};
             const res = yield app.manager.init_proxy(new_proxy);
             assert_has(res, {proxy_port: new_proxy, proxy_err: 'my_error'});
@@ -501,14 +509,17 @@ describe('manager', function(){
     describe('api', function(){
         this.timeout(6000);
         it('ssl', etask._fn(function*(_this){
+            const cust_crt = lpm_file.get_file_path('lpm.crt');
+            const sys_crt = path.join(__dirname, '../bin/ca.crt');
+            const crt_path = fs.existsSync(cust_crt) ? cust_crt : sys_crt;
             app = yield app_with_args();
             const res = yield api('ssl');
             assert_has(res.headers, {
                 'content-type': 'application/x-x509-ca-cert',
                 'content-disposition': 'filename=luminati.crt',
-            }, 'headers');
-            assert.equal(res.body, fs.readFileSync(path.join(__dirname,
-                '../bin/ca.crt')), 'certificate');
+            }, 'headers mismatch');
+            assert.equal(res.body, fs.readFileSync(crt_path),
+                'certificate mismatch');
         }));
         describe('version info', ()=>{
             it('current', ()=>etask(function*(){

@@ -97,6 +97,7 @@ E.http_proxy = port=>etask(function*(){
     });
     http_shutdown(proxy.http);
     const headers = {};
+    ssl.load_ca();
     proxy.http.on('connect', (req, res, head)=>etask(function*(){
         let _url = req.url;
         if (proxy.fake)

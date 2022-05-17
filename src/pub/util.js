@@ -306,3 +306,6 @@ export const is_local = ()=>{
     const {href} = window.location;
     return href.includes('localhost') || href.includes('127.0.0.1');
 };
+
+export const in_cp = ()=>window.location!==window.parent.location;
+

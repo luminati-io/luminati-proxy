@@ -51,7 +51,17 @@ E.get_cmd = (cmd, opt)=>{
 };
 E.get_env = opt=>{
     if (!opt.opt||!opt.opt.env)
-        return process.env;
+    {
+        if (!opt.opt||!opt.opt.remove_env)
+            return process.env;
+        let cur_env = {};
+        for (let k of Object.keys(process.env)
+            .filter(r=>!opt.opt.remove_env.includes(r)))
+        {
+            cur_env[k] = process.env[k];
+        }
+        return cur_env;
+    }
     if (!opt.node)
         return opt.opt.env;
     let nave_env = {};

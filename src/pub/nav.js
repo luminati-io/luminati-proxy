@@ -33,7 +33,7 @@ class Nav extends Pure_component {
           <Nav_top/>
           <Nav_left zagent={this.state.settings.zagent}
             lock={this.state.lock}/>
-          <Report_bug_modal/>
+          <Report_bug_modal username={this.state.settings.username}/>
           <Upgrade_downgrade_modal action='upgrade'/>
           <Upgrade_downgrade_modal action='downgrade'/>
           <Shutdown_modal/>

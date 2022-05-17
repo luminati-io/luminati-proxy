@@ -16,6 +16,8 @@ import Tooltip from './common/tooltip.js';
 import {T, t, Language} from './common/i18n.js';
 import conv from '../../util/conv.js';
 
+export const www_api = 'https://brightdata.com';
+
 export const Tooltip_bytes = props=>{
     let {bytes, bytes_out, bytes_in, cost} = props;
     bytes = bytes||0;
@@ -198,11 +200,11 @@ export const with_www_api = Component=>{
             });
         }
         render(){
-            let www_api = 'https://brightdata.com';
+            let _www_api = www_api;
             if (this.state.www_api)
-                www_api = this.state.www_api;
+                _www_api = this.state.www_api;
             return React.createElement(Component,
-                {...this.props, www_api});
+                {...this.props, www_api: _www_api});
         }
     }
     return With_www_api;

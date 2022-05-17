@@ -157,7 +157,8 @@ E.zon_root = product=>{
     if (!file.exists(zon_dir))
     {
         console.error(`checking out zon to ${zon_dir}`);
-        let _env = {CVSROOT: `:pserver:${env.USER}@cvs.luminati.io:/arch/cvs`};
+        let _env = {CVSROOT: `:pserver:${env.USER}@cvs.brightdata.com`
+            +':/arch/cvs'};
         const res = exec.sys_sync(
             ['cvs', '-q', 'co', '-d', path.basename(zon_dir), 'zon'],
             {opt: {cwd: path.dirname(zon_dir), env: _env}});

@@ -17,6 +17,7 @@ const zutil = require('../util/util.js');
 const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
 const Worker = require('../lib/worker.js');
+const Manager = require('../lib/manager.js');
 const requester = require('../lib/requester.js');
 const Timeline = require('../lib/timeline.js');
 const lutil = require('../lib/util.js');
@@ -102,6 +103,7 @@ describe('proxy', ()=>{
     before(etask._fn(function*before(_this){
         _this.timeout(30000);
         console.log('Start prep', new Date());
+        yield ssl.load_ca(new Manager({}));
         proxy = yield http_proxy();
         smtp = yield smtp_test_server(TEST_SMTP_PORT);
         ping = yield http_ping();

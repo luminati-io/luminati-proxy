@@ -4,9 +4,12 @@ const assert = require('assert');
 const os = require('os');
 const path = require('path');
 const sinon = require('sinon');
+const pki = require('node-forge').pki;
 const zerr = require('../util/zerr.js');
 const lpm_file = require('../util/lpm_file.js');
 const lpm_util = require('../util/lpm_util.js');
+const Cert_gen = require('../util/cert_util.js');
+const date = require('../util/date.js');
 const util = require('../lib/util.js');
 
 describe('util', ()=>{
@@ -94,6 +97,66 @@ describe('util', ()=>{
         });
         it('should not accept longer string', ()=>{
             assert.ok(!util.is_eip('r'+new Array(34).join('A')));
+        });
+    });
+    describe('cert_gen', ()=>{
+        it('Should be valid certificate', ()=>{
+            let ca = Cert_gen.create_root_ca();
+            const ca_store = pki.createCaStore([ca.cert]);
+            let ca_to_verify = pki.certificateFromPem(ca.cert);
+            assert.ok(pki.verifyCertificateChain(ca_store, [ca_to_verify]),
+                'Certificate is not valid');
+        });
+        it('Should have valid Public Key', ()=>{
+            let ca = Cert_gen.create_root_ca();
+            let crt = pki.certificateFromPem(ca.cert);
+            assert.equal(crt.publicKey.n.toString(2).length, 2048,
+                'Public Key is not valid');
+        });
+        it('Should have valid extensions', ()=>{
+            let ca = Cert_gen.create_root_ca();
+            let crt = pki.certificateFromPem(ca.cert);
+            assert.ok(crt.getExtension('basicConstraints').cA,
+                'basicConstraints.cA is not set');
+            assert.ok(crt.getExtension('keyUsage').keyCertSign,
+                'basicConstraints.keyCertSign is not set');
+            assert.ok(crt.getExtension('keyUsage').cRLSign,
+                'basicConstraints.cRLSign is not set');
+        });
+        it('Should have given attributes', ()=>{
+            let country = 'Test C', state = 'Test ST', city = 'Test L';
+            let common_name = 'Test PMGR CA', customer = 'Test cust';
+            let cert_opt = {country, state, city, common_name, customer};
+            let ca = Cert_gen.create_root_ca(cert_opt);
+            let crt = pki.certificateFromPem(ca.cert);
+            assert.equal(crt.issuer.getField('C').value, country,
+                'Attribute countryName is not set');
+            assert.equal(crt.issuer.getField('ST').value, state,
+                'Attribute State is not set');
+            assert.equal(crt.issuer.getField('L').value, city,
+                'Attribute Locality is not set');
+            assert.equal(crt.issuer.getField('CN').value, common_name,
+                'Attribute commonName is not set');
+            assert.equal(crt.issuer.getField('O').value, customer,
+                'Attribute Organization is not set');
+        });
+        it('Validity should be instances of Date', ()=>{
+            let {not_before, not_after} = Cert_gen.create_root_ca();
+            assert.ok(not_before instanceof Date, 'not_before is not Date');
+            assert.ok(not_after instanceof Date, 'not_after is not Date');
+        });
+        it('Should be valid not before then 2 days', ()=>{
+            let {not_before} = Cert_gen.create_root_ca();
+            assert.ok(not_before < date.add(date(), {day: -2, sec: 2}),
+                'not_before is less then 2 days ago');
+            assert.ok(not_before > date.add(date(), {day: -2, sec: -2}),
+                'not_before is more then 2 days ago');
+
+        });
+        it('Should be valid not after then 20 years', ()=>{
+            let {not_before, not_after} = Cert_gen.create_root_ca();
+            assert.deepStrictEqual(not_after, date.add(not_before,
+                {year: 20}), 'not_after is not 20 years in future');
         });
     });
 });

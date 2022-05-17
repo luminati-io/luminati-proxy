@@ -272,13 +272,13 @@ E.post_all_workers = function(message, args){
         E.post_worker(cluster.workers[id], message, args);
 };
 
-E.worker_remove_listener = function(name){
+E.worker_off = E.worker_remove_listener = function(name){
     if (cluster.isMaster)
         throw new Error('worker_remove_listener called from Cluster master');
     delete handlers[name];
 };
 
-E.master_remove_listener = function(name){
+E.master_off = E.master_remove_listener = function(name){
     if (!cluster.isMaster)
         throw new Error('master_remove_listener called from Cluster worker');
     delete handlers[name];

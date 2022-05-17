@@ -13,6 +13,7 @@ var E = date_get;
 
 E.sec = {
     NANO: 1e-9,
+    MICRO: 1e-6,
     MS: 1e-3,
     SEC: 1,
     MIN: 60,

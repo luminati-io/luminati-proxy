@@ -54,11 +54,11 @@ E.restore_case = function(headers, original_raw){
 };
 
 const generate_sec_ch_rules =
-(first_version, last_version, browser_opts = {})=>{
+(first_version, last_version, browser_opts = {}, specific_versions = {})=>{
     const versions_array = Array.from(
         {length: last_version - first_version + 1},
         (_, idx)=>idx+first_version);
-    return versions_array.map(v=>({
+    return versions_array.map(v=>specific_versions[v]||{
         match: Object.assign(
             {browser: 'chrome', https: true, version_min: v}, browser_opts),
         rules: {
@@ -67,10 +67,43 @@ const generate_sec_ch_rules =
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': '"Windows"',
         },
-    }));
+    });
 };
 
-const sec_ch_rules_chrome = generate_sec_ch_rules(89, 117);
+const sec_ch_rules_chrome = generate_sec_ch_rules(89, 117, {}, {
+    91: {match: {browser: 'chrome', https: true, version_min: 91},
+        rules: {
+            'sec-ch-ua': `" Not;A Brand";v="99", "Google Chrome";v="91", `
+                +`"Chromium";v="91"`,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        },
+    },
+    94: {match: {browser: 'chrome', https: true, version_min: 94},
+        rules: {
+            'sec-ch-ua': `"Chromium";v="94", "Google Chrome";v="94", `
+                +`";Not A Brand";v="99"`,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        },
+    },
+    95: {match: {browser: 'chrome', https: true, version_min: 95},
+        rules: {
+            'sec-ch-ua': `"Google Chrome";v="95", "Chromium";v="95", `+
+                `";Not A Brand";v="99"`,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        },
+    },
+    97: {match: {browser: 'chrome', https: true, version_min: 97},
+        rules: {
+            'sec-ch-ua': `" Not;A Brand";v="99", "Google Chrome";v="97", `
+                +`"Chromium";v="97"`,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        },
+    },
+});
 
 // default header values
 const rules_headers = [
@@ -223,7 +256,7 @@ const rules_headers = [
         rules: {accept: 'image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5'}},
     {match: {browser: 'safari', version_min: 11, type: 'image'},
         rules: {accept: 'image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
-    {match: {browser: 'safari', version_min: 15, type: 'image'},
+    {match: {browser: 'safari', version_min: 14, type: 'image'},
         rules: {accept: 'image/webp,image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
     {match: {browser: 'safari', https: true, version_min: 11},
         rules: {'accept-encoding': 'br, gzip, deflate'}},
@@ -271,6 +304,7 @@ E.browser_defaults = function(browser, opt){
         version: opt.major,
         https: opt.https,
         type: opt.type==='document' ? undefined : opt.type,
+        redirect: opt.redirect,
     });
 };
 
@@ -401,6 +435,11 @@ const rules_orders = [
             cache-control upgrade-insecure-requests user-agent sec-fetch-mode
             sec-fetch-user accept sec-fetch-site referer accept-encoding
             accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 81},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            origin upgrade-insecure-requests user-agent content-type accept
+            sec-fetch-site sec-fetch-mode sec-fetch-user sec-fetch-dest referer
+            accept-encoding accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 85},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             origin upgrade-insecure-requests user-agent accept
@@ -412,6 +451,18 @@ const rules_orders = [
             origin upgrade-insecure-requests user-agent accept
             sec-fetch-site sec-fetch-mode sec-fetch-user sec-fetch-dest referer
             accept-encoding accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 89, redirect: true},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            upgrade-insecure-requests origin user-agent accept
+            sec-ch-ua-platform sec-fetch-site sec-fetch-mode sec-fetch-user
+            sec-fetch-dest sec-ch-ua sec-ch-ua-mobile referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 94, redirect: true},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            upgrade-insecure-requests origin user-agent accept sec-fetch-site
+            sec-fetch-mode sec-fetch-user sec-fetch-dest sec-ch-ua
+            sec-ch-ua-mobile sec-ch-ua-platform referer accept-encoding
+            accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 76,
         type: ['script', 'image']},
         rules: {order: qw`:method :authority :scheme :path pragma
@@ -429,24 +480,25 @@ const rules_orders = [
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             sec-fetch-mode x-requested-with user-agent content-type accept
             sec-fetch-site referer accept-encoding accept-language cookie`}},
-    {match: {browser: 'chrome', http2: true, version_min: 78},
-        rules: {order: qw`:method :authority :scheme :path pragma cache-control
-            origin upgrade-insecure-requests user-agent sec-fetch-user accept
-            sec-fetch-site sec-fetch-mode referer accept-encoding
-            accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 78, type: 'ajax'},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             x-requested-with user-agent content-type accept sec-fetch-site
             sec-fetch-mode referer accept-encoding accept-language cookie`}},
-    {match: {browser: 'chrome', http2: true, version_min: 80},
-        rules: {order: qw`:method :authority :scheme :path pragma cache-control
-            origin upgrade-insecure-requests user-agent sec-fetch-dest accept
-            sec-fetch-site sec-fetch-mode sec-fetch-user referer
-            accept-encoding accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 80, type: 'ajax'},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             content-length user-agent sec-fetch-dest accept x-requested-with
             origin sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 89, type: 'ajax'},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+        content-length sec-ch-ua sec-ch-ua-mobile user-agent accept
+        x-requested-with sec-fetch-site sec-fetch-mode sec-fetch-dest
+        origin referer accept-encoding accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 94, type: 'ajax'},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            content-length sec-ch-ua sec-ch-ua-mobile user-agent
+            sec-ch-ua-platform accept x-requested-with sec-fetch-site
+            sec-fetch-mode sec-fetch-dest origin referer accept-encoding
             accept-language cookie`}},
     {
         match: {browser: 'chrome', http2: true, version_min: 80, type: 'ajax',
@@ -456,11 +508,21 @@ const rules_orders = [
             x-requested-with origin sec-fetch-site sec-fetch-mode referer
             accept-encoding accept-language cookie`}
     },
-    {match: {browser: 'chrome', http2: true, version_min: 81},
+    {match: {browser: 'chrome', http2: true, version_min: 89, type: 'ajax',
+        headers: {'content-type': exists}},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
-            origin upgrade-insecure-requests user-agent content-type accept
-            sec-fetch-site sec-fetch-mode sec-fetch-user sec-fetch-dest referer
-            accept-encoding accept-language cookie`}},
+        content-length sec-ch-ua sec-ch-ua-mobile user-agent content-type
+        accept x-requested-with origin sec-fetch-site sec-fetch-mode
+        sec-fetch-dest referer accept-encoding accept-language cookie`}
+    },
+    {match: {browser: 'chrome', http2: true, version_min: 94, type: 'ajax',
+        headers: {'content-type': exists}},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            content-length sec-ch-ua sec-ch-ua-mobile user-agent
+            sec-ch-ua-platform content-type accept x-requested-with origin
+            sec-fetch-site sec-fetch-mode sec-fetch-dest referer
+            accept-encoding accept-language cookie`}
+    },
     {match: {browser: 'mobile_chrome', http2: true},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
@@ -516,6 +578,7 @@ E.browser_default_header_order = function(browser, opt){
         type: opt.req_type||'document',
         http2: opt.http2,
         headers: opt.headers,
+        redirect: opt.redirect,
     }).order;
 };
 

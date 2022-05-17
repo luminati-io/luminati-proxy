@@ -27,7 +27,7 @@ import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
-import {report_exception} from './util.js';
+import {report_exception, in_cp} from './util.js';
 import {createGlobalStyle} from 'styled-components';
 import i18n, {TranslationContext, is_except_path} from './common/i18n.js';
 import './css/app.less';
@@ -312,6 +312,7 @@ class Page extends Pure_component {
           <Proxy_add settings={settings}/>
           <div className={classnames('page_body vbox', {zagent})}>
             <Error_boundry>
+              <Validator zagent={zagent}/>
               <Switch>
                 <Route path="/overview" exact component={Overview}/>
                 <Route path="/proxy/:port" component={Proxy_edit}/>
@@ -327,6 +328,12 @@ class Page extends Pure_component {
         </div>;
     }
 }
+
+const Validator = ({zagent})=>{
+    if (zagent && !in_cp())
+        throw 'cp_required';
+    return <React.Fragment></React.Fragment>;
+};
 
 const Root = ()=>
     <BrowserRouter>

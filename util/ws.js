@@ -856,7 +856,7 @@ class IPC_client {
     }
     _call(opt, cmd, ...arg){
         let _this = this;
-        let timeout = opt.timeout||5*MIN;
+        let timeout = opt.timeout!==null&&(opt.timeout||5*MIN);
         let send_retry_timeout = 3*SEC;
         return etask(function*IPC_client_call(){
             let req = {type: opt.type=='mux' && 'ipc_mux' || 'ipc_call', cmd,
@@ -870,11 +870,14 @@ class IPC_client {
             this.info.cookie = req.cookie;
             _this._pending.set(req.cookie, this);
             this.finally(()=>_this._pending.delete(req.cookie));
-            this.alarm(timeout, ()=>{
-                let e = new Error(`${cmd} timeout`);
-                e.code = 'ipc_timeout';
-                this.throw(e);
-            });
+            if (timeout)
+            {
+                this.alarm(timeout, ()=>{
+                    let e = new Error(`${cmd} timeout`);
+                    e.code = 'ipc_timeout';
+                    this.throw(e);
+                });
+            }
             let res = {status: _this._ws.status}, prev;
             let send = _this._ws[opt.zjson ? 'zjson' : 'json'].bind(_this._ws);
             let mk_bad_ipc_call_error = msg=>{
@@ -1335,6 +1338,7 @@ class Mux {
         stream.create_ts = Date.now();
         stream.win_size = DEFAULT_WIN_SIZE;
         stream.sent = stream.ack = stream.zread = 0;
+        stream.fin_got = false;
         stream.prependListener('finish', ()=>zfinish(false, true));
         stream.prependListener('data', function(chunk){
             this.zread += chunk.length;
