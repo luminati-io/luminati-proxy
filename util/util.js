@@ -550,7 +550,7 @@ E.reduce_obj = function(coll, key_cb, val_cb, merge_cb){
 };
 
 E.group_by = function(coll, key_cb, val_cb){
-    var inner_val_cb = get_map_fn(val_cb); 
+    var inner_val_cb = get_map_fn(val_cb);
     val_cb = function(it){ return [inner_val_cb(it)]; };
     var merge_cb = function(a, b){ return a.concat(b); };
     return E.reduce_obj(coll, key_cb, val_cb, merge_cb);

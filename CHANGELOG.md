@@ -1,6 +1,6 @@
 Proxy manager - Change Log
 
-## 1.300.88 Stable
+## 1.300.693 Stable
 - :star: Prefill username in report a bug modal
 - :bug: Fix Ban IP globally rule doesn't unban after 1 minute
 
