@@ -531,7 +531,7 @@ E.reduce_obj = function(coll, key_cb, val_cb, merge_cb){
             if (k===undefined || v===undefined)
                 return;
             if (obj[k]!==undefined && merge_cb)
-                v = merge_cb(v, obj[k]);
+                v = merge_cb(obj[k], v);
             obj[k] = v;
         });
     }
@@ -542,7 +542,7 @@ E.reduce_obj = function(coll, key_cb, val_cb, merge_cb){
             if (k===undefined || v===undefined)
                 return;
             if (obj[k]!==undefined && merge_cb)
-                v = merge_cb(v, obj[k]);
+                v = merge_cb(obj[k], v);
             obj[k] = v;
         });
     }
@@ -601,8 +601,11 @@ E.make_error_wo_stack = function(msg, extra){
     return e;
 };
 
-E.omit_falsy_props = o=>Object.fromEntries(Object.entries(o).filter(
-    ([, v])=>![null, undefined, ''].includes(v)));
+E.omit_falsy_props = function(o){
+    return Object.fromEntries(Object.entries(o).filter(function(arg){
+        return ![null, undefined, ''].includes(arg[1]);
+    }));
+};
 
 function get_map_fn(v){
     if (v==null)

@@ -55,7 +55,7 @@ E.send = function(opt){
         var _this = this;
         xhr.done(function(v){
             if (opt.restore_dates && v && typeof v=='object')
-                E.restore_dates(v);
+                zescape.restore_dates(v);
             _this.continue(v);
         });
         xhr.fail(function(_xhr, status_text, err){
@@ -78,17 +78,17 @@ E.send = function(opt){
             (xhr.responseText||'').substr(0, 200));
         if (retry && (!opt.should_retry||opt.should_retry(err, xhr, ajopt)))
             return this.return(E.send(assign({}, opt, {retry: retry-1})));
-        if (xhr.statusText=='timeout')
+        if (xhr.statusText=='timeout' && !opt.no_emit_err)
             E.events.emit('timeout', this);
-        if (xhr.status==403)
+        if (xhr.status==403 && !opt.no_emit_err)
             E.events.emit('unauthorized', this, xhr);
-        if (xhr.status==406)
+        if (xhr.status==406 && !opt.no_emit_err)
             E.events.emit('maintenance', this, xhr);
-        if (xhr.status==500)
+        if (xhr.status==500 && !opt.no_emit_err)
             E.events.emit('unhandledException', this, xhr);
         var xhr_data = get_res_data(xhr);
         if (opt.restore_dates && xhr_data && typeof xhr_data=='object')
-            E.restore_dates(xhr_data);
+            zescape.restore_dates(xhr_data);
         if (opt.no_throw)
         {
             return {
@@ -170,34 +170,5 @@ function get_res_data(xhr){
     }
     return xhr.responseText||'';
 }
-
-E.restore_dates = function(data){
-    if (!data || typeof data!='object')
-        return;
-    var stack = new Array(100), len = 0;
-    stack[len++] = data;
-    while (len>0)
-    {
-        var obj = stack[--len];
-        for (var k in obj)
-        {
-            var v = obj[k];
-            if (typeof v=='string')
-            {
-                var strlen = v.length;
-                if (strlen>=20 && strlen<30 && date_rx.test(v))
-                    obj[k] = new Date(v);
-            }
-            else if (typeof v=='object' && v!=null)
-            {
-                if (!v.constructor || v.constructor==Object)
-                    stack[len++] = v;
-                else if (v.length && Array.isArray(v))
-                    stack[len++] = v;
-            }
-        }
-    }
-};
-var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;
 
 return E; }); }());

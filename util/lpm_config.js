@@ -15,9 +15,11 @@ conf.work_dir = lpm_file.work_dir;
 Object.assign(conf.manager_default, {
     api_domain: process.env.PMGR_API||pkg.api_domain,
     config: lpm_file.get_file_path(
-        '.luminati.json'.substr(conf.is_win ? 1 : 0)),
+        '.luminati.json'.slice(conf.is_win ? 1 : 0)),
     loki: lpm_file.get_file_path(
-        '.luminati.db'.substr(conf.is_win ? 1 : 0)),
+        '.luminati.db'.slice(conf.is_win ? 1 : 0)),
+    username: lpm_file.get_file_path(
+        '.username.json'.slice(conf.is_win ? 1 : 0)),
 });
 
 Object.assign(module.exports, conf);

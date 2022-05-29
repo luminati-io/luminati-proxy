@@ -59,7 +59,10 @@ const App = withRouter(class App extends Pure_component {
                 yield window.fetch('/api/cloud_auth', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({lpm_token: qs_o.lpm_token}),
+                    body: JSON.stringify({
+                        lpm_token: qs_o.lpm_token,
+                        username: qs_o.user,
+                    }),
                 });
             }
             if (qs_o.lang)

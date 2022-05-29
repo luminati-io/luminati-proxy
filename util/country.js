@@ -1505,9 +1505,9 @@ var terr_country = {
     +'MP GU MH PG UM AU TL SB FM NR NF TK TO TV WF',
     east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
     +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
-    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB GW TF YT ST',
+    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB GW TF YT ST SD',
     east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
-    +'MK AL AZ KG BA UZ SD BI XK SM',
+    +'MK AL AZ KG BA UZ BI XK SM',
     in: 'IN BD LK RE MV',
     uk_ie_dach: 'DE AT CH UK GB IE IM',
     west_europe: 'FR ES NL IT PT BE AD MT MC MA LU TN DZ GI LI SE DK FI NO AX '

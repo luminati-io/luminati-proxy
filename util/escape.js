@@ -280,4 +280,34 @@ E.markdown2 = function(val, type){
     return (''+val).replace(re, '\\$&');
 };
 
+E.restore_dates = function(data){
+    if (!data || typeof data!='object')
+        return;
+    var stack = new Array(100), len = 0;
+    stack[len++] = data;
+    while (len>0)
+    {
+        var obj = stack[--len];
+        for (var k in obj)
+        {
+            var v = obj[k];
+            if (typeof v=='string')
+            {
+                var strlen = v.length;
+                if (strlen>=20 && strlen<30 && date_rx.test(v))
+                    obj[k] = new Date(v);
+            }
+            else if (typeof v=='object' && v!=null)
+            {
+                if (!v.constructor || v.constructor==Object)
+                    stack[len++] = v;
+                else if (v.length && Array.isArray(v))
+                    stack[len++] = v;
+            }
+        }
+    }
+    return;
+};
+var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;
+
 return E; }); }());

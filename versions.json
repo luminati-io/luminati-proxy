@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.302.488",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Correct username in event log"
+            }
+        ]
+    },
+    {
         "ver": "1.300.693",
         "type": "stable",
         "changes": [
