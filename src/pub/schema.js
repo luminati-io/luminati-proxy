@@ -106,7 +106,7 @@ class Schema extends Pure_component {
               <Layer no_btn id="port_numbers"><T>Port</T>{' '
                   +this.state.proxy_port}</Layer>
               <Layer id="super_proxy">
-                <span className={'flag-icon flag-icon-'+this.state.spcountry}/>
+                <span className={'fi fi-'+this.state.spcountry}/>
                 <T>Super Proxy</T>
               </Layer>
               <Layer no_btn id="port_numbers"><T>Port</T> 80, 443</Layer>
@@ -171,7 +171,7 @@ const Flag = ({proxy={}, zones})=>{
     if (!country||country=='any'||country=='*')
         country = proxy.country;
     if (country&&country!='any'&&country!='*')
-        return <span className={'flag-icon flag-icon-'+country}/>;
+        return <span className={'fi fi-'+country}/>;
     return <img className="globe" src="/img/flag_any_country.svg"/>;
 };
 

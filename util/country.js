@@ -1468,6 +1468,18 @@ E.regions = {
     ZM: ['Eastern Africa', 'EMEA'],
     ZW: ['Eastern Africa', 'EMEA'],
 };
+E.region = {};
+for (var cn in E.regions)
+{
+    var codes = ['EMEA', 'AMER', 'APAC'];
+    var regions = E.regions[cn];
+    var code = codes.find(function(c){ return regions.includes(c); });
+    if (code)
+        E.region[cn] = code;
+    if (regions.includes('China'))
+        E.region[cn] = 'APAC';
+}
+
 var supraregions = {
     'Northern America': ['America'],
     'South America': ['LATAM'],

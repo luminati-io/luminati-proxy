@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.303.587 Stable
+- :bug: Remove usage of username.json file
+
 ## 1.302.488 Stable
 - :star: Correct username in event log
 

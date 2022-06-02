@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.303.587",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Remove usage of username.json file"
+            }
+        ]
+    },
+    {
         "ver": "1.302.488",
         "type": "stable",
         "changes": [

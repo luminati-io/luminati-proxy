@@ -13,7 +13,7 @@ process.argv.push('--dir', os.tmpdir());
 const lpm_file = require('../util/lpm_file.js');
 const Manager = require('../lib/manager.js');
 const cities = require('../lib/cities');
-sinon.stub(cities, 'ensure_data', ()=>null);
+sinon.stub(cities, 'ensure_data').returns(null);
 const logger = require('../lib/logger.js');
 const etask = require('../util/etask.js');
 const zutil = require('../util/util.js');
@@ -208,7 +208,7 @@ describe('manager', function(){
     }));
     beforeEach(()=>{
         temp_files = [];
-        sb = sinon.sandbox.create();
+        sb = sinon.createSandbox();
         sb.stub(os, 'cpus').returns([1, 1]);
         nock(api_base).get('/').times(2).reply(200, {});
         nock(api_base).get('/lpm/server_conf').query(true).reply(200, {});
@@ -717,8 +717,10 @@ describe('manager', function(){
                 }));
                 it('does not hang on errors', etask._fn(function*(_this){
                     app = yield app_with_proxies([{port: 24000}], {});
-                    const stub = sinon.stub(app.manager, 'create_new_proxy',
-                        ()=>{ throw new Error('error creating proxy'); });
+                    const stub = sinon.stub(app.manager, 'create_new_proxy')
+                        .callsFake(()=>{
+                            throw new Error('error creating proxy');
+                        });
                     const res = yield api_json('api/proxy_dup',
                         {method: 'post', body: {port: 24000}});
                     assert.equal(res.statusCode, 500);
@@ -731,10 +733,10 @@ describe('manager', function(){
                 const t = (name, opt, eq)=>it(name, etask.fn(function*(){
                     const proxy = Object.assign({port: 24000}, opt);
                     app = yield app_with_proxies([proxy], {});
-                    const {statusCode: status_code, body} =
+                    const refresh_sessions_res =
                         yield api_json(`api/refresh_sessions/${proxy.port}`);
-                    assert.equal(status_code, eq.code);
-                    assert.deepEqual(body, eq.body);
+                    assert.equal(refresh_sessions_res.statusCode, eq.code);
+                    assert.deepEqual(refresh_sessions_res.body, eq.body);
                 }));
                 t('returns session_id when not rotating', null,
                     {code: 200, body: {session_id: '24000_1'}});
@@ -842,11 +844,11 @@ describe('manager', function(){
         describe('open browser with custom opts', ()=>{
             let launch_stub, open_stub;
             beforeEach(()=>{
-                launch_stub = sinon.stub(puppeteer, 'launch', ()=>null);
-                open_stub = sinon.stub(puppeteer, 'open_page', ()=>null);
+                launch_stub = sinon.stub(puppeteer, 'launch').returns(null);
+                open_stub = sinon.stub(puppeteer, 'open_page').returns(null);
             });
             afterEach(()=>{
-                [launch_stub, open_stub].forEach(stub=>sinon.restore(stub));
+                [launch_stub, open_stub].forEach(stub=>stub.restore());
             });
             const t = (name, opt, arg, expected)=>it(name, etask._fn(
             function*(_this){
@@ -1189,7 +1191,8 @@ describe('manager', function(){
                 yield mgr.start();
                 assert.deepEqual(date(mgr.config_ts), date(local_conf.ts));
                 let local_update_ts;
-                sb.stub(mgr.lpm_f, 'update_conf', ({_defaults, ts})=>{
+                sb.stub(mgr.lpm_f, 'update_conf').callsFake(
+                ({_defaults, ts})=>{
                     local_update_ts = date(ts);
                     zutil.extend_deep(server_conf, {_defaults, ts});
                 });

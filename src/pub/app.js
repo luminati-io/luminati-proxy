@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'flag-icon-css/css/flag-icon.css';
+import 'flag-icons/css/flag-icons.css';
 import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';

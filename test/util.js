@@ -42,7 +42,7 @@ describe('util', ()=>{
         const t = (env, params, result, error)=>{
             if (error)
             {
-                const spy = sinon.stub(zerr, 'zexit',
+                const spy = sinon.stub(zerr, 'zexit').callsFake(
                     err=>assert.equal(err, error));
                 lpm_util.t.parse_env_params(env, params);
                 assert(spy.called);

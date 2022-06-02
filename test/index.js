@@ -123,7 +123,7 @@ describe('proxy', ()=>{
         Server.session_to_ip = {};
         Server.last_ip = new Netmask('1.1.1.0');
         common.last_ip = new Netmask('1.1.1.0');
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         proxy.fake = true;
         proxy.connection = null;
         proxy.history = [];
@@ -152,7 +152,8 @@ describe('proxy', ()=>{
             req = req();
             if (tls)
             {
-                sandbox.stub(process.env, 'NODE_TLS_REJECT_UNAUTHORIZED', 0);
+                sandbox.stub(process.env, 'NODE_TLS_REJECT_UNAUTHORIZED')
+                    .value(0);
                 if (typeof req=='string')
                     req = {url: req};
                 req.agent = new https.Agent({servername: 'localhost'});
@@ -845,7 +846,8 @@ describe('proxy', ()=>{
             ip = ip||'ip';
             let call_count = 0;
             const handle_proxy_resp_org = li.handle_proxy_resp.bind(li);
-            return sinon.stub(li, 'handle_proxy_resp', (...args)=>_res=>{
+            return sinon.stub(li, 'handle_proxy_resp').callsFake((...args)=>
+            _res=>{
                 const ip_inj = ip_alt && call_count++%2 ? ip_alt : ip;
                 _res.headers['x-luminati-ip'] = ip_inj;
                 return handle_proxy_resp_org(...args)(_res);
@@ -982,12 +984,10 @@ describe('proxy', ()=>{
                     assert.ok(!retried);
                     assert.ok(add_stub.called);
                 }));
-                const t = (name, req)=>it(name, ()=>etask(
-                    function*()
-                {
+                const t = (name, req)=>it(name, ()=>etask(function*(){
                     proxy.fake = true;
-                    sandbox.stub(Server, 'get_random_ip', ()=>'1.1.1.1');
-                    sandbox.stub(common, 'get_random_ip', ()=>'1.1.1.1');
+                    sandbox.stub(Server, 'get_random_ip').returns('1.1.1.1');
+                    sandbox.stub(common, 'get_random_ip').returns('1.1.1.1');
                     l = yield lum({rules: [{
                         action: {ban_ip: 0},
                         action_type: 'ban_ip',
@@ -1018,7 +1018,7 @@ describe('proxy', ()=>{
                 beforeEach(()=>etask(function*(){
                     l = yield lum({rules: []});
                     req = {ctx: {}};
-                    req_stub = sinon.stub(request, 'Request',
+                    req_stub = sinon.stub(request, 'Request').callsFake(
                         ()=>({on: ()=>null, end: ()=>null}));
                 }));
                 afterEach(()=>{

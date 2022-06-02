@@ -458,7 +458,7 @@ export const any_flag = props=><Tooltip title={t('Any')}>
 export const flag_with_title = (country, title, tooltip)=>{
     return <Tooltip title={tooltip||country.toUpperCase()}>
       <span>
-        <span className={'flag-icon flag-icon-'+country}/>
+        <span className={'fi fi-'+country}/>
         <span className="lit">{title}</span>
       </span>
     </Tooltip>;

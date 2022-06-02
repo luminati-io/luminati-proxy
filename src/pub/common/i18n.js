@@ -136,7 +136,7 @@ const Lang_row = ({lang, set_lang})=>
 
 const Lang_cell = ({lang})=>
     <React.Fragment>
-      <span className={`flag-icon flag-icon-${langs[lang].flag}`}/>
+      <span className={`fi fi-${langs[lang].flag}`}/>
       {langs[lang].name}
     </React.Fragment>;
 
