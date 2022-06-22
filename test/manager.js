@@ -1088,7 +1088,7 @@ describe('manager', function(){
         const spy_obj_methods = (obj, ...methods)=>
             Object.fromEntries(methods.map(m=>[m, sb.spy(obj, m)]));
         describe('config on server is newer', ()=>{
-            let local_conf, server_conf;
+            let local_conf, server_conf, acc_opt = {force: false};
             beforeEach(()=>{
                 local_conf = get_local_conf(date.add(date(), {day: -1}));
                 server_conf = get_server_conf(date());
@@ -1107,7 +1107,7 @@ describe('manager', function(){
                 yield mgr.start();
                 sinon.assert.calledWith(perr, 'start_success');
                 sinon.assert.calledWithExactly(apply_cloud_config,
-                    server_conf);
+                    server_conf, acc_opt);
                 const logged_in = logged_update.returnValues[0].retval;
                 assert.strictEqual(logged_in, true);
                 assert.equal(+mgr.config_ts, +server_conf.ts);
@@ -1154,7 +1154,7 @@ describe('manager', function(){
             }));
         });
         describe('local config is newer', ()=>{
-            let local_conf, server_conf;
+            let local_conf, server_conf, acc_opt = {force: false};
             beforeEach(()=>{
                 local_conf = get_local_conf(date());
                 server_conf = get_server_conf(date.add(date(), {day: -1}));
@@ -1173,7 +1173,7 @@ describe('manager', function(){
                 yield mgr.start();
                 sinon.assert.calledWith(perr, 'start_success');
                 sinon.assert.calledWithExactly(apply_cloud_config,
-                    server_conf);
+                    server_conf, acc_opt);
                 const logged_in = logged_update.returnValues[0].retval;
                 assert.strictEqual(logged_in, true);
                 assert_has(mgr, {

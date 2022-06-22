@@ -37,8 +37,9 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
     if (msg.type=='ipc_post')
     {
         try { handlers[msg.handler](msg.msg, sock);
-        } catch(e){ ef(e);
-            zerr.err(`cluster_ipc.on_call ${sender}: ${e}`); }
+        } catch(e){ ef(e, this);
+            zerr.err(`cluster_ipc.on_call ${sender}: ${e}`);
+        }
         return;
     }
     this.info.from = sender;
@@ -46,7 +47,7 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
     let value, handler_error;
     try {
         value = yield handlers[msg.handler](msg.msg, sock);
-    } catch(e){ ef(e);
+    } catch(e){ ef(e, this);
         handler_error = e;
         zerr.err(`cluster_message_handler: ${msg.handler}: ${e}`);
     }
@@ -69,7 +70,9 @@ let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
                 +`to ${sender}.${msg.handler} cookie ${msg.cookie}`);
         }
         send(sender, response);
-    } catch(e){ ef(e); zerr.err(`cluster_ipc.on_call ${sender}: ${e}`); }
+    } catch(e){ ef(e, this);
+        zerr.err(`cluster_ipc.on_call ${sender}: ${e}`);
+    }
 });
 
 let on_response = (sender, msg)=>{
@@ -174,7 +177,7 @@ let call = (to, name, args, sock, timeout)=>etask(function*ipc_call(){
         let msg = {type: 'ipc_call', handler: name, msg: args, cookie: cookie};
         send(to, msg, sock);
         return yield this.wait(timeout);
-    } catch(e){ ef(e);
+    } catch(e){ ef(e, this);
         zerr.err(`cluster_ipc.call to ${to} ${name}(${args}): `+zerr.e2s(e));
         throw e;
     }

@@ -135,4 +135,14 @@ E.trim = function(s){
         .replace(/[\s\u00a0\u200c]*$/g, '');
 };
 
+E.object_to_str = function(obj){
+    return Object.entries(obj)
+    .map(function(entry){
+        if (entry[1]!=null)
+            return entry[0]+'='+entry[1];
+    })
+    .filter(Boolean)
+    .join(' ');
+};
+
 return E; }); }());

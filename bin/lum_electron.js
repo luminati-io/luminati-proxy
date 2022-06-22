@@ -12,6 +12,7 @@ console.info = function(){};
 const auto_updater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
 const config = require('../util/lpm_config.js');
+const lpm_config_static = require('../util/lpm_config_static');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
@@ -90,8 +91,8 @@ auto_updater.on('update-available', e=>etask(function*(){
         }
         return;
     }
-    const changelog_url = 'https://github.com/luminati-io/luminati-proxy/blob/'
-    +'master/CHANGELOG.md';
+    const changelog_url = 'https://github.com/'+lpm_config_static.github_repo
+    +'/blob/master/CHANGELOG.md';
     const update_msg = `Update version ${e.version} is available. Full list of`
     +` changes is available here: ${changelog_url}`;
     logger.notice(update_msg);

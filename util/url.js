@@ -79,7 +79,7 @@ E.get_root_domain = function(domain){
 
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
-    var match = email.toLowerCase().match(/^[a-z0-9_.\-+*%!]+@(.*)$/);
+    var match = (email||'').toLowerCase().match(/^[a-z0-9_.\-+*%!]+@(.*)$/);
     return match && match[1];
 };
 

@@ -10,6 +10,7 @@ const conf = {
     is_win: process.platform=='win32',
     is_lum: undefined,
     daemon_name: 'luminati_proxy_manager',
+    github_repo: 'luminati-io/luminati-proxy',
     work_dir: '',
     min_node: '12.18.3',
     max_node: '14.19.0',

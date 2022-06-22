@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.307.810",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix 'Host' header behavior"
+            }
+        ]
+    },
+    {
         "ver": "1.303.587",
         "type": "stable",
         "changes": [

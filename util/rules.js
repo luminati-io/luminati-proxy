@@ -109,6 +109,41 @@ E.rule_value_match = (rule_v, v, opts)=>{
         (_rule_v, k)=>E.rule_value_match(_rule_v, v && v[k], opts));
 };
 
+E.rule_value_match_debug = (rule_v, v, opts)=>{
+    if (Array.isArray(rule_v))
+    {
+        for (let _rule_v of rule_v)
+        {
+            let match = E.rule_value_match_debug(_rule_v, v, opts);
+            if (match.context)
+                return match;
+        }
+        return {};
+    }
+    if (!_.isObject(rule_v))
+    {
+        // XXX denis: remove this conversion
+        // rules need to be case *sensitive* if not stated otherwise
+        rule_v = typeof rule_v=='string' ? rule_v.toLowerCase() : rule_v;
+        v = typeof v=='string' ? v.toLowerCase() : v;
+        return rule_v==v ? {pattern: rule_v, context: v} : {};
+    }
+    // object is not supported: 2 patterns will be found - which one to return?
+    if (!rule_v.test)
+        return {};
+    // XXX denis: remove this conversion
+    // rules need to be case *sensitive* if not stated otherwise
+    rule_v = new RegExp(rule_v, rule_v.flags.replace('i', '')+'i');
+    let match = rule_v.exec(v);
+    if (!match)
+        return {};
+    let before = _.get(opts, 'before', 10);
+    let after = _.get(opts, 'after', 10);
+    let context = typeof v!='string' ? v :
+        v.substring(match.index-before, match.index+match[0].length+after);
+    return {pattern: rule_v.toString(), context};
+};
+
 E.rule_merge_customizer = (dest, src)=>{
     if (Array.isArray(src))
         return src;

@@ -4,6 +4,7 @@
 if (!module.parent)
     global.zon_config_fallback = {};
 require('../util/config.js');
+const lpm_config = require('./util/lpm_config_static'); 
 const etask = require('../util/etask.js');
 const request = require('request');
 const exec = require('../util/exec.js');
@@ -17,8 +18,8 @@ const main = ()=>etask(function*(){
     cli.process_args();
     if (!cli.opt.version)
         return console.log('You need to pass --version');
-    const url = 'https://raw.githubusercontent.com/luminati-io/'
-        +'luminati-proxy/master/package.json';
+    const url = 'https://raw.githubusercontent.com/'+lpm_config.github_repo
+        +'/master/package.json';
     const github_res = yield etask.nfn_apply(request, [{url, json: true}]);
     if (github_res.body.version!=cli.opt.version)
         return console.log('Wrong version on github.com');

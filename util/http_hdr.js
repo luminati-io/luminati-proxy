@@ -54,13 +54,12 @@ E.restore_case = function(headers, original_raw){
 };
 
 const generate_sec_ch_rules =
-(first_version, last_version, browser_opts = {}, specific_versions = {})=>{
+(first_version, last_version, specific_versions = {})=>{
     const versions_array = Array.from(
         {length: last_version - first_version + 1},
         (_, idx)=>idx+first_version);
     return versions_array.map(v=>specific_versions[v]||{
-        match: Object.assign(
-            {browser: 'chrome', https: true, version_min: v}, browser_opts),
+        match: {browser: 'chrome', https: true, version_min: v},
         rules: {
             'sec-ch-ua': `" Not A;Brand";v="99", `
                 +`"Chromium";v="${v}", "Google Chrome";v="${v}"`,
@@ -70,7 +69,7 @@ const generate_sec_ch_rules =
     });
 };
 
-const sec_ch_rules_chrome = generate_sec_ch_rules(89, 117, {}, {
+const sec_ch_rules_chrome = generate_sec_ch_rules(89, 117, {
     91: {match: {browser: 'chrome', https: true, version_min: 91},
         rules: {
             'sec-ch-ua': `" Not;A Brand";v="99", "Google Chrome";v="91", `
@@ -125,6 +124,8 @@ const rules_headers = [
             'sec-fetch-site': 'none',
         }},
     ...sec_ch_rules_chrome,
+    {match: {browser: 'chrome', https: true, version_min: 89, os: 'mac'},
+        rules: {'sec-ch-ua-platform': '"macOS"'}},
     {match: {browser: 'chrome', version_min: 79},
         rules: {accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'}},
     {match: {browser: 'chrome', https: true, version_min: 80},
@@ -305,6 +306,7 @@ E.browser_defaults = function(browser, opt){
         https: opt.https,
         type: opt.type==='document' ? undefined : opt.type,
         redirect: opt.redirect,
+        os: opt.os,
     });
 };
 

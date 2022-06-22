@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.307.810 Stable
+- :bug: Fix 'Host' header behavior
+
 ## 1.303.587 Stable
 - :bug: Remove usage of username.json file
 

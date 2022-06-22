@@ -389,7 +389,7 @@ class WS extends events.EventEmitter {
                 this.emit('raw', msg);
                 handled = true;
             }
-        } catch(e){ ef(e);
+        } catch(e){ ef(e, this);
             zerr(`${this}: ${zerr.e2s(e)}`);
             return this.abort(1011, e.message);
         }
@@ -760,7 +760,7 @@ class Server {
         {
             try {
                 zws.data = this.handler(zws, req);
-            } catch(e){ ef(e);
+            } catch(e){ ef(e, this);
                 zerr(zerr.e2s(e));
                 return zws.close(1011, String(e));
             }
@@ -855,8 +855,12 @@ class IPC_client {
         }
     }
     _call(opt, cmd, ...arg){
-        let _this = this;
-        let timeout = opt.timeout!==null&&(opt.timeout||5*MIN);
+        let _this = this, timeout;
+        if (opt.timeout!==null)
+        {
+            timeout = typeof opt.timeout=='function' ? opt.timeout()
+                : opt.timeout||5*MIN;
+        }
         let send_retry_timeout = 3*SEC;
         return etask(function*IPC_client_call(){
             let req = {type: opt.type=='mux' && 'ipc_mux' || 'ipc_call', cmd,

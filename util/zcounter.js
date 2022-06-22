@@ -297,7 +297,7 @@ let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
     if (update_prev)
     {
         for (let fn of E.on_send)
-            try { yield fn(); } catch(e){ ef(e); }
+            try { yield fn(); } catch(e){ ef(e, this); }
         // base gauge for 'sum_mono' kind should be reset so that next
         // measurement will be relative to the current value
         let mono = {sum_mono: {}, sum_mono_eco: {}};

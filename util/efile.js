@@ -35,7 +35,7 @@ E.close_e = fd=>etask.nfn_apply(fs.close, [fd]);
 E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
     let ret, fd = yield E.open_e(path, flags, mode);
     try { ret = yield cb(fd); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         yield E.close_e(fd);
         throw e;
     }
@@ -79,14 +79,14 @@ E.mkdirp_e = (p, mode)=>etask(function*mkdirp_e(){
         this.finally(()=>process.umask(oldmask));
     }
     try { yield E.mkdir_e(p, mode); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         if (e.code=='EEXIST')
             return;
         if (e.code!='ENOENT')
             throw e;
         yield E.mkdirp_e(path.dirname(p), mode);
         try { yield E.mkdir_e(p, mode); }
-        catch(e){ ef(e);
+        catch(e){ ef(e, this);
             if (e.code=='EEXIST')
                 return;
             throw e;
@@ -175,7 +175,7 @@ E.copy_e = (old_path, new_path, opt)=>etask(function*copy_e(){
     r_stream.on('close', this.continue_fn());
     r_stream.pipe(w_stream);
     try { yield this.wait(); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         log('copy error: '+e);
         close();
         yield E.unlink_e(new_path);
@@ -339,7 +339,7 @@ E.link_e = (src, dst, opt)=>etask(function*line_e(){
     dst = file.normalize(dst);
     yield check_file(dst, opt);
     try { yield etask.nfn_apply(fs.link, [src, dst]); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         if (opt.no_copy)
             throw e;
         return yield E.copy_e(src, dst, opt);
@@ -381,12 +381,12 @@ E.mtime_e = path=>etask(function*mtime_e(){
     return +(yield E.stat_e(path)).mtime; });
 E.exists = path=>etask(function*exists(){
     try { yield etask.nfn_apply(fs.access, [path]); }
-    catch(e){ ef(e); return false; }
+    catch(e){ ef(e, this); return false; }
     return true;
 });
 E.is_exec = path=>etask(function*is_exec(){
     try { yield etask.nfn_apply(fs.access, [path, fs.X_OK]); }
-    catch(e){ ef(e); return false; }
+    catch(e){ ef(e, this); return false; }
     return true;
 });
 let false_stat = {isSymbolicLink: ()=>false, isCharacterDevice: ()=>false,
@@ -465,7 +465,7 @@ let call_safe = (method, func, ret, args)=>etask(method, function*(){
     E.errno = 0;
     E.error = null;
     try { return yield func.apply(null, args); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         E.errno = e.code||e;
         E.error = e;
         log(`${method} failed: ${e}`);

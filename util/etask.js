@@ -152,6 +152,7 @@ function Etask(opt, states){
     this.name = opt.name;
     this._name = this.name===undefined ? 'noname' : this.name;
     this.cancelable = opt.cancel;
+    this.zexit_on_err = opt.zexit_on_err;
     this.then_waiting = new Set();
     this.child = new Set();
     this.child_guess = new Set();
@@ -255,7 +256,7 @@ E.prototype._check_free = function(){
 };
 
 E.prototype._call_err = function(e){
-    E.ef(e);
+    E.ef(e, this);
     // XXX derry: add assert(0, 'etask err in signal: '+e);
 };
 E.prototype.emit_safe = function(){
@@ -316,7 +317,7 @@ E.prototype._next = function(rv){
     if (rv.err!==undefined)
     {
         if (zerr.on_exception)
-            zerr.on_exception(rv.err);
+            zerr.on_exception(rv.err, this);
         if (this.run_state && this.run_state.try_catch)
         {
             this.use_retval = true;
@@ -1460,9 +1461,11 @@ function etask_fn(opt, states, push_this){
         states.constructor.name=='GeneratorFunction';
     return function(){
         var _opt = assign({}, opt);
-        _opt.state0_args = Array.from(arguments);
-        if (push_this)
-            _opt.state0_args.unshift(this);
+        var arg_start = +push_this;
+        _opt.state0_args = new Array(arg_start+arguments.length);
+        _opt.state0_args[0] = this;
+        for (var i=0; i<arguments.length; i++)
+            _opt.state0_args[arg_start+i] = arguments[i];
         if (is_generator)
             return E._generator(null, states, _opt);
         return new Etask(_opt, states);
@@ -1502,9 +1505,9 @@ E._generator = function(gen, ctor, opt){
             try { gen.return(); } catch(e){}
     }]);
 };
-E.ef = function(err){ // error filter
+E.ef = function(err, et){ // error filter
     if (zerr.on_exception)
-        zerr.on_exception(err);
+        zerr.on_exception(err, et);
     return err;
 };
 // similar to setInterval

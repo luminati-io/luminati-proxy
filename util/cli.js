@@ -261,7 +261,7 @@ E.process_exit = (promise, opt)=>etask(function*process_main(){
                 yield this.wait_ext(et);
             }
         }
-    } catch(e){ ef(e);
+    } catch(e){ ef(e, this);
         console.error(opt.skip_stack ? e.message : e.stack||e);
         return exit_with_code(opt, 1);
     }

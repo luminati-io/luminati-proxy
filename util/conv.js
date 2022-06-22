@@ -34,7 +34,7 @@ else
     vm = require('vm');
     define = require('./require_node.js').define(module, '../');
 }
-define(['/util/util.js'], function(zutil){
+define(['/util/util.js', '/util/date.js'], function(zutil, date){
 var E = {};
 
 var has_map = typeof Map=='function' && Map.prototype.get && Map.prototype.set;
@@ -647,6 +647,18 @@ E.JSON_parse = function(s, opt){
 E.JSON_parse_obj = function(v, opt){
     opt = Object.assign({date: true, re: true, func: true, inf: true}, opt);
     return parse_obj(v, opt);
+};
+
+E.mongo_funcs_to_conv_json = function(str){
+    str = str.replace(/ISODate\(['"]([^'"]+)['"]\)/g, function(x, v){
+        if (!date.is_date_like(v))
+            return x;
+        return '{__ISODate__:"'+date(v).toISOString()+'"}';
+    });
+    str = str.replace(/ObjectId\(['"]([^'"]+)['"]\)/g, function(x, v){
+        return '{__ObjectId__:"'+v+'"}';
+    });
+    return str;
 };
 
 E.hex2bin = function(hex, opt){
