@@ -1318,7 +1318,7 @@ class Mux {
                 catch(e){
                     stream.end();
                     try { yield this.wait(opt.fin_timeout/2); }
-                    catch(e2){ w_log(e2, 'fin_wait2'); }
+                    catch(_e){ w_log(_e, 'fin_wait2'); }
                 }
             }
             if (pending && !etask.is_final(pending))

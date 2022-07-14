@@ -78,6 +78,26 @@ E.dur_to_str = function(dur, opt){
     return parts.slice(0, opt.units||parts.length).join(opt.sep||'');
 };
 
+// google sheets duration format
+E.dur_to_gs_str = function(dur, opt){
+    opt = opt||{};
+    var parts = [];
+    dur = E.round_dur(+dur, opt.precision);
+    function chop(period){
+        var number = Math.floor(dur/period);
+        parts.push(number);
+        dur -= number*period;
+    }
+    chop(ms.HOUR);
+    chop(ms.MIN);
+    var res = [''+parts[0]]
+        .concat(parts.slice(1)
+            .map(function(p){ return (''+p).padStart(2, '0'); }))
+        .concat((dur/ms.SEC)
+            .toLocaleString('en-US', {minimumIntegerDigits: 2}));
+    return res.join(':');
+};
+
 E.monotonic = undefined;
 E.init = function(){
     var adjust, last;
@@ -263,6 +283,21 @@ E.align = function(d, align){
     default: throw new Error('invalid align '+align);
     }
     return d;
+};
+
+E.align_up = function(d, align){
+    d = E.get(d, 1);
+    var mult;
+    switch (align.toUpperCase())
+    {
+    case 'MS': break;
+    case 'SEC': mult = ms.SEC; break;
+    case 'MIN': mult = ms.MIN; break;
+    case 'HOUR': mult = ms.HOUR; break;
+    case 'DAY': mult = ms.DAY; break;
+    default: throw new Error('invalid align '+align);
+    }
+    return new Date(Math.ceil(d/mult)*mult);
 };
 
 E.add = function(d, dur){

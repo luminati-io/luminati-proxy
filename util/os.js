@@ -18,6 +18,7 @@ const env = process.env, qw = string.qw, KB = 1024, MB = KB*KB;
 let fallocate;
 try { fallocate = require('fallocate-uint32'); } catch(e){}
 const BIN_IP = '/bin/ip';
+const PROC_DIR = env.PROC_DIR||'/proc';
 
 var distro_release;
 var procfs_fmt = {
@@ -79,7 +80,7 @@ E.meminfo_parse = function(info){
 E.meminfo = function(){
     if (file.is_darwin)
         return {memtotal: os.totalmem(), memfree_all: os.freemem()};
-    var info = cyg_read('/proc/meminfo');
+    var info = cyg_read(`${PROC_DIR}/meminfo`);
     var mem = E.meminfo_parse(info);
     mem.buffers = mem.buffers||0; // openvz does not always have Buffers
     mem.cached = mem.cached||0; // cygwin does not have Cached
@@ -178,7 +179,7 @@ E.swapoff = function(){ cli.exec_rt('swapoff '+swapfile); };
 E.swap_usage = function(){
     if (file.is_darwin)
         return {count: 0, usage: 0};
-    let swaps = cyg_read_lines('/proc/swaps').slice(1);
+    let swaps = cyg_read_lines(`${PROC_DIR}/swaps`).slice(1);
     let ret = {count: swaps.length, usage: 0};
     if (!swaps.length)
         return ret;
@@ -238,7 +239,7 @@ E.cpus = function(){
             cpus.all[item] = cpus.reduce((p, c)=>p+c[item], 0)/res.length;
         return cpus;
     }
-    var ll = cyg_read_lines('/proc/stat');
+    var ll = cyg_read_lines(`${PROC_DIR}/stat`);
     ll.forEach(l=>{
         if (!/^cpu\d* /.test(l))
             return;
@@ -263,8 +264,8 @@ E.cpu_threads = function(){
     };
     E.ps().forEach(pid=>{
         if (file.is_win)
-            return read_stat('/proc', pid);
-        let taskdir = `/proc/${pid}/task`;
+            return read_stat(PROC_DIR, pid);
+        let taskdir = `${PROC_DIR}/${pid}/task`;
         cyg_readdir(taskdir).forEach(tid=>read_stat(taskdir, tid));
     });
     return res;
@@ -404,7 +405,7 @@ function beancounter_value(value){
 
 E.beancounters = function(){
     try {
-        var info = file.read_lines_e('/proc/user_beancounters')
+        var info = file.read_lines_e(`${PROC_DIR}/user_beancounters`)
         .slice(2).map(line=>line.slice(12).split(/[^\w]+/g));
         var data = {total_failcnt: 0};
         info.forEach(line=>{
@@ -437,13 +438,13 @@ E.TCP = { // net/tcp_states.h
 E.sockets_count = proto=>etask(function*(){
     let line_idx = -1, v = {total: 0, lo: 0, ext: 0, err: 0};
     zutil.forEach(E.TCP, id=>v[id] = 0);
-    yield efile.read_line_cb_e('/proc/net/'+proto, conn=>{
+    yield efile.read_line_cb_e(`${PROC_DIR}/net/${proto}`, conn=>{
         line_idx++;
         if (!conn || !line_idx)
             return;
         let start;
         if ((start = conn.indexOf(':'))==-1)
-            return void(v.err++);
+            return void (v.err++);
         v.total++;
         if (conn.substr(start+2, 8)=='0100007F')
             v.lo++;
@@ -457,7 +458,7 @@ E.sockets_count = proto=>etask(function*(){
 });
 
 E.tcp_stats = ()=>{
-    let ll = file.read_lines_e('/proc/net/snmp'), i = 0;
+    let ll = file.read_lines_e(`${PROC_DIR}/net/snmp`), i = 0;
     for (; i<ll.length && !ll[i].startsWith('Tcp'); i++);
     if (i<ll.length-1)
     {
@@ -468,7 +469,7 @@ E.tcp_stats = ()=>{
 };
 
 E.udp_stats = ()=>{
-    let ll = file.read_lines_e('/proc/net/snmp'), i = 0;
+    let ll = file.read_lines_e(`${PROC_DIR}/net/snmp`), i = 0;
     for (; i<ll.length && !ll[i].startsWith('Udp'); i++);
     if (i<ll.length-1)
     {
@@ -480,7 +481,7 @@ E.udp_stats = ()=>{
 };
 
 E.vmstat = function(){
-    var vmstat = file.read_lines_e('/proc/vmstat');
+    var vmstat = file.read_lines_e(`${PROC_DIR}/vmstat`);
     var ret = {};
     for (var i=0; i<vmstat.length; i++)
     {
@@ -547,7 +548,7 @@ E.diskstats_sys = function(dev, inflight){
 E.diskstats = function(){
     // https://www.kernel.org/doc/Documentation/iostats.txt
     let diskstats;
-    if (!(diskstats = cyg_read_lines('/proc/diskstats')))
+    if (!(diskstats = cyg_read_lines(`${PROC_DIR}/diskstats`)))
         return;
     let ret = {};
     for (let i=0; i<diskstats.length; i++)
@@ -610,7 +611,7 @@ E.node = function(){
 };
 
 E.ps = function(){
-    return cyg_readdir('/proc').filter(p=>/^\d+$/.test(p)).map(p=>+p)
+    return cyg_readdir(PROC_DIR).filter(p=>/^\d+$/.test(p)).map(p=>+p)
     .sort((a, b)=>a-b);
 };
 
@@ -623,7 +624,7 @@ E.fd_use = opt=>etask(function*(){
     if (!pids.length)
         return res;
     let calc = (o, m)=>o<0 ? 0 : 100*o/m;
-    let ln = file.read_line('/proc/sys/fs/file-nr').split('\t');
+    let ln = file.read_line(`${PROC_DIR}/sys/fs/file-nr`).split('\t');
     if (ln.length==3)
     {
         res.glob.open = +ln[0];
@@ -633,10 +634,10 @@ E.fd_use = opt=>etask(function*(){
     for (let pid of pids)
     {
         pid = ''+pid;
-        let dir = `/proc/${pid}/fd`;
+        let dir = `${PROC_DIR}/${pid}/fd`;
         let open = yield efile.readdir(dir);
         let nopen = efile.error ? -1 : open.length;
-        let ln_re = cyg_read('/proc/'+pid+'/limits'), nmax = -1, m;
+        let ln_re = cyg_read(`${PROC_DIR}/${pid}/limits`), nmax = -1, m;
         if (m = /Max open files\s+([0-9]+)/g.exec(ln_re))
             nmax = +m[1];
         if (!nmax)
@@ -646,7 +647,7 @@ E.fd_use = opt=>etask(function*(){
         {
             res.use = use;
             res.pid = +pid;
-            let status = cyg_read(`/proc/${pid}/status`);
+            let status = cyg_read(`${PROC_DIR}/${pid}/status`);
             if (m = /^Name:\t(.*)/.exec(status))
                 res.name = m[1];
         }
@@ -685,12 +686,13 @@ const parse_pid_stat = stat=>{
     return {pid: +res[1], name: res[2], rss: +(fields[21]||0)*PAGESIZE};
 };
 
-const proc_mem = pid=>parse_pid_stat(cyg_read('/proc/'+pid+'/stat'));
+const proc_mem = pid=>parse_pid_stat(cyg_read(`${PROC_DIR}/${pid}/stat`));
 
 E.ps_mem = ()=>E.ps().map(p=>proc_mem(p));
 
 E.conntrack = function(){
-    const count = +cyg_read('/proc/sys/net/netfilter/nf_conntrack_count');
-    const max = +cyg_read('/proc/sys/net/netfilter/nf_conntrack_max');
+    const count = +cyg_read(
+        `${PROC_DIR}/sys/net/netfilter/nf_conntrack_count`);
+    const max = +cyg_read(`${PROC_DIR}/sys/net/netfilter/nf_conntrack_max`);
     return {count, max, use: Math.round(count*100/max)};
 };

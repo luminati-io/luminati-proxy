@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.312.660",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Zone auth allowed only for whitelisted customers"
+            }
+        ]
+    },
+    {
         "ver": "1.307.810",
         "type": "stable",
         "changes": [

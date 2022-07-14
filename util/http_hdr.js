@@ -53,56 +53,70 @@ E.restore_case = function(headers, original_raw){
     return res;
 };
 
-const generate_sec_ch_rules =
-(first_version, last_version, specific_versions = {})=>{
-    const versions_array = Array.from(
-        {length: last_version - first_version + 1},
-        (_, idx)=>idx+first_version);
-    return versions_array.map(v=>specific_versions[v]||{
-        match: {browser: 'chrome', https: true, version_min: v},
+const generate_sec_ch_rules_chromium = ({ver_from, ver_to, browser_name,
+    browser_full_name})=>{
+    const specific_vers = {
+        91: {match: {browser: browser_name, https: true, version_min: 91},
+            rules: {
+                'sec-ch-ua': `" Not;A Brand";v="99", "${browser_full_name}"`
+                    +`;v="91", "Chromium";v="91"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
+        94: {match: {browser: browser_name, https: true, version_min: 94},
+            rules: {
+                'sec-ch-ua': `"Chromium";v="94", "${browser_full_name}";v="94"`
+                    +`, ";Not A Brand";v="99"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
+        95: {match: {browser: browser_name, https: true, version_min: 95},
+            rules: {
+                'sec-ch-ua': `"${browser_full_name}";v="95", "Chromium";`+
+                    `v="95", ";Not A Brand";v="99"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
+        97: {match: {browser: browser_name, https: true, version_min: 97},
+            rules: {
+                'sec-ch-ua': `" Not;A Brand";v="99", "${browser_full_name}";`
+                    +`v="97", "Chromium";v="97"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
+        103: {match: {browser: browser_name, https: true, version_min: 103},
+            rules: {
+                'sec-ch-ua': `".Not/A)Brand";v="99", "${browser_full_name}";`
+                    +`v="103", "Chromium";v="103"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        }
+    };
+    const versions_array = Array.from({length: ver_to - ver_from + 1},
+        (_, idx)=>idx+ver_from);
+    return versions_array.map(v=>specific_vers[v]||{
+        match: {browser: browser_name, https: true, version_min: v},
         rules: {
             'sec-ch-ua': `" Not A;Brand";v="99", `
-                +`"Chromium";v="${v}", "Google Chrome";v="${v}"`,
+                +`"Chromium";v="${v}", "${browser_full_name}";v="${v}"`,
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': '"Windows"',
         },
     });
 };
 
-const sec_ch_rules_chrome = generate_sec_ch_rules(89, 117, {
-    91: {match: {browser: 'chrome', https: true, version_min: 91},
-        rules: {
-            'sec-ch-ua': `" Not;A Brand";v="99", "Google Chrome";v="91", `
-                +`"Chromium";v="91"`,
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-        },
-    },
-    94: {match: {browser: 'chrome', https: true, version_min: 94},
-        rules: {
-            'sec-ch-ua': `"Chromium";v="94", "Google Chrome";v="94", `
-                +`";Not A Brand";v="99"`,
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-        },
-    },
-    95: {match: {browser: 'chrome', https: true, version_min: 95},
-        rules: {
-            'sec-ch-ua': `"Google Chrome";v="95", "Chromium";v="95", `+
-                `";Not A Brand";v="99"`,
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-        },
-    },
-    97: {match: {browser: 'chrome', https: true, version_min: 97},
-        rules: {
-            'sec-ch-ua': `" Not;A Brand";v="99", "Google Chrome";v="97", `
-                +`"Chromium";v="97"`,
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-        },
-    },
-});
+const sec_ch_rules_chrome = generate_sec_ch_rules_chromium({
+    ver_from: 89, ver_to: 117, browser_name: 'chrome',
+    browser_full_name: 'Google Chrome'});
+
+const sec_ch_rules_edge = generate_sec_ch_rules_chromium({
+    ver_from: 97, ver_to: 117, browser_name: 'edge',
+    browser_full_name: 'Microsoft Edge'});
 
 // default header values
 const rules_headers = [
@@ -242,6 +256,29 @@ const rules_headers = [
         rules: {
             'accept-encoding': 'gzip, deflate, br',
         }},
+    {match: {browser: 'edge', type: 'image', version_min: 97},
+        rules: {
+            accept: 'image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+        }},
+    {match: {browser: 'edge', https: true, version_min: 97, type: 'image'},
+        rules: {
+            'sec-fetch-mode': 'no-cors',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-dest': 'image',
+        }},
+    {match: {browser: 'edge', https: true, version_min: 97, type: 'script'},
+        rules: {
+            'sec-fetch-mode': 'no-cors',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-dest': 'script',
+        }},
+    {match: {browser: 'edge', https: true, version_min: 97, type: 'ajax'},
+        rules: {
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-dest': 'empty',
+        }},
+    ...sec_ch_rules_edge,
     {match: {browser: 'safari'},
         rules: {
             connection: 'keep-alive',
@@ -548,6 +585,33 @@ const rules_orders = [
         rules: {order: qw`:method :path :authority :scheme referer
             cache-control accept accept-language upgrade-insecure-requests
             user-agent accept-encoding cookie`}},
+    {match: {browser: 'edge', http2: true, version_min: 97},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            sec-ch-ua sec-ch-ua-mobile sec-ch-ua-platform
+            origin upgrade-insecure-requests user-agent accept
+            sec-fetch-site sec-fetch-mode sec-fetch-user sec-fetch-dest referer
+            accept-encoding accept-language cookie`}},
+    {match: {browser: 'edge', http2: true, version_min: 97, redirect: true},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            upgrade-insecure-requests origin user-agent accept sec-fetch-site
+            sec-fetch-mode sec-fetch-user sec-fetch-dest sec-ch-ua
+            sec-ch-ua-mobile sec-ch-ua-platform referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'edge', http2: true, version_min: 97,
+        type: ['image', 'ajax', 'script']},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            sec-ch-ua sec-ch-ua-mobile user-agent sec-ch-ua-platform
+            origin upgrade-insecure-requests accept
+            sec-fetch-site sec-fetch-mode sec-fetch-user sec-fetch-dest referer
+            accept-encoding accept-language cookie`}},
+    {match: {browser: 'edge', http2: true, version_min: 97, type: 'ajax',
+        headers: {'content-type': exists}},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            content-length sec-ch-ua sec-ch-ua-mobile user-agent
+            sec-ch-ua-platform content-type accept x-requested-with origin
+            sec-fetch-site sec-fetch-mode sec-fetch-dest referer
+            accept-encoding accept-language cookie`}
+        },
     {match: {browser: 'safari', http2: true},
         rules: {order: qw`:method :scheme :path :authority cookie accept
             content-type accept-encoding user-agent accept-language referer`}},

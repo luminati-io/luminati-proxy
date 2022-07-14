@@ -29,6 +29,8 @@ const test_url = {http: 'http://lumtest.com/test',
     https: 'https://lumtest.com/test'};
 const customer = 'abc';
 const password = 'xyz';
+const zone_auth_type_whitelist = [customer];
+const customer_out_of_zone_auth_whitelist = customer+'d';
 
 const TEST_SMTP_PORT = 10025;
 
@@ -46,6 +48,7 @@ describe('proxy', ()=>{
             proxy_port: proxy.port,
             customer,
             password,
+            zone_auth_type_whitelist,
             log: 'none',
             logs: 1000,
             port: 24000,
@@ -297,6 +300,16 @@ describe('proxy', ()=>{
                 assert.equal(res.body.auth.customer, 'abc');
                 assert.equal(res.body.auth.password, 'xyz');
                 assert.equal(res.body.auth.zone, 'static');
+            }));
+            it('no zone auth if cust out of whitelist', ()=>etask(function*(){
+                let cust = customer_out_of_zone_auth_whitelist;
+                l = yield lum();
+                const res = yield l.test({no_usage: 1, headers: {
+                    'proxy-authorization': 'Basic '+
+                        Buffer.from(`lum-customer-${cust}-zone-static:xyz`)
+                        .toString('base64'),
+                }});
+                assert.equal(res.statusCode, 407);
             }));
         });
         describe('password is optional', ()=>{

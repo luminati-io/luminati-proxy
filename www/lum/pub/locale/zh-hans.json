@@ -5629,5 +5629,6 @@
   "Run on Bright Data Cloud":"安装客户端到我们服务器",
   "$150/month with no hidden costs":"150 美元/月，无隐藏费用",
   "Proxy Manager Statistics":"代理管理器统计",
-  "Proxy Manager Event log":"代理管理器事件日志"
+  "Proxy Manager Event log":"代理管理器事件日志",
+  "https://help.brightdata.com/hc/en-us": "https://help.brightdata.com/hc/zh-cn"
 }

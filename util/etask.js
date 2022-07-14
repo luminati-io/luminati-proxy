@@ -745,6 +745,14 @@ E.prototype.del_alarm = function(){
     this._alarm = undefined;
 };
 
+E.prototype.upd_alarm = function(ms){
+    var a = this._alarm;
+    if (!a)
+        return;
+    var cb = a.cb;
+    this.alarm(ms, cb);
+};
+
 E.prototype.alarm_left = function(){
     var a = this._alarm;
     if (!a)

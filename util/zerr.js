@@ -323,6 +323,13 @@ E._zerr = _zerr;
 
 E.zexit = function(args){
     var stack;
+    // this prevents logs from being truncated when the process exits, which
+    // might cause us to lose crash stack traces
+    // https://github.com/nodejs/node/issues/6379
+    [process.stdout, process.stderr].forEach(function(s){
+        if (s && s._handle && s._handle.setBlocking)
+            s._handle.setBlocking(true);
+    });
     if (err_has_stack(args))
     {
         stack = args.stack;

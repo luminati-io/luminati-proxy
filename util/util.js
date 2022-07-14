@@ -593,12 +593,18 @@ E.pairwise = function(coll, opt){
     return res;
 };
 
-E.make_error_wo_stack = function(msg, extra){
-    var stack_trace_limit = Error.stackTraceLimit;
+E.stackless_error = function(msg, extra, Err_f){
+    if (!Err_f && typeof extra=='function')
+    {
+        Err_f = extra;
+        extra = undefined;
+    }
+    Err_f = Err_f || Error;
+    const old_lmt = Error.stackTraceLimit;
     Error.stackTraceLimit = 0;
-    var e = Object.assign(new Error(msg), extra);
-    Error.stackTraceLimit = stack_trace_limit;
-    return e;
+    const err = Object.assign(new Err_f(msg), extra);
+    Error.stackTraceLimit = old_lmt;
+    return err;
 };
 
 E.omit_falsy_props = function(o){

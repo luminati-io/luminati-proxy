@@ -49,6 +49,7 @@
     "productName": "Proxy Manager"
   },
   "dependencies": {
+    "user-agents": "~1.0.1056",
     "colors": "1.4.0",
     "body-parser": "1.19.0",
     "check-node-version": "4.0.1",
@@ -147,7 +148,7 @@
   "api_domain": "lum-lpm.com",
   "api_domain_fallback": "l-lpm.com",
   "api_domain_fallback_cn": "luminati-china.biz",
-  "mail_domain": "lumidaili.cn",
+  "mail_domain": "bright.cn",
   "keywords": [
     "luminati",
     "proxy",
@@ -401,7 +402,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "2cc2b5a6adb197d2dc7cbc8c8a733a75"
+    "md5": "f6e5894705ff30a6dc6fd47a688be73e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -416,7 +417,7 @@
     "sinon": "14.0.0",
     "puppeteer": "14.1.2",
     "longjohn": "0.2.12",
-    "uws": "luminati-io/uWebSockets-bindings#1d4f506"
+    "uws": "@luminati-io/lum-uws#10.148.0-lum.12"
   },
   "preferGlobal": true,
   "recommendedNode": ">=12.0.0",
@@ -433,5 +434,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.307.810"
+  "version": "1.312.660"
 }

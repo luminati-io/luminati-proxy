@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.312.660 Stable
+- :star: Zone auth allowed only for whitelisted customers
+
 ## 1.307.810 Stable
 - :bug: Fix 'Host' header behavior
 
