@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.313.493",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Increased the headers size. Fixed: Parse Error: Header overflow"
+            }
+        ]
+    },
+    {
         "ver": "1.312.660",
         "type": "stable",
         "changes": [

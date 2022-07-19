@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.313.493 Stable
+- :bug: Increased the headers size. Fixed: Parse Error: Header overflow
+
 ## 1.312.660 Stable
 - :star: Zone auth allowed only for whitelisted customers
 
