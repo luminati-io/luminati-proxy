@@ -1374,7 +1374,7 @@ class Mux {
         });
         const throttle_ack = +opt.throttle_ack;
         const _send_ack = ()=>{
-            _this.ws.json({vfd, ack: stream.zread});
+            _this.ws.send(`{"vfd":${vfd},"ack":${stream.zread}}`);
             send_ack_ts = Date.now();
         };
         stream.send_ack = !throttle_ack ? _send_ack : ()=>{
@@ -1396,7 +1396,8 @@ class Mux {
         stream.send_win_size = ()=>{
             if (stream.win_size_sent)
                 return;
-            _this.ws.json({vfd, win_size: opt.win_size||DEFAULT_WIN_SIZE});
+            _this.ws.send(
+                `{"vfd":${vfd},"win_size":${opt.win_size||DEFAULT_WIN_SIZE}}`);
             stream.win_size_sent = true;
         };
         stream.on_win_size = size=>{
@@ -1406,7 +1407,10 @@ class Mux {
                 pending.continue();
         };
         stream.send_fin = error=>{
-            _this.ws.json({vfd, fin: 1, error});
+            if (error)
+                _this.ws.json({vfd, fin: 1, error});
+            else
+                _this.ws.send(`{"vfd":${vfd},"fin":1}`);
             stream.fin_sent = true;
         };
         stream.on_fin = msg=>{

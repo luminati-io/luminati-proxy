@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.314.864 Stable
+- :bug: Fix 'certificate has expired' error
+
 ## 1.313.493 Stable
 - :bug: Increased the headers size. Fixed: Parse Error: Header overflow
 

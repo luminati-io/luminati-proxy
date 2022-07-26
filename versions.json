@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.314.864",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix 'certificate has expired' error"
+            }
+        ]
+    },
+    {
         "ver": "1.313.493",
         "type": "stable",
         "changes": [

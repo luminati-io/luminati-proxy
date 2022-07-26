@@ -14,7 +14,7 @@ function local_jdir_one(top){
     let root, inbin, rel = '', _rel, ret = {};
     top = file.normalize(top||process.cwd());
     let t = file.cyg2unix('/');
-    let re = new RegExp(`^(${t}.*)\/([^\/]*)$`);
+    let re = new RegExp(`^(${t}.*)/([^/]*)$`);
     for (let i=0; i<24 && top!==t; i++)
     {
         let up_top = top;
@@ -188,14 +188,6 @@ E.split_debug_flags = opt=>{
             args.push(opt[f]);
         switch (f)
         {
-        case '-d':
-            node_args.push('--debug');
-            break;
-        case 'debug':
-        case '--debug':
-        case '--debug-brk':
-            node_args.push(a);
-            break;
         case '--gc':
         case '--expose-gc':
             node_args.push('--expose-gc');
@@ -213,6 +205,7 @@ E.split_debug_flags = opt=>{
         case '--tls-min-v1.0':
         case '--insecure-http-parser':
         case '--expose-internals':
+        case 'inspect':
         case '--inspect':
         case '--inspect-brk':
             node_args.push(a);
