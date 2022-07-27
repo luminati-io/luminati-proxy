@@ -18,7 +18,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 USER root
 RUN npm config set user root
-RUN npm install -g npm@8.1.3
+RUN npm install -g npm@6.14.13
 
 # Install Proxy Manager
 RUN npm install -g @luminati-io/luminati-proxy

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.315.269 Stable
+- :bug: Fix docker build
+
 ## 1.314.864 Stable
 - :bug: Fix 'certificate has expired' error
 

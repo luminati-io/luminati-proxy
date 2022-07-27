@@ -613,6 +613,12 @@ E.omit_falsy_props = function(o){
     }));
 };
 
+// XXX: drop once jshint version supports BigInt (esversion >= 11)
+/* jshint -W119 */
+E.object_sizeof = obj=>Buffer.byteLength(
+    JSON.stringify(obj, (_k, v)=>typeof v=='bigint' ? Number(v) : v));
+/* jshint +W119 */
+
 function get_map_fn(v){
     if (v==null)
         return function(it){ return it; };
