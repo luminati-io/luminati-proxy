@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.317.660 Stable
+- :bug: Fix update default proxy port
+
 ## 1.315.269 Stable
 - :bug: Fix docker build
 

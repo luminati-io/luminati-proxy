@@ -18,8 +18,6 @@ Object.assign(conf.manager_default, {
         '.luminati.json'.slice(conf.is_win ? 1 : 0)),
     loki: lpm_file.get_file_path(
         '.luminati.db'.slice(conf.is_win ? 1 : 0)),
-    username: lpm_file.get_file_path(
-        '.username.json'.slice(conf.is_win ? 1 : 0)),
 });
 
 Object.assign(module.exports, conf);

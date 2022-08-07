@@ -145,4 +145,10 @@ E.object_to_str = function(obj){
     .join(' ');
 };
 
+var snake_case_regex = /(([A-Z](?![^A-Z]))+|[A-Z])[^A-Z]*|[^A-Z]+/g;
+E.to_snake_case = function(str){
+    return Array.from((str||'').matchAll(snake_case_regex))
+        .map(function(m){ return m[0].toLowerCase(); }).join('_');
+};
+
 return E; }); }());

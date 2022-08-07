@@ -184,6 +184,10 @@ E.move = function(a, from, to, n){
 
 E.to_array = function(v){ return Array.isArray(v) ? v : v==null ? [] : [v]; };
 
+E.enumerate = function(arr){
+    return Array.from(arr).map(function(e, i){ return [i, e]; });
+};
+
 var proto = {};
 proto.sed = function(regex, replace){
     return E.sed(this, regex, replace); };

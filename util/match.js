@@ -189,7 +189,7 @@ E.match_fn = function(filter, opt){
         }
         cmp[i] = c;
         if (typeof c=='function')
-            func += 'cmp['+i+'](s, extra) ';
+            func += 'cmp['+i+'](s, extra, extra2) ';
         else if (c instanceof Object)
             func += c.fn ? c.fn+' ' : '';
         else
@@ -198,7 +198,7 @@ E.match_fn = function(filter, opt){
     if (!cmp.length)
         func += 'false ';
     func += ';';
-    return new Function(['cmp', 's', 'extra'], func).bind(null, cmp);
+    return new Function(['cmp', 's', 'extra', 'extra2'], func).bind(null, cmp);
 };
 E.match = function(filter, value, opt){
     return E.match_fn(filter, opt)(value, opt && opt.extra); };

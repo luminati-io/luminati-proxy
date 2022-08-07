@@ -284,7 +284,8 @@ const Form = props=>{
 };
 
 const filter_by = (option, props)=>{
-    return option.id.includes(props.text)||option.cname.includes(props.text);
+    return option.id && option.id.includes(props.text)
+        || option.cname && option.cname.includes(props.text);
 };
 
 class Customers_form extends Pure_component {

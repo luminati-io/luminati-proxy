@@ -1187,8 +1187,9 @@ class Mux {
             parser.execute = buf=>{
                 parser.execute = old_execute;
                 this.parser = old_parser;
-                return new Error('Mux Duplex parser removed before data '+
-                    'consumed');
+                return Object.assign(new Error('Mux Duplex parser removed '+
+                    'before data consumed'),
+                    {code: 'ws_mutex.parsed_removed'});
             };
         });
         stream.allow = (bytes=Infinity)=>{

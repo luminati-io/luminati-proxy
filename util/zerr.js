@@ -181,6 +181,25 @@ E.e2s = function(err){
     return str;
 };
 
+E.s2e = function(str){
+    if (!str)
+        return;
+    var code_match = /^\[code=([^\]]*)\] /.exec(str);
+    if (code_match)
+        str = str.substr(code_match.index+code_match[0].length);
+    if (!str.startsWith('Error:'))
+        str = 'Error: '+str;
+    var message = (/^Error: (.*)/.exec(str)||[])[1]||'';
+    var err = new Error();
+    err.message = message;
+    err.stack = str;
+    if (code_match)
+        err.code = code_match[1];
+    if (/^\d+$/.test(err.code))
+        err.code = +err.code;
+    return err;
+};
+
 E.on_exception = undefined;
 var in_exception;
 E.set_exception_handler = function(prefix, err_func){
