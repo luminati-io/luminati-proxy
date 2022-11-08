@@ -106,7 +106,7 @@ describe('username', ()=>{
         const calc_header = (uname, password)=>
             'Basic '+Buffer.from(uname+':'+password).toString('base64');
         it('basic', ()=>{
-            const header = calc_header('lum-customer-test-zone-static',
+            const header = calc_header('brd-customer-test-zone-static',
                 'pass123');
             const parsed = username.parse(header);
             assert.deepEqual(parsed, {
@@ -117,7 +117,7 @@ describe('username', ()=>{
         });
         it('with abbr', ()=>{
             const header = calc_header(
-                'lum-customer-test-zone-static-ct-newyork',
+                'brd-customer-test-zone-static-ct-newyork',
                 'pass123');
             const parsed = username.parse(header);
             assert.deepEqual(parsed, {
@@ -129,7 +129,7 @@ describe('username', ()=>{
         });
         it('with boolean flags', ()=>{
             const header = calc_header(
-                'lum-customer-test-zone-static-unblocker-direct',
+                'brd-customer-test-zone-static-unblocker-direct',
                 'pass123');
             const parsed = username.parse(header);
             assert.deepEqual(parsed, {
@@ -142,7 +142,7 @@ describe('username', ()=>{
         });
         it('with incorrect flags', ()=>{
             const header = calc_header(
-                'lum-customer-test-zone-static-wrong', 'pass123');
+                'brd-customer-test-zone-static-wrong', 'pass123');
             const parsed = username.parse(header);
             assert.deepEqual(parsed, {
                 customer: 'test',
@@ -153,7 +153,7 @@ describe('username', ()=>{
         });
         it('without password', ()=>{
             const header = calc_header(
-                'lum-customer-test-zone-static');
+                'brd-customer-test-zone-static');
             const parsed = username.parse(header);
             assert.deepEqual(parsed, {
                 customer: 'test',

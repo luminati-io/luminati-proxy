@@ -196,7 +196,7 @@
   "Instale o Gerenciador de Proxies Bright Data ",
   "here": "Aqui",
   "Change the code to send HTTP requests directly to the specified port (for example, 127.0.0.1:24000) instead of to zproxy.lum-superproxy.io:22225": "Altere o código para enviar solicitações HTTP diretamente para a porta especificada (por exemplo, 127.0.0.1:24000) em vez de para zproxy.lum-superproxy.io:22225",
-  "Configure the settings for your custom proxies and Zones through the LPM dashboard. You do not need to send the user parameter (lum-customer-customer_name-zone-zone_name…) alongside your requests, as all the needed data is wrapped within the manual proxy configuration.": "Configure as configurações para os seus proxies e zonas por meio do painel do LPM. Você não precisa enviar o parâmetro do usuário (lum-customer-customer_name-zone-zone_name ...) juntamente com suas solicitações, pois todos os dados necessários são agrupados na configuração do proxy manual.",
+  "Configure the settings for your custom proxies and Zones through the LPM dashboard. You do not need to send the user parameter (brd-customer-customer_name-zone-zone_name…) alongside your requests, as all the needed data is wrapped within the manual proxy configuration.": "Configure as configurações para os seus proxies e zonas por meio do painel do LPM. Você não precisa enviar o parâmetro do usuário (brd-customer-customer_name-zone-zone_name ...) juntamente com suas solicitações, pois todos os dados necessários são agrupados na configuração do proxy manual.",
   "How to configure Bright Data raw API with iPhone":
   "Como configurar o API Bright Data com iPhone",
   "Guidelines for configuring Bright Data raw API with iPhone":
@@ -212,7 +212,7 @@
   "Open Browser": "Abra o browser",
   "Add the target URL": "Adicione o URL desejado",
   "In the Pop Up, tap settings": "No pop up , clique em configurações",
-  "Add the username (e.g. lum-customer-lum_qa-country-us-zone -city)": "Adicione o nome de usuario (exemplo: lum-customer-lum_qa-country-us-zone -city)",
+  "Add the username (e.g. brd-customer-lum_qa-country-us-zone -city)": "Adicione o nome de usuario (exemplo: brd-customer-lum_qa-country-us-zone -city)",
   "Zone Password and tap OK": "Senha de Zona e Pressione Ok",
   "How do I know if I'm getting cloaked? (misleading information)": "Como saber se eu estou sendo enganado? (Informações Incorretas)",
   "Getting cloaked means that you're getting misleading information from the website you are scraping.": "Ser enganado significa que voce esta recebendo dados de informação não corretos do site que você esta raspando",
@@ -1976,7 +1976,7 @@
   "Great Britain": "Grã Bretanha",
   "South Korea": "Coreia do Sul",
   "Shared (Pay per IP)": "Compartilhado (Pague por IP)",
-  "IPs are allocated from all countries. In order to send your request through specific country you can pass the param in your username as part of your IP:PORT:USERNAME:PASSWORD format. (e.g. for username string: lum-customer-portal_demo-zone-ami-country-au)": "IPs são alocados de todos os países. Para enviar o seu pedido através de um país específico, você pode passar o parametro em seu nome de usuário como parte de seu IP: PORT: Nome de usuário: formato de senha. (Por exemplo, para a seqüência de usuário: lum-cliente-portal_demo-zone-ami-country-au)",
+  "IPs are allocated from all countries. In order to send your request through specific country you can pass the param in your username as part of your IP:PORT:USERNAME:PASSWORD format. (e.g. for username string: brd-customer-portal_demo-zone-ami-country-au)": "IPs são alocados de todos os países. Para enviar o seu pedido através de um país específico, você pode passar o parametro em seu nome de usuário como parte de seu IP: PORT: Nome de usuário: formato de senha. (Por exemplo, para a seqüência de usuário: brd-cliente-portal_demo-zone-ami-country-au)",
   "Shared pool of datacenter IPs. Select number of IPs and country. Pay for IPs and usage, or switch to unlimited bandwidth": "Pool coletiva de IPs datacenter. Selecione o número de IPs e país. Pagar por IPs e uso, ou mude para banda larga ilimitada",
   "By dedicated IPs for dedicated domains. Have full exclusivity over the IPs": "Por IPs dedicados para domínios dedicados. Tem exclusividade total sobre os IPs",
   "Geo location": "Geo localização",

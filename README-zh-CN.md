@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.317.812-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.337.221-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -124,7 +124,7 @@ Options:
   --ext_proxy_username          Default username for external vendor ips[string]
   --ext_proxy_password          Default password for external vendor ips[string]
   --ext_proxy_port              Default port for external vendor ips    [number]
-  --dns                         DNS resolving                           [string]
+  --dns                         DNS resolving        [string] [default: "local"]
   --reverse_lookup_dns          Process reverse lookup via DNS
                                                       [boolean] [default: false]
   --reverse_lookup_file         Process reverse lookup via file         [string]
@@ -146,7 +146,7 @@ Options:
   --os                          Operating System of the Peer IP         [string]
   --headers                     Request headers                          [array]
   --debug                       Request debug info default value
-                                                      [string] [default: "full"]
+                                                      [string] [default: "none"]
   --lpm_auth                    x-lpm-authorization header
                                                       [string] [default: "none"]
   --const                                             [boolean] [default: false]
@@ -164,7 +164,6 @@ Options:
                                 granting access to them    [array] [default: []]
   --www_whitelist_ips           Whitelist ip list for granting access to browser
                                 admin UI                   [array] [default: []]
-  --reverse_proxy_ips                                      [array] [default: []]
   --www                         HTTP and WebSocket port used for browser admin
                                 UI and request logs             [default: 22999]
   --config                      Config file containing proxy definitions[string]
@@ -191,6 +190,7 @@ Options:
   --log                         Log level           [string] [default: "notice"]
   --logs                        Number of request logs to store
                                                         [number] [default: 1000]
+  --logs_settings               Settings for logs remote delivery  [default: {}]
   --har_limit                   Number of bytes to store[number] [default: 1024]
   --ports_limit                 Limit the numer of open proxy ports at the same
                                 time                            [default: 10000]
@@ -212,6 +212,10 @@ Options:
                                                       [boolean] [default: false]
   --extra_ssl_ips               List of IPs to add to SSL certificate
                                                            [array] [default: []]
+  --bw_limit_webhook_url        URL to send webhook messages to when BW limit is
+                                reached                                 [string]
+  --bw_th_webhook_url           URL to send webhook messages to when BW limit
+                                threshold is reached                    [string]
   --no-www                      Disable local web
   --no-config                   Working without a config file
   --daemon, -d, --start-daemon  Start as a daemon

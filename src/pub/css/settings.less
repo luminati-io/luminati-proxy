@@ -5,10 +5,52 @@
         .field_row {
             align-items: baseline;
             .desc {
-                width: 155px;
+                width: 170px;
                 margin-right: 5px;
                 white-space: nowrap;
             }
         }
     }
 }
+.logs_settings_modal {
+    &_tabs{
+        margin-top: 10px;
+        margin-bottom: 10px;
+        .inputs_container {
+            display: flex;
+            input {
+                width: 100%;
+            }
+            margin-top: 10px;
+            .aggr_url {
+                flex: 1;
+                margin-right: 10px;
+                width: 100%;
+            }
+            .btn_test {
+                min-width: 80px;
+            }
+            .input_main{
+                width: 70%;
+                &_sub {
+                    width: 30%;
+                }
+            }
+            .input_second{
+                margin-left: 10px;
+                width: 30%;
+            }
+        }
+    }
+    .use_limit {
+        align-items: center;
+        display: flex;
+        margin-top: 10px;
+        &_tooltip {
+            margin-right: 15px;
+            font-size: 15px;
+        }
+    }
+}
+
+

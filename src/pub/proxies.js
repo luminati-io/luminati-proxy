@@ -16,7 +16,7 @@ import {get_static_country, report_exception, is_local} from './util.js';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title, No_zones,
-    Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
+    Tooltip_bytes, Loader_small, Toolbar_button, Warnings} from './common.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
 import {T, t} from './common/i18n.js';
@@ -27,10 +27,12 @@ import Tooltip from './common/tooltip.js';
 import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
 import './css/proxies.less';
 
-const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog})=>{
+const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog,
+    show_error_ntf})=>{
     return <Actions proxy={proxy} get_status={mgr.get_status}
           update_proxies={mgr.update} scrolling={scrolling}
-          open_delete_dialog={open_delete_dialog}/>;
+          open_delete_dialog={open_delete_dialog}
+          show_error_ntf={show_error_ntf}/>;
 };
 
 class Targeting_cell extends Pure_component {
@@ -549,6 +551,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             open_delete_dialog: false,
             delete_proxies: [],
             errors: [],
+            err_ntf_list: []
         };
         setdb.set('head.proxies.update', this.update);
     }
@@ -750,11 +753,16 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             }, {}) : {};
         this.setState({selected_proxies, checked_all});
     };
+    show_error_ntf = err_ntf_list=>{
+        this.setState({err_ntf_list});
+        $('#proxy_errors').modal('show');
+    };
     cell_renderer = function Cell_renderer(props){
         return <Cell {...props}
             mgr={this}
             history={this.props.history}
-            open_delete_dialog={this.open_delete_dialog}/>;
+            open_delete_dialog={this.open_delete_dialog}
+            show_error_ntf={this.show_error_ntf}/>;
     };
     on_row_click = e=>{
         const proxy = e.rowData;
@@ -893,6 +901,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
               close_dialog={this.close_delete_dialog}
               proxies={this.state.delete_proxies}
               update_proxies={this.update}/>
+            <Modal className="warnings_modal" id="proxy_errors"
+                   title="Errors:" no_cancel_btn>
+                <Warnings warnings={this.state.err_ntf_list}/>
+            </Modal>
           </React.Fragment>;
     }
 });
@@ -1003,7 +1015,8 @@ class Cell extends React.Component {
                 <S_cell proxy={props.rowData}
                   mgr={props.mgr}
                   col={props.dataKey}
-                  open_delete_dialog={props.open_delete_dialog}/>
+                  open_delete_dialog={props.open_delete_dialog}
+                  show_error_ntf={props.show_error_ntf}/>
               </span>;
         }
         return props.cellData||'';
@@ -1080,11 +1093,14 @@ class Actions extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxies.Actions.duplicate');
             }));
-            yield window.fetch('/api/proxy_dup', {
+            const raw_resp = yield window.fetch('/api/proxy_dup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({port: _this.props.proxy.port}),
             });
+            const resp = yield raw_resp.json();
+            if (resp.errors)
+                _this.props.show_error_ntf(resp.errors);
             yield _this.props.update_proxies();
         });
     };

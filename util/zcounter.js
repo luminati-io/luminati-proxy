@@ -14,6 +14,7 @@ const env = process.env, ef = etask.ef, ms = date.ms;
 const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
+const global_only_worlds = new Set();
 
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
@@ -432,8 +433,11 @@ let prepare = ()=>etask(function*zcounter_prepare(){
                 else
                     path = `stats.${parts[0]}.${conf.app}.${parts[1]}`;
             }
-            res[world].push({path, v: agg.v, w: agg.w,
-                agg_srv: c.agg_srv, agg_tm: c.agg_tm});
+            if (!global_only_worlds.has(world) || path.includes('.glob.'))
+            {
+                res[world].push({path, v: agg.v, w: agg.w,
+                    agg_srv: c.agg_srv, agg_tm: c.agg_tm});
+            }
         }
     }
     return res;
@@ -518,20 +522,47 @@ function ws_client(world, url){
     return ws;
 }
 
+const lazy_conns = {lum: [], stats: []};
+class Lazy_ws_client {
+    constructor(world, url){
+        zerr.notice(`Opening lazy zcounter conn to ${url}`);
+        this.world = world;
+        this.url = url;
+    }
+    connect(){
+        let _this = this;
+        return etask(function*(){
+            _this.ws = ws_client(_this.world, _this.url);
+            if (_this.ws.connected)
+                return _this.ws;
+            let task = etask.sleep(10*ms.SEC);
+            _this.ws.on('connected', task.continue_fn());
+            yield task;
+            return _this.ws;
+        });
+    }
+}
+
 function run(){
     init();
     if (cluster.isWorker)
         return;
     let port = env.ZCOUNTER_PORT||3374;
+    let create_client = env.ZCOUNTER_LAZY_CONNECT
+        ? (world, url)=>{
+            let client = new Lazy_ws_client(world, url);
+            lazy_conns[world].push(client);
+        } : ws_client;
     if (env.NODE_ENV!='production')
     {
-        ws_client('lum', `ws://localhost:${port}`);
-        ws_client('stats', `ws://localhost:${port}`);
+        create_client('lum', `ws://localhost:${port}`);
+        create_client('stats', `ws://localhost:${port}`);
     }
     else if (env.ZCOUNTER_STATS_URL && env.ZCOUNTER_LUM_URL)
     {
-        env.ZCOUNTER_STATS_URL.split(';').forEach(x=>ws_client('stats', x));
-        env.ZCOUNTER_LUM_URL.split(';').forEach(x=>ws_client('lum', x));
+        env.ZCOUNTER_STATS_URL.split(';')
+            .forEach(x=>create_client('stats', x));
+        env.ZCOUNTER_LUM_URL.split(';').forEach(x=>create_client('lum', x));
     }
     else
     {
@@ -543,15 +574,27 @@ function run(){
             lum = ['zs-graphite.luminati.io'];
             stats = ['zs-graphite-stats.luminati.io'];
         }
-        lum.forEach(h=>ws_client('lum', `ws://${h}:${port}`));
-        stats.forEach(h=>ws_client('stats', `ws://${h}:${port}`));
+        lum.forEach(h=>create_client('lum', `ws://${h}:${port}`));
+        stats.forEach(h=>create_client('stats', `ws://${h}:${port}`));
     }
+    if (env.ZCOUNTER_LUM_GLOB_ONLY)
+        global_only_worlds.add('lum');
+    if (env.ZCOUNTER_STATS_GLOB_ONLY)
+        global_only_worlds.add('stats');
     etask.interval(interval, function*zcounter_run(){
+        this.on('uncaught', e=>zerr.e2s(e));
         let data = yield prepare();
         for (let world of ['lum', 'stats'])
         {
-            if (data[world].length)
-                ws_queue[world].put(data[world], max_age);
+            if (!data[world].length)
+                continue;
+            if (lazy_conns[world].length)
+            {
+                let tasks = lazy_conns[world].map(x=>x.connect());
+                lazy_conns[world] = [];
+                yield etask.all(tasks);
+            }
+            ws_queue[world].put(data[world], max_age);
         }
     });
 }

@@ -105,7 +105,6 @@ E.manager_fields = {
         +'ip list for granting access to them'},
     www_whitelist_ips: {type: 'array', desc: 'Whitelist ip list for granting '
         +'access to browser admin UI'},
-    reverse_proxy_ips: {type: 'array'},
     www: {type: 'integer', desc: 'HTTP and WebSocket port used for browser '
         +'admin UI and request logs'},
     config: {type: 'string', desc: 'Config file containing proxy definitions'},
@@ -129,6 +128,7 @@ E.manager_fields = {
     test_url: {type: 'string', desc: 'Url for testing proxy'},
     log: {type: 'string', desc: 'Log level'},
     logs: {type: 'number', desc: 'Number of request logs to store'},
+    logs_settings: {type: 'object', desc: 'Settings for logs remote delivery'},
     har_limit: {type: 'number', desc: 'Number of bytes to store'},
     debug: {type: 'string', desc: 'Request debug info default value'},
     lpm_auth: {type: 'string', desc: 'x-lpm-authorization header'},
@@ -152,5 +152,9 @@ E.manager_fields = {
         +'config file'},
     extra_ssl_ips: {type: 'array', desc: 'List of IPs to add to SSL '
         +'certificate'},
+    bw_limit_webhook_url: {type: 'string', desc: 'URL to send webhook '
+        +'messages to when BW limit is reached'},
+    bw_th_webhook_url: {type: 'string', desc: 'URL to send webhook messages '
+        +'to when BW limit threshold is reached'},
 };
 return E; }); // eslint-disable-line

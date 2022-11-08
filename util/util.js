@@ -398,15 +398,9 @@ E.clone_inplace = function(dst, src){
         dst.splice(src.length);
     }
     else if (typeof dst=='object')
-    {
-        var k;
-        for (k in src)
-            dst[k] = src[k];
-        for (k in dst)
-        {
-            if (!src.hasOwnProperty(k))
-                delete dst[k];
-        }
+    { /* saving strict items order */
+        Object.keys(dst).forEach(x=>delete dst[x]);
+        Object.entries(src).forEach(([k, v])=>dst[k] = v);
     }
     return dst;
 };

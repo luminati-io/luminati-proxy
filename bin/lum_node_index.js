@@ -4,7 +4,7 @@
 const semver = require('semver');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
-require('../lib/perr.js').run({});
+const perr = require('../lib/perr.js');
 const logger = require('../lib/logger.js').child({category: 'lum_node_index'});
 const ssl = require('../lib/ssl.js');
 const lpm_config = require('../util/lpm_config.js');
@@ -24,6 +24,7 @@ catch(e){ logger.warn('could not load pm2: daemon mode not supported'); }
 class Lum_node_index {
     constructor(argv){
         this.argv = argv;
+        perr.run({enabled: !argv.no_usage_stats, zagent: argv.zagent});
     }
     is_daemon_running(list){
         const daemon = list.find(p=>p.name==lpm_config.daemon_name);

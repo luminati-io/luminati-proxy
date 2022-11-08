@@ -242,15 +242,16 @@
             }
             .days_input { flex: 1; }
         }
-        .renewable_container {
+        .field_container {
             align-items: center;
             display: flex;
-            margin-top: 10px;
-            &_tooltip {
+            min-height: 38px;
+            &_title {
                 margin-right: 15px;
                 font-size: 15px;
             }
         }
+        input[type=number].error { border-color: #eb3a28; }
     }
     .regex_field {
         width: 100%;

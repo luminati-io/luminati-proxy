@@ -69,10 +69,12 @@ const SEC = 1000, MIN = 60*SEC, VFD_SZ = 8, VFD_BIN_SZ = 12;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
 const net = is_node ? require('net') : null, BUFFER_CONTENT = 10;
 let SnappyStream, UnsnappyStream;
+const EventEmitter = is_node ? require('events').EventEmitter
+    : events.EventEmitter;
 
 function noop(){}
 
-class WS extends events.EventEmitter {
+class WS extends EventEmitter {
     constructor(opt){
         super();
         this.ws = undefined;
@@ -720,6 +722,8 @@ class Server {
             zerr.notice('incoming conn from %s', headers.origin);
         }
         let zws = new WS(this.opt);
+        if (this.opt.conn_max_event_listeners!==undefined)
+            zws.setMaxListeners(this.opt.conn_max_event_listeners);
         if (this.opt.trust_forwarded)
         {
             let forwarded = headers['x-real-ip'];
@@ -1240,7 +1244,7 @@ class Mux {
                     zerr.debug(`${_this.ws}> vfd ${vfd} sent ${stream.sent} `
                         +`ack ${stream.ack} win_size ${stream.win_size}`);
                 }
-                if (!buf_pending)
+                if (!buf_pending || !buf_pending.length)
                     return void cb();
                 pending = etask(function*_mux_stream_pending(){
                     yield this.wait();

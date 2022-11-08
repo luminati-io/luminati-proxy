@@ -104,7 +104,7 @@ E.init_args = args=>{
             acc[curr.name] = curr.value||true;
         return acc;
     }, {});
-    perr.enabled = !argv.no_usage_stats;
+    perr.set_opt({enabled: !argv.no_usage_stats, zagent: argv.zagent});
     return argv;
 };
 

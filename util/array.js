@@ -188,6 +188,10 @@ E.enumerate = function(arr){
     return Array.from(arr).map(function(e, i){ return [i, e]; });
 };
 
+E.range = function(length){
+    return Array.from({length: length}).map(function(_, i){ return i; });
+};
+
 var proto = {};
 proto.sed = function(regex, replace){
     return E.sed(this, regex, replace); };

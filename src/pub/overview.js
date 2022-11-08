@@ -25,6 +25,7 @@ class Overview extends Pure_component {
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
         this.state = {
             show_logs: null,
+            remote_logs_enabled: null,
             request_stats: null,
             tls_warning: false,
             embedded: qs_o.embedded=='true' || window.self!=window.top,
@@ -34,7 +35,9 @@ class Overview extends Pure_component {
         this.setdb_on('head.settings', settings=>{
             if (!settings)
                 return;
+            let remote_settings = settings.logs_settings||{};
             this.setState({show_logs: settings.logs>0,
+                remote_logs_enabled: !!remote_settings.type,
                 zagent: settings.zagent, reseller: settings.reseller,
                 request_stats: settings.request_stats});
             if (settings.ask_sync_config&&!settings.zagent)
@@ -81,7 +84,8 @@ class Overview extends Pure_component {
         });
     };
     render(){
-        const {show_logs, zagent, request_stats, reseller} = this.state;
+        const {show_logs, zagent, request_stats, reseller,
+            remote_logs_enabled} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
         const title = <T>Proxy Manager Dashboard</T>;
         return <div className="overview_page">
@@ -118,7 +122,7 @@ class Overview extends Pure_component {
             <div className="logs_wrapper">
               <Har_viewer/>
             </div>}
-          {show_logs===false && !reseller &&
+          {show_logs===false && !reseller && !remote_logs_enabled &&
             <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>
           }
           <Modal id="sync_config_modal" ok_btn_title="Yes"

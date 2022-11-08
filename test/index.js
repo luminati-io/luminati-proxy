@@ -4,6 +4,8 @@ const assert = require('assert');
 const dns = require('dns');
 const net = require('net');
 const https = require('https');
+const http = require('http');
+const tls = require('tls');
 const socks = require('lum_socksv5');
 const {Netmask} = require('netmask');
 const {Readable, Writable} = require('stream');
@@ -74,15 +76,24 @@ describe('proxy', ()=>{
                 }
                 delete req_opt.fake;
             }
+            if (!req_opt.skip_proxy)
+            {
+                req_opt.proxy = req_opt.proxy ||
+                    `http://127.0.0.1:${opt.port||'24000'}`;
+            }
+            let req = request(req_opt, (err, res)=>
+                this.continue(etask.err_res(err, res)));
+            if (req_opt.lb_data)
+                req.on('socket', socket=>socket.write(req_opt.lb_data));
             if (req_opt.no_usage)
-                return yield etask.nfn_apply(_this, '.request', [req_opt]);
+                return yield this.wait();
             const w = etask.wait();
             l.on('error', e=>w.throw(e));
             l.on('request_error', e=>w.throw(e));
             l.on('usage', ()=>w.continue());
             l.on('usage_abort', ()=>w.continue());
             l.on('switched', ()=>w.continue());
-            const res = yield etask.nfn_apply(_this, '.request', [req_opt]);
+            const res = yield this.wait();
             yield w;
             return res;
         });
@@ -288,26 +299,31 @@ describe('proxy', ()=>{
     }));
     describe('options', ()=>{
         describe('passthrough', ()=>{
-            it('authentication passed', ()=>etask(function*(){
-                l = yield lum({pool_size: 3});
-                const res = yield l.test({headers: {
-                    'proxy-authorization': 'Basic '+
-                        Buffer.from('lum-customer-abc-zone-static:xyz')
-                        .toString('base64'),
-                }});
-                assert.ok(!l.sessions);
-                assert.equal(proxy.history.length, 1);
-                assert.equal(res.body.auth.customer, 'abc');
-                assert.equal(res.body.auth.password, 'xyz');
-                assert.equal(res.body.auth.zone, 'static');
-            }));
-            it('no zone auth if cust out of whitelist', ()=>etask(function*(){
+            const check_auth = function (prefix) {
+                return etask(function*(){
+                    l = yield lum({pool_size: 3});
+                    const res = yield l.test({headers: {
+                            'proxy-authorization': 'Basic '+
+                                Buffer.from(prefix
+                                    +'-customer-abc-zone-static:xyz')
+                                    .toString('base64'),
+                        }});
+                    assert.ok(!l.sessions);
+                    assert.equal(proxy.history.length, 1);
+                    assert.equal(res.body.auth.customer, 'abc');
+                    assert.equal(res.body.auth.password, 'xyz');
+                    assert.equal(res.body.auth.zone, 'static');
+                });
+            };
+            it('authentication passed brd', ()=>check_auth('brd'));
+            it('authentication passed lum', ()=>check_auth('lum'));
+            it('no zone auth if cust out of whitelist lum', ()=>etask(function*(){
                 let cust = customer_out_of_zone_auth_whitelist;
                 l = yield lum();
                 const res = yield l.test({no_usage: 1, headers: {
                     'proxy-authorization': 'Basic '+
                         Buffer.from(`lum-customer-${cust}-zone-static:xyz`)
-                        .toString('base64'),
+                            .toString('base64'),
                 }});
                 assert.equal(res.statusCode, 407);
             }));
@@ -507,6 +523,13 @@ describe('proxy', ()=>{
                 let res = yield l.test({url: test_url.http});
                 assert.equal(res.statusCode, 200);
             }));
+            it('http through lb', etask._fn(function*(){
+                l = yield lum({whitelist_ips: ['1.1.1.1'],
+                    lb_ips: ['127.0.0.1']});
+                let res = yield l.test({url: test_url.http, no_usage: true,
+                    lb_data: 'PROXY TCP4 1.1.1.1\r\n'});
+                assert.equal(res.statusCode, 200);
+            }));
             it('http reject', etask._fn(function*(){
                 l = yield lum({whitelist_ips: ['1.1.1.1']});
                 sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
@@ -514,9 +537,43 @@ describe('proxy', ()=>{
                 assert.equal(res.statusCode, 407);
                 assert.equal(res.body, undefined);
             }));
+            it('http through lb reject', etask._fn(function*(){
+                l = yield lum({whitelist_ips: ['1.1.1.1'],
+                    lb_ips: ['127.0.0.1']});
+                let res = yield l.test({url: test_url.http, no_usage: true,
+                    lb_data: 'PROXY TCP4 1.1.1.2\r\n'});
+                assert.equal(res.statusCode, 407);
+                assert.equal(res.body, undefined);
+            }));
             it('https', etask._fn(function*(){
                 l = yield lum();
                 let res = yield l.test({url: test_url.https});
+                assert.equal(res.statusCode, 200);
+            }));
+            it('https through lb', etask._fn(function*(){
+                l = yield lum({whitelist_ips: ['1.1.1.1'],
+                    lb_ips: ['127.0.0.1']});
+                let socket = net.connect(24000, '127.0.0.1');
+                socket.on('error', e=>this.throw(e));
+                socket.on('timeout', e=>this.throw(new Error('timeout')));
+                socket.on('connect', ()=>this.continue());
+                yield this.wait();
+                socket.write('PROXY TCP4 1.1.1.1\r\n');
+                let r = http.request({method: 'CONNECT', path: 'lumtest.com',
+                    createConnection: ()=>socket}).end();
+                r.on('error', e=>this.throw(e));
+                r.on('connect', res=>this.continue(res));
+                r = yield this.wait();
+                let tls_socket = tls.connect({host: 'lumtest.com',
+                    socket, servername: 'lumtest.com',
+                    rejectUnauthorized: false}, ()=>this.continue());
+                tls_socket.on('error', e=>this.throw(e));
+                yield this.wait();
+                const agent = new https.Agent({rejectUnauthorized: false});
+                agent.createConnection = ()=>tls_socket;
+                let req = {url: test_url.https, skip_proxy: 1,
+                    agent};
+                let res = yield l.test(req);
                 assert.equal(res.statusCode, 200);
             }));
             it('https reject', etask._fn(function*(){
@@ -528,6 +585,22 @@ describe('proxy', ()=>{
                 } catch(e){ error = e.toString(); }
                 assert(error.includes('tunneling socket could not be '
                 +'established, statusCode=407'));
+            }));
+            it('https through lb reject', etask._fn(function*(){
+                l = yield lum({whitelist_ips: ['1.1.1.1'],
+                    lb_ips: ['127.0.0.1']});
+                let socket = net.connect(24000, '127.0.0.1');
+                socket.on('error', e=>this.throw(e));
+                socket.on('timeout', e=>this.throw(new Error('timeout')));
+                socket.on('connect', ()=>this.continue());
+                yield this.wait();
+                socket.write('PROXY TCP4 1.1.1.2\r\n');
+                let r = http.request({method: 'CONNECT', path: 'lumtest.com',
+                    createConnection: ()=>socket}).end();
+                r.on('error', e=>this.throw(e));
+                r.on('connect', res=>this.continue(res));
+                r = yield this.wait();
+                assert.equal(r.statusCode, 407);
             }));
             describe('socks', ()=>{
                 it('http', etask._fn(function*(_this){
@@ -544,6 +617,33 @@ describe('proxy', ()=>{
                     let body = JSON.parse(res.body);
                     assert.equal(body.url, test_url.http);
                 }));
+                it('http through lb', etask._fn(function*(_this){
+                    _this.timeout(30000);
+                    l = yield lum({port: 25000, lb_ips: ['127.0.0.1'],
+                        whitelist_ips: ['1.1.1.1']});
+                    const _on_connect = socks.Client.prototype._onConnect;
+                    sandbox.stub(socks.Client.prototype, '_onConnect')
+                    .callsFake(function(){
+                        l.update_lb_ips({lb_ips: []});
+                        this._sock.write('PROXY TCP4 1.1.1.1\r\n');
+                        _on_connect.apply(this, arguments);
+                    });
+                    let w = etask.wait();
+                    l.on('usage', data=>w.return(data));
+                    let res = yield etask.nfn_apply(request, [{
+                        agent: new socks.HttpAgent({
+                            proxyHost: '127.0.0.1',
+                            proxyPort: 25000,
+                            auths: [socks.auth.None()],
+                        }),
+                        url: test_url.http,
+                    }]);
+                    assert.equal(res.statusCode, 200);
+                    let usage = yield w;
+                    assert.equal(usage.remote_address, '1.1.1.1');
+                    let body = JSON.parse(res.body);
+                    assert.equal(body.url, test_url.http);
+                }));
                 it('socks http', etask._fn(function*(){
                     l = yield lum();
                     let res = yield etask.nfn_apply(request, [{
@@ -556,6 +656,35 @@ describe('proxy', ()=>{
                         url: test_url.http,
                     }]);
                     assert.equal(res.statusCode, 200);
+                    let body = JSON.parse(res.body);
+                    assert.equal(body.url, test_url.http);
+                }));
+                it('socks http through lb', etask._fn(function*(){
+                    l = yield lum({lb_ips: ['127.0.0.1'],
+                        whitelist_ips: ['1.1.1.1']});
+                    const _on_connect = socks.Client.prototype._onConnect;
+                    sandbox.stub(socks.Client.prototype, '_onConnect')
+                    .callsFake(function(){
+                        l.update_lb_ips({lb_ips: []});
+                        this._sock.write('PROXY TCP4 1.1.1.1\r\n');
+                        _on_connect.apply(this, arguments);
+                    });
+                    let w = etask.wait();
+                    l.on('usage', data=>w.return(data));
+                    let res = yield etask.nfn_apply(request, [{
+                        agent: new socks.HttpAgent({
+                            proxyHost: '127.0.0.1',
+                            proxyPort: l.port,
+                            auths: [socks.auth.None()],
+                        }),
+                        rejectUnauthorized: false,
+                        url: test_url.http,
+                    }]);
+                    assert.equal(res.statusCode, 200);
+                    let usage = yield w;
+                    assert.equal(usage.remote_address, '1.1.1.1');
+                    let body = JSON.parse(res.body);
+                    assert.equal(body.url, test_url.http);
                 }));
                 it('socks http reject', etask._fn(function*(){
                     l = yield lum({whitelist_ips: ['1.1.1.1']});
@@ -572,6 +701,30 @@ describe('proxy', ()=>{
                     }]);
                     assert.equal(res.statusCode, 407);
                 }));
+                it('socks http through lb reject', etask._fn(function*(){
+                    l = yield lum({lb_ips: ['127.0.0.1'],
+                        whitelist_ips: ['1.1.1.1']});
+                    const _on_connect = socks.Client.prototype._onConnect;
+                    sandbox.stub(socks.Client.prototype, '_onConnect')
+                    .callsFake(function(){
+                        l.update_lb_ips({lb_ips: []});
+                        this._sock.write('PROXY TCP4 1.1.1.2\r\n');
+                        _on_connect.apply(this, arguments);
+                    });
+                    let error = '';
+                    try {
+                        yield etask.nfn_apply(request, [{
+                            agent: new socks.HttpAgent({
+                                proxyHost: '127.0.0.1',
+                                proxyPort: l.port,
+                                auths: [socks.auth.None()],
+                            }),
+                            rejectUnauthorized: false,
+                            url: test_url.http,
+                        }]);
+                    } catch(e){ error = e.toString(); }
+                    assert(error.includes('not allowed by ruleset'));
+                }));
                 it('socks https', etask._fn(function*(){
                     l = yield lum();
                     let res = yield etask.nfn_apply(request, [{
@@ -584,6 +737,31 @@ describe('proxy', ()=>{
                         url: test_url.https,
                     }]);
                     assert.equal(res.statusCode, 200);
+                    let body = JSON.parse(res.body);
+                    assert.equal(body.url, '/test');
+                }));
+                it('socks https through lb', etask._fn(function*(){
+                    l = yield lum({lb_ips: ['127.0.0.1'],
+                        whitelist_ips: ['1.1.1.1']});
+                    const _on_connect = socks.Client.prototype._onConnect;
+                    sandbox.stub(socks.Client.prototype, '_onConnect')
+                    .callsFake(function(){
+                        l.update_lb_ips({lb_ips: []});
+                        this._sock.write('PROXY TCP4 1.1.1.1\r\n');
+                        _on_connect.apply(this, arguments);
+                    });
+                    let res = yield etask.nfn_apply(request, [{
+                        agent: new socks.HttpsAgent({
+                            proxyHost: '127.0.0.1',
+                            proxyPort: l.port,
+                            auths: [socks.auth.None()],
+                        }),
+                        rejectUnauthorized: false,
+                        url: test_url.https,
+                    }]);
+                    assert.equal(res.statusCode, 200);
+                    let body = JSON.parse(res.body);
+                    assert.equal(body.url, '/test');
                 }));
                 it('socks https reject', etask._fn(function*(){
                     l = yield lum({whitelist_ips: ['1.1.1.1']});
@@ -603,6 +781,30 @@ describe('proxy', ()=>{
                     } catch(e){ error = e.toString(); }
                     assert(error.includes('Client network socket disconnected '
                     +'before secure TLS connection was established'));
+                }));
+                it('socks https through lb reject', etask._fn(function*(){
+                    l = yield lum({lb_ips: ['127.0.0.1'],
+                        whitelist_ips: ['1.1.1.1']});
+                    const _on_connect = socks.Client.prototype._onConnect;
+                    sandbox.stub(socks.Client.prototype, '_onConnect')
+                    .callsFake(function(){
+                        l.update_lb_ips({lb_ips: []});
+                        this._sock.write('PROXY TCP4 1.1.1.2\r\n');
+                        _on_connect.apply(this, arguments);
+                    });
+                    let error;
+                    try {
+                        yield etask.nfn_apply(request, [{
+                            agent: new socks.HttpsAgent({
+                                proxyHost: '127.0.0.1',
+                                proxyPort: l.port,
+                                auths: [socks.auth.None()],
+                            }),
+                            rejectUnauthorized: false,
+                            url: test_url.https,
+                        }]);
+                    } catch(e){ error = e.toString(); }
+                    assert(error.includes('not allowed by ruleset'));
                 }));
             });
         });
@@ -754,10 +956,10 @@ describe('proxy', ()=>{
                 assert.equal(r.statusCode, 200);
                 debug_headers.forEach(hdr=>assert.ok(r.headers[hdr]));
             }));
-            it('lum_user_hide_headers', ()=>etask(function*(){
+            it('lum_user_hide_headers_lum', ()=>etask(function*(){
                 l = yield lum(opts);
                 const auth = 'Basic '+Buffer
-                .from('lum-customer-abc-zone-static:t2').toString('base64');
+                    .from('lum-customer-abc-zone-static:t2').toString('base64');
                 let r = yield l.test({headers: {'proxy-authorization': auth}});
                 assert.equal(r.statusCode, 200);
                 debug_headers.forEach(hdr=>assert.ok(!r.headers[hdr]));
@@ -1595,6 +1797,8 @@ describe('proxy', ()=>{
             proxy.fake = false;
             l = yield lum(Object.assign({history: true}, config));
             let socket = net.connect(24000, '127.0.0.1');
+            if (opt.lb_data)
+                socket.write(opt.lb_data);
             socket.on('connect', ()=>{
                 if (opt.abort)
                     socket.end();
@@ -1629,6 +1833,68 @@ describe('proxy', ()=>{
             Object.assign({}, config, {rules}), 200, 1, {close: true});
         t('rules is triggered when server ends connection',
             Object.assign({}, config, {rules}), 200, 1, {smtp_close: true});
+        t('rules is triggered regular req through lb',
+            Object.assign({}, config, {rules, lb_ips: ['127.0.0.1']}),
+            200, 1, {close: true, lb_data: 'PROXY TCP4 127.0.0.1\r\n'});
+        t('rules is triggered when server ends connection through lb',
+            Object.assign({}, config, {rules, lb_ips: ['127.0.0.1']}),
+            200, 1, {smtp_close: true, lb_data: 'PROXY TCP4 127.0.0.1\r\n'});
+    });
+    describe('multiple super proxy ports', ()=>{
+        const default_super_proxy_port = 20001;
+        const super_proxy_port_2 = 20002;
+        const single_port = [default_super_proxy_port];
+        const multiple_ports = [default_super_proxy_port, super_proxy_port_2];
+        let proxy2;
+        before(etask._fn(function*before(_this){
+            _this.timeout(3000);
+            proxy2 = yield http_proxy(super_proxy_port_2);
+        }));
+        after(etask._fn(function*after(_this){
+            _this.timeout(3000);
+            if (proxy2)
+                yield proxy2.stop();
+            proxy2 = null;
+        }));
+        const get_super_proxy_port = usage=>+usage.super_proxy.split(':')[1];
+        const assert_round_robin = ports=>etask(function*(){
+            let w = etask.wait();
+            l.on('usage', data=>w.return(data));
+            const expected_ports = [];
+            const actual_ports = [];
+            let usage;
+            for (let i = 0; i < ports.length*2; i++)
+            {
+                yield l.test({url: ping.http.url});
+                usage = yield w;
+                assert.equal(usage.success, 1);
+                expected_ports.push(ports[i%ports.length]);
+                actual_ports.push(get_super_proxy_port(usage));
+            }
+            assert.deepEqual(expected_ports, actual_ports, 'round robin ports '
+                +'are incorrect.\nExpected: '+expected_ports+'\nActual: '
+                +actual_ports+'\n');
+        });
+        it('default', ()=>etask(function*(){
+            l = yield lum({super_proxy_ports: multiple_ports});
+            assert.deepEqual(l.opt.super_proxy_ports, multiple_ports);
+            yield assert_round_robin(multiple_ports);
+        }));
+        it('no ports', ()=>etask(function*(){
+            l = yield lum();
+            assert.ok(!l.opt.super_proxy_ports, 'server.opt.super_proxy_ports '
+                +'is truthy');
+            yield assert_round_robin(single_port);
+        }));
+        it('works after set_opt', ()=>etask(function*(){
+            l = yield lum();
+            assert.ok(!l.opt.super_proxy_ports, 'server.opt.super_proxy_ports '
+                +'is truthy');
+            yield assert_round_robin(single_port);
+            l.set_opt({super_proxy_ports: multiple_ports});
+            assert.deepEqual(l.opt.super_proxy_ports, multiple_ports);
+            yield assert_round_robin(multiple_ports);
+        }));
     });
     // XXX krzysztof/vitkor: move to util.js
     describe('util', ()=>{

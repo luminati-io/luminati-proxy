@@ -23,6 +23,7 @@ import Settings from './settings.js';
 import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
+import ws from './ws.js';
 import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
@@ -115,7 +116,19 @@ const App = withRouter(class App extends Pure_component {
                 lang = 'en';
             i18n.set_curr_lang(lang);
         });
+        ws.addEventListener('message', this.on_message);
     }
+    willUnmount(){
+        ws.removeEventListener('message', this.on_message);
+    }
+    on_message = event=>{
+        const {msg, settings, defaults} = JSON.parse(event.data) || {};
+        if (msg=='settings_updated')
+        {
+            setdb.set('head.settings', settings);
+            setdb.set('head.defaults', defaults);
+        }
+    };
     load_data = ()=>this.etask(function*(){
         const errors = [];
         const err_handler = msg=>etask.fn(function*(e){

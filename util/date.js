@@ -300,6 +300,37 @@ E.align_up = function(d, align){
     return new Date(Math.ceil(d/mult)*mult);
 };
 
+E.today = function(now){
+    return E.align(now, 'DAY');
+};
+
+E.nth_of_month = function(now, n){
+    if (n===undefined)
+    {
+        n = now;
+        now = date_get();
+    }
+    var res = E.align(now, 'MONTH');
+    var last_day = E.last_day_of_month(res);
+    if (n<0)
+        res = E.add(res, {d: last_day+n});
+    else if (n>1)
+        res = E.add(res, {d: n-1});
+    return res;
+};
+
+E.last_day_of_month = function(month, year){
+    if (year===undefined && !(Number.isFinite(month)&&month>=1&&month<=12)
+        && E.is_date_like(month))
+    {
+        var d = date_get(month);
+        month = d.getUTCMonth()+1;
+        year = d.getUTCFullYear();
+    }
+    var ts = Date.UTC(year||2001, month, 0); // default to non-leap year
+    return new Date(ts).getUTCDate();
+};
+
 E.add = function(d, dur){
     d = E.get(d, 1);
     dur = normalize_dur(dur);
@@ -321,7 +352,7 @@ E.add = function(d, dur){
             year++;
             month -= 12;
         }
-        day = Math.min(day, last_day_of_month(month, year));
+        day = Math.min(day, E.last_day_of_month(month+1, year));
         d.setUTCFullYear(year, month, day);
     }
     ['day', 'hour', 'min', 'sec', 'ms'].forEach(function(k){
@@ -342,11 +373,6 @@ function normalize_dur(dur){
     for (var k in dur)
         norm[aliases[k]||k] = dur[k];
     return norm;
-}
-
-function last_day_of_month(month, year){
-    var ts = Date.UTC(year||2001, month+1, 0); // default to non-leap year
-    return new Date(ts).getUTCDate();
 }
 
 E.describe_interval = function(_ms, decimals){
@@ -506,17 +532,17 @@ E.strptime = function(str, fmt){
 };
 
 // tz in format shh:mm (for exmpl +01:00, -03:45)
-E.apply_tz = function(date, tz, opt){
-    if (!date)
-        return date;
-    date = E.get(date);
+E.apply_tz = function(d, tz, opt){
+    if (!d)
+        return d;
+    d = E.get(d);
     tz = (tz||E.local_tz).replace(':', '');
     opt = opt||{};
     var timezone = +tz.slice(1, 3)*E.ms.HOUR+tz.slice(3, 5)*E.ms.MIN;
     var sign = tz.slice(0, 1) == '+' ? 1 : -1;
     if (opt.inverse)
         sign *= -1;
-    return new Date(date.getTime()+sign*timezone);
+    return new Date(d.getTime()+sign*timezone);
 };
 
 var utc_local = {
@@ -796,5 +822,20 @@ var date_like_regexes = [
     /^\d{2}[ /-](\d{2}|[a-z]{3,10})[ /-]\d{2}(\d{2})?/i, // dd-mm-yy(yy)?
     /^(\d{2}|[a-z]{3,10})[ /-]\d{2}[ /-]\d{2}(\d{2})?/i, // mm-dd-yy(yy)?
 ];
+
+var metronomes = {};
+E.metronome = function(delay, cb){
+    if (!metronomes.hasOwnProperty(delay))
+    {
+        metronomes[delay] = [];
+        var t = setInterval(function(){
+            metronomes[delay].forEach(function(f){ f(); });
+        }, delay);
+        if (is_node)
+            t.unref();
+        cb();
+    }
+    metronomes[delay].push(cb);
+};
 
 return E; }); }());

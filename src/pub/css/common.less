@@ -33,6 +33,10 @@
 @link: #428bca;
 @tooltip: #154055;
 @chrome_border: #d0d0d0;
+@color-white: #ffffff;
+@color-alert-danger: #E22541;
+@color-alert-success: #0BE597;
+
 @keyframes field_highlight {
     0% {
         border: 1px solid white;
@@ -1229,7 +1233,7 @@ span.icon_link {
         }
         &_on {
             left: 7px;
-            color: #ffffff;
+            color: @color-white;
             transform: translateX(-24px);
         }
         &_active {
@@ -1242,7 +1246,7 @@ span.icon_link {
         width: 14px;
         height: 14px;
         border-radius: 7px;
-        background-color: #ffffff;
+        background-color: @color-white;
         transition: transform 350ms ease;
         left: 0;
         top: 2px;
@@ -1293,4 +1297,56 @@ span.icon_link {
 .faq_link {
     margin: 0 3px;
     cursor: pointer;
+}
+.alert_wrapper {
+    bottom: 0;
+    left: 44px;
+    position: fixed;
+    z-index: 9000;
+    min-width: 20%;
+    .alert {
+        white-space: pre-line;
+        border: 0;
+        border-radius: 5px;
+        color: @color-white;
+        min-height: 48px;
+        position: relative;
+        font-weight: normal;
+        line-height: 22px;
+        font-size: 14px;
+    }
+    .alert-danger {
+        background-color: @color-alert-danger;
+    }
+    .alert-success {
+        background-color: @color-alert-success;
+    }
+    .alert-warning {
+        background-color: #ffdb7b;
+        color: #5f5233;
+    }
+    .alert-dismissable, .alert-dismissible {
+        padding-right: 0;
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        align-items: center;
+        .close {
+            color: inherit;
+            opacity: 1;
+            text-shadow: none;
+            outline: 0;
+            right: 10px;
+            top: 0px;
+            &:hover {
+                color: fade(@dark, 70%);
+            }
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+}
+.zagent .alert_wrapper {
+    left: 10px;
 }

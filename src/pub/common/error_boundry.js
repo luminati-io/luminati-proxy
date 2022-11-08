@@ -15,9 +15,11 @@ export default class Error_boundry extends Pure_component {
         case 'duplicate_port_number':
             msg = <h4>Multiple port configuration detected -
                 please check port set up and delete duplicated port</h4>;
+            break;
         case 'cp_required':
             msg = <h4>Cloud Proxy Manager can be opened only
                 in <a href={cp_href}>Bright Data control panel</a></h4>;
+            break;
         }
         return {error: true, msg};
     }

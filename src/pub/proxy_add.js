@@ -77,13 +77,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 yield report_exception(e, 'proxy_add.Proxy_add.persist');
                 _this.setState({show_loader: false});
             }));
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
-            let port = 24000;
-            proxies.forEach(p=>{
-                if (p.port>=port)
-                    port = p.port+1;
-            });
-            form.port = port;
             const raw_resp = yield window.fetch('/api/proxies', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -92,7 +85,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             const resp = yield raw_resp.json();
             if (resp.errors)
                 return resp;
-            return {port};
+            return {port: resp.data.port};
         });
     };
     save = (opt={})=>{

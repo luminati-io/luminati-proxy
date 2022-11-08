@@ -262,6 +262,9 @@ E.list = {
     ZW: 'Zimbabwe',
 };
 
+E.country_codes_lowered = Object.keys(E.list).map(function(c){
+    return c.toLowerCase(); });
+
 E.cn_list = {
     AF: '阿富汗',
     AL: '阿爾巴尼亞',
@@ -1321,7 +1324,7 @@ E.regions = {
     GT: ['South America', 'AMER'],
     GU: ['Micronesia', 'APAC'],
     GW: ['Western Africa', 'EMEA'],
-    GY: ['South America', 'EMEA'],
+    GY: ['South America', 'AMER'],
     HK: ['Eastern Asia', 'China'],
     HN: ['South America', 'AMER'],
     HR: ['South-Eastern Europe', 'EMEA', 'EU'],
@@ -2938,6 +2941,9 @@ E.label2code = function(label){
         var _c = c_list[i];
         if (_c[1]===label)
             return _c[0];
+        var bracket_ind = _c[1].indexOf('(');
+        if (bracket_ind!=-1 && _c[1].slice(0, bracket_ind-1)==label)
+            return _c[0];
     }
     // XXX sergeim: Åland Islands case
     for (var k in E.adj_list)
@@ -2958,6 +2964,14 @@ E.cnlabel2code = function(label){
             return i;
     }
     return '';
+};
+
+E.alpha3_to_alpha2 = function alpha3_to_alpha2(a3){
+    a3 = a3.toUpperCase();
+    var alpha2 = Object.keys(alpha_3_list);
+    var alpha3 = Object.values(alpha_3_list);
+    var a2 = alpha2[alpha3.indexOf(a3)];
+    return a2||a3;
 };
 
 E.mixed2code = function(mixed){

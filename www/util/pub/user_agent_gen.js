@@ -6,62 +6,62 @@ define([], function(){
 const E = [
     {name: 'Chrome 102 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; '
         +'Win64; x64) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
-        +'Chrome/103.0.5060.114Safari/101.0.4951.64'},
+        +'Chrome/105.0.5195.102 Safari/101.0.4951.64'},
     {name: 'Chrome 102 Windows 7', value: 'Mozilla/5.0 (Windows NT 6.1; '
         +'Win64; x64) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
-        +'Chrome/103.0.5060.114Safari/101.0.4951.64'},
+        +'Chrome/105.0.5195.102 Safari/101.0.4951.64'},
     {name: 'Chrome 71 Android 4', value: 'Mozilla/5.0 (Linux; Android 4.1.1; '
         +'Nexus 7 Build/JRO03D) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
         +'Chrome/92.0.4515.115 Safari/101.0.4951.64'},
     {name: 'Chrome 102 Android 8', value: 'Mozilla/5.0 (Linux; Android 8.1.0; '
         +'Build/OPM1.171019.011; wv) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
-        +'Version/4.0 Chrome/103.0.5060.114Mobile Safari/101.0.4951.64'},
+        +'Version/4.0 Chrome/105.0.5195.77Mobile Safari/101.0.4951.64'},
     {name: 'Chrome 102 OSX 10.14.1', value: 'Mozilla/5.0 (Macintosh; Intel Mac '
         +'OS X 10_14_1) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
-        +'Chrome/103.0.5060.114Safari/101.0.4951.64'},
+        +'Chrome/104.0.5112. Safari/101.0.4951.64'},
     {name: 'Chrome 102 Linux', value: 'Mozilla/5.0 (X11; Linux x86_64) '
-        +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/103.0.5060.114'
+        +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/105.0.5195.102'
         +'Safari/101.0.4951.64'},
     {name: 'Chrome 102 iOS 12.1', value: 'Mozilla/5.0 (iPhone; CPU iPhone OS '
         +'12_1 like Mac OS X) AppleWebKit/605.115 (KHTML, like Gecko) '
-        +'CriOS/103.0.5060.63Mobile/15E148 Safari/605.1'},
+        +'CriOS/105.0.5195.98Mobile/15E148 Safari/605.1'},
     {name: 'Chrome 102 Samsung Galaxy S6', value: 'Mozilla/5.0 (Linux; Android '
         +'6.0.1; SM-G920V Build/MMB29K) AppleWebKit/101.0.4951.64 (KHTML, like '
-        +'Gecko) Chrome/103.0.5060.114Mobile Safari/101.0.4951.64'},
+        +'Gecko) Chrome/105.0.5195.77Mobile Safari/101.0.4951.64'},
     {name: 'Chromium 102 Linux', value: 'Mozilla/5.0 (X11; Linux x86_64) '
         +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 '
-        +'Chrome/103.0.5060.114Safari/101.0.4951.64'},
+        +'Chrome/105.0.5195.102 Safari/101.0.4951.64'},
     {name: 'Opera 87 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; '
         +'Win64; x64) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
-        +'Chrome/101.0.4951.648  Safari/101.0.4951.64 OPR/89.0.4447.38 '},
-    {name: 'Firefox 101 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; '
-        +'Win64; x64; rv:101) Gecko/20100101 Firefox/101'},
-    {name: 'Firefox 101 Windows 7', value: 'Mozilla/5.0 (Windows NT 6.1; '
-        +'WOW64; rv:101) Gecko/20100101 Firefox/101'},
-    {name: 'Firefox 101 OSX 10.14.1', value: 'Mozilla/5.0 (Macintosh; Intel '
-        +'Mac OS X 10.14.1; rv:101) Gecko/20100101 Firefox/101'},
-    {name: 'Firefox 101 Linux', value: 'Mozilla/5.0 (X11; Ubuntu; '
-        +'Linux x86_64; rv:101) Gecko/20100101 Firefox/101'},
+        +'Chrome/104.0.5112.102  Safari/101.0.4951.64 OPR/90.0.4480.54 '},
+    {name: 'Firefox 104 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; '
+        +'Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0'},
+    {name: 'Firefox 104 Windows 7', value: 'Mozilla/5.0 (Windows NT 6.1; '
+        +'WOW64; rv:104.0) Gecko/20100101 Firefox/104.0'},
+    {name: 'Firefox 104 OSX 10.14.1', value: 'Mozilla/5.0 (Macintosh; Intel '
+        +'Mac OS X 10.14.1; rv:104.0) Gecko/20100101 Firefox/104.0'},
+    {name: 'Firefox 104 Linux', value: 'Mozilla/5.0 (X11; Ubuntu; '
+        +'Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0'},
     // XXX iago: double check android firefox header (gecko specially)
     {name: 'Firefox 100.0 Android 4.4', value: 'Mozilla/5.0 (Android 4.4; '
         +'Mobile; rv:99.0) Gecko/41.0 Firefox/100.0'},
-    {name: 'Firefox 101 Android 8', value: 'Mozilla/5.0 (Android 8.1.0; '
-        +'Mobile; rv:101) Gecko/41.0 Firefox/101'},
-    {name: 'Safari 15.4 MacOSX 10.14.1', value: 'Mozilla/5.0 (Macintosh; '
+    {name: 'Firefox 104 Android 8', value: 'Mozilla/5.0 (Android 8.1.0; '
+        +'Mobile; rv:104.0) Gecko/41.0 Firefox/104.0'},
+    {name: 'Safari 15.6 MacOSX 10.14.1', value: 'Mozilla/5.0 (Macintosh; '
         +'Intel Mac OS X 10_14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) '
-        +'Version/15.4 Safari/15.4'},
-    {name: 'Safari Mobile 15.4 iOS 12', value: 'Mozilla/5.0 (iPhone; CPU '
+        +'Version/15.6 Safari/15.4'},
+    {name: 'Safari Mobile 15.6 iOS 12', value: 'Mozilla/5.0 (iPhone; CPU '
         +'iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like '
-        +'Gecko) Version/15.4 Mobile/15E148 Safari/15.4'},
+        +'Gecko) Version/15.6 Mobile/15E148 Safari/15.4'},
     {name: 'IE 11.0 for Desktop Windows 10', value: 'Mozilla/5.0 (Windows NT '
         +'10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'},
     {name: 'Edge 101 Windows 10', value: 'Mozilla/5.0 (Windows NT 10.0; Win64; '
-        +'x64) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/101.0.4951.648  '
-        +'Safari/101.0.4951.64 Edge/101.0.4951.64'},
+        +'x64) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/104.0.5112.81  '
+        +'Safari/101.0.4951.64 Edge/104.0.1293.47'},
     {name: 'Samsung Browser 16.2 Samsung Galaxy Tab A', value: 'Mozilla/6.2 '
         +'(Linux; Android 7.0; SAMSUNG SM-T585 Build/NRD90M) '
-        +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) SamsungBrowser/16.2 '
-        +'Chrome/92.0.4515.166 Safari/101.0.4951.64'},
+        +'AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/18 '
+        +'Chrome/99.0.4844.88 Safari/101.0.4951.64'},
     // for customer clicksc
     {name: 'Redmi 3S', value: 'Mozilla/5.0 (Linux; Android 6.0.1; Redmi 3S '
         +'Build/MMB29M) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
@@ -70,7 +70,7 @@ const E = [
         +'Build/LMY47I) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Version/4.0 '
         +'Chrome/39.0.0.0 Mobile Safari/101.0.4951.64'},
     {name: 'Nexus 10', value: 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 10) '
-        +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/102.0.5005.99'
+        +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/105.0.5195.77'
         +'Safari/101.0.4951.64'},
     {name: 'Micromax Q301', value: 'Mozilla/5.0 (Linux; Android 5.1; Micromax '
         +'Q301 Build/LMY47D) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '
@@ -84,7 +84,7 @@ const E = [
         +'Chrome/54.0.2840.68 Mobile Safari/101.0.4951.64 (Mobile; '
         +'afma-sdk-a-v10084036.9877000.2)'},
     {name: 'Moto G', value: 'Mozilla/5.0 (Linux; Android 6.0; XT1068) '
-        +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/102.0.5005.99'
+        +'AppleWebKit/101.0.4951.64 (KHTML, like Gecko) Chrome/105.0.5195.77'
         +'Mobile Safari/101.0.4951.64'},
     {name: 'Redmi Note 4', value: 'Mozilla/5.0 (Linux; Android 6.0.1; Redmi '
         +'Note 4 Build/MMB29M; wv) AppleWebKit/101.0.4951.64 (KHTML, like Gecko) '

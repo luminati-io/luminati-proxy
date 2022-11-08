@@ -10,7 +10,7 @@ import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import {qw} from '../../../util/string.js';
 import {Loader, Loader_small, Preset_description, Ext_tooltip,
-    Checkbox, Faq_link} from '../common.js';
+    Checkbox, Faq_link, Alert} from '../common.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
@@ -32,11 +32,14 @@ import {report_exception, bind_all, is_local} from '../util.js';
 import Warnings_modal from '../common/warnings_modal.js';
 import '../css/proxy_edit.less';
 
+const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
+
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
         super(props);
         this.state = {form: {}, errors: {}, show_loader: false,
-            saving: false};
+            saving: false, is_changed: false, default_form: {},
+            show_alert: false};
         this.debounced_save = _.debounce(this.save, 500);
         this.debounced = [];
         setdb.set('head.proxy_edit.set_field', this.set_field);
@@ -61,7 +64,7 @@ const Index = withRouter(class Index extends Pure_component {
             if (!proxy)
                 return this.props.history.push('/overview');
             const form = Object.assign({}, proxy);
-            this.apply_preset(form);
+            this.apply_preset(form, undefined, true);
             this.setState({proxies}, this.delayed_loader());
         });
         this.setdb_on('ws.zones', zones=>{
@@ -114,18 +117,45 @@ const Index = withRouter(class Index extends Pure_component {
             this.props.history.push({pathname, state: {field}});
         }
     };
+    isEmpty = value=>{
+        const type = typeof value;
+        switch (type)
+        {
+            case 'boolean':
+            case 'number':
+                return !value;
+            case 'string':
+                return !value.trim();
+            case 'object':
+                if (value.hasOwnProperty('length'))
+                {
+                    if (value.length)
+                        return value.every(v=>this.isEmpty(v));
+                    return true;
+                }
+                return this.isEmpty(Object.values(value));
+        }
+    };
+    has_changes = (new_obj, old_obj)=>{
+        const is_changed = _.intersection(Object.keys(new_obj),
+            Object.keys(old_obj)).some(k=>!_.isEqual(new_obj[k], old_obj[k]));
+        const diffs = _.xor(Object.keys(new_obj), Object.keys(old_obj))
+            .filter(k=>!mgr_proxy_shared_fields.includes(k))
+            .some(k=>!this.isEmpty(new_obj[k]));
+        return is_changed || diffs;
+    };
     set_field = (field_name, value, opt={})=>{
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
             const pending_form = {...prev_state.pending_form,
                 [field_name]: value};
-            return {form: new_form, pending_form};
-        }, this.start_saving.bind(null, opt));
+            const is_changed = this.has_changes(new_form,
+                this.state.default_form);
+            return {form: new_form, pending_form, is_changed};
+        });
         setdb.set('head.proxy_edit.form.'+field_name, value);
     };
-    start_saving = opt=>{
-        if (opt.skip_save)
-            return;
+    start_saving = ()=>{
         this.setState({saving: true}, ()=>this.lock_nav(true));
         this.debounced_save();
     };
@@ -174,7 +204,13 @@ const Index = withRouter(class Index extends Pure_component {
         }
         return false;
     };
-    apply_preset = (_form, preset)=>{
+    set_default_mgr_proxy_shared_fields = form=>{
+        mgr_proxy_shared_fields.forEach(k=>{
+            if (!form.hasOwnProperty(k) && this.state.defaults[k])
+                form[k] = `default-${this.state.defaults[k]}`;
+        });
+    };
+    apply_preset = (_form, preset, is_mount)=>{
         const form_upd = {};
         const form = Object.assign({}, _form);
         if (!preset)
@@ -223,6 +259,12 @@ const Index = withRouter(class Index extends Pure_component {
             delete form_upd.session;
         }
         this.setState({form, pending_form: form_upd});
+        if (is_mount)
+        {
+            const default_form = _.cloneDeep(form);
+            this.set_default_mgr_proxy_shared_fields(default_form);
+            this.setState({default_form});
+        }
         setdb.set('head.proxy_edit.form', form);
         for (let i in form)
             setdb.emit('head.proxy_edit.form.'+i, form[i]);
@@ -253,10 +295,9 @@ const Index = withRouter(class Index extends Pure_component {
             return;
         }
         const data = this.prepare_to_save();
-        this.setState({pending_form: {}});
         this.saving = true;
         const _this = this;
-        this.etask(function*(){
+        return this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxy_edit/index.Index.save');
                 _this.setState({error_list: [{msg: 'Something went wrong'}]});
@@ -276,8 +317,13 @@ const Index = withRouter(class Index extends Pure_component {
             if (json_resp.errors)
             {
                 _this.set_errors(json_resp.errors);
-                return $('#save_proxy_errors').modal('show');
+                $('#save_proxy_errors').modal('show');
+                return json_resp.errors;
             }
+            const c_form = _.cloneDeep(_this.state.form);
+            _this.set_default_mgr_proxy_shared_fields(c_form);
+            _this.setState({default_form: c_form,
+                is_changed: false, show_alert: true, pending_form: {}});
             if (_this.props.match.params.port!=_this.state.form.port)
             {
                 const port = _this.state.form.port;
@@ -361,9 +407,10 @@ const Index = withRouter(class Index extends Pure_component {
         const zone = this.state.zones.zones.find(p=>p.name==zone_name) || {};
         return zone.plan || {};
     };
-    on_back_click = ()=>{
-        this.props.history.push({pathname: '/overview'});
-    };
+    back_func = ()=>this.props.history.push({pathname: '/overview'});
+    on_back_click = ()=>this.state.is_changed
+        ? $('#port_confirmation_modal').modal()
+        : this.back_func();
     render(){
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
@@ -389,6 +436,9 @@ const Index = withRouter(class Index extends Pure_component {
                 form={this.state.form}
                 plan={curr_plan}
                 on_change_preset={this.apply_preset}
+                is_changed={this.state.is_changed}
+                saving={this.state.saving}
+                save={()=>$('#save_port_confirmation_modal').modal()}
               />
               <Nav_tabs_wrapper/>
             </div>
@@ -403,6 +453,38 @@ const Index = withRouter(class Index extends Pure_component {
               plan={curr_plan}
             />
           </div>
+          {this.state.show_alert &&
+            <Alert
+              variant="success"
+              dismissible
+              text="Port changes saved"
+              on_close={()=>this.setState({show_alert: false})}
+            />
+          }
+          <Modal
+            id="port_confirmation_modal"
+            title="Would you like to save your changes?"
+            ok_btn_title="Save"
+            click_ok={()=>{
+              let _this = this;
+              etask(function*(){
+                _this.setState({saving: true}, ()=>_this.lock_nav(true));
+                const errs = yield _this.save();
+                if (!errs)
+                    _this.back_func();
+              });
+            }}
+            cancel_clicked={this.back_func}>
+            <h4>Looks like you did not save the changes you made to port
+                &nbsp;{this.props.match.params.port}.
+                Would you like to save them?</h4>
+          </Modal>
+          <Modal
+            id="save_port_confirmation_modal"
+            title="Accept save changes"
+            ok_btn_title="Yes"
+            click_ok={this.start_saving}>
+          </Modal>
         </div>;
     }
 });
@@ -582,6 +664,11 @@ class Nav extends Pure_component {
           {is_local() &&
             <Open_browser_btn port={this.props.form.port}/>
           }
+          <button className="btn btn_lpm btn_lpm_primary"
+            onClick={this.props.save}
+            disabled={!this.props.is_changed || this.props.saving}>
+            <T>Save changes</T>
+          </button>
           <Confirmation_modal on_ok={this.state.confirm_action}/>
         </div>;
     }

@@ -1,26 +1,26 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint node:true*/
+'use strict'; /*jslint node:true es9:true*/
 require('./config.js');
 const _ = require('lodash');
 const crypto = require('crypto');
 const zurl = require('./url.js');
 const E = exports;
+const MD5_RAND_MAX = parseInt('f'.repeat(32), 16);
 
 E.find_matches = (all_rules, selector)=>
     (all_rules||[]).filter(x=>E.matches_rule(x.match, selector, x.opts));
 
-E.select_rules = (all_rules, selector, overrides=[])=>{
+E.select_rules = (all_rules, selector, overrides=[], opts)=>{
     let matches = E.find_matches(all_rules, selector);
-    return _.merge({}, ...matches.map(x=>x.rules), ...overrides,
+    matches = opts?.matches_preprocessor?.(matches) || matches;
+    let merged = _.merge({}, ...matches.map(x=>x.rules), ...overrides,
         E.rule_merge_customizer);
+    return merged;
 };
 
-const MD5_RAND_MAX = parseInt('f'.repeat(32), 16);
-const str_to_rand = str=>parseInt(crypto.createHash('md5').update(str)
-    .digest('hex'), 16) / MD5_RAND_MAX;
-
-E.make_rules_object = rules=>{
+E.make_rules_object = (rules, selector)=>{
     return {
+        selector,
         // this function is the high-loaded place: must be as quick as possible
         // ONLY dots must be used as props separator
         get(k, _default){
@@ -38,10 +38,13 @@ E.make_rules_object = rules=>{
         merge: new_rules=>_.merge(rules, new_rules, E.rule_merge_customizer),
         clone_and_merge: new_rules=>{
             return E.make_rules_object(_.merge({}, rules, new_rules,
-                E.rule_merge_customizer));
+                E.rule_merge_customizer), selector);
         },
     };
 };
+
+const str_to_rand = str=>parseInt(crypto.createHash('md5').update(str)
+    .digest('hex'), 16) / MD5_RAND_MAX;
 
 E.matches_rule = (match, selector, opts)=>{
     opts = opts||{};

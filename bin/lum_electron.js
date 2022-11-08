@@ -15,7 +15,7 @@ const config = require('../util/lpm_config.js');
 const lpm_config_static = require('../util/lpm_config_static');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
-require('../lib/perr.js').run({});
+const perr = require('../lib/perr.js');
 const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
@@ -225,6 +225,7 @@ let quit = err=>{
 };
 
 E.run = argv=>{
+    perr.run({enabled: !argv.no_usage_stats, zagent: argv.zagent});
     app.on('ready', ()=>_run(argv));
     process.on('SIGINT', quit);
     process.on('SIGTERM', quit);

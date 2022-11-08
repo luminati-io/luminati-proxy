@@ -79,7 +79,8 @@ E.get_root_domain = function(domain){
 
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
-    var match = (email||'').toLowerCase().match(/^[a-z0-9_.\-+*%!]+@(.*)$/);
+    // XXX viktor: /^[\p{L}0-9_.\-+*%!]+@(.*)$/u works only in ES9
+    var match = (email||'').toLowerCase().match(/^[a-z0-9_.\-+*%!ö]+@(.*)$/);
     return match && match[1];
 };
 
@@ -171,6 +172,10 @@ E.num2ip = function(num){
     return (num>>>24)+'.'+(num>>16 & 255)+'.'+(num>>8 & 255)+'.'+(num & 255);
 };
 
+E.get_subnet24 = function(ip){
+    return ip.substr(0, ip.lastIndexOf('.'))+'.0/24';
+};
+
 E.is_ip_subnet = function(host){
     var m = /(.+?)\/(\d+)$/.exec(host);
     return m && E.is_ip(m[1]) && +m[2]<=32;
@@ -249,7 +254,7 @@ E.is_email_need_sanitize = function(email){
 // XXX vadimr: move to email.js:sanitize
 E.sanitize_email = function(email){
     var main = E.get_main_email(email);
-    if(!main)
+    if (!main)
         return;
     var sp = main.split('@');
     return sp[0].replace(/\.*/g, '')+'@'+sp[1];

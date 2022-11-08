@@ -81,7 +81,11 @@ E.send = function(opt){
         if (xhr.statusText=='timeout' && !opt.no_emit_err)
             E.events.emit('timeout', this);
         if (xhr.status==403 && !opt.no_emit_err)
+        {
+            if (typeof console!=='undefined' && console.error)
+                console.error('unauthorized debug '+JSON.stringify(opt));
             E.events.emit('unauthorized', this, xhr);
+        }
         if (xhr.status==406 && !opt.no_emit_err)
             E.events.emit('maintenance', this, xhr);
         if (xhr.status==500 && !opt.no_emit_err)

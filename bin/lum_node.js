@@ -11,7 +11,6 @@ const get_cache = require('../lib/cache.js');
 const cluster_ipc = require('../util/cluster_ipc.js');
 // XXX krzysztof: is perr.run() needed here?
 const perr = require('../lib/perr.js');
-perr.run({});
 const E = module.exports = {};
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
@@ -184,6 +183,7 @@ E.uninit_cmd = ()=>{
 E.init = argv=>{
     if (E.initialized)
         return;
+    perr.run({enabled: !argv.no_usage_stats, zagent: argv.zagent});
     E.initialized = true;
     E.shutdown_timeout = null;
     E.shutdowning = false;

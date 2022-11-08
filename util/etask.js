@@ -153,6 +153,7 @@ function Etask(opt, states){
     this._name = this.name===undefined ? 'noname' : this.name;
     this.cancelable = opt.cancel;
     this.zexit_on_err = opt.zexit_on_err;
+    this.skip_err_metrics = opt.skip_err_metrics;
     this.then_waiting = new Set();
     this.child = new Set();
     this.child_guess = new Set();
@@ -584,7 +585,11 @@ E.prototype.set_state = function(name){
 };
 
 E.prototype.finally = function(cb){
-    this.prependListener('finally', cb); };
+    if (this.tm_completed)
+        process.nextTick(cb);
+    else
+        this.prependListener('finally', cb);
+};
 E.prototype.goto_fn = function(name){
     return this.goto.bind(this, name); };
 E.prototype.goto = function(name, promise){
@@ -753,11 +758,27 @@ E.prototype.upd_alarm = function(ms){
     this.alarm(ms, cb);
 };
 
+E.prototype.inc_alarm = function(ms){
+    var a = this._alarm;
+    if (!a)
+        return;
+    var cb = a.cb;
+    var left = this.alarm_left();
+    this.alarm(ms+left, cb);
+};
+
 E.prototype.alarm_left = function(){
     var a = this._alarm;
     if (!a)
         return 0;
-    return a.start-Date.now();
+    return a.start+a.ms-Date.now();
+};
+
+E.prototype.alarm_elapsed = function(){
+    var a = this._alarm;
+    if (!a)
+        return 0;
+    return Date.now()-a.start;
 };
 
 E.prototype._operation_opt = function(opt){
@@ -1568,7 +1589,7 @@ E.interval = function(opt, states){
     throw new Error('unexpected mode '+opt.mode);
 };
 E._class = function(cls){
-    var proto = cls.prototype, keys = Object.getOwnPropertyNames(proto);
+    var proto = cls.prototype, keys = Reflect.ownKeys(proto);
     for (var i=0; i<keys.length; i++)
     {
         var key = keys[i];

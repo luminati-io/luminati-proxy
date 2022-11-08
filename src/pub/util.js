@@ -308,4 +308,3 @@ export const is_local = ()=>{
 };
 
 export const in_cp = ()=>window.location!==window.parent.location;
-

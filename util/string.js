@@ -151,4 +151,7 @@ E.to_snake_case = function(str){
         .map(function(m){ return m[0].toLowerCase(); }).join('_');
 };
 
+/* eslint-disable-next-line no-control-regex*/
+E.str_rm_null = function(s){ return (s||'').replace(/\u0000/g, ''); };
+
 return E; }); }());

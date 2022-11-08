@@ -12,6 +12,7 @@ const winston = require('winston');
 process.argv.push('--dir', os.tmpdir());
 const lpm_file = require('../util/lpm_file.js');
 const Manager = require('../lib/manager.js');
+const Proxy_port = require('../lib/proxy_port.js');
 const cities = require('../lib/cities');
 sinon.stub(cities, 'ensure_data').returns(null);
 const logger = require('../lib/logger.js');
@@ -27,19 +28,19 @@ const puppeteer = require('../lib/puppeteer.js');
 const consts = require('../lib/consts.js');
 const customer = 'abc';
 const password = 'xyz';
-const {assert_has} = require('./common.js');
+const {assert_has, http_proxy} = require('./common.js');
 const api_base = 'https://'+pkg.api_domain;
 const {SEC} = date.ms;
 
 describe('manager', function(){
     this.timeout(5000);
-    let app, temp_files, logger_stub, sb;
+    let app, temp_files, logger_stub, sb, os_cpus_stub;
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
         return i ? args[i] : null;
     };
     const app_with_args = (args, opt={})=>etask(function*(){
-        let manager, {only_explicit, start_manager} = opt;
+        let manager, {only_explicit, start_manager, server_conf} = opt;
         this.finally(()=>{
             if (this.error && manager)
                 return manager.stop(true);
@@ -76,6 +77,7 @@ describe('manager', function(){
                 account_id: 'c_123',
                 customer: 'test_cust',
                 password: 'pass123',
+                debug: 'full',
                 zone: 'static',
                 zones: {
                     static: {
@@ -108,7 +110,11 @@ describe('manager', function(){
             logins: [],
         });
         manager.lpm_f.get_server_conf = ()=>{
-            manager.lpm_f.emit('server_conf', {client: {}});
+            manager.lpm_f.emit('server_conf', Object.assign({client: {}},
+                server_conf));
+        };
+        manager.lpm_f.get_lb_ips = ()=>{
+            manager.lpm_f.emit('lb_ips', []);
         };
         if (start_manager!==false)
             yield manager.start();
@@ -209,12 +215,13 @@ describe('manager', function(){
     beforeEach(()=>{
         temp_files = [];
         sb = sinon.createSandbox();
-        sb.stub(os, 'cpus').returns([1, 1]);
+        os_cpus_stub = sb.stub(os, 'cpus').returns([1, 1]);
         nock(api_base).get('/').times(2).reply(200, {});
         nock(api_base).get('/lpm/server_conf').query(true).reply(200, {});
     });
     afterEach('after manager 2', ()=>{
         sb.verifyAndRestore();
+        os_cpus_stub = null;
         temp_files.forEach(f=>f.done());
     });
     describe('get_params', ()=>{
@@ -398,6 +405,75 @@ describe('manager', function(){
             assert.equal(res.body, 'Proxy is read-only');
             assert.equal(res.statusMessage, 'Bad Request');
             assert.equal(res.statusCode, 400);
+        }));
+        it('too many days', etask._fn(function*(_this){
+            const cli = {zagent: true};
+            app = yield app_with_proxies([{port: 24000},
+                {port: 24001, multiply: 3}], cli);
+            const res = yield api_json('api/bw_limit/24000', {
+                method: 'put', body: {days: 1e6, bytes: 1000}});
+            const get_res = yield api_json('api/bw_limit/24000',
+                {method: 'get'});
+            assert.equal(res.statusCode, 400);
+            assert.equal(res.body, 'Invalid BW limit params, days should be '
+                +'positive number no greater than 100000');
+            assert.equal(res.statusMessage, 'Bad Request');
+        }));
+        it('too many bytes', etask._fn(function*(_this){
+            const cli = {zagent: true};
+            app = yield app_with_proxies([{port: 24000},
+                {port: 24001, multiply: 3}], cli);
+            const res = yield api_json('api/bw_limit/24000', {
+                method: 'put', body: {days: 1e6, bytes: Infinity}});
+            const get_res = yield api_json('api/bw_limit/24000',
+                {method: 'get'});
+            assert.equal(res.statusCode, 400);
+            assert.equal(res.body, 'Invalid BW limit params, bytes should be '
+                +'positive number no greater than '+Number.MAX_SAFE_INTEGER);
+            assert.equal(res.statusMessage, 'Bad Request');
+        }));
+        it('threshold', etask._fn(function*(_this){
+            const cli = {zagent: true};
+            const port = 24000;
+            app = yield app_with_proxies([{port}], cli);
+            const error_msg = 'Invalid BW limit params, th_webhook_value '
+                +'should be a number between 0 and 99';
+            const t = (th_webhook_value, is_correct)=>etask(function*(){
+                const res = yield api_json('api/bw_limit/'+port, {
+                    method: 'put', body: {bytes: 10000, days: 10,
+                        th_webhook_value}});
+                if (is_correct)
+                    assert.equal(res.statusCode, 200);
+                else
+                {
+                    assert.equal(res.statusCode, 400);
+                    assert.equal(res.body, error_msg);
+                    assert.equal(res.statusMessage, 'Bad Request');
+                }
+            });
+            t(-1, false);
+            t(0, false);
+            t(100, false);
+            t(10000, false);
+            t(null, false);
+            t(1, true);
+            t(99, true);
+            t('', true);
+        }));
+        it('invalid use_webhook_limit value', etask._fn(function*(_this){
+            const cli = {zagent: true};
+            const port = 24000;
+            app = yield app_with_proxies([{port}], cli);
+            for (const use_limit_webhook of [0, null, 1])
+            {
+                const res = yield api_json('api/bw_limit/'+port, {
+                    method: 'put', body: {bytes: 10000, days: 10,
+                        use_limit_webhook}});
+                assert.equal(res.statusCode, 400);
+                assert.equal(res.body, 'Invalid BW limit params, '
+                    +'use_limit_webhook should be true or false');
+                assert.equal(res.statusMessage, 'Bad Request');
+            }
         }));
     });
     describe('bw_limit', ()=>{
@@ -744,8 +820,9 @@ describe('manager', function(){
                     {rotate_session: true}, {code: 204});
             });
         });
-        describe('har logs', function(){
-            this.timeout(6000);
+        // XXX arkadii: remove after migration
+        const har_log_tests = function(_this, prefix){
+            _this.timeout(6000);
             beforeEach(()=>etask(function*(){
                 app = yield app_with_args(['--customer', 'mock_user',
                     '--port', '24000']);
@@ -753,7 +830,8 @@ describe('manager', function(){
                 app.manager.proxy_ports[24000].emit('usage', {
                     timeline: null,
                     url: 'http://bbc.com',
-                    username: 'lum-customer-test_user-zone-static-session-qwe',
+                    username: prefix
+                        +'-customer-test_user-zone-static-session-qwe',
                     request: {url: 'http://bbc.com'},
                     response: {},
                 });
@@ -784,7 +862,13 @@ describe('manager', function(){
                 const res = yield api_json('api/logs_har?search=test_user');
                 assert.equal(res.body.log.entries.length, 0);
             }));
-        });
+        };
+        describe('har logs[brd]', etask._fn(function*(_this){
+            yield har_log_tests(_this, 'brd');
+        }));
+        describe('har logs[lum]', etask._fn(function*(_this){
+            yield har_log_tests(_this, 'lum');
+        }));
         describe('add_wip', ()=>{
             it('forbidden when token is not set',
             etask._fn(function*(_this){
@@ -879,8 +963,10 @@ describe('manager', function(){
         it('return value format is consistent', etask._fn(function*(_this){
             const [p1, p2] = [{port: 24000}, {port: 24001}];
             app = yield app_with_proxies([p1, p2]);
-            const lpm_f_stub = sinon.stub(app.manager.lpm_f,
+            const lpm_f_stub_update = sinon.stub(app.manager.lpm_f,
                 'proxy_update_in_place').returns(true);
+            const lpm_f_stub_recreate = sinon.stub(app.manager.lpm_f,
+                'proxy_remove_and_create').returns(true);
             app.manager._defaults.sync_config = true;
             const recreate = yield app.manager.proxy_update(p1, {port: 24500});
             const in_place = yield app.manager.proxy_update(p2,
@@ -889,7 +975,8 @@ describe('manager', function(){
                 assert.equal(Object.keys(res).length, 1);
                 assert.ok(res.proxy_port);
             });
-            sinon.assert.calledOnce(lpm_f_stub);
+            sinon.assert.calledOnce(lpm_f_stub_update);
+            sinon.assert.calledOnce(lpm_f_stub_recreate);
         }));
     });
     describe('flags', ()=>{
@@ -1186,6 +1273,7 @@ describe('manager', function(){
                 app = yield app_with_config({config: local_conf,
                     start_manager: false});
                 const mgr = app.manager;
+                sb.stub(mgr.lpm_f, 'update_settings').returns(true);
                 sb.stub(mgr.lpm_f, 'init');
                 sb.stub(mgr.lpm_f, 'get_conf').returns(server_conf);
                 yield mgr.start();
@@ -1247,6 +1335,113 @@ describe('manager', function(){
                 }, 'app.manager');
             }));
         });
+    });
+    describe('multiple super proxy ports', ()=>{
+        const PORT = 24000;
+        const get_mgr = (server_conf={})=>etask(function*(){
+            const super_proxy_ports = server_conf.cloud &&
+                server_conf.cloud.proxy_ports &&
+                Object.keys(server_conf.cloud.proxy_ports).map(Number)||[];
+            const proxy_port_start_spy = sb.spy(Proxy_port.prototype, 'start');
+            const config = {
+                _defaults: {log: 'info'},
+                proxies: [{port: PORT}],
+                ts: date(),
+            };
+            app = yield app_with_config({config, server_conf});
+            const mgr = app.manager;
+            sb.stub(mgr.lpm_f, 'init');
+            sb.stub(mgr.lpm_f, 'get_conf').returns(config);
+            assert.deepEqual(
+                proxy_port_start_spy.firstCall.thisValue.opt.super_proxy_ports,
+                super_proxy_ports);
+            return mgr;
+        });
+        const all_super_proxies = [20001, 20002, 20003];
+        const server_conf = {cloud: {proxy_ports: {20001: ['c_123'],
+            20002: ['c_123']}}};
+        let proxies = [];
+        before(etask._fn(function*before(){
+            for (const port of all_super_proxies)
+                proxies.push(yield http_proxy(port));
+        }));
+        after(etask._fn(function*after(){
+            for (const proxy of proxies)
+                yield proxy.stop();
+        }));
+        beforeEach(()=>{
+            os_cpus_stub.returns([1]);
+        });
+        const assert_round_robin = (mgr, ports, index=0)=>etask(function*(){
+            mgr.loki.requests_clear();
+            const expected_ports = [];
+            for (let i = index; i < ports.length*2+index; i++)
+            {
+                yield make_user_req();
+                expected_ports.push(ports[i%ports.length]);
+            }
+            const res = yield api_json('api/logs_har');
+            const actual_ports = res.body.log.entries
+                .sort((a, b)=>date(a.startedDateTime)-date(b.startedDateTime))
+                .map(e=>+e.serverIPAddress.split(':')[1]);
+            assert.deepEqual(expected_ports, actual_ports, 'round robin ports '
+                +'are incorrect.\nExpected: '+expected_ports+'\nActual: '
+                +actual_ports+'\n');
+        });
+        const update_server_conf = (mgr, new_server_conf)=>etask(function*(){
+            mgr.lpm_f.get_server_conf = ()=>{
+                mgr.lpm_f.emit('server_conf', Object.assign({client: {}},
+                    new_server_conf));
+            };
+            yield mgr.lpm_f.get_server_conf();
+        });
+        it('default', ()=>etask(function*(){
+            const mgr = yield get_mgr(server_conf);
+            yield assert_round_robin(mgr, [20001, 20002]);
+        }));
+        it('start without ports then add them', ()=>etask(function*(){
+            const mgr = yield get_mgr();
+            yield assert_round_robin(mgr, [PORT]);
+            yield update_server_conf(mgr, server_conf);
+            assert.deepEqual(mgr.proxy_ports[PORT].opt.super_proxy_ports,
+                [20001, 20002]);
+            yield assert_round_robin(mgr, [20001, 20002]);
+        }));
+        it('start with ports then delete them', ()=>etask(function*(){
+            const mgr = yield get_mgr(server_conf);
+            yield assert_round_robin(mgr, [20001, 20002]);
+            yield update_server_conf(mgr, undefined);
+            assert.deepEqual(mgr.proxy_ports[PORT].opt.super_proxy_ports,
+                []);
+            yield assert_round_robin(mgr, [PORT]);
+        }));
+        it('start with ports then change server_conf', ()=>etask(function*(){
+        const mgr = yield get_mgr(server_conf);
+            yield assert_round_robin(mgr, [20001, 20002]);
+            // Set new config and update
+            const new_server_conf = {cloud: {proxy_ports: {20001: ['c_123'],
+                20002: ['c_123'], 20003: ['c_123']}}};
+            yield update_server_conf(mgr, new_server_conf);
+            assert.deepEqual(mgr.proxy_ports[PORT].opt.super_proxy_ports,
+                [20001, 20002, 20003]);
+            yield assert_round_robin(mgr, [20001, 20002, 20003], 2);
+        }));
+    });
+    it('get_super_proxy_ports', ()=>{
+        const account_id = 'c_123';
+        const mgr = {_defaults: {account_id}};
+        const func = Manager.prototype.get_super_proxy_ports.bind(mgr);
+        const t = (server_conf, expected)=>{
+            assert.deepEqual(func(server_conf), expected);
+        };
+        t(undefined, []);
+        t({}, []);
+        t({cloud: {}}, []);
+        t({cloud: {proxy_ports: {}}}, []);
+        t({cloud: {proxy_ports: {20001: ['cust1'], 20002: ['cust2']}}},
+            []);
+        t({cloud: {proxy_ports: {20001: ['cust1', account_id], 20002: [],
+            20003: [account_id]}}}, [20001, 20003]);
     });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{

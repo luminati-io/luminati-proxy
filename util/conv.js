@@ -93,6 +93,18 @@ E.encode_base64_shift = function(data, charset){
     return data;
 };
 
+E.decode_base64_shift = function(data, charset){
+    charset = charset||'ascii';
+    var i = data.indexOf('=');
+    var l = data.length;
+    if (i==-1)
+        data = data.substr(l-3)+data.substr(0, l-3);
+    else
+        data = data.substr(i-3, 3)+data.substr(0, i-3)+data.substr(i);
+    data = Buffer.from(data, 'base64').toString(charset);
+    return data;
+};
+
 E.md5 = function(buf, hash_len, encoding){
     return E.hash(buf, hash_len, encoding, 'md5');
 };
@@ -444,7 +456,9 @@ E.parse_function = function(f){
     };
 };
 
-function date_stringify(d){ return {__ISODate__: d.toISOString()}; }
+function date_stringify(d){
+    return !isNaN(d) ? {__ISODate__: d.toISOString()} : null;
+}
 
 var pos_inf = {__Infinity__: 1};
 var neg_inf = {__Infinity__: -1};

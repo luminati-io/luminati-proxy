@@ -21,14 +21,15 @@ function make_csv_error(msg){
 // [['field1', 'field2', 'field3'], ['1','2','3'], [..], ..]
 E.to_arr = function(data, opt){
     opt = assign({field: ',', quote: '"', line: '\n'}, opt);
-    if (opt.cr_as_new_line)
-        data = data.replace(/\r([^\n])/g, '\n$1');
     var line = opt.line, field = opt.field, quote = opt.quote;
     var i = 0, c = data[i], row = 0, array = [];
     while (c)
     {
-        while (opt.trim && (c==' ' || c=='\t' || c=='\r'))
+        while (opt.trim && (c==' ' || c=='\t' || c=='\r') ||
+            opt.trim_cr && c=='\r')
+        {
             c = data[++i];
+        }
         var value = '';
         if (c==quote)
         {
@@ -73,6 +74,12 @@ E.to_arr = function(data, opt){
         if (opt.trim)
         {
             value = value.trim();
+            if (c=='\r')
+                c = data[++i];
+        }
+        if (opt.trim_cr)
+        {
+            value = value.replace(/\r+$/, '');
             if (c=='\r')
                 c = data[++i];
         }
@@ -126,7 +133,16 @@ E.escape_field = function(v, opt){
     if (is_complex(v))
         v = JSON.stringify(v);
     else
+    {
         v = ''+v;
+        if (opt && opt.escape_replace)
+        {
+            v = v
+                .replace(new RegExp(opt.field||',', 'g'), '.')
+                .replace(/"/g, "'")
+                .replace(/\s+/g, ' ');
+        }
+    }
     if (!/["'\n,]/.test(v))
         return v;
     return '"'+v.replace(/"/g, '""')+'"';

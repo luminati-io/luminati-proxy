@@ -1,8 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-import React from 'react';
+/* eslint-disable react/display-name */
+import React, {useState, useEffect} from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_tooltip from 'react-tooltip';
+import {Alert as RB_Alert} from 'react-bootstrap';
 import classnames from 'classnames';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
@@ -15,6 +17,7 @@ import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
 import Tooltip from './common/tooltip.js';
 import {T, t, Language} from './common/i18n.js';
 import conv from '../../util/conv.js';
+import date from '../../util/date.js';
 
 export const www_api = 'https://brightdata.com';
 
@@ -519,3 +522,23 @@ export const Toolbar_button = props=>
       onClick={props.on_click}/>
   </Tooltip>;
 
+export const Alert = props=>{
+    const [close_tm, set_close_tm] = useState(null);
+    useEffect(()=>{
+        const tm = setTimeout(()=>props.on_close(),
+            props.duration||10*date.ms.SEC);
+        set_close_tm(tm);
+        return ()=>{ clearTimeout(tm); };
+    }, []);
+    return <div className="alert_wrapper">
+      <RB_Alert
+        className="alert_wrapper"
+        variant={props.variant}
+        dismissible={props.dismissible}
+        transition={false}
+        closeLabel="Close"
+        onClose={()=>{ clearTimeout(close_tm); props.on_close(); }}>
+        <div>{props.text}</div>
+      </RB_Alert>
+    </div>;
+};

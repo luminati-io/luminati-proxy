@@ -496,8 +496,10 @@ export class Url_input extends Pure_component {
         this.state = {url: props.val, valid: true};
     }
     on_url_change = (url, id)=>{
-        const valid = zurl.is_valid_url(url);
-        if (valid)
+        // XXX egor: always call on_change
+        const valid = this.props.allow_empty_url && !url
+            || zurl.is_valid_url(url);
+        if (this.props.allow_bad_url_change || valid)
             this.props.on_change_wrapper(url, id);
         this.setState({url, valid});
     };

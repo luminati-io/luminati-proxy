@@ -153,8 +153,10 @@ export default class General extends Pure_component {
         return <div className="general">
           <Tab_context.Provider value="general">
             <Users_modal form={this.state.form}/>
-            <Bw_limit_modal form={this.state.form}
-              on_hide={this.bw_limit_hide}/>
+            <Bw_limit_modal form={this.state.form} on_hide={this.bw_limit_hide}
+              bw_limit_webhook_url={this.state.settings.bw_limit_webhook_url}
+              bw_th_webhook_url={this.state.settings.bw_th_webhook_url}
+            />
             <Config type="text" id="internal_name"/>
             <Config type="number" id="port"/>
             <Config

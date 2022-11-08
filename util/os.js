@@ -282,7 +282,7 @@ E.cpu_threads_usage = function(){
 };
 
 E.cpus_prev = [null, null];
-E.cpu_usage = function(cpus_curr, cpus_prev){
+let calc_cpu_usage = function(cpus_curr, cpus_prev){
     var p = cpus_prev||E.cpus_prev;
     cpus_curr = cpus_curr||E.cpus();
     var zero = {all: 0, single: 0};
@@ -303,12 +303,23 @@ E.cpu_usage = function(cpus_curr, cpus_prev){
         p[1] = p[0];
         p[0] = cpus_curr;
     }
-    const total_per_cpu = d.all.total/d.length;
-    const threads = E.cpu_threads_usage();
-    return {all: d.all.busy_ratio,
+    return {
+        all: d.all.busy_ratio,
         single: Math.max.apply(null, d.map(e=>e.busy_ratio)),
-        thread_single: Math.max.apply(null, threads.map(x=>x/total_per_cpu)),
-        diff: d};
+        diff: d,
+    };
+};
+E.cpu_usage = function(cpus_curr, cpus_prev){
+    let ret = calc_cpu_usage(cpus_curr, cpus_prev);
+    if (!ret.diff)
+        return ret;
+    let threads = E.cpu_threads_usage();
+    let total_per_cpu = ret.diff.all.total/ret.diff.length;
+    let thread_single = Math.max.apply(null, threads.map(x=>x/total_per_cpu));
+    return Object.assign(ret, {thread_single});
+};
+E.cpu_usage_all = function(cpus_curr, cpus_prev){
+    return calc_cpu_usage(cpus_curr, cpus_prev).all;
 };
 if (!file.is_darwin)
     E.cpu_usage(); // init

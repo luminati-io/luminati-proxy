@@ -14,8 +14,8 @@ import {T} from './common/i18n.js';
 import './css/login.less';
 
 const token_err_msg = {
-    'bad token': 'Invalid token',
-    'token expired': 'Expired token. A new token has been sent',
+    'bad_token': 'Invalid token',
+    'token_expired': 'Expired token. A new token has been sent',
     default: 'Something went wrong'
 };
 
@@ -109,16 +109,20 @@ const Login = withRouter(class Login extends Pure_component {
         const _this = this;
         this.etask(function*(){
             _this.setState({loading: true});
+            const creds = {two_step_token,
+                two_step_pending: !_this.state.two_step_verified};
+            if (_this.token)
+                creds.token = _this.token;
             const res = yield ajax.json({
                 url: '/api/creds_user',
                 method: 'POST',
-                data: {two_step_token},
+                data: creds,
                 no_throw: true,
             });
             if (res && res.error)
             {
                 _this.setState({loading: false, error_message:
-                    token_err_msg[res.message]||token_err_msg.default});
+                    token_err_msg[res.error.message]||token_err_msg.default});
             }
             else
                 _this.setState({two_step_verified: true}, _this.get_in);

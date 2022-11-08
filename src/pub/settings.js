@@ -1,30 +1,52 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
-import React from 'react';
-import {Labeled_controller, Loader_small} from './common.js';
+import React, {useState} from 'react';
+import {Labeled_controller, Loader_small, Alert} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
-import etask from '../../util/etask.js';
+import zurl from '../../util/url.js';
 import {report_exception} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import {Select_zone, Pins} from './common/controls.js';
 import Warnings_modal from './common/warnings_modal.js';
+import {Modal} from './common/modals.js';
+import Logs_settings_modal from './common/logs_settings_modal.js';
 import {Back_btn} from './proxy_edit/index.js';
 import './css/settings.less';
 import {T} from './common/i18n.js';
 
 export default function Settings(props){
-    const btn_click = ()=>props.history.push({pathname: '/overview'});
+    const [show_alert, set_show_alert] = useState(false);
+    const [show_conf, set_show_conf] = useState(false);
+    const back_func = ()=>props.history.push({pathname: '/overview'});
+    const btn_click = ()=>show_conf ? $('#settings_confirmation_modal').modal()
+        : back_func();
     return <div className="settings">
           <div className="cp_panel">
             <div className="cp_panel_header">
               <Back_btn click={btn_click}/>
               <h2><T>General settings</T></h2>
             </div>
-            <Form/>
+            <Form show_alert={set_show_alert}
+              show_conf={set_show_conf}/>
           </div>
+          {show_alert &&
+            <Alert
+              variant="success"
+              dismissible
+              text="Settings changes saved"
+              on_close={()=>set_show_alert(false)}
+            />
+          }
+          <Modal
+            id="settings_confirmation_modal"
+            title="You have unsaved settings changes"
+            ok_btn_title="Yes"
+            click_ok={back_func}>
+            <h4>Are you sure you want to exit?</h4>
+          </Modal>
         </div>;
 }
 
@@ -62,6 +84,10 @@ const tooltips = {
         </ul>`,
     sync_config: `All changes on Proxy Manager instances with enabled config
         synchronization will be propagated and applied immediately.`,
+    bw_limit_webhook_url: `URL to send webhook messages to when BW limit is
+        reached`,
+    bw_th_webhook_url: `URL to send webhook messages to when BW limit threshold
+        is reached`,
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
@@ -74,7 +100,7 @@ let har_limit_options = [
 ];
 
 class Form extends Pure_component {
-    state = {saving: false};
+    state = {saving: false, form: {}, pending_settings: {}};
     logs_metric_opts = [
         {key: 'requests', value: 'requests'},
         {key: 'megabytes', value: 'megabytes'},
@@ -88,7 +114,12 @@ class Form extends Pure_component {
         this.setdb_on('head.settings', settings=>{
             if (!settings)
                 return;
-            this.setState({settings: {...settings}});
+            const c_settings = _.cloneDeep(settings);
+            const res_settings = {...c_settings,
+                ...this.state.pending_settings};
+            this.setState({
+                settings: res_settings, default_settings: c_settings,
+                is_changed: !_.isEqual(c_settings, res_settings)});
         });
         this.setdb_on('head.save_settings', save_settings=>{
             this.save_settings = save_settings;
@@ -103,21 +134,64 @@ class Form extends Pure_component {
         this.setState(prev=>({settings: {...prev.settings, zone: val}}),
             this.debounced_save);
     };
-    on_change_handler = (field, opt)=>val=>{
-        opt = opt||{};
-        const {settings, pending_settings} = this.state;
-        let value = val;
-        if (field=='whitelist_ips')
-            value = val.filter(ip=>!settings.fixed_whitelist_ips.includes(ip));
-        if (opt.number)
-            value = +value;
+    prepare_change = ({field, value, opt})=>{
+      opt = opt||{};
+      const {settings} = this.state;
+      let val = value;
+      if (field=='whitelist_ips')
+          val = value.filter(ip=>!settings.fixed_whitelist_ips.includes(ip));
+      if (opt.number)
+          val = +val;
+      return {field, value: val};
+    };
+    apply_changes = changes=>{
+        const {settings, pending_settings, default_settings} = this.state;
+        let changes_obj = changes.reduce((acc, ch)=>Object.assign(acc,
+          {[ch.field]: ch.value}), {});
+        const c_settings = {...settings, ...changes_obj};
+        const is_changed = !_.isEqual(default_settings, c_settings);
         this.setState({
-            settings: {...settings, [field]: value},
-            pending_settings: {...pending_settings, [field]: value},
-        }, this.debounced_save);
+            settings: c_settings,
+            pending_settings: {...pending_settings, ...changes_obj},
+            is_changed
+        });
+        this.props.show_conf(is_changed);
+    };
+    on_change_handler = (field, opt)=>value=>
+        this.on_multi_change_handler([{field, opt, value}]);
+    on_multi_change_handler = changes=>
+        this.apply_changes(changes.map(this.prepare_change));
+    remote_logs_enabled = ()=>this.state.settings
+        && this.state.settings.logs_settings
+        && this.state.settings.logs_settings.type;
+    logs_enabled = ()=>this.state.settings.logs || this.remote_logs_enabled();
+    toggle_logs = ()=>{
+      let settings = [
+        {field: 'logs', value: 0, opt: {number: 1}},
+        {field: 'logs_settings', value: {}},
+      ];
+      if (this.logs_enabled())
+          return this.apply_changes(settings.map(this.prepare_change));
+      settings[0].value = 1000;
+      this.apply_changes(settings.map(this.prepare_change));
     };
     lock_nav = lock=>setdb.set('head.lock_navigation', lock);
+    urls_valid = ()=>{
+        const {bw_limit_webhook_url: limit_url,
+            bw_th_webhook_url: th_url} = this.state.pending_settings;
+        for (const url of [limit_url, th_url].filter(Boolean))
+        {
+            if (zurl.is_valid_url(url))
+                continue;
+            this.setState({error: [{msg: 'Invalid webhook url'}]},
+                ()=>$('#upd_settings_error').modal('show'));
+            return false;
+        }
+        return true;
+    };
     save = ()=>{
+        if (!this.urls_valid())
+            return;
         if (this.saving || !this.save_settings)
         {
             this.resave = true;
@@ -142,19 +216,16 @@ class Form extends Pure_component {
                 }
             });
             const body = {..._this.state.pending_settings};
-            _this.setState({pending_settings: {}});
             const save_res = yield _this.save_settings(body);
             if (save_res.err)
             {
-                return _this.setState({api_error: [{msg: save_res.err}]}, ()=>
+                return _this.setState({error: [{msg: save_res.err}]}, ()=>
                     $('#upd_settings_error').modal('show'));
             }
-            etask(function*(){
-                const defaults = yield ajax.json({url: '/api/defaults'});
-                setdb.set('head.defaults', defaults);
-            });
-            const zones = yield ajax.json({url: '/api/zones'});
-            setdb.set('ws.zones', zones);
+            _this.setState({is_changed: false, pending_settings: {},
+                default_settings: _this.state.settings});
+            _this.props.show_alert(true);
+            _this.props.show_conf(false);
             if (_this.state.settings.sync_config)
             {
                 const proxies = yield ajax.json({url: '/api/proxies_running'});
@@ -162,6 +233,7 @@ class Form extends Pure_component {
             }
         });
     };
+    open_logs_settings_modal = ()=>$('#logs_settings_modal').modal('show');
     debounced_save = _.debounce(this.save, 500);
     render(){
         const s = this.state.settings;
@@ -171,11 +243,26 @@ class Form extends Pure_component {
         const logs_data = s.zagent ? [0, 1000] : [0, 100, 1000, 10000];
         const har_limit_data = s.zagent ? har_limit_options.filter(({value})=>
             [-1, 1024].includes(value)) : har_limit_options;
+        const note_logs = this.logs_enabled() ?
+            <a className="link" onClick={this.open_logs_settings_modal}>
+                <T>Logs settings</T>
+            </a> : null;
         return <div className="settings_form">
           <Warnings_modal
             id='upd_settings_error'
-            warnings={this.state.api_error}
+            warnings={this.state.error}
           />
+          {this.logs_enabled() &&
+              <Logs_settings_modal
+                  tooltip={tooltips.logs}
+                  logs_data={logs_data}
+                  logs_disabled_num={logs_data[0]||0}
+                  logs_enabled_num={logs_data[1]||1000}
+                  settings={s.logs_settings}
+                  on_save={this.on_multi_change_handler}
+                  remote_enabled={this.remote_logs_enabled()}
+              />
+          }
           <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
             <Select_zone
               val={s.zone}
@@ -217,14 +304,22 @@ class Form extends Pure_component {
               tooltip={tooltips.request_stats}
             />
           }
-          <Labeled_controller
+          {!s.zagent && <Labeled_controller
             val={s.logs}
             type="select_number"
             on_change_wrapper={this.on_change_handler('logs', {number: 1})}
             data={logs_data}
             label="Limit for request logs"
             default tooltip={tooltips.logs}
-          />
+          />}
+          {s.zagent && <Labeled_controller
+            val={this.logs_enabled()}
+            type="yes_no"
+            on_change_wrapper={this.toggle_logs}
+            label="Enable request logs"
+            default tooltip={tooltips.logs}
+            note={note_logs}
+          />}
           <Labeled_controller
             val={s.har_limit}
             type="select_number"
@@ -271,7 +366,36 @@ class Form extends Pure_component {
             disabled={s.zagent}
             faq_id="pmgr-sync-config"
           />
+          {s.zagent && <Labeled_controller
+            val={s.bw_limit_webhook_url || ''}
+            allow_empty_url
+            allow_bad_url_change
+            type="url"
+            on_change_wrapper={this.on_change_handler('bw_limit_webhook_url')}
+            label="BW limit webhook URL"
+            tooltip={tooltips.bw_limit_webhook_url}
+          />}
+          {s.zagent && <Labeled_controller
+            val={s.bw_th_webhook_url || ''}
+            allow_empty_url
+            allow_bad_url_change
+            type="url"
+            on_change_wrapper={this.on_change_handler('bw_th_webhook_url')}
+            label="BW threshold webhook URL"
+            tooltip={tooltips.bw_th_webhook_url}
+          />}
           <Loader_small show={this.state.saving}/>
+          <button className="btn btn_lpm btn_lpm_primary"
+            onClick={()=>$('#save_settings_confirmation_modal').modal()}
+            disabled={!this.state.is_changed || this.state.saving}>
+            <T>Save changes</T>
+          </button>
+          <Modal
+            id="save_settings_confirmation_modal"
+            title="Accept save changes"
+            ok_btn_title="Yes"
+            click_ok={this.save}>
+          </Modal>
         </div>;
     }
 }

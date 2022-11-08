@@ -26,6 +26,7 @@ const L = E.L = {
 };
 L.require('readline', 'readline-sync');
 L.require('getopt', 'node-getopt');
+const TERM = {OSC: '\x1b]', ST: '\x1b\\'};
 
 function find_opt(arg, argv){
     for (let a=0; a<argv.length; a++)
@@ -232,7 +233,7 @@ E.script_error = name=>{
         this.opt = opt||{};
         this.name = name;
         this.message = msg.message||msg;
-        this.stack = msg.stack||(new Error(this)).stack;
+        this.stack = msg.stack||new Error(this).stack;
         this.output = this.opt.output||'';
     }
     err.prototype = Object.create(Error.prototype);
@@ -331,3 +332,44 @@ E.spinner.stop = ()=>{
     process.stderr.clearLine();
     process.stderr.write('\r');
 };
+
+// process bash pipe input line by line
+// cb(lines) - a callback (can be async) to call on each portion of lines
+E.pipe_lines = cb=>etask(function*(){
+    if (process.stdin.isTTY)
+        E.exit('pipe input expected');
+    let stdin = process.openStdin();
+    let data = [], finished, _this = this;
+    let process_lines = ()=>etask(function*(){
+        let lines = Buffer.concat(data).toString().split('\n');
+        try { yield cb(lines); }
+        catch(e){ _this.throw(e); }
+    });
+    let finalize = ()=>etask(function*(){
+        yield process_lines();
+        _this.continue();
+    });
+    stdin.on('data', chunk=>etask(function*(){
+        let idx = chunk.lastIndexOf('\n');
+        if (idx<0)
+            return void data.push(chunk);
+        data.push(chunk.subarray(0, idx));
+        stdin.pause();
+        yield process_lines();
+        data = [chunk.subarray(idx+1)];
+        stdin.resume();
+        if (finished)
+            finalize();
+    }));
+    stdin.on('end', ()=>{
+        finished = true;
+        if (!stdin.isPaused())
+            finalize();
+    });
+    yield this.wait();
+});
+
+// encode url with anchor text to be parsed by terminal
+// see https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+E.term_url = (url, text)=>process.stdout.isTTY ?
+    TERM.OSC+'8;;'+url+TERM.ST+(text||url)+TERM.OSC+'8;;'+TERM.ST : text;
