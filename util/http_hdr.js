@@ -112,6 +112,22 @@ const generate_sec_ch_rules_chromium = ({ver_from, ver_to, browser_name,
                 'sec-ch-ua-platform': '"Windows"',
             },
         },
+        106: {match: {browser: browser_name, https: true, version_min: 106},
+            rules: {
+                'sec-ch-ua': `"Chromium";v="106", "${browser_full_name}";`
+                    +`v="106", "Not;A=Brand";v="99"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
+        107: {match: {browser: browser_name, https: true, version_min: 107},
+            rules: {
+                'sec-ch-ua': `"${browser_full_name}";v="107", `
+                    +`"Chromium";v="107", "Not=A?Brand";v="24"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
     };
     const versions_array = Array.from({length: ver_to - ver_from + 1},
         (_, idx)=>idx+ver_from);
@@ -339,6 +355,9 @@ const rules_headers = [
         rules: {accept: 'image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
     {match: {browser: 'mobile_safari', version_min: 15, type: 'image'},
         rules: {accept: 'image/webp,image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
+    {match: {browser: 'mobile_safari', version_min: 16, type: 'image'},
+        rules: {accept: 'image/webp,image/avif,video/*;q=0.8,image/png,'
+            +'image/svg+xml,image/*;q=0.8,*/*;q=0.5'}},
     {match: {type: 'script'},
         rules: {accept: '*/*'}},
     {match: {type: 'ajax'},
@@ -578,6 +597,14 @@ const rules_orders = [
             sec-fetch-site sec-fetch-mode sec-fetch-dest referer
             accept-encoding accept-language cookie`}
     },
+    {match: {browser: 'chrome', http2: true, version_min: 106, type: 'ajax',
+        headers: {'content-type': exists}},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            content-length sec-ch-ua sec-ch-ua-platform sec-ch-ua-mobile
+            user-agent content-type accept x-requested-with origin
+            sec-fetch-site sec-fetch-mode sec-fetch-dest referer
+            accept-encoding accept-language cookie`}
+    },
     {match: {browser: 'mobile_chrome', http2: true},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
@@ -628,6 +655,14 @@ const rules_orders = [
             sec-fetch-site sec-fetch-mode sec-fetch-dest referer
             accept-encoding accept-language cookie`}
         },
+    {match: {browser: 'edge', http2: true, version_min: 106, type: 'ajax',
+        headers: {'content-type': exists}},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            content-length sec-ch-ua sec-ch-ua-platform sec-ch-ua-mobile
+            user-agent content-type accept x-requested-with origin
+            sec-fetch-site sec-fetch-mode sec-fetch-dest referer
+            accept-encoding accept-language cookie`}
+        },
     {match: {browser: 'safari', http2: true},
         rules: {order: qw`:method :scheme :path :authority cookie accept
             content-type accept-encoding user-agent accept-language referer`}},
@@ -643,6 +678,13 @@ const rules_orders = [
     {match: {browser: 'mobile_safari', http2: true},
         rules: {order: qw`:method :scheme :path :authority cookie accept
             accept-encoding user-agent accept-language referer`}},
+    {match: {browser: 'mobile_safari', http2: true, version_min: 16},
+        rules: {order: qw`:method :scheme :path :authority cookie user-agent
+            accept accept-language accept-encoding referer`}},
+    {match: {browser: 'mobile_safari', http2: true, version_min: 16,
+        type: 'ajax', headers: {'content-type': exists}},
+        rules: {order: qw`:method :scheme :path :authority cookie accept
+            content-type accept-encoding user-agent referer accept-language`}},
 ];
 
 function is_browser_supported(browser){

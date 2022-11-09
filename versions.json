@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.337.781",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix premise pmgr NodeJS 12.18.3 compatibility"
+            }
+        ]
+    },
+    {
         "ver": "1.337.221",
         "type": "stable",
         "changes": [

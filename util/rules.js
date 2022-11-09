@@ -12,7 +12,8 @@ E.find_matches = (all_rules, selector)=>
 
 E.select_rules = (all_rules, selector, overrides=[], opts)=>{
     let matches = E.find_matches(all_rules, selector);
-    matches = opts?.matches_preprocessor?.(matches) || matches;
+    matches = opts && opts.matches_preprocessor ?
+        opts.matches_preprocessor(matches) : matches;
     let merged = _.merge({}, ...matches.map(x=>x.rules), ...overrides,
         E.rule_merge_customizer);
     return merged;
