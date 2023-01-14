@@ -88,15 +88,15 @@ const Login = withRouter(class Login extends Pure_component {
             {
                 _this.setState({
                     customer: null,
-                    user_account_ids: null,
+                    user_customer_ids: null,
                     customer_selected: false,
                     error_message: res.error.message||'Something went wrong',
                 });
             }
-            else if (res.account_ids || res.ask_two_step)
+            else if (res.customer_ids || res.ask_two_step)
             {
                 _this.setState({
-                    user_account_ids: res.account_ids,
+                    user_customer_ids: res.customer_ids,
                     error_message: '',
                     two_step: res.ask_two_step,
                 });
@@ -176,7 +176,7 @@ const Login = withRouter(class Login extends Pure_component {
           <Header/>
           <Form
             save_user={this.save_user}
-            user_account_ids={this.state.user_account_ids}
+            user_customer_ids={this.state.user_customer_ids}
             customer_selected={this.state.customer_selected}
             two_step={this.state.two_step}
             password={this.state.password}
@@ -260,10 +260,10 @@ const Form = props=>{
             +'//'+l.hostname+':'+get_location_port()+'?api_version=3');
         window.location = href;
     };
-    if (props.user_account_ids && !props.customer_selected)
+    if (props.user_customer_ids && !props.customer_selected)
     {
         return <Customers_form
-          user_account_ids={props.user_account_ids}
+          user_customer_ids={props.user_customer_ids}
           select_final_customer={props.select_final_customer}
           select_customer={props.select_customer}
         />;
@@ -299,7 +299,7 @@ class Customers_form extends Pure_component {
         this.props.select_customer(e&&e[0]);
     };
     render(){
-        const opt = this.props.user_account_ids
+        const opt = this.props.user_customer_ids
             .map(e=>({id: e[0], cname: e[1]}));
         return <div className="row customers_form">
           <div className="warning choose_customer">

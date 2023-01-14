@@ -29,7 +29,7 @@ const tls_lib_opt = [
 const render_zones = ['unblocker', 'serp'];
 
 const Limit_zagent_note = with_www_api(({www_api})=>{
-    const path = '/cp/lpm';
+    const path = '/cp/zones/lpm';
     const href = www_api+path;
     const display_url = new URL(www_api).hostname+path;
     return <T>{t=>

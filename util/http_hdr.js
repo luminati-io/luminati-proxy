@@ -128,6 +128,22 @@ const generate_sec_ch_rules_chromium = ({ver_from, ver_to, browser_name,
                 'sec-ch-ua-platform': '"Windows"',
             },
         },
+        108: {match: {browser: browser_name, https: true, version_min: 108},
+            rules: {
+                'sec-ch-ua': `"Not?A_Brand";v="8", `
+                    +`"Chromium";v="108", "${browser_full_name}";v="108"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
+        109: {match: {browser: browser_name, https: true, version_min: 109},
+            rules: {
+                'sec-ch-ua': `"Not_A Brand";v="99", `
+                    +`"${browser_full_name}";v="109", "Chromium";v="109"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
     };
     const versions_array = Array.from({length: ver_to - ver_from + 1},
         (_, idx)=>idx+ver_from);
@@ -328,6 +344,9 @@ const rules_headers = [
         rules: {accept: 'image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
     {match: {browser: 'safari', version_min: 14, type: 'image'},
         rules: {accept: 'image/webp,image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
+    {match: {browser: 'safari', version_min: 16, type: 'image'},
+        rules: {accept: 'image/webp,image/avif,video/*;q=0.8,image/png,image/s'
+            +'vg+xml,image/*;q=0.8,*/*;q=0.5'}},
     {match: {browser: 'safari', https: true, version_min: 11},
         rules: {'accept-encoding': 'br, gzip, deflate'}},
     {match: {browser: 'safari', https: true, version_min: 13},

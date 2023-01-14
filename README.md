@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.337.781/luminati-proxy-manager-v1.337.781-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.351.969/luminati-proxy-manager-v1.351.969-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -124,7 +124,7 @@ proxy-manager --no-dropin
 ```
 
 For full documentation on the API for making requests through the dropin proxy,
-see <a href="https://brightdata.com/cp/api_example?manager=all&group=active">the
+see <a href="https://brightdata.com/cp/zones/proxy_examples?type=api&group=active">the
 API Example page in your Bright Data account</a>.
 
 ### Complete list of command line options

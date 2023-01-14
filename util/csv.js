@@ -23,6 +23,7 @@ E.to_arr = function(data, opt){
     opt = assign({field: ',', quote: '"', line: '\n'}, opt);
     var line = opt.line, field = opt.field, quote = opt.quote;
     var i = 0, c = data[i], row = 0, array = [];
+    var stopped_because_of_fail = false;
     while (c)
     {
         while (opt.trim && (c==' ' || c=='\t' || c=='\r') ||
@@ -57,8 +58,16 @@ E.to_arr = function(data, opt){
             } while (c && (c!=quote || data[i+1]==quote));
             if (!c)
             {
-                throw make_csv_error(
-                    'Unexpected end of data, no closing quote found');
+                if (opt.return_succesful_rows)
+                {
+                    stopped_because_of_fail = true;
+                    break;
+                }
+                else
+                {
+                    throw make_csv_error(
+                        'Unexpected end of data, no closing quote found');
+                }
             }
             c = data[++i];
         }
@@ -97,6 +106,8 @@ E.to_arr = function(data, opt){
     }
     if (i && data[i-1]==field)
         array[row].push('');
+    if (stopped_because_of_fail)
+        array.pop();
     return array;
 };
 
@@ -143,9 +154,9 @@ E.escape_field = function(v, opt){
                 .replace(/\s+/g, ' ');
         }
     }
-    if (!/["'\n,]/.test(v))
-        return v;
-    return '"'+v.replace(/"/g, '""')+'"';
+    var quote_needed = /["'\n,]/.test(v) ||
+        opt && opt.quote_spaces && v && v.includes(' ');
+    return quote_needed ? '"'+v.replace(/"/g, '""')+'"' : v;
 };
 
 function flatten(obj, opt, keys){

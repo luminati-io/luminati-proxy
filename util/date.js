@@ -28,7 +28,11 @@ for (var key in E.sec)
     E.ms[key] = E.sec[key]*1000;
 var ms = E.ms;
 
-function pad(num, size){ return ('000'+num).slice(-size); }
+var pads = ['', '0', '00', '000'];
+function pad(num, size){
+    var s = num.toString();
+    return pads[size-s.length]+s;
+}
 
 E.ms_to_dur = function(_ms){
     var s = '', sec = Math.floor(_ms/1000);
@@ -215,7 +219,7 @@ E.to_sql_ms = function(d){
     d = E.get(d);
     if (isNaN(d))
         return '0000-00-00 00:00:00.000';
-    return pad(d.getUTCFullYear(), 4)+'-'+pad(d.getUTCMonth()+1, 2)
+    return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1, 2)
     +'-'+pad(d.getUTCDate(), 2)
     +' '+pad(d.getUTCHours(), 2)+':'+pad(d.getUTCMinutes(), 2)
     +':'+pad(d.getUTCSeconds(), 2)
@@ -570,46 +574,6 @@ var utc_local = {
 };
 
 E.strftime = function(fmt, d, opt){
-    function hours12(hours){
-        return hours==0 ? 12 : hours>12 ? hours-12 : hours; }
-    function ord_str(n){
-        var i = n % 10, ii = n % 100;
-        if (ii>=11 && ii<=13 || i==0 || i>=4)
-            return 'th';
-        switch (i)
-        {
-        case 1: return 'st';
-        case 2: return 'nd';
-        case 3: return 'rd';
-        }
-    }
-    function week_num(l, _d, first_weekday){
-        // This works by shifting the weekday back by one day if we
-        // are treating Monday as the first day of the week.
-        var wday = l.getDay(_d);
-        if (first_weekday=='monday')
-            wday = wday==0 /* Sunday */ ? wday = 6 : wday-1;
-        var yday = (_d-l.getYearBegin(_d))/ms.DAY;
-        return Math.floor((yday + 7 - wday)/7);
-    }
-    // Default padding is '0' and default length is 2, both are optional.
-    function padx(n, padding, length){
-        // padx(n, <length>)
-        if (typeof padding=='number')
-        {
-            length = padding;
-            padding = '0';
-        }
-        // Defaults handle padx(n) and padx(n, <padding>)
-        if (padding===undefined)
-            padding = '0';
-        length = length||2;
-        var s = ''+n;
-        // padding may be an empty string, don't loop forever if it is
-        if (padding)
-            for (; s.length<length; s = padding + s);
-        return s;
-    }
     opt = opt||{};
     d = E.get(d);
     var locale = opt.locale||E.locale;
@@ -635,11 +599,16 @@ E.strftime = function(fmt, d, opt){
             d = new Date(+d+tz*60000);
     }
     var l = utc ? utc_local.utc : utc_local.local;
-    // Most of the specifiers supported by C's strftime, and some from Ruby.
-    // Some other syntax extensions from Ruby are supported: %-, %_, and %0
-    // to pad with nothing, space, or zero (respectively).
-    function replace(_fmt){ return _fmt.replace(/%([-_0]?.)/g, function(_, c){
-        var mod, padding, day;
+    var p = {d: d, utc: utc, l: l, locale: locale, formats: formats, tz: tz};
+    return format(fmt, p);
+};
+
+// Most of the specifiers supported by C's strftime, and some from Ruby.
+// Some other syntax extensions from Ruby are supported: %-, %_, and %0
+// to pad with nothing, space, or zero (respectively).
+function format(fmt, p){
+    function replacer(_, c){
+        var mod, padding;
         if (c.length==2)
         {
             mod = c[0];
@@ -653,70 +622,195 @@ E.strftime = function(fmt, d, opt){
                 return _;
             c = c[1];
         }
-        switch (c)
-        {
-        // Examples for new Date(0) in GMT
-        case 'A': return locale.days_long[l.getDay(d)]; // 'Thursday'
-        case 'a': return locale.days_short[l.getDay(d)]; // 'Thu'
-        case 'B': return locale.months_long[l.getMonth(d)]; // 'January'
-        case 'b': return locale.months_short[l.getMonth(d)]; // 'Jan'
-        case 'C': // '19'
-            return padx(Math.floor(l.getFullYear(d)/100), padding);
-        case 'D': return replace(formats.D || '%m/%d/%y'); // '01/01/70'
-        case 'd': return padx(l.getDate(d), padding); // '01'
-        case 'e': return l.getDate(d); // '01'
-        case 'F': return replace(formats.F || '%Y-%m-%d'); // '1970-01-01'
-        case 'H': return padx(l.getHours(d), padding); // '00'
-        case 'h': return locale.months_short[l.getMonth(d)]; // 'Jan'
-        case 'I': return padx(hours12(l.getHours(d)), padding); // '12'
-        case 'j': // '000'
-            day = Math.ceil((+d-l.getYearBegin(d))/(1000*60*60*24));
-            return pad(day, 3);
-        case 'k': // ' 0'
-            return padx(l.getHours(d), padding===undefined ? ' ' : padding);
-        case 'L': return pad(Math.floor(d.getMilliseconds()), 3); // '000'
-        case 'l': // '12'
-            return padx(hours12(l.getHours(d)),
-                padding===undefined ? ' ' : padding);
-        case 'M': return padx(l.getMinutes(d), padding); // '00'
-        case 'm': return padx(l.getMonth(d)+1, padding); // '01'
-        case 'n': return '\n'; // '\n'
-        case 'o': return ''+l.getDate(d)+ord_str(l.getDate(d)); // '1st'
-        case 'P': // 'am'
-            return (l.getHours(d)<12 ? locale.AM : locale.PM).toLowerCase();
-        case 'p': return l.getHours(d)<12 ? locale.AM : locale.PM; // 'AM'
-        case 'R': return replace(formats.R || '%H:%M'); // '00:00'
-        case 'r': return replace(formats.r || '%I:%M:%S %p'); // '12:00:00 AM'
-        case 'S': return padx(l.getSeconds(d), padding); // '00'
-        case 's': return Math.floor(+d/1000); // '0'
-        case 'T': return replace(formats.T || '%H:%M:%S'); // '00:00:00'
-        case 't': return '\t'; // '\t'
-        case 'U': return padx(week_num(l, d, 'sunday'), padding); // '00'
-        case 'u': // '4'
-            day = l.getDay(d);
-            // 1 - 7, Monday is first day of the week
-            return day==0 ? 7 : day;
-        case 'v': return replace(formats.v || '%e-%b-%Y'); // '1-Jan-1970'
-        case 'W': return padx(week_num(l, d, 'monday'), padding); // '00'
-        case 'w': return l.getDay(d); // '4'. 0 Sunday - 6 Saturday
-        case 'Y': return l.getFullYear(d); // '1970'
-        case 'y': return (''+l.getFullYear(d)).slice(-2); // '70'
-        case 'Z': // 'GMT'
-            if (utc)
-                return 'GMT';
-            var tz_string = d.toString().match(/\((\w+)\)/);
-            return tz_string && tz_string[1] || '';
-        case 'z': // '+0000'
-            if (utc)
-                return '+0000';
-            var off = typeof tz=='number' ? tz : -d.getTimezoneOffset();
-            return (off<0 ? '-' : '+')+pad(Math.abs(Math.trunc(off/60)), 2)+
-                pad(off%60, 2);
-        default: return c;
-        }
-    }); }
-    return replace(fmt);
+        return ext.hasOwnProperty(c) ? ext[c](p, padding) : c;
+    }
+    if ((fmt.length==2 || fmt.length==3) && fmt[0]=='%')
+        return ''+replacer(fmt, fmt.slice(1));
+    if (frequently_used.hasOwnProperty(fmt))
+        return frequently_used[fmt](p);
+    return fmt.replace(/%([-_0]?.)/g, replacer);
+}
+
+var frequently_used = {
+    '%Y-%m-%d': function(p){ return ext.F(p); },
+    '%Y_%m_%d': function(p){ return ext.Y(p)+'_'+ext.m(p)+'_'+ext.d(p); },
+    '%Y-%m-%d %H:%M:%S': function(p){ return ext.F(p)+' '+ext.T(p); },
+    '%H:%M': function(p){ return ext.R(p); },
+    '%H:%M:%S': function(p){ return ext.T(p); },
+    '%b-%Y': function(p){ return ext.b(p)+'-'+ext.Y(p); },
+    '%d-%b': function(p){ return ext.d(p)+'-'+ext.b(p); },
+    '%d-%b-%y': function(p){ return ext.d(p)+'-'+ext.b(p)+'-'+ext.y(p); },
+    '%d-%b-%Y': function(p){ return ext.d(p)+'-'+ext.b(p)+'-'+ext.Y(p); },
+    '%d-%m-%Y': function(p){ return ext.d(p)+'-'+ext.m(p)+'-'+ext.Y(p); },
+    '%e-%b-%Y': function(p){ return ext.v(p); },
+    '%B %Y': function(p){ return ext.B(p)+' '+ext.Y(p); },
+    '%F %T': function(p){ return ext.F(p)+' '+ext.T(p); },
+    '%F %R': function(p){ return ext.F(p)+' '+ext.R(p); },
 };
+var ext = {
+    // Examples for new Date(0) in GMT
+    A: function(p, padding){ // 'Thursday'
+        return p.locale.days_long[p.l.getDay(p.d)]; },
+    a: function(p, padding){ // 'Thu'
+        return p.locale.days_short[p.l.getDay(p.d)]; },
+    B: function(p, padding){ // 'January'
+        return p.locale.months_long[p.l.getMonth(p.d)]; },
+    b: function(p, padding){ // 'Jan'
+        return p.locale.months_short[p.l.getMonth(p.d)]; },
+    C: function(p, padding){ // '19'
+        return padx(Math.floor(p.l.getFullYear(p.d)/100), padding); },
+    D: function(p, padding){ // '01/01/70'
+        return p.formats.D ? format(p.formats.D, p) :
+            ext.m(p, padding)+'/'+
+            ext.d(p, padding)+'/'+
+            ext.y(p, padding);
+    },
+    d: function(p, padding){ // '01'
+        return padx(p.l.getDate(p.d), padding); },
+    e: function(p, padding){ // '01'
+        return p.l.getDate(p.d); },
+    F: function(p, padding){ // '1970-01-01'
+        return p.formats.F ? format(p.formats.F, p) :
+            ext.Y(p, padding)+'-'+
+            ext.m(p, padding)+'-'+
+            ext.d(p, padding);
+    },
+    H: function(p, padding){ // '00'
+        return padx(p.l.getHours(p.d), padding); },
+    h: function(p, padding){ // 'Jan'
+        return p.locale.months_short[p.l.getMonth(p.d)]; },
+    I: function(p, padding){ // '12'
+        return padx(hours12(p.l.getHours(p.d)), padding); },
+    j: function(p, padding){ // '000'
+        var day = Math.ceil((+p.d-p.l.getYearBegin(p.d))/(1000*60*60*24));
+        return pad(day, 3);
+    },
+    k: function(p, padding){ // ' 0'
+        return padx(p.l.getHours(p.d), padding===undefined ? ' ' : padding); },
+    L: function(p, padding){ // '000'
+        return pad(p.d.getMilliseconds(), 3); },
+    l: function(p, padding){ // '12'
+        return padx(hours12(p.l.getHours(p.d)),
+            padding===undefined ? ' ' : padding);
+    },
+    M: function(p, padding){ // '00'
+        return padx(p.l.getMinutes(p.d), padding); },
+    m: function(p, padding){ // '01'
+        return padx(p.l.getMonth(p.d)+1, padding); },
+    n: function(p, padding){ // '\n'
+        return '\n'; },
+    o: function(p, padding){ // '1st'
+        return ''+p.l.getDate(p.d)+ord_str(p.l.getDate(p.d)); },
+    P: function(p, padding){ // 'am'
+        return (p.l.getHours(p.d)<12 ? p.locale.AM : p.locale.PM)
+            .toLowerCase();
+    },
+    p: function(p, padding){ // 'AM'
+        return p.l.getHours(p.d)<12 ? p.locale.AM : p.locale.PM; },
+    R: function(p, padding){ // '00:00'
+        return p.formats.R ? format(p.formats.R, p) :
+            ext.H(p, padding)+':'+
+            ext.M(p, padding);
+    },
+    r: function(p, padding){ // '12:00:00 AM'
+        return p.formats.r ? format(p.formats.r, p) :
+            ext.I(p, padding)+':'+
+            ext.M(p, padding)+':'+
+            ext.S(p, padding)+' '+
+            ext.p(p, padding);
+    },
+    S: function(p, padding){ // '00'
+        return padx(p.l.getSeconds(p.d), padding); },
+    s: function(p, padding){ // '0'
+        return Math.floor(+p.d/1000);
+    },
+    T: function(p, padding){ // '00:00:00'
+        return p.formats.T ? format(p.formats.T, p) :
+            ext.H(p, padding)+':'+
+            ext.M(p, padding)+':'+
+            ext.S(p, padding);
+    },
+    t: function(p, padding){ // '\t'
+        return '\t'; },
+    U: function(p, padding){ // '00'
+        return padx(week_num(p.l, p.d, 'sunday'), padding);
+    },
+    u: function(p, padding){ // '4'
+        var day = p.l.getDay(p.d);
+        // 1 - 7, Monday is first day of the week
+        return day==0 ? 7 : day;
+    },
+    v: function(p, padding){ // '1-Jan-1970'
+        return p.formats.v ? format(p.formats.v, p) :
+            ext.e(p, padding)+'-'+
+            ext.b(p, padding)+'-'+
+            ext.Y(p, padding);
+    },
+    W: function(p, padding){ // '00'
+        return padx(week_num(p.l, p.d, 'monday'), padding);
+    },
+    w: function(p, padding){ // '4'. 0 Sunday - 6 Saturday
+        return p.l.getDay(p.d); },
+    Y: function(p, padding){ // '1970'
+        return p.l.getFullYear(p.d); },
+    y: function(p, padding){ // '70'
+        return (''+p.l.getFullYear(p.d)).slice(-2); },
+    Z: function(p, padding){ // 'GMT'
+        if (p.utc)
+            return 'GMT';
+        var tz_string = p.d.toString().match(/\((\w+)\)/);
+        return tz_string && tz_string[1] || '';
+    },
+    z: function(p, padding){ // '+0000'
+        if (p.utc)
+            return '+0000';
+        var off = typeof p.tz=='number' ? p.tz : -p.d.getTimezoneOffset();
+        return (off<0 ? '-' : '+')+pad(Math.abs(Math.trunc(off/60)), 2)+
+            pad(off%60, 2);
+    },
+};
+
+function hours12(hours){
+    return hours==0 ? 12 : hours>12 ? hours-12 : hours;
+}
+function ord_str(n){
+    var i = n % 10, ii = n % 100;
+    if (ii>=11 && ii<=13 || i==0 || i>=4)
+        return 'th';
+    switch (i)
+    {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    }
+}
+function week_num(l, _d, first_weekday){
+    // This works by shifting the weekday back by one day if we
+    // are treating Monday as the first day of the week.
+    var wday = l.getDay(_d);
+    if (first_weekday=='monday')
+        wday = wday==0 /* Sunday */ ? wday = 6 : wday-1;
+    var yday = (_d-l.getYearBegin(_d))/ms.DAY;
+    return Math.floor((yday + 7 - wday)/7);
+}
+// Default padding is '0' and default length is 2, both are optional.
+function padx(n, padding, length){
+    // padx(n, <length>)
+    if (typeof padding=='number')
+    {
+        length = padding;
+        padding = '0';
+    }
+    // Defaults handle padx(n) and padx(n, <padding>)
+    if (padding===undefined)
+        padding = '0';
+    length = length||2;
+    var s = ''+n;
+    // padding may be an empty string, don't loop forever if it is
+    if (padding)
+        for (; s.length<length; s = padding + s);
+    return s;
+}
 
 E.local_tz = E.strftime('%z', E.get(), {utc: false});
 

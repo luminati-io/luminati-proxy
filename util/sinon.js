@@ -12,7 +12,6 @@ define(['sinon', 'events', '/util/date.js', '/util/etask.js',
 var E = {};
 var timer;
 var is_auto_inc;
-var clock_restore;
 var clock_tick;
 var clock;
 var idle_time = 30;
@@ -100,28 +99,35 @@ E.clock_set = function(opt){
     opt.to_fake = opt.to_fake||[];
     is_auto_inc = opt.auto_inc;
     clock = sinon.useFakeTimers.apply(null, [opt.now].concat(opt.to_fake));
-    var _cst = clock.setTimeout;
-    clock.setTimeout = function(){
-        var r = _cst.apply(clock, arguments);
+    var _clock = clock;
+    var _cst = _clock.setTimeout;
+    _clock.setTimeout = function(){
+        var r = _cst.apply(_clock, arguments);
         if (r instanceof Object) // support node ver>10
-            r.refresh = function(){};
+            var _timer = _clock.timers[r.id];
+            r.refresh = function(){
+                _timer.callAt = _clock.now +
+                    (_timer.delay || (_clock.duringTick ? 1 : 0));
+                _clock.timers[_timer.id] = _timer;
+                return r;
+            };
         return r;
     };
-    clock_restore = clock.restore;
-    clock_tick = clock.tick;
+    var _clock_restore = _clock.restore;
+    clock_tick = _clock.tick;
+    var _clock_tick = clock_tick;
     var _monotonic = opt.date.monotonic;
-    opt.date.monotonic = function(){ return clock.now; };
-    clock.restore = function(){
+    opt.date.monotonic = function(){ return _clock.now; };
+    _clock.restore = function(){
         opt.date.monotonic = _monotonic;
-        clock.restore = clock_restore;
-        clock.tick = clock_tick;
-        clock_restore.apply(clock, arguments);
+        _clock.restore = _clock_restore;
+        _clock.tick = _clock_tick;
+        _clock_restore.apply(_clock, arguments);
     };
     if (typeof opt.idle_time=='number')
         idle_time = opt.idle_time||idle_time;
-    clock.tick = E.tick;
-    clock._tick = clock_tick;
-    if (is_auto_inc)
+    _clock.tick = E.tick;
+    if (opt.auto_inc)
     {
         event_funcs.forEach(function(elem){
             if (!elem.obj)
@@ -137,7 +143,7 @@ E.clock_set = function(opt){
         });
     }
     timer_set();
-    return clock;
+    return _clock;
 };
 E.clock_restore = function(){ return clock.restore(); };
 E.create_sandbox = function(opt){

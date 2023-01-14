@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.351.969",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix memory leak on long running proxy manager"
+            }
+        ]
+    },
+    {
         "ver": "1.337.781",
         "type": "stable",
         "changes": [

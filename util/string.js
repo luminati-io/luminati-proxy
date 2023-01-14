@@ -3,8 +3,8 @@
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -36,9 +36,9 @@ E.split_crlf = function(s){
 E.split_nl = function(s){
     return E.rm_empty_last(s.split('\n')); };
 E.to_array_buffer = function(s){
-    return (new TextEncoder()).encode(s).buffer; };
+    return new TextEncoder().encode(s).buffer; };
 E.from_array_buffer = function(buf, enc){
-    return (new TextDecoder(enc||'utf8')).decode(buf); };
+    return new TextDecoder(enc||'utf8').decode(buf); };
 E.capitalize = function(s){
     s = ''+s;
     return (s[0]||'').toUpperCase()+s.slice(1);
@@ -153,5 +153,13 @@ E.to_snake_case = function(str){
 
 /* eslint-disable-next-line no-control-regex*/
 E.str_rm_null = function(s){ return (s||'').replace(/\u0000/g, ''); };
+
+E.count = function(s, p){
+    if (!p || !p.toString || (p=p.toString()).length<1 || p.length>s.length)
+        return 0;
+    var c, i;
+    for (c=-1, i=-1-p.length; i!=-1; ++c, i=s.indexOf(p, i+p.length));
+    return c;
+};
 
 return E; }); }());

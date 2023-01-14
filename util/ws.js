@@ -11,7 +11,7 @@ if (is_rn)
     define = require('./require_node.js').define(module, '../',
         require('/util/conv.js'), require('/util/etask.js'),
         require('/util/events.js'), require('/util/string.js'),
-        require('/util/zerr.js'));
+        require('/util/zerr.js'), require('/util/util.js'));
 }
 else if (!is_node)
 {
@@ -51,8 +51,8 @@ else
     define = require('./require_node.js').define(module, '../');
 next_tick = next_tick || process.nextTick;
 define(['/util/conv.js', '/util/etask.js', '/util/events.js',
-    '/util/string.js', '/util/zerr.js'],
-    function(conv, etask, events, string, zerr){
+    '/util/string.js', '/util/zerr.js', '/util/util.js'],
+    function(conv, etask, events, string, zerr, zutil){
 
 const ef = etask.ef, assign = Object.assign;
 // for security reasons 'func' is disabled by default
@@ -67,12 +67,104 @@ const default_user_agent = is_node ? (()=>{
 const DEBUG_STR_LEN = 4096, DEFAULT_WIN_SIZE = 1048576;
 const SEC = 1000, MIN = 60*SEC, VFD_SZ = 8, VFD_BIN_SZ = 12;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
-const net = is_node ? require('net') : null, BUFFER_CONTENT = 10;
+const net = is_node ? require('net') : null;
+const BUFFER_CONTENT = 10;
+const BUFFER_IPC_CALL = 11;
 let SnappyStream, UnsnappyStream;
 const EventEmitter = is_node ? require('events').EventEmitter
     : events.EventEmitter;
 
 function noop(){}
+
+const duplicates = (()=>{
+    const cache = new Map();
+    return function duplicates_cache(str){
+        let v = cache.get(str);
+        if (v===undefined)
+            cache.set(str, v = str);
+        return v;
+    };
+})();
+
+const BUFFER_MESSAGES_CONTENT = 20;
+const BUFFER_MESSAGES_TYPE_BIN = 0;
+const BUFFER_MESSAGES_TYPE_STRING = 1;
+const BUFFER_MESSAGES_TYPE_JSON = 2;
+const BUFFER_MESSAGES_BIN_SZ = 4;
+const BUFFER_MESSAGES_MAX_LENGTH = Math.pow(2, 32)-1;
+
+class Buffers_array {
+    static is_buffer(buf){
+        if (!(buf instanceof Buffer) || buf.length<3*BUFFER_MESSAGES_BIN_SZ)
+            return false;
+        let prefix = buf.readUInt32BE(0);
+        let msg_type = buf.readUInt32BE(BUFFER_MESSAGES_BIN_SZ);
+        let length = buf.readUInt32BE(BUFFER_MESSAGES_BIN_SZ*2);
+        return prefix===0 && length==buf.length
+            && msg_type==BUFFER_MESSAGES_CONTENT;
+    }
+    static parse(buf){
+        let offset = 3*BUFFER_MESSAGES_BIN_SZ, messages = [];
+        while (offset<buf.length)
+        {
+            let msg_type = buf.readUInt8(offset);
+            let msg_len = buf.readUInt32BE(offset+1);
+            let msg_value = buf.slice(offset+1+BUFFER_MESSAGES_BIN_SZ,
+                offset+1+BUFFER_MESSAGES_BIN_SZ+msg_len);
+            if (msg_type==BUFFER_MESSAGES_TYPE_STRING
+                || msg_type==BUFFER_MESSAGES_TYPE_JSON)
+            {
+                msg_value = msg_value.toString();
+            }
+            messages.push(msg_value);
+            offset = offset+1+BUFFER_MESSAGES_BIN_SZ+msg_len;
+        }
+        return messages;
+    }
+    constructor(){
+        this.clean();
+    }
+    push(value){
+        let type;
+        if (value instanceof Buffer)
+            type = BUFFER_MESSAGES_TYPE_BIN;
+        else if (typeof value=='string')
+        {
+            type = BUFFER_MESSAGES_TYPE_STRING;
+            value = Buffer.from(value);
+        }
+        else
+        {
+            type = BUFFER_MESSAGES_TYPE_JSON;
+            value = Buffer.from(JSON.stringify(value));
+        }
+        let new_bytes_size = this._bytes_size+1+BUFFER_MESSAGES_BIN_SZ
+            +value.length;
+        if (new_bytes_size>BUFFER_MESSAGES_MAX_LENGTH)
+            throw `Buffers_array overflow ${new_bytes_size}`;
+        this._bytes_size += 1+BUFFER_MESSAGES_BIN_SZ+value.length;
+        this._buffer.push({type, value});
+    }
+    clean(){
+        this._buffer = [];
+        this._bytes_size = 3*BUFFER_MESSAGES_BIN_SZ;
+    }
+    get_buffer(){
+        let buf = Buffer.allocUnsafe(this._bytes_size);
+        buf.writeUInt32BE(0, 0);
+        buf.writeUInt32BE(BUFFER_MESSAGES_CONTENT, BUFFER_MESSAGES_BIN_SZ);
+        buf.writeUInt32BE(this._bytes_size, BUFFER_MESSAGES_BIN_SZ*2);
+        let offset = 3*BUFFER_MESSAGES_BIN_SZ;
+        for (let {type, value} of this._buffer)
+        {
+            buf.writeUInt8(type, offset);
+            buf.writeUInt32BE(value.length, offset+1);
+            value.copy(buf, offset = offset+1+BUFFER_MESSAGES_BIN_SZ);
+            offset += value.length;
+        }
+        return buf;
+    }
+}
 
 class WS extends EventEmitter {
     constructor(opt){
@@ -81,12 +173,14 @@ class WS extends EventEmitter {
         this.data = opt.data;
         this.connected = false;
         this.reason = undefined;
+        this.listen_bin_throttle = opt.listen_bin_throttle;
         this.zc_rx = opt.zcounter=='rx' || opt.zcounter=='all';
         this.zc_tx = opt.zcounter=='tx' || opt.zcounter=='all';
+        this.zc_mux = opt.zcounter=='mux' || opt.zcounter=='all';
         this.msg_log = assign({}, {treshold_size: null, print_size: 100},
             opt.msg_log);
-        this.zc = opt.zc_label ||
-            (opt.zcounter ? opt.label ? `${opt.label}_ws` : 'ws' : undefined);
+        this.zc = opt.zc_label || (opt.zcounter ?
+            opt.label ? duplicates(`${opt.label}_ws`) : 'ws' : undefined);
         this.zjson_opt = assign({}, zjson_opt, opt.zjson_opt);
         this.zjson_opt_send = assign({}, this.zjson_opt, opt.zjson_opt_send);
         this.zjson_opt_receive = assign({}, this.zjson_opt,
@@ -106,9 +200,9 @@ class WS extends EventEmitter {
             this.ping_timeout = typeof opt.ping_timeout=='function'
                 ? opt.ping_timeout() : opt.ping_timeout || 10000;
             this.ping_timer = undefined;
+            this.ping_expire_timer = undefined;
             this.ping_last = undefined;
-            this.ping_expire_fn = this._ping_expire.bind(this);
-            this.ping_fn = this._ping.bind(this);
+            this.pong_received = true;
         }
         this.idle_timeout = opt.idle_timeout;
         this.idle_timer = undefined;
@@ -116,7 +210,7 @@ class WS extends EventEmitter {
             ? new IPC_client(this, opt.ipc_client, {zjson: opt.ipc_zjson,
                 mux: opt.mux})
             : undefined;
-        this.bin_methods = this.ipc && this.ipc.bin_methods;
+        this.bin_methods = opt.bin_methods || this.ipc && this.ipc.bin_methods;
         this.time_parse = opt.time_parse;
         if (opt.ipc_server)
         {
@@ -128,8 +222,25 @@ class WS extends EventEmitter {
             });
         }
         this.mux = opt.mux ? new Mux(this) : undefined;
-        if (this.zc && !zcounter)
+        if ((this.zc || this.zc_mux) && !zcounter)
             zcounter = require('./zcounter.js');
+    }
+    _clean_throttle(){
+        if (this._send_throttle_t)
+        {
+            clearTimeout(this._send_throttle_t);
+            this._send_throttle_t = null;
+        }
+        this._buffers = null;
+    }
+    _send_throttle(msg, throttle_ts){
+        this._buffers = this._buffers || new Buffers_array();
+        this._buffers.push(msg);
+        this._send_throttle_t = this._send_throttle_t || setTimeout(()=>{
+            this._send_throttle_t = null;
+            this.ws.send(this._buffers.get_buffer());
+            this._buffers.clean();
+        }, throttle_ts);
     }
     send(msg, opt){
         if (zerr.is.debug())
@@ -153,7 +264,10 @@ class WS extends EventEmitter {
             return false;
         }
         this._update_idle();
-        this.ws.send(msg, opt);
+        if (opt && opt.bin_throttle)
+            this._send_throttle(msg, opt.bin_throttle);
+        else
+            this.ws.send(msg, opt);
         if (this.zc_tx)
         {
             zcounter.inc(`${this.zc}_tx_msg`);
@@ -161,6 +275,19 @@ class WS extends EventEmitter {
             zcounter.avg(`${this.zc}_tx_bytes_per_msg`, msg.length);
         }
         return true;
+    }
+    bin(data){
+        data.msg = data.msg||Buffer.alloc(0);
+        let cmd = data.cmd;
+        let buf = Buffer.alloc(16 + cmd.length + data.msg.length);
+        // [0|BUFFER_IPC_CALL|cookie|cmd length|...cmd bin|...cmd result bin]
+        buf.writeUInt32BE(0, 0);
+        buf.writeUInt32BE(BUFFER_IPC_CALL, 4);
+        buf.writeUInt32BE(data.cookie, 8);
+        buf.writeUInt32BE(cmd.length, 12);
+        buf.write(cmd, 16);
+        data.msg.copy(buf, 16+cmd.length);
+        return this.send(buf);
     }
     json(data){ return this.send(JSON.stringify(data)); }
     zjson(data){
@@ -214,8 +341,11 @@ class WS extends EventEmitter {
         if (this.ping)
         {
             clearTimeout(this.ping_timer);
+            clearTimeout(this.ping_expire_timer);
             this.ping_timer = undefined;
+            this.ping_expire_timer = undefined;
             this.ping_last = undefined;
+            this.pong_received = true;
             this.ws.removeAllListeners('pong');
         }
         this.ws.onopen = undefined;
@@ -246,6 +376,7 @@ class WS extends EventEmitter {
         }
         this.ws = undefined;
         this.connected = false;
+        this._clean_throttle();
     }
     toString(){
         let res = this.label ? `${this.label} WS` : 'WS';
@@ -269,7 +400,7 @@ class WS extends EventEmitter {
         // XXX pavlo: uws lib doesn't have these properties in _socket:
         // https://github.com/hola/uWebSockets-bindings/blob/master/nodejs/src/uws.js#L276
         // get them from upgrade request
-        this.local_addr = sock.localAddress;
+        this.local_addr = duplicates(sock.localAddress);
         this.local_port = sock.localPort;
         if (this.remote_addr==sock.remoteAddress)
             this.remote_forwarded = false;
@@ -280,7 +411,12 @@ class WS extends EventEmitter {
         }
         zerr.notice(`${this}: connected`);
         if (this.ping)
-            this.ping_timer = setTimeout(this.ping_fn, this.ping_interval);
+        {
+            this.pong_received = true; // skip first ping expiration
+            this.ping_timer = setTimeout(()=>this._ping(), this.ping_interval);
+            this.ping_expire_timer = setTimeout(()=>this._ping_expire(),
+                this.ping_timeout);
+        }
         this._check_status();
     }
     _on_close(event){
@@ -303,10 +439,17 @@ class WS extends EventEmitter {
     }
     _on_upgrade(resp){ zerr.notice(`${this}: upgrade conn`); }
     _on_message(event){
-        let msg = event.data, handled = false;
+        let msg = event.data;
         if (msg instanceof ArrayBuffer)
             msg = Buffer.from(Buffer.from(msg)); // make a copy
-        let is_bin, bin_event;
+        if (!this.listen_bin_throttle || !Buffers_array.is_buffer(msg))
+            return this._on_message_base(msg);
+        const messages = Buffers_array.parse(msg);
+        for (let data of messages)
+            this._on_message_base(data);
+    }
+    _on_message_base(msg){
+        let handled = false, is_bin, bin_event;
         if (this.bin_methods && msg instanceof Buffer &&
             msg.readUInt32BE(0)===0 && msg.readUInt32BE(4)==BUFFER_CONTENT)
         {
@@ -315,6 +458,16 @@ class WS extends EventEmitter {
             bin_event = JSON.parse(msg.slice(VFD_BIN_SZ,
                 VFD_BIN_SZ+bin_event_len).toString());
             bin_event.msg = msg.slice(VFD_BIN_SZ+bin_event_len);
+        }
+        if (this.bin_methods && msg instanceof Buffer &&
+            msg.readUInt32BE(0)===0 && msg.readUInt32BE(4)==BUFFER_IPC_CALL)
+        {
+            is_bin = true;
+            let cookie = msg.readUInt32BE(8);
+            let cmd_length = msg.readUInt32BE(12);
+            let cmd = msg.slice(16, 16+cmd_length).toString();
+            let res = msg.slice(16+cmd_length, msg.length - 16+cmd_length + 1);
+            bin_event = {type: 'ipc_call', cookie, cmd, msg: res, bin: true};
         }
         if (zerr.is.debug())
         {
@@ -398,32 +551,20 @@ class WS extends EventEmitter {
         if (!handled)
             this.abort(1003, 'Unexpected message');
         this._update_idle();
-        if (this.ping_timer)
-        {
-            // refresh() was added in node 10, we need to support node 8 too
-            if (this.ping_timer.refresh)
-                this.ping_timer.refresh();
-            else
-            {
-                clearTimeout(this.ping_timer);
-                this.ping_timer = this.ping_last
-                    ? setTimeout(this.ping_expire_fn, this.ping_timeout)
-                    : setTimeout(this.ping_fn, this.ping_interval);
-            }
-        }
+        this._refresh_ping_timers();
     }
     _on_pong(){
-        clearTimeout(this.ping_timer);
-        let rtt = Date.now()-this.ping_last;
-        this.ping_last = undefined;
-        this.ping_timer = setTimeout(this.ping_fn,
-            Math.max(this.ping_interval-rtt, 0));
+        this.pong_received = true;
         if (zerr.is.debug())
-            zerr.debug(`${this}< pong (rtt ${rtt}ms)`);
+            zerr.debug(`${this}< pong (rtt ${Date.now()-this.ping_last}ms)`);
         if (this.zc)
-            zcounter.avg(`${this.zc}_ping_ms`, rtt);
+            zcounter.avg(`${this.zc}_ping_ms`, Date.now()-this.ping_last);
     }
     _ping(){
+        // don't send new ping if ping_timeout > ping_interval (weird case)
+        if (!this.pong_received)
+            return;
+        this.pong_received = false;
         // workaround for ws library: the socket is already closing,
         // but a notification has not yet been emitted
         if (!this.connected || this.ws.readyState==2) // ws.CLOSING
@@ -433,12 +574,31 @@ class WS extends EventEmitter {
             return zerr('Ping attempt fail, for'
                 +` ${JSON.stringify(this.inspect())} ${zerr.e2s(e)}`);
         }
-        this.ping_timer = setTimeout(this.ping_expire_fn, this.ping_timeout);
+        this._refresh_ping_timers();
         this.ping_last = Date.now();
         if (zerr.is.debug())
             zerr.debug(`${this}> ping (max ${this.ping_timeout}ms)`);
     }
-    _ping_expire(){ this.abort(1002, 'Ping timeout'); }
+    _ping_expire(){
+        if (this.pong_received)
+            return;
+        this.abort(1002, 'Ping timeout');
+    }
+    _refresh_ping_timers(){
+        if (!this.ping_timer || !this.ping_expire_timer)
+            return;
+        if (zutil.is_timer_refresh)
+        {
+            this.ping_timer.refresh();
+            this.ping_expire_timer.refresh();
+            return;
+        }
+        clearTimeout(this.ping_timer);
+        this.ping_timer = setTimeout(()=>this._ping(), this.ping_interval);
+        clearTimeout(this.ping_expire_timer);
+        this.ping_expire_timer = setTimeout(()=>this._ping_expire(),
+            this.ping_timeout);
+    }
     _idle(){
         if (this.zc)
             zcounter.inc(`${this.zc}_idle_timeout`);
@@ -838,7 +998,7 @@ class IPC_client {
                     spec = {type: spec};
                 let _opt = assign({}, opt, spec);
                 // ability to transfer Buffer as is, without JSON conversion
-                if (_opt.bin)
+                if (_opt.bin||_opt.send_bin)
                     this.bin_methods = 1;
                 switch (_opt.type||'call')
                 {
@@ -887,7 +1047,11 @@ class IPC_client {
                 });
             }
             let res = {status: _this._ws.status}, prev;
-            let send = _this._ws[opt.zjson ? 'zjson' : 'json'].bind(_this._ws);
+            let send = (...args)=>{
+                if (opt.send_bin)
+                    return _this._ws.bin(...args);
+                return _this._ws[opt.zjson ? 'zjson' : 'json'](...args);
+            };
             let mk_bad_ipc_call_error = msg=>{
                 let e = new Error(msg);
                 e.code = ERROR_CODES.bad_ipc_call_attempt;
@@ -1224,6 +1388,8 @@ class Mux {
     open_ack(vfd, opt={}){
         const _lib = require('stream');
         const _this = this;
+        const bin_throttle_opt = opt && opt.bin_throttle ?
+            {bin_throttle: opt.bin_throttle} : null;
         opt.fin_timeout = opt.fin_timeout||10*SEC;
         const w_log = (e, str)=>
             zerr.warn(`${_this.ws}: ${str}: ${vfd}-${zerr.e2s(e)}`);
@@ -1234,7 +1400,7 @@ class Mux {
                 const {buf, buf_pending} = stream.process_data(data);
                 if (buf)
                 {
-                    if (!_this.ws.send(buf))
+                    if (!_this.ws.send(buf, bin_throttle_opt))
                         return cb(new Error(_this.ws.reason||_this.ws.status));
                     stream.sent += buf.length-VFD_SZ;
                     stream.last_use_ts = Date.now();
@@ -1379,12 +1545,16 @@ class Mux {
         });
         const throttle_ack = +opt.throttle_ack;
         const _send_ack = ()=>{
-            _this.ws.send(`{"vfd":${vfd},"ack":${stream.zread}}`);
+            _this.ws.send(`{"vfd":${vfd},"ack":${stream.zread}}`,
+                bin_throttle_opt);
             send_ack_ts = Date.now();
         };
         stream.send_ack = !throttle_ack ? _send_ack : ()=>{
             if (send_ack_timeout)
                 return;
+            // XXX igors: send ack in throttle ms
+            if (!send_ack_ts && opt.delayed_ack)
+                send_ack_ts = Date.now();
             const delta = Date.now()-send_ack_ts;
             if (delta>=throttle_ack)
                 return _send_ack();
@@ -1397,12 +1567,15 @@ class Mux {
             stream.ack = ack;
             if (pending)
                 pending.continue();
+            if (_this.ws.zc_mux)
+                zcounter.inc(`${_this.ws.zc||'unknown'}_mux_on_ack`);
         };
         stream.send_win_size = ()=>{
             if (stream.win_size_sent)
                 return;
             _this.ws.send(
-                `{"vfd":${vfd},"win_size":${opt.win_size||DEFAULT_WIN_SIZE}}`);
+                `{"vfd":${vfd},"win_size":${opt.win_size||DEFAULT_WIN_SIZE}}`,
+                bin_throttle_opt);
             stream.win_size_sent = true;
         };
         stream.on_win_size = size=>{
@@ -1412,7 +1585,17 @@ class Mux {
                 pending.continue();
         };
         stream.send_fin = error=>{
-            if (error)
+            if (send_ack_timeout)
+            {
+                clearTimeout(send_ack_timeout);
+                _send_ack();
+            }
+            if (bin_throttle_opt)
+            {
+                _this.ws.send(error ? {vfd, fin: 1, error}
+                    : `{"vfd":${vfd},"fin":1}`, bin_throttle_opt);
+            }
+            else if (error)
                 _this.ws.json({vfd, fin: 1, error});
             else
                 _this.ws.send(`{"vfd":${vfd},"fin":1}`);
@@ -1420,6 +1603,8 @@ class Mux {
         };
         stream.on_fin = msg=>{
             stream.fin_got = true;
+            if (_this.ws.zc_mux)
+                zcounter.inc(`${_this.ws.zc||'unknown'}_mux_on_fin`);
             const fn = ()=>next_tick(()=>zfin_pending ?
                 zfin_pending.continue() : zfinish(true, false));
             etask(function*_mux_stream_on_fin(){
@@ -1505,6 +1690,8 @@ class Mux {
         {
             return;
         }
+        if (this.listen_bin_throttle && Buffers_array.is_buffer(buf))
+            return zerr(`${this.ws}: unexpected Buffers_array on bin event`);
         if (buf.length<VFD_SZ)
             return zerr(`${this.ws}: malformed binary message`);
         let vfd = buf.readUInt32BE(0);

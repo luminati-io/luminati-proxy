@@ -3405,7 +3405,7 @@
   "Trusted by Fortune 500 companies, Bright Data is at the forefront of Web Data Extraction Services across the globe. Our networks are 100% opt-in complying with all laws and regulations. Let your account manager assist in the set-up and deployment of operations. With API and examples in over ten coding languages, you can save money on servers and engineers. With Bright Data, you can guarantee the accuracy of your data collection and never get blocked or misled again!": "被财富500强公司所信耐，Bright Data 始终位于全球网络数据提取服务的最前端。 我们的网络100％遵守了所有相关法律和法规。 让您的客户经理协助您设置和部署。我们有着十种编码语言的API和示例，让您可以在服务器和工程师方面节省资金。 使用Bright Data，您能保证您数据采集的准确性，并且永不被屏蔽和误导。",
   "Account Management IPs built for accuracy and reliability": "专为高精确度和可靠性而设的账户管理IP",
   "Bright Data has connected": "Bright Data networks LTD has connected",
-  "advanced proxy services in the world.": "advanced proxy services in the world. Company address: Hamahshvev st. 3, Netanya, Israel.",
+  "advanced proxy services in the world.": "advanced proxy services in the world. Company address: Hamahshvev st. 4, Netanya, Israel.",
   "Proxy Service": "代理服务",
   "Email*": "*电子邮箱",
   "Password*": "*密码",
@@ -5366,7 +5366,7 @@
   "Bright Data": "Bright Data 网络",
   "rebrands as Bright Data": "更名为Bright Data",
   "- find out why": "- 了解原因",
-  "Bright Data Ltd. (Headquarters), 3 Hamahshev St., Netanya 4250713, Israel (POB 8025)": "以色列内塔尼亚市Hamahshev街3号亮数据(总部）邮编：4250713（邮政信箱 8025）",
+  "Bright Data Ltd. (Headquarters), 4 Hamahshev St., Netanya 4250714, Israel (POB 8025)": "以色列内塔尼亚市Hamahshev街4号亮数据(总部）邮编：4250714（邮政信箱 8025）",
   "Finance":"财务员",
   "Ops":"操作员",
   "Can manage all aspects of the account. You will need to verify this user by typing a code sent to your email.":"可以管理帐户的各个方面。需要通过邮箱验证码来验证此用户。",
@@ -5449,7 +5449,7 @@
   "输入 Google Authenticator 应用 提供 的 代码 以 附加 设备",
   "Bright Data License and Service Agreement": "亮数据许可和服务协议",
   "Last Updated February 9, 2021": "上次更新于2021年2月9",
-  "This License and Service Agreement (the \"Agreement\") is an agreement between Bright Data Ltd., (\"Bright Data\") with address at 3 Hamahshev St., Netanya 4250713, Israel, and you or the entity you represent (\"Client\"). This Agreement takes effect when you sign up to Bright Data or, if earlier, when you access or use the System or Service (the \"Effective Date\"). If you are using the System or Service on behalf of an entity, you represent to us that you are lawfully able to enter into this Agreement on behalf of the Client.": "本许可和服务协议（以下简称\"协议\"）双方为亮数据有限公司（以下简称“亮数据”），地址为以色列内坦亚Hamahshev街3号（邮编4250713），以及您或您代表的企业（以下简称“客户”）。本协议在您注册亮数据账户时生效，或在您访问或使用亮数据系统或服务（若较早）时生效（以下简称“生效日期”）。如果您代表企业使用系统或服务，则表示您向我们声明，您可以合法代表客户签订本协议。",
+  "This License and Service Agreement (the \"Agreement\") is an agreement between Bright Data Ltd., (\"Bright Data\") with address at 4 Hamahshev St., Netanya 4250714, Israel, and you or the entity you represent (\"Client\"). This Agreement takes effect when you sign up to Bright Data or, if earlier, when you access or use the System or Service (the \"Effective Date\"). If you are using the System or Service on behalf of an entity, you represent to us that you are lawfully able to enter into this Agreement on behalf of the Client.": "本许可和服务协议（以下简称\"协议\"）双方为亮数据有限公司（以下简称“亮数据”），地址为以色列内坦亚Hamahshev街4号（邮编4250713），以及您或您代表的企业（以下简称“客户”）。本协议在您注册亮数据账户时生效，或在您访问或使用亮数据系统或服务（若较早）时生效（以下简称“生效日期”）。如果您代表企业使用系统或服务，则表示您向我们声明，您可以合法代表客户签订本协议。",
   "1. Grant of License": "1. 授予许可",
   "1.1 Bright Data has developed, owns and offers a service which enables browsing the internet anonymously by redirecting users' communication through other users' devices (the \"System\"). This is available for commercial use under this agreement.": "1.1 亮数据已开发、拥有并提供了一项服务，即通过重定向用户通信，使用户得以匿名浏览互联网，对其他用户设备不可见（以下简称\"系统\"）。根据本协议，许可适用于商业用途。",
   "1.2 During the term of this Agreement Bright Data grants the Client a limited license (with no right to sublicense) to access and use the System solely for the purpose of Client's internal business operations.": "1.2 在协议有效期内，亮数据授予客户有限许可（无权进行再许可），客户仅可出于内部业务运营的目的访问和使用系统。",
@@ -5630,5 +5630,8 @@
   "$150/month with no hidden costs":"150 美元/月，无隐藏费用",
   "Proxy Manager Statistics":"代理管理器统计",
   "Proxy Manager Event log":"代理管理器事件日志",
-  "https://help.brightdata.com/hc/en-us": "https://help.brightdata.com/hc/zh-cn"
+  "https://help.brightdata.com/hc/en-us": "https://help.brightdata.com/hc/zh-cn",
+  "Register - Set a password":"注册：设置密码",
+  "Confirm password":"确认密码",
+  "Confirm your password":"确认你的密码"
 }

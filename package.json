@@ -127,6 +127,7 @@
     "@babel/plugin-proposal-object-rest-spread": "7.18.9",
     "@babel/plugin-transform-runtime": "7.18.10",
     "@babel/plugin-transform-modules-amd": "7.18.6",
+    "@babel/plugin-transform-block-scoping": "7.20.5",
     "css-loader": "0.28.4",
     "electron": "12.2.1",
     "electron-builder": "16.6.1",
@@ -301,8 +302,6 @@
       "lib/ssl.js",
       "lib/stat.js",
       "lib/throttle_mgr.js",
-      "lib/timeline.js",
-      "lib/timeouts.js",
       "lib/username.js",
       "lib/util.js",
       "lib/worker.js",
@@ -408,7 +407,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "92ef2eb8eba9caa664c27ee015f94dd5"
+    "md5": "21036e5759ba9805cf754b813d7e727b"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -440,5 +439,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.337.781"
+  "version": "1.351.969"
 }

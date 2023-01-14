@@ -10,7 +10,8 @@ import zcountry from '../../../util/country.js';
 import {qw} from '../../../util/string.js';
 import {Config, Tab_context} from './common.js';
 import {Remove_icon, Field_row_raw, Warning, Note} from '../common.js';
-import {formatted_user_agents, is_local} from '../util.js';
+import user_agents from '/www/util/pub/user_agent_gen.json';
+import {is_local} from '../util.js';
 import Tooltip from '../common/tooltip.js';
 import {Select_multiple} from '../common/controls.js';
 import {T} from '../common/i18n.js';
@@ -222,7 +223,7 @@ const headers = {
     'user-agent': [
         {label: 'Random (desktop)', value: 'random_desktop'},
         {label: 'Random (mobile)', value: 'random_mobile'},
-        ...formatted_user_agents,
+        ...user_agents,
     ],
     'accept': [
         '*/*',

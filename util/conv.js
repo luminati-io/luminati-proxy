@@ -118,7 +118,7 @@ E.md5_etag = function(buf){ return E.md5(buf, 8); };
 
 E.inet_ntoa_t = function(ip){
     return ((ip & 0xff000000)>>>24)+'.'+((ip & 0xff0000)>>>16)+'.'
-    +((ip & 0xff00)>>>8)+'.'+(ip & 0xff);
+        +((ip & 0xff00)>>>8)+'.'+(ip & 0xff);
 };
 
 E.inet_addr = function(ip){
@@ -578,30 +578,61 @@ E.JSON_stringify = function(obj, opt){
     return s;
 };
 
+var leaf_type = {
+    __ISODate__: [
+        function(opt){ return opt.date; },
+        function(v, opt){ return new Date(v.__ISODate__); },
+    ],
+    __Function__: [
+        function(opt){ return opt.func; },
+        function(v, opt){ return vm
+            ? vm.runInThisContext('"use strict";('+v.__Function__+')')
+            // fallback for browser environment
+            : new Function('', '"use strict";return ('+v.__Function__+');')();
+        },
+    ],
+    __RegExp__: [
+        function(opt){ return opt.re; },
+        function(v, opt){
+            var parsed = /^\/(.*)\/(\w*)$/.exec(v.__RegExp__);
+            if (!parsed)
+                throw new Error('failed parsing regexp');
+            return new RegExp(parsed[1], parsed[2]);
+        },
+    ],
+    __Infinity__: [
+        function(opt){ return opt.inf; },
+        function(v, opt){
+            return v.__Infinity__ < 0 ? -Infinity : Infinity;
+        },
+    ],
+    __ObjectId__: [
+        function(opt){ return typeof opt.object_id=='function'; },
+        function(v, opt){ return opt.object_id(v.__ObjectId__); },
+    ],
+};
+
+function get_single_key(o){
+    var key = '';
+    var i = 0;
+    for (var k in o)
+    {
+        if (i)
+            return '';
+        if (!o.hasOwnProperty(k))
+            continue;
+        key = k;
+        ++i;
+    }
+    return key;
+}
+
 function parse_leaf(v, opt){
-    if (!v || typeof v!='object' || Object.keys(v).length!=1)
+    var key;
+    if (!v || typeof v!='object' || !(key = get_single_key(v)))
         return v;
-    if (v.__ISODate__ && opt.date)
-        return new Date(v.__ISODate__);
-    if (v.__Function__ && opt.func)
-    {
-        if (vm)
-            return vm.runInThisContext('"use strict";('+v.__Function__+')');
-        // fallback for browser environment
-        return new Function('', '"use strict";return ('+v.__Function__+');')();
-    }
-    if (v.__RegExp__ && opt.re)
-    {
-        var parsed = /^\/(.*)\/(\w*)$/.exec(v.__RegExp__);
-        if (!parsed)
-            throw new Error('failed parsing regexp');
-        return new RegExp(parsed[1], parsed[2]);
-    }
-    if (v.__Infinity__ && opt.inf)
-        return v.__Infinity__ < 0 ? -Infinity : Infinity;
-    if (v.__ObjectId__ && typeof opt.object_id=='function')
-        return opt.object_id(v.__ObjectId__);
-    return v;
+    return leaf_type.hasOwnProperty(key) && leaf_type[key][0](opt)
+        ? leaf_type[key][1](v, opt) : v;
 }
 
 function parse_obj(v, opt){

@@ -134,6 +134,7 @@ const Logo = withRouter(({lock})=>
 const Nav_right = props=>
     <div className="nav_top_right">
       <div className="schema"><Schema/></div>
+      <Certificate custom={props.settings.use_custom_cert}/>
       {props.embedded && <Language hidden/>}
       {!props.embedded &&
         <React.Fragment>
@@ -154,6 +155,13 @@ const Patent = with_www_api(props=>
       </a>
     </div>
 );
+
+const Certificate = ({custom})=>
+  <Tooltip title={(custom ? 'User' : 'System')+' certificate'}
+    placement="left" >
+    <span className={classnames('glyphicon', 'glyphicon-certificate', 'cert',
+      custom ? 'custom' : '')}/>
+  </Tooltip>;
 
 const show_reload = function(){
     $('#restarting').modal({

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.337.781",
+        "version": "1.351.969",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -978,6 +978,50 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/refresh_ip/{port}": {
+            "post": {
+                "description": "Refresh allocated IP or gIP in determined port",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Proxy port",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "description": "Refresh IP options (specify either IP or gIP)",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ip": {
+                                    "description": "IP to be refreshed",
+                                    "type": "string",
+                                    "example": "10.0.0.0"
+                                },
+                                "vip": {
+                                    "description": "gIP to be refreshed",
+                                    "type": "string",
+                                    "example": "gIP_1"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Error response"
                     }
                 }
             }

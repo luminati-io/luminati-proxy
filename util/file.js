@@ -554,7 +554,7 @@ E.absolutize = (p, d1, d2)=>{
 };
 E.normalize = p=>E.cyg2unix(E.win2unix(path.normalize(p)));
 E.is_subdir = (root, sub)=>{
-    let nroot = root.length;
+    let nroot = root && root.length ? root.length : 0;
     return !root || sub.startsWith(root) && (root[nroot-1]=='/' ||
         sub[nroot]===undefined || sub[nroot]=='/');
 };

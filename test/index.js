@@ -21,8 +21,7 @@ const Server = require('../lib/server.js');
 const Worker = require('../lib/worker.js');
 const Manager = require('../lib/manager.js');
 const requester = require('../lib/requester.js');
-const Timeline = require('../lib/timeline.js');
-const lutil = require('../lib/util.js');
+const {Timeline, decode_body} = require('../lib/util.js');
 const consts = require('../lib/consts.js');
 const common = require('./common.js');
 const {assert_has, http_proxy, smtp_test_server, http_ping, keys} = common;
@@ -156,7 +155,7 @@ describe('proxy', ()=>{
     describe('sanity', ()=>{
         if (!('NODE_TLS_REJECT_UNAUTHORIZED' in process.env))
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = 1;
-        const t = (name, tls, req, opt)=>it(name+(tls ? ' tls' : ''),
+        const t = (name, use_tls, req, opt)=>it(name+(use_tls ? ' tls' : ''),
             etask._fn(
         function*(_this){
             _this.timeout(5000);
@@ -164,7 +163,7 @@ describe('proxy', ()=>{
             opt = opt||{};
             l = yield lum(opt);
             req = req();
-            if (tls)
+            if (use_tls)
             {
                 sandbox.stub(process.env, 'NODE_TLS_REJECT_UNAUTHORIZED')
                     .value(0);
@@ -180,18 +179,18 @@ describe('proxy', ()=>{
                 Object.assign(expected, {body: req.body});
             assert_has(res, expected, 'res');
         }));
-        for (let tls of [false, true])
+        for (let use_tls of [false, true])
         {
-            t('http', tls, ()=>ping.http.url);
-            t('http post', tls, ()=>{
+            t('http', use_tls, ()=>ping.http.url);
+            t('http post', use_tls, ()=>{
                 return {url: ping.http.url, method: 'POST', body: 'test body'};
             });
-            t('https', tls, ()=>ping.https.url, {ssl: false});
-            t('https post', tls,
+            t('https', use_tls, ()=>ping.https.url, {ssl: false});
+            t('https post', use_tls,
                 ()=>({url: ping.https.url, method: 'POST', body: 'test body'}),
                 {ssl: false});
-            t('https sniffing', tls, ()=>ping.https.url);
-            t('https sniffing post', tls, ()=>({
+            t('https sniffing', use_tls, ()=>ping.https.url);
+            t('https sniffing post', use_tls, ()=>({
                 url: ping.https.url, method: 'POST', body: 'test body'}));
         }
     });
@@ -299,7 +298,7 @@ describe('proxy', ()=>{
     }));
     describe('options', ()=>{
         describe('passthrough', ()=>{
-            const check_auth = function (prefix) {
+            const check_auth = function(prefix){
                 return etask(function*(){
                     l = yield lum({pool_size: 3});
                     const res = yield l.test({headers: {
@@ -317,7 +316,8 @@ describe('proxy', ()=>{
             };
             it('authentication passed brd', ()=>check_auth('brd'));
             it('authentication passed lum', ()=>check_auth('lum'));
-            it('no zone auth if cust out of whitelist lum', ()=>etask(function*(){
+            it('no zone auth if cust out of whitelist lum', ()=>
+            etask(function*(){
                 let cust = customer_out_of_zone_auth_whitelist;
                 l = yield lum();
                 const res = yield l.test({no_usage: 1, headers: {
@@ -959,7 +959,8 @@ describe('proxy', ()=>{
             it('lum_user_hide_headers_lum', ()=>etask(function*(){
                 l = yield lum(opts);
                 const auth = 'Basic '+Buffer
-                    .from('lum-customer-abc-zone-static:t2').toString('base64');
+                    .from('lum-customer-abc-zone-static:t2')
+                    .toString('base64');
                 let r = yield l.test({headers: {'proxy-authorization': auth}});
                 assert.equal(r.statusCode, 200);
                 debug_headers.forEach(hdr=>assert.ok(!r.headers[hdr]));
@@ -1924,7 +1925,7 @@ describe('proxy', ()=>{
         describe('decode_body', ()=>{
             let t = (name, limit, expected)=>it(name, ()=>{
                 let buffer = Buffer.from('1234567890');
-                let body = lutil.decode_body([buffer], '', limit);
+                let body = decode_body([buffer], '', limit);
                 assert.equal(body, expected);
             });
             t('disabled', -1, '');

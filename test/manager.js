@@ -75,6 +75,7 @@ describe('manager', function(){
         manager.lpm_f.get_meta_conf = ()=>({
             _defaults: {
                 account_id: 'c_123',
+                customer_id: 'hl_123',
                 customer: 'test_cust',
                 password: 'pass123',
                 debug: 'full',
@@ -338,7 +339,7 @@ describe('manager', function(){
             assert.equal(app.manager.proxy_ports[24000].opt.har_limit, 1024);
         }));
         it('applies explicit mgr argv to defaults', etask._fn(function*(_this){
-            _this.timeout(6000);
+            _this.timeout(15000);
             app = yield app_with_args(['--port', '24000', '--har_limit',
                 '1337', '--api_domain', 'invalid_domain']);
             const {opt} = app.manager.proxy_ports[24000];
@@ -1157,6 +1158,7 @@ describe('manager', function(){
         const server_meta_conf = {config: {_defaults: {
             customer: 'abc',
             account_id: 'abc',
+            customer_id: 'hl_abc',
         }}};
         const get_local_conf = ts=>({
             _defaults: {
@@ -1428,8 +1430,8 @@ describe('manager', function(){
         }));
     });
     it('get_super_proxy_ports', ()=>{
-        const account_id = 'c_123';
-        const mgr = {_defaults: {account_id}};
+        const account_id = 'c_123', customer_id = 'hl_123';
+        const mgr = {_defaults: {account_id, customer_id}};
         const func = Manager.prototype.get_super_proxy_ports.bind(mgr);
         const t = (server_conf, expected)=>{
             assert.deepEqual(func(server_conf), expected);

@@ -90,12 +90,18 @@ E.jtest_uninit = function(){
 E.basic_u32 = function(v){ return 1103515245*v+12345 >>> 0; };
 E.basic_u31 = function(v){ return 1103515245*v+12345 & 0x7fffffff; };
 
-// using rand instead of rand_range to be able correctly use jtest
+var backoff_jitter_strategies = {
+    full_jitter: function(base, cap, attempt){
+        // using rand instead of rand_range to be able correctly use jtest
+        return Math.round(
+            E.rand('jitter')*Math.min(cap, base*Math.pow(2, attempt)));
+    },
+};
 E.calc_exp_delay_with_jitter = function(attempt, opt){
     opt = opt||{};
     var base = opt.base||3*date.ms.SEC, cap = opt.cap||15*date.ms.SEC;
-    return Math.round(E.rand('jitter')*
-        Math.min(cap, base*Math.pow(2, attempt)));
+    var strategy = opt.strategy||'full_jitter';
+    return backoff_jitter_strategies[strategy](base, cap, attempt);
 };
 
 return E; }); }());

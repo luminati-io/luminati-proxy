@@ -310,14 +310,14 @@ E.cn_list = {
     CF: '中非共和國',
     TD: '乍得',
     CL: '智利',
-    CN: '中國',
+    CN: '中国',
     CX: '聖誕島',
     CC: '科科斯（基林）群島',
     CO: '哥倫比亞',
     KM: '科摩罗',
     CG: '刚果（布）',
     CK: '庫克群島',
-    CR: '哥斯達黎加',
+    CR: '哥斯达黎加',
     CI: '科特迪瓦',
     HR: '克羅地亞（Hrvatska）',
     CU: '古巴',
@@ -352,7 +352,7 @@ E.cn_list = {
     GH: '加納',
     GI: '直布罗陀',
     GB: '大不列顛',
-    GR: '希臘',
+    GR: '希腊',
     GL: '格陵蘭',
     GD: '格林納達',
     GU: '关岛',
@@ -422,7 +422,7 @@ E.cn_list = {
     NL: '荷兰',
     AN: '荷屬安的列斯',
     NC: '新喀里多尼亚',
-    NZ: '新西蘭',
+    NZ: '新西兰',
     NI: '尼加拉瓜',
     NE: '尼日爾',
     NG: '尼日利亚',
@@ -490,7 +490,7 @@ E.cn_list = {
     TO: '湯加',
     TT: '特立尼达和多巴哥',
     TN: '突尼斯',
-    TR: '火雞',
+    TR: '土耳其',
     TM: '土庫曼斯坦',
     TC: '特克斯和凱科斯群島',
     TV: '圖瓦盧',
@@ -1562,16 +1562,21 @@ E.unallowed_list = {
     IQ: 1,
 };
 
-E.is_allowed = function(code){
-    return E.list[code] && !E.unallowed_list[code];
+E.is_allowed = function(c){
+    return E.list[c] && !E.unallowed_list[c];
 };
 
-E.is_hidden = function(code){
+E.is_hidden = function(c){
     return !!{
         EU: 1,
         PS: 1,
         AQ: 1,
-    }[code];
+    }[c];
+};
+
+E.is_country_code = function(c){
+    return typeof c=='string'&&c.length==2
+        &&this.country_codes_lowered.includes(c.toLowerCase());
 };
 
 E.non_iso = {GB: 1, EU: 1};
@@ -2912,19 +2917,19 @@ E.us_states2code = {};
 for (var s in E.us_states)
     E.us_states2code[E.us_states[s]] = s;
 
-E.code2label = function(code){
-    code = code.toUpperCase();
-    return E.list[code] || code;
+E.code2label = function(c){
+    c = c.toUpperCase();
+    return E.list[c] || c;
 };
 
-E.code2adj = function(code){
-    code = code.toUpperCase();
-    return E.adj_list[code] || code;
+E.code2adj = function(c){
+    c = c.toUpperCase();
+    return E.adj_list[c] || c;
 };
 
-E.code2timezone = function(code){
-    code = code.toUpperCase();
-    return E.timezone[code] || code;
+E.code2timezone = function(c){
+    c = c.toUpperCase();
+    return E.timezone[c] || c;
 };
 
 E.state_code2timezone = function(ts_country, state){
@@ -2981,10 +2986,10 @@ E.mixed2code = function(mixed){
         return mixed;
     if (mixed.length==2)
         return mixed.toUpperCase();
-    for (var code in E.list)
+    for (var ccode in E.list)
     {
-        if (E.list[code].toLowerCase()==mixed.toLowerCase())
-            return code;
+        if (E.list[ccode].toLowerCase()==mixed.toLowerCase())
+            return ccode;
     }
     if (mixed.length==3)
     {
@@ -2997,11 +3002,11 @@ E.mixed2code = function(mixed){
     return mixed;
 };
 
-E.www2code = function(code){
-    return code=='UK' ? 'GB' : code=='uk' ? 'gb' : code; };
+E.www2code = function(c){
+    return c=='UK' ? 'GB' : c=='uk' ? 'gb' : c; };
 
-E.code2www = function(code){
-    return code=='GB' ? 'UK' : code=='gb' ? 'uk' : code; };
+E.code2www = function(c){
+    return c=='GB' ? 'UK' : c=='gb' ? 'uk' : c; };
 
 E.gl2uule = function(gl){
     gl = E.www2code(gl.toUpperCase());

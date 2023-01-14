@@ -1,10 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, browser:true*/
 (function(){
-var define, process;
+var define, process, cluster, worker_threads, version;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -28,13 +28,13 @@ else
     {
         process = global.process||require('_process');
         require('./config.js');
-        var cluster = require('cluster');
+        cluster = require('cluster');
         // XXX stanislav/sergeyp: remove try/catch wrap after node on
         // app_win64_jse is updated
-        var worker_threads = {isMainThread: true};
+        worker_threads = {isMainThread: true};
         try { worker_threads = require('worker_threads'); }
         catch(e){}
-        var version = require('./version.js').version;
+        version = require('./version.js').version;
     }
 }
 define(['/util/array.js', '/util/date.js', '/util/util.js',
@@ -101,8 +101,20 @@ function wrap_perr(perr_fn){
         send = perr_fn.send;
         pre_send = perr_fn.pre_send;
     }
-    return function(id, info, opt){
+    return function new_perr(id, info, opt){
         opt = opt||{};
+        if (!/^[a-zA-Z0-9_.]+$/.test(id))
+        {
+            var perr_id = 'invalid_zerr_perr_id';
+            var perr_info = {arguments: arguments, trace: E.get_stack_trace()};
+            if (env.NODE_ENV=='production')
+            {
+                var zcounter_file = require('./zcounter_file.js');
+                zcounter_file.inc(perr_id);
+                perr_info.server = env.SERVER_ID;
+            }
+            return new_perr(perr_id, perr_info, {rate_limit: false});
+        }
         var _rate_limit = opt.rate_limit||{};
         var default_rate_limit = zutil.is_mocha() ? 100 : 10;
         var ms = _rate_limit.ms||date.ms.HOUR;
@@ -314,16 +326,81 @@ var init = function(){
 };
 init();
 
+var systemd_level_dict = [];
+for (var slk in L)
+    systemd_level_dict[L[slk]] = '<'+L[slk]+'>';
+var systemd_level = env.CURRENT_SYSTEMD_UNIT_NAME
+    ? function(level){ return systemd_level_dict[level]; }
+    : function(level){ return ''; };
+
+var level_prefix = [];
+for (var lpk in L)
+    level_prefix[L[lpk]] = lpk+': ';
+
 var __zerr = function(level, args){
     var msg = zerr_format(args);
-    var k = Object.keys(L);
-    var prefix = E.prefix+(E.hide_timestamp ? '' : date.to_sql_ms()+' ');
-    if (env.CURRENT_SYSTEMD_UNIT_NAME)
-        prefix = '<'+level+'>'+prefix;
-    var res = prefix+k[level]+': '+msg;
-    console.error(res);
+    var ts = E.hide_timestamp ? '' : date.to_sql_ms()+' ';
+    var res = systemd_level(level)+E.prefix+ts+level_prefix[level]+msg;
+    console_error(res);
     log_tail_push(res);
 };
+
+// simplified nodejs console.error
+// https://github.com/nodejs/node/blob/5fad0b93667ffc6e4def52996b9529ac99b26319/lib/internal/console/constructor.js#L381
+var console_error = function(string){
+    // There may be an error occurring synchronously (e.g. for files or TTYs
+    // on POSIX systems) or asynchronously (e.g. pipes on POSIX systems), so
+    // handle both situations.
+    try {
+        // Add and later remove a noop error handler to catch synchronous
+        // errors.
+        if (process.stderr.listenerCount('error') === 0)
+            process.stderr.once('error', noop);
+        process.stderr.write(string+'\n', stderr_error_handler);
+    } catch(e){
+        // Console is a debugging utility, so it swallowing errors is not
+        // desirable even in edge cases such as low stack space.
+        if (is_stack_overflow_error(e))
+            throw e;
+        // Sorry, there's no proper way to pass along the error here.
+    } finally {
+        process.stderr.removeListener('error', noop);
+    }
+};
+// Make a function that can serve as the callback passed to `stream.write()`.
+var stderr_error_handler = function(err){
+    // This conditional evaluates to true if and only if there was an error
+    // that was not already emitted (which happens when the _write callback
+    // is invoked asynchronously).
+    if (err !== null && !process.stderr._writableState.errorEmitted)
+    {
+        // If there was an error, it will be emitted on `stream` as
+        // an `error` event. Adding a `once` listener will keep that error
+        // from becoming an uncaught exception, but since the handler is
+        // removed after the event, non-console.* writes won't be affected.
+        // we are only adding noop if there is no one else listening for
+        // 'error'
+        if (process.stderr.listenerCount('error') === 0)
+            process.stderr.once('error', noop);
+    }
+};
+var max_stack_error_name;
+var max_stack_error_message;
+try {
+    var overflow_stack = function(){ overflow_stack(); };
+    overflow_stack();
+} catch(e){
+    max_stack_error_name = e.name;
+    max_stack_error_message = e.message;
+}
+// Returns true if `err.name` and `err.message` are equal to engine-specific
+// values indicating max call stack size has been exceeded.
+// "Maximum call stack size exceeded" in V8.
+var is_stack_overflow_error = function(err){
+    return err && err.name === max_stack_error_name &&
+        err.message === max_stack_error_message;
+};
+var noop = function(){};
 
 E.set_logger = function(logger){
     __zerr = function(level, args){
@@ -375,8 +452,8 @@ E.zexit = function(args){
     }
     if (env.NODE_ENV=='production')
     {
-        var conf = require('./conf.js');
         var zcounter_file = require('./zcounter_file.js');
+        var conf = require('./conf.js');
         zcounter_file.inc('server_zexit');
         args = zerr_format(arguments);
         write_zexit_log({id: 'lerr_server_zexit', info: ''+args,

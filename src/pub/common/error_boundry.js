@@ -8,7 +8,7 @@ import {www_api} from '../common.js';
 export default class Error_boundry extends Pure_component {
     state = {error: false, msg: null};
     static getDerivedStateFromError(error){
-        const cp_href = www_api+'/cp/lpm';
+        const cp_href = www_api+'/cp/zones/lpm';
         let msg = null;
         switch (error)
         {

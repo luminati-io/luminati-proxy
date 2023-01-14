@@ -2,7 +2,6 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import semver from 'semver';
-import user_agent_gen from '/www/util/pub/user_agent_gen.js';
 import etask from '../../util/etask.js';
 
 export const bytes_format = (bytes, number)=>{
@@ -16,11 +15,6 @@ export const bytes_format = (bytes, number)=>{
         n = 0;
     return n+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
 };
-
-export const formatted_user_agents = user_agent_gen.map(u=>({
-    value: u.value,
-    label: u.name,
-}));
 
 const error_desc = [
     // proxy.js

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.351.969 Stable
+- :bug: Fix memory leak on long running proxy manager
+
 ## 1.337.781 Stable
 - :bug: Fix premise pmgr NodeJS 12.18.3 compatibility
 

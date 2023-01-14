@@ -18,11 +18,11 @@ const global_only_worlds = new Set();
 
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
-        if (process.env.IS_MOCHA)
+        if (env.IS_MOCHA)
             return;
         zerr.warn('zcounter.enable_submit() was already called: ignoring.');
     };
-    if (+process.env.ZCOUNTER_DROP)
+    if (+env.ZCOUNTER_DROP)
         when = false;
     switch (when)
     {
@@ -38,9 +38,13 @@ E.enable_submit = when=>{
     zerr.warn(`zcounter is disabled`);
 };
 
-let to_valid_ids = {};
-E.to_valid_id = id=>to_valid_ids[id]||
-    (to_valid_ids[id]=id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
+const to_valid_ids = new Map();
+E.to_valid_id = id=>{
+    let v = to_valid_ids.get(id);
+    if (!v)
+        to_valid_ids.set(id, v = id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
+    return v;
+};
 
 // XXX vladislavl: convert to Map all structure
 let type = {sum: new Map(), avg: {}, sum_mono: {}, avg_level: {},
@@ -641,7 +645,7 @@ E.flush = ()=>etask(function*zcounter_flush(){
     }
 });
 
-let agent_conf;
+let agent_conf, agent_num;
 E.is_debug = title=>{
     if (!agent_conf)
     {
@@ -651,7 +655,7 @@ E.is_debug = title=>{
     let debug = agent_conf.debug_zcounter;
     let v = debug && debug[title];
     if (typeof v=='object')
-        return v.includes(+env.AGENT_NUM);
+        return v.includes(agent_num || (agent_num = +env.AGENT_NUM));
     return !!v;
 };
 

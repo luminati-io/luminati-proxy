@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.337.781-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.351.969-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -78,7 +78,7 @@ Bright Data 代理服务器所含的”Dropin 模式” 和现有的超级代理
 pmgr --no-dropin
 ```
 
-为了完整的API解说文件 （为了'dropin'代理请求），请从你的Bright Data账户关注 <a href="https://lum-lpm.com/cp/api_example?manager=all&group=active">API例网页</a>.
+为了完整的API解说文件 （为了'dropin'代理请求），请从你的Bright Data账户关注 <a href="https://lum-lpm.com/cp/zones/proxy_examples?type=api&group=active">API例网页</a>.
 
 ### 完整的API命令名单:
 ```sh

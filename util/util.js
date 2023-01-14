@@ -32,6 +32,14 @@ E.is_mocha = function(){
 
 E.is_lxc = function(){ return is_node && +process.env.LXC; };
 
+// refresh() was added in node 10, we need to support node 8 for webOS TV 5.0
+// https://webostv.developer.lge.com/develop/guides/js-service-basics
+E.is_timer_refresh = (()=>{
+    let t = setTimeout(()=>{});
+    clearTimeout(t);
+    return !!t.refresh;
+})();
+
 E.f_mset = function(flags, mask, bits){ return flags&~mask | bits; };
 E.f_lset = function(flags, bits, logic){
     return E.f_mset(flags, bits, logic ? bits : 0); };
@@ -376,6 +384,7 @@ E.unset = function(o, path){
 };
 var has_unique = {};
 E.has = function(o, path){ return E.get(o, path, has_unique)!==has_unique; };
+
 E.own = function(o, prop){
     return o!=null && Object.prototype.hasOwnProperty.call(o, prop); };
 
@@ -465,11 +474,6 @@ E.omit = function(obj, omit){
             o[i] = obj[i];
     }
     return o;
-};
-
-E.if_set = function(val, o, name){
-    if (val!==undefined)
-        o[name] = val;
 };
 
 E.escape_dotted_keys = function(obj, repl){
