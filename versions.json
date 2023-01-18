@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.352.979",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix Ban IP per Domain rule not apply"
+            },
+            {
+                "type": "star",
+                "text": "Better CPU usage on high load"
+            }
+        ]
+    },
+    {
         "ver": "1.351.969",
         "type": "stable",
         "changes": [

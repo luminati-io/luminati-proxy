@@ -64,6 +64,7 @@ const default_user_agent = is_node ? (()=>{
     const conf = require('./conf.js');
     return `Hola ${conf.app}/${zconf.ZON_VERSION}`;
 })() : undefined;
+const internalize = string.internalize_pool();
 const DEBUG_STR_LEN = 4096, DEFAULT_WIN_SIZE = 1048576;
 const SEC = 1000, MIN = 60*SEC, VFD_SZ = 8, VFD_BIN_SZ = 12;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
@@ -75,16 +76,6 @@ const EventEmitter = is_node ? require('events').EventEmitter
     : events.EventEmitter;
 
 function noop(){}
-
-const duplicates = (()=>{
-    const cache = new Map();
-    return function duplicates_cache(str){
-        let v = cache.get(str);
-        if (v===undefined)
-            cache.set(str, v = str);
-        return v;
-    };
-})();
 
 const BUFFER_MESSAGES_CONTENT = 20;
 const BUFFER_MESSAGES_TYPE_BIN = 0;
@@ -180,7 +171,7 @@ class WS extends EventEmitter {
         this.msg_log = assign({}, {treshold_size: null, print_size: 100},
             opt.msg_log);
         this.zc = opt.zc_label || (opt.zcounter ?
-            opt.label ? duplicates(`${opt.label}_ws`) : 'ws' : undefined);
+            opt.label ? internalize(`${opt.label}_ws`) : 'ws' : undefined);
         this.zjson_opt = assign({}, zjson_opt, opt.zjson_opt);
         this.zjson_opt_send = assign({}, this.zjson_opt, opt.zjson_opt_send);
         this.zjson_opt_receive = assign({}, this.zjson_opt,
@@ -400,7 +391,7 @@ class WS extends EventEmitter {
         // XXX pavlo: uws lib doesn't have these properties in _socket:
         // https://github.com/hola/uWebSockets-bindings/blob/master/nodejs/src/uws.js#L276
         // get them from upgrade request
-        this.local_addr = duplicates(sock.localAddress);
+        this.local_addr = internalize(sock.localAddress);
         this.local_port = sock.localPort;
         if (this.remote_addr==sock.remoteAddress)
             this.remote_forwarded = false;

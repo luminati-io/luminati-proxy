@@ -504,19 +504,21 @@ E.qs_str = function(qs){
 
 E.qs_add = function(url, qs){
     var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {}, qs);
-    u.path = u.pathname+'?'+E.qs_str(q);
+    var query = E.qs_str(q);
+    u.path = u.pathname+(query ? '?'+query : '');
     return E.uri_obj_href(u);
 };
 
 E.qs_remove = function(url, qs){
     var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {});
     qs.forEach(function(query){ delete q[query]; });
-    u.path = u.pathname+'?'+E.qs_str(q);
+    var query = E.qs_str(q);
+    u.path = u.pathname+(query ? '?'+query : '');
     return E.uri_obj_href(u);
 };
 
 E.qs_parse_url = function(url){
-    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, ''));
+    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, '').replace(/#.*$/,''));
 };
 
 var INVALID_PATH_REGEX = /[^\u0021-\u00ff]/;

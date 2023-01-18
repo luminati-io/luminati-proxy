@@ -413,8 +413,7 @@ describe('manager', function(){
                 {port: 24001, multiply: 3}], cli);
             const res = yield api_json('api/bw_limit/24000', {
                 method: 'put', body: {days: 1e6, bytes: 1000}});
-            const get_res = yield api_json('api/bw_limit/24000',
-                {method: 'get'});
+            yield api_json('api/bw_limit/24000', {method: 'get'});
             assert.equal(res.statusCode, 400);
             assert.equal(res.body, 'Invalid BW limit params, days should be '
                 +'positive number no greater than 100000');
@@ -426,8 +425,7 @@ describe('manager', function(){
                 {port: 24001, multiply: 3}], cli);
             const res = yield api_json('api/bw_limit/24000', {
                 method: 'put', body: {days: 1e6, bytes: Infinity}});
-            const get_res = yield api_json('api/bw_limit/24000',
-                {method: 'get'});
+            yield api_json('api/bw_limit/24000', {method: 'get'});
             assert.equal(res.statusCode, 400);
             assert.equal(res.body, 'Invalid BW limit params, bytes should be '
                 +'positive number no greater than '+Number.MAX_SAFE_INTEGER);
@@ -837,29 +835,29 @@ describe('manager', function(){
                     response: {},
                 });
             }));
-            it('fetches all the logs', etask._fn(function*(_this){
+            it('fetches all the logs', etask._fn(function*(){
                 const res = yield api_json(`api/logs_har`);
                 assert_has(res.body.log.entries[0],
                     {request: {url: 'http://bbc.com'}});
                 assert.equal(res.body.log.entries.length, 1);
             }));
-            it('search by url', etask._fn(function*(_this){
+            it('search by url', etask._fn(function*(){
                 const res = yield api_json('api/logs_har?search=bbc');
                 assert_has(res.body.log.entries[0],
                     {request: {url: 'http://bbc.com'}});
                 assert.equal(res.body.log.entries.length, 1);
             }));
-            it('search by url, no results', etask._fn(function*(_this){
+            it('search by url, no results', etask._fn(function*(){
                 const res = yield api_json('api/logs_har?search=bbcc');
                 assert.equal(res.body.log.entries.length, 0);
             }));
-            it('search by session', etask._fn(function*(_this){
+            it('search by session', etask._fn(function*(){
                 const res = yield api_json('api/logs_har?search=qwe');
                 assert_has(res.body.log.entries[0],
                     {request: {url: 'http://bbc.com'}});
                 assert.equal(res.body.log.entries.length, 1);
             }));
-            it('search only by session', etask._fn(function*(_this){
+            it('search only by session', etask._fn(function*(){
                 const res = yield api_json('api/logs_har?search=test_user');
                 assert.equal(res.body.log.entries.length, 0);
             }));
@@ -1016,7 +1014,8 @@ describe('manager', function(){
         it('sends updated banlist instance to workers via ipc', ()=>{
             assert.equal(new_banlist.size, 2);
             assert.equal(new_banlist.get('1.1.1.1').to_date, to_date);
-            const stub_worker = {on: ()=>null, send: sinon.spy()};
+            const stub_worker = {on: ()=>null, send: sinon.spy(),
+                isConnected: ()=>true};
             port.setup_worker(stub_worker);
             const worker_send_spy = stub_worker.send;
             const serialized_banlist = Object.keys(

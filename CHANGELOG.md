@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.352.979 Stable
+- :bug: Fix Ban IP per Domain rule not apply
+- :star: Better CPU usage on high load
+
 ## 1.351.969 Stable
 - :bug: Fix memory leak on long running proxy manager
 
