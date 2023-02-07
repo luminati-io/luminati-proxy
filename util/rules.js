@@ -103,12 +103,7 @@ E.rule_value_match = (rule_v, v, opts)=>{
         return true;
     }
     if (rule_v.test)
-    {
-        // XXX vladislavp: move this logic (insensitive case for regex) in
-        // method for rules config update
-        return new RegExp(rule_v, rule_v.flags.replace('i', '')+'i')
-            .test(v||'');
-    }
+        return rule_v.test(v||'');
     return _.every(rule_v,
         (_rule_v, k)=>E.rule_value_match(_rule_v, v && v[k], opts));
 };

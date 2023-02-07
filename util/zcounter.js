@@ -62,12 +62,12 @@ function report_invalid_val(name, value){
 }
 
 // monotonic counters: http req/sec, bytes/sec
-E.inc = (name, inc=1, agg_srv='sum')=>{
+E.inc = (name, inc=1, agg_srv='sum', agg_tm='avg0')=>{
     if (!Number.isFinite(inc))
         return void report_invalid_val(name, inc);
     let _type = type.sum, entry = _type.get(name);
     if (!entry)
-        _type.set(name, entry = {v: 0, agg_srv, agg_tm: 'avg0'});
+        _type.set(name, entry = {v: 0, agg_srv, agg_tm});
     entry.v += inc;
 };
 

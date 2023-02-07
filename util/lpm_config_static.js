@@ -119,6 +119,7 @@ conf.manager_default = Object.assign({}, conf.server_default, {
 });
 delete conf.manager_default.port;
 conf.log_levels = {
+    system: -1,
     error: 0,
     warn: 1,
     notice: 2,

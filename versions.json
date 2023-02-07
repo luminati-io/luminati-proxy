@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.357.632",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix docker image build"
+            },
+            {
+                "type": "sparkles",
+                "text": "Better startup logging"
+            }
+        ]
+    },
+    {
         "ver": "1.352.979",
         "type": "stable",
         "changes": [

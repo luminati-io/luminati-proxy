@@ -56,7 +56,7 @@ define(['/util/conv.js', '/util/etask.js', '/util/events.js',
 
 const ef = etask.ef, assign = Object.assign;
 // for security reasons 'func' is disabled by default
-const zjson_opt = {func: false, date: true, re: true};
+const zjson_opt_default = {func: false, date: true, re: true};
 const is_win = /^win/.test((is_node||is_rn) && process.platform);
 const is_darwin = is_node && process.platform=='darwin';
 const default_user_agent = is_node ? (()=>{
@@ -69,11 +69,13 @@ const DEBUG_STR_LEN = 4096, DEFAULT_WIN_SIZE = 1048576;
 const SEC = 1000, MIN = 60*SEC, VFD_SZ = 8, VFD_BIN_SZ = 12;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
 const net = is_node ? require('net') : null;
+const SERVER_NO_MASK_SUPPORT = 'server_no_mask_support';
 const BUFFER_CONTENT = 10;
 const BUFFER_IPC_CALL = 11;
 let SnappyStream, UnsnappyStream;
 const EventEmitter = is_node ? require('events').EventEmitter
     : events.EventEmitter;
+const json_event = flag=>flag ? 'zjson' : 'json';
 
 function noop(){}
 
@@ -157,9 +159,20 @@ class Buffers_array {
     }
 }
 
+const make_ipc_server_class = ws_opt=>{
+    if (ws_opt.ipc_server && !ws_opt.ipc_server_class)
+        ws_opt.ipc_server_class = IPC_server_base.build(ws_opt);
+};
+const make_ipc_client_class = ws_opt=>{
+    if (ws_opt.ipc_client && !ws_opt.ipc_client_class)
+        ws_opt.ipc_client_class = IPC_client_base.build(ws_opt);
+};
+
 class WS extends EventEmitter {
     constructor(opt){
         super();
+        make_ipc_server_class(opt);
+        make_ipc_client_class(opt);
         this.ws = undefined;
         this.data = opt.data;
         this.connected = false;
@@ -172,10 +185,9 @@ class WS extends EventEmitter {
             opt.msg_log);
         this.zc = opt.zc_label || (opt.zcounter ?
             opt.label ? internalize(`${opt.label}_ws`) : 'ws' : undefined);
-        this.zjson_opt = assign({}, zjson_opt, opt.zjson_opt);
-        this.zjson_opt_send = assign({}, this.zjson_opt, opt.zjson_opt_send);
-        this.zjson_opt_receive = assign({}, this.zjson_opt,
-            opt.zjson_opt_receive);
+        const zjson_opt = assign({}, zjson_opt_default, opt.zjson_opt);
+        this.zjson_opt_send = assign({}, zjson_opt, opt.zjson_opt_send);
+        this.zjson_opt_receive = assign({}, zjson_opt, opt.zjson_opt_receive);
         this.label = opt.label;
         this.remote_label = undefined;
         this.local_addr = undefined;
@@ -192,43 +204,36 @@ class WS extends EventEmitter {
                 ? opt.ping_timeout() : opt.ping_timeout || 10000;
             this.ping_timer = undefined;
             this.ping_expire_timer = undefined;
-            this.ping_last = undefined;
-            this.pong_received = true;
+            this.ping_last = 0;
         }
+        this.pong_received = true;
         this.idle_timeout = opt.idle_timeout;
         this.idle_timer = undefined;
-        this.ipc = opt.ipc_client
-            ? new IPC_client(this, opt.ipc_client, {zjson: opt.ipc_zjson,
-                mux: opt.mux})
+        this.ipc = opt.ipc_client_class ? new opt.ipc_client_class(this)
             : undefined;
+        if (opt.ipc_server_class)
+            new opt.ipc_server_class(this);
         this.bin_methods = opt.bin_methods || this.ipc && this.ipc.bin_methods;
         this.time_parse = opt.time_parse;
-        if (opt.ipc_server)
-        {
-            new IPC_server(this, opt.ipc_server, {
-                zjson: opt.ipc_zjson,
-                sync: opt.ipc_sync,
-                call_zerr: opt.ipc_call_zerr,
-                mux: opt.mux
-            });
-        }
         this.mux = opt.mux ? new Mux(this) : undefined;
         if ((this.zc || this.zc_mux) && !zcounter)
             zcounter = require('./zcounter.js');
+        this._send_throttle_t = undefined;
+        this._buffers = undefined;
     }
     _clean_throttle(){
         if (this._send_throttle_t)
         {
             clearTimeout(this._send_throttle_t);
-            this._send_throttle_t = null;
+            this._send_throttle_t = undefined;
         }
-        this._buffers = null;
+        this._buffers = undefined;
     }
     _send_throttle(msg, throttle_ts){
         this._buffers = this._buffers || new Buffers_array();
         this._buffers.push(msg);
         this._send_throttle_t = this._send_throttle_t || setTimeout(()=>{
-            this._send_throttle_t = null;
+            this._send_throttle_t = undefined;
             this.ws.send(this._buffers.get_buffer());
             this._buffers.clean();
         }, throttle_ts);
@@ -335,7 +340,7 @@ class WS extends EventEmitter {
             clearTimeout(this.ping_expire_timer);
             this.ping_timer = undefined;
             this.ping_expire_timer = undefined;
-            this.ping_last = undefined;
+            this.ping_last = 0;
             this.pong_received = true;
             this.ws.removeAllListeners('pong');
         }
@@ -428,7 +433,7 @@ class WS extends EventEmitter {
         this._on_error({message: 'unexpected response'});
         this.emit('unexpected-response');
     }
-    _on_upgrade(resp){ zerr.notice(`${this}: upgrade conn`); }
+    _on_upgrade(resp){ zerr.debug(`${this}: upgrade conn`); }
     _on_message(event){
         let msg = event.data;
         if (msg instanceof ArrayBuffer)
@@ -648,30 +653,29 @@ class Client extends WS {
         this.lookup_ip = opt.lookup_ip;
         this.fallback = opt.fallback &&
             assign({retry_threshold: 1, retry_mod: 5}, opt.fallback);
-        if (is_node)
-        {
-            this.headers = assign(
-                {'User-Agent': opt.user_agent||default_user_agent},
-                opt.headers);
-            // XXX vladislavl: for graceful release only: must be always true
-            // once test period is over
-            if (this.client_no_mask_support = opt.client_no_mask_support)
-                this.headers['client-no-mask-support'] = 1;
-        }
+        this.headers = undefined;
         this.deflate = !!opt.deflate;
-        if (opt.proxy)
-        {
-            let _lib = require('https-proxy-agent');
-            this.agent = new _lib(opt.proxy);
-        }
-        else
-            this.agent = opt.agent;
+        this.agent = opt.agent;
+        this.reason = undefined;
         this.reconnect_timer = undefined;
+        this.server_no_mask_support = false;
         this.handshake_timeout = opt.handshake_timeout===undefined
             ? 50000 : opt.handshake_timeout;
         this.handshake_timer = undefined;
         if (this.zc)
             zcounter.inc_level(`level_${this.zc}_online`, 0, 'sum');
+        if (opt.proxy)
+        {
+            let _lib = require('https-proxy-agent');
+            this.agent = new _lib(opt.proxy);
+        }
+        if (is_node)
+        {
+            this.headers = assign(
+                {'User-Agent': opt.user_agent||default_user_agent},
+                opt.headers,
+                {'client-no-mask-support': 1});
+        }
         this._connect();
     }
     // we don't want WS to emit 'destroyed', Client controls it by itself,
@@ -679,18 +683,15 @@ class Client extends WS {
     _on_disconnected(){}
     send(msg){
         return super.send(msg,
-            this.client_no_mask_support && this.server_no_mask_support
-            ? {mask: false} : undefined);
+            this.server_no_mask_support ? {mask: false} : undefined);
     }
-    _on_message(event){
-        if (this.client_no_mask_support && !this.server_no_mask_support
-            && event.data==='server_no_mask_support')
+    _on_message(ev){
+        if (!this.server_no_mask_support && ev.data==SERVER_NO_MASK_SUPPORT)
         {
             this.server_no_mask_support = true;
-            this.emit('server_no_mask_support');
-            return;
+            return void this.emit(SERVER_NO_MASK_SUPPORT);
         }
-        return super._on_message(event);
+        return super._on_message(ev);
     }
     _assign(ws){
         super._assign(ws);
@@ -707,7 +708,7 @@ class Client extends WS {
     _connect(){
         this.reason = undefined;
         this.reconnect_timer = undefined;
-        this.server_no_mask_support = undefined;
+        this.server_no_mask_support = false;
         let opt = {headers: this.headers};
         let url = this.url, lookup_ip = this.lookup_ip, fb = this.fallback, v;
         if (fb && fb.url && this._retry_count%fb.retry_mod>fb.retry_threshold)
@@ -816,6 +817,8 @@ class Server {
     constructor(opt={}, handler=undefined){
         if (opt.mux)
             opt.mux = assign({}, {dec_vfd: true}, opt.mux);
+        make_ipc_server_class(opt);
+        make_ipc_client_class(opt);
         this.handler = handler;
         let ws_opt = {
             server: opt.http_server,
@@ -836,8 +839,8 @@ class Server {
         this.opt = opt;
         this.label = opt.label;
         this.connections = new Set();
-        if (opt.zcounter!=false)
-            this.zc = opt.label ? `${opt.label}_ws` : 'ws';
+        this.zc = opt.zcounter!=false ? opt.label ? `${opt.label}_ws` : 'ws'
+            : undefined;
         this.ws_server.addListener('connection', this.accept.bind(this));
         if (opt.port)
             zerr.notice(`${this}: listening on port ${opt.port}`);
@@ -899,7 +902,7 @@ class Server {
         zws._assign(ws);
         zws._on_open();
         if (this.server_no_mask_support && headers['client-no-mask-support'])
-            zws.send('server_no_mask_support');
+            zws.send(SERVER_NO_MASK_SUPPORT);
         this.connections.add(zws);
         if (this.zc)
         {
@@ -959,71 +962,90 @@ class Server {
     }
 }
 
+let ipc_clients_cookie = 0;
 const ERROR_CODES = {bad_ipc_call_attempt: 'bad_ipc_call_attempt'};
-class IPC_client {
-    constructor(zws, names, opt={}){
-        if (opt.mux)
-        {
-            this._vfd = opt.mux.start_vfd==undefined && 2147483647 ||
-                opt.mux.start_vfd;
-            this.mux = opt.mux;
+class IPC_client_base {
+    static build(ws_opt){
+        const ipc_opt = {
+            zjson: ws_opt.ipc_zjson,
+            mux: ws_opt.mux,
+        };
+        class IPC_client extends IPC_client_base {
+            constructor(zws){
+                super(zws, ipc_opt);
+            }
         }
+        if (Array.isArray(ws_opt.ipc_client))
+        {
+            for (const name of ws_opt.ipc_client)
+            {
+                Object.defineProperty(IPC_client.prototype, name, {value:
+                    function(...arg){ return this._call(ipc_opt, name, arg); },
+                    writable: true});
+            }
+            return IPC_client;
+        }
+        for (const [name, spec] of Object.entries(ws_opt.ipc_client))
+        {
+            const opt = assign({}, ipc_opt,
+                typeof spec=='string' ? {type: spec} : spec);
+            // ability to transfer Buffer as is, without JSON conversion
+            if ((opt.bin||opt.send_bin) && !IPC_client.prototype.bin_methods)
+            {
+                Object.defineProperty(IPC_client.prototype, 'bin_methods',
+                    {value: true});
+            }
+            let fn;
+            switch (opt.type||'call')
+            {
+            case 'call':
+                fn = function(...arg){ return this._call(opt, name, arg); };
+                break;
+            case 'post':
+                fn = function(...arg){ return this._post(opt, name, arg); };
+                break;
+            case 'mux':
+                fn = function(...arg){ return this._mux(opt, name, arg); };
+                break;
+            default:
+                zerr.zexit(`${ws_opt.label} ${name}: Invalid IPC client spec`);
+            }
+            Object.defineProperty(IPC_client.prototype, name,
+                {value: fn, writable: true});
+        }
+        return IPC_client;
+    }
+    constructor(zws, opt){
+        this.mux = opt.mux;
+        this._vfd = opt.mux ? opt.mux.start_vfd==undefined ? 2147483647
+            : opt.mux.start_vfd : 0;
         this._ws = zws;
         this._pending = new Map();
-        this._ws.addListener(opt.zjson ? 'zjson' : 'json',
-            this._on_resp.bind(this));
+        this._ws.addListener(json_event(opt.zjson), this._on_resp.bind(this));
         this._ws.addListener('status', this._on_status.bind(this));
         this._ws.addListener('destroyed',
             this._on_status.bind(this, 'destroyed'));
-        if (Array.isArray(names))
-        {
-            for (let name of names)
-                this[name] = this._call.bind(this, opt, name);
-        }
-        else
-        {
-            for (let name in names)
-            {
-                let spec = names[name];
-                if (typeof spec=='string')
-                    spec = {type: spec};
-                let _opt = assign({}, opt, spec);
-                // ability to transfer Buffer as is, without JSON conversion
-                if (_opt.bin||_opt.send_bin)
-                    this.bin_methods = 1;
-                switch (_opt.type||'call')
-                {
-                case 'call':
-                    this[name] = this._call.bind(this, _opt, name);
-                    break;
-                case 'post':
-                    this[name] = this._post.bind(this, _opt, name);
-                    break;
-                case 'mux':
-                    this[name] = this._mux.bind(this, _opt, name);
-                    break;
-                default:
-                    zerr.zexit(
-                        `${this._ws}: ${name}: Invalid IPC client spec`);
-                }
-            }
-        }
     }
-    _call(opt, cmd, ...arg){
-        let _this = this, timeout;
+    pending_count(){
+        return this._pending.size;
+    }
+    _call(opt, cmd, arg){
+        const _this = this;
+        const send_retry_timeout = 3*SEC;
+        let timeout;
         if (opt.timeout!==null)
         {
             timeout = typeof opt.timeout=='function' ? opt.timeout()
                 : opt.timeout||5*MIN;
         }
-        let send_retry_timeout = 3*SEC;
         return etask(function*IPC_client_call(){
-            let req = {type: opt.type=='mux' && 'ipc_mux' || 'ipc_call', cmd,
-                cookie: ++IPC_client._cookie, bin: opt.bin ? 1 : undefined};
-            if (arg.length==1)
-                req.msg = arg[0];
-            else if (arg)
-                req.arg = arg;
+            let req = {
+                type: opt.type=='mux' ? 'ipc_mux' : 'ipc_call',
+                cmd,
+                cookie: ++ipc_clients_cookie,
+                bin: opt.bin ? 1 : undefined
+            };
+            _this._req_set_arg(req, arg);
             this.info.label = ()=>_this._ws.toString();
             this.info.cmd = cmd;
             this.info.cookie = req.cookie;
@@ -1038,36 +1060,25 @@ class IPC_client {
                 });
             }
             let res = {status: _this._ws.status}, prev;
-            let send = (...args)=>{
-                if (opt.send_bin)
-                    return _this._ws.bin(...args);
-                return _this._ws[opt.zjson ? 'zjson' : 'json'](...args);
-            };
-            let mk_bad_ipc_call_error = msg=>{
-                let e = new Error(msg);
-                e.code = ERROR_CODES.bad_ipc_call_attempt;
-                return e;
-            };
             while (res.status)
             {
-                let conn_closed_error = _this._ws.reason||'Connection closed';
                 switch (res.status)
                 {
                 case 'disconnected':
                     if (opt.retry==false || !_this._ws.reconnect_timer)
-                        throw mk_bad_ipc_call_error(conn_closed_error);
+                        throw _this._err_ipc_call();
                     break;
                 case 'connecting':
                     if (opt.retry==false)
-                        throw mk_bad_ipc_call_error('Connection not ready');
+                        throw _this._err_ipc_call('Connection not ready');
                     break;
                 case 'destroyed':
-                    throw mk_bad_ipc_call_error(conn_closed_error);
+                    throw _this._err_ipc_call();
                 case 'connected':
-                    while (!send(req))
+                    while (!_this._send(opt, req))
                     {
                         if (opt.retry==false)
-                            throw mk_bad_ipc_call_error(conn_closed_error);
+                            throw _this._err_ipc_call();
                         yield etask.sleep(send_retry_timeout);
                     }
                     break;
@@ -1080,31 +1091,43 @@ class IPC_client {
             return res.value;
         });
     }
-    _post(opt, cmd, ...arg){
+    _post(opt, cmd, arg){
         let req = {type: 'ipc_post', cmd};
-        if (arg.length==1)
-            req.msg = arg[0];
-        else if (arg)
-            req.arg = arg;
-        if (opt.zjson)
-            this._ws.zjson(req);
-        else
-            this._ws.json(req);
+        this._req_set_arg(req, arg);
+        this._send(opt, req);
     }
-    _mux(opt, cmd, ...args)
+    _mux(opt, cmd, arg)
     {
         if (!this._ws.mux)
             throw new Error('Mux is not defined');
-        let _this = this;
-        let vfd = this.mux.dec_vfd ? --this._vfd : ++this._vfd;
+        const _this = this;
+        const vfd = this.mux.dec_vfd ? --this._vfd : ++this._vfd;
         return etask(function*IPC_client__mux(){
             let stream = _this._ws.mux.open(vfd, _this.mux.bytes_allowed,
                 _this.mux);
             stream.close = ()=>_this._ws.mux.close(vfd);
-            args.unshift(vfd);
-            yield _this._call(opt, cmd, ...args);
+            arg.unshift(vfd);
+            yield _this._call(opt, cmd, arg);
             return stream;
         });
+    }
+    _req_set_arg(req, arg){
+        if (arg.length==1)
+            req.msg = arg[0];
+        else if (arg)
+            req.arg = arg;
+    }
+    _send(opt, req){
+        if (opt.send_bin)
+            return this._ws.bin(req);
+        if (opt.zjson)
+            return this._ws.zjson(req);
+        return this._ws.json(req);
+    }
+    _err_ipc_call(msg = this._ws.reason||'Connection closed'){
+        let e = new Error(msg);
+        e.code = ERROR_CODES.bad_ipc_call_attempt;
+        return e;
     }
     _on_resp(msg){
         if (!msg || msg.type!='ipc_result' && msg.type!='ipc_error')
@@ -1128,151 +1151,218 @@ class IPC_client {
         for (let task of this._pending.values())
             task.continue({status});
     }
-    pending_count(){
-        return this._pending.size;
-    }
 }
-IPC_client._cookie = 0;
 
-class IPC_server {
-    constructor(zws, methods, opt={}){
-        this.ws = zws;
-        if (Array.isArray(methods))
-        {
-            this.methods = {};
-            for (let m of methods)
-                this.methods[m] = true;
+class IPC_server_base {
+    static build(ws_opt){
+        const ipc_opt = {
+            zjson: ws_opt.ipc_zjson,
+            sync: ws_opt.ipc_sync,
+            call_zerr: ws_opt.ipc_call_zerr,
+            mux: ws_opt.mux,
+        };
+        const specs = Array.isArray(ws_opt.ipc_server)
+            ? ws_opt.ipc_server.reduce((o, name)=>(o[name] = true, o), {})
+            : ws_opt.ipc_server;
+        class IPC_server_methods {
+            constructor(zws){
+                this._zws = zws;
+            }
         }
-        else
-            this.methods = methods;
-        Object.setPrototypeOf(this.methods, null);
+        Object.setPrototypeOf(IPC_server_methods.prototype, null);
+        for (const name in specs)
+        {
+            const value = specs[name]===true
+                ? function(arg){ return this._zws.data[name]
+                    .apply(this._zws.data||this._zws, arg); }
+                : function(arg){ return specs[name]
+                    .apply(this._zws.data||this._zws, arg); };
+            Object.defineProperty(IPC_server_methods.prototype, name,
+                {value, writable: true});
+        }
+        return class IPC_server extends IPC_server_base {
+            constructor(zws){
+                super(zws, ipc_opt);
+                this.methods = new IPC_server_methods(zws);
+            }
+        };
+    }
+    constructor(zws, opt){
+        this.ws = zws;
         this.mux = opt.mux;
         this.zjson = !!opt.zjson;
         this.sync = !!opt.sync;
         this.call_zerr = !!opt.call_zerr;
         this.pending = this.sync ? undefined : new Set();
-        this.ws.addListener(this.zjson ? 'zjson' : 'json',
-            this._on_call.bind(this));
-        if (!this.sync)
+        if (this.sync)
+            zws.addListener(json_event(this.zjson), v=>this._on_call_sync(v));
+        else
         {
-            this.ws.addListener('disconnected',
-                this._on_disconnected.bind(this));
+            zws.addListener(json_event(this.zjson), v=>this._on_call_async(v));
+            zws.addListener('disconnected', this._on_disconnected.bind(this));
         }
     }
-    _on_call(msg){
+    _on_call_sync(msg){
         if (!msg || !msg.cmd)
             return;
-        let type = msg.type||'ipc_call', cmd = msg.cmd;
-        if (!['ipc_call', 'ipc_post', 'ipc_mux'].includes(type))
+        if (!msg.type || msg.type=='ipc_call')
+            return void new IPC_server_resp_call_sync(this, msg);
+        if (msg.type=='ipc_post')
+            return void new IPC_server_resp_post_sync(this, msg);
+        if (msg.type=='ipc_mux')
+            return void new IPC_server_resp_mux_sync(this, msg);
+    }
+    _on_call_async(msg){
+        if (!msg || !msg.cmd)
             return;
-        let method = this.methods[cmd];
-        if (method===true) // avoid useless type conversion
-            method = this.ws.data[cmd];
-        if (!method)
-        {
-            let err = `Method ${cmd} not defined`;
-            if (type=='ipc_post')
-                return zerr(`${this.ws}: ${err}`);
-            return this.ws.json({
-                type: 'ipc_error',
-                cmd: cmd,
-                cookie: msg.cookie,
-                msg: err,
-            });
-        }
-        const res_process = rv=>{
-            if (type=='ipc_post' || type=='ipc_mux')
-                return;
-            const res = {
-                type: 'ipc_result',
-                cmd: cmd,
-                cookie: msg.cookie,
-                msg: rv,
-            };
-            if (msg.bin && rv instanceof Buffer)
-            {
-                res.msg = undefined;
-                let res_buf = Buffer.from(JSON.stringify(res));
-                // [0|BUFFER_CONTENT|cmd length|...cmd bin|...cmd result bin]
-                let buf = Buffer.allocUnsafe(rv.length+VFD_BIN_SZ+res_buf
-                    .length);
-                buf.writeUInt32BE(0, 0);
-                buf.writeUInt32BE(BUFFER_CONTENT, 4);
-                buf.writeUInt32BE(res_buf.length, VFD_SZ);
-                res_buf.copy(buf, VFD_BIN_SZ);
-                rv.copy(buf, VFD_BIN_SZ+res_buf.length);
-                return this.ws.send(buf);
-            }
-            if (this.zjson)
-                this.ws.zjson(res);
-            else
-                this.ws.json(res);
-        };
-        const err_process = e=>{
-            if (this.call_zerr && (type=='ipc_call'||type=='ipc_mux'))
-                zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
-            if (type=='ipc_post')
-                return zerr(`${this.ws}: ${cmd}: ${zerr.e2s(e)}`);
-            this.ws.json({
-                type: 'ipc_error',
-                cmd: cmd,
-                cookie: msg.cookie,
-                msg: e.message || String(e),
-                err_code: e.code,
-            });
-        };
-        const arg = msg.arg || [msg.msg], ctx = this.ws.data||this.ws;
-        if (type=='ipc_mux')
-        {
-            if (!this.ws.mux)
-            {
-                return this.ws.json({
-                    type: 'ipc_error',
-                    cmd: cmd,
-                    cookie: msg.cookie,
-                    msg: `Mux is not defined`,
-                });
-            }
-            let vfd = arg.shift();
-            let stream = this.ws.mux.open(vfd, this.mux.bytes_allowed,
-                this.mux);
-            stream.close = ()=>this.ws.mux.close(vfd);
-            arg.unshift(stream);
-            const res = {
-                type: 'ipc_result',
-                cmd: cmd,
-                cookie: msg.cookie,
-            };
-            if (this.zjson)
-                this.ws.zjson(res);
-            else
-                this.ws.json(res);
-        }
-        if (this.sync)
-        {
-            try { res_process(method.apply(ctx, arg)); }
-            catch(e){ err_process(e); }
-            return;
-        }
-        const _this = this;
-        etask(function*IPC_server_on_call(){
-            if (type=='ipc_post' || type=='ipc_mux')
-            {
-                _this.pending.add(this);
-                this.finally(()=>_this.pending.delete(this));
-            }
-            this.info.label = ()=>_this.ws.toString();
-            this.info.cmd = cmd;
-            this.info.cookie = msg.cookie;
-            try { res_process(yield method.apply(ctx, arg)); }
-            catch(e){ err_process(e); }
-        });
+        if (!msg.type || msg.type=='ipc_call')
+            return void new IPC_server_resp_call_async(this, msg);
+        if (msg.type=='ipc_post')
+            return void new IPC_server_resp_post_async(this, msg);
+        if (msg.type=='ipc_mux')
+            return void new IPC_server_resp_mux_async(this, msg);
     }
     _on_disconnected(){
         for (let task of this.pending)
             task.return();
     }
 }
+class IPC_server_resp {
+    constructor(ipc, msg){
+        this.ipc = ipc;
+        this.msg = msg;
+        if (typeof ipc.methods[msg.cmd] != 'function')
+            return void this.no_method(`Method ${msg.cmd} not defined`);
+        this.arg = msg.arg||[msg.msg];
+        this.pre_handle();
+        this.handle();
+    }
+    pre_handle(){}
+    handle(){}
+    add_pending(et){}
+    response(rv){}
+    fail(e){
+        if (this.ipc.call_zerr)
+            zerr(`${this.ipc.ws}: ${this.msg.cmd}: ${zerr.e2s(e)}`);
+        this.ipc.ws.json({
+            type: 'ipc_error',
+            cmd: this.msg.cmd,
+            cookie: this.msg.cookie,
+            msg: e.message || String(e),
+            err_code: e.code,
+        });
+    }
+    json(res){
+        if (this.ipc.zjson)
+            return void this.ipc.ws.zjson(res);
+        this.ipc.ws.json(res);
+    }
+}
+class IPC_server_resp_sync extends IPC_server_resp {
+    handle(){
+        try { this.response(this.ipc.methods[this.msg.cmd](this.arg)); }
+        catch(e){ this.fail(e); }
+    }
+}
+class IPC_server_resp_async extends IPC_server_resp {
+    handle(){ const _this = this; etask(function*IPC_server_handle(){
+        _this.add_pending(this);
+        this.info.label = ()=>_this.ipc.ws.toString();
+        this.info.cmd = _this.msg.cmd;
+        this.info.cookie = _this.msg.cookie;
+        try { _this.response(
+            yield _this.ipc.methods[_this.msg.cmd](_this.arg)); }
+        catch(e){ _this.fail(e); }
+    }); }
+}
+const ipcsr_call_make = parent=>class IPC_server_call extends parent {
+    no_method(err){
+        this.ipc.ws.json({
+            type: 'ipc_error',
+            cmd: this.msg.cmd,
+            cookie: this.msg.cookie,
+            msg: err,
+        });
+    }
+    response(rv){
+        if (this.msg.bin && rv instanceof Buffer)
+            return void this.response_buf(rv);
+        this.json({
+            type: 'ipc_result',
+            cmd: this.msg.cmd,
+            cookie: this.msg.cookie,
+            msg: rv,
+        });
+    }
+    response_buf(rv){
+        const res_buf = Buffer.from(JSON.stringify({
+            type: 'ipc_result',
+            cmd: this.msg.cmd,
+            cookie: this.msg.cookie,
+        }));
+        // [0|BUFFER_CONTENT|cmd length|...cmd bin|...cmd result bin]
+        const buf = Buffer.allocUnsafe(rv.length+VFD_BIN_SZ+res_buf.length);
+        buf.writeUInt32BE(0, 0);
+        buf.writeUInt32BE(BUFFER_CONTENT, 4);
+        buf.writeUInt32BE(res_buf.length, VFD_SZ);
+        res_buf.copy(buf, VFD_BIN_SZ);
+        rv.copy(buf, VFD_BIN_SZ+res_buf.length);
+        this.ipc.ws.send(buf);
+    }
+};
+const IPC_server_resp_call_sync = ipcsr_call_make(IPC_server_resp_sync);
+const IPC_server_resp_call_async = ipcsr_call_make(IPC_server_resp_async);
+const ipcsr_post_make = parent=>class IPC_server_post extends parent {
+    no_method(err){
+        zerr(`${this.ipc.ws}: ${err}`);
+    }
+    add_pending(et){
+        this.ipc.pending.add(et);
+        et.finally(()=>this.ipc.pending.delete(et));
+    }
+    fail(e){
+        zerr(`${this.ipc.ws}: ${this.msg.cmd}: ${zerr.e2s(e)}`);
+    }
+};
+const IPC_server_resp_post_sync = ipcsr_post_make(IPC_server_resp_sync);
+const IPC_server_resp_post_async = ipcsr_post_make(IPC_server_resp_async);
+const ipcsr_mux_make = parent=>class IPC_server_mux extends parent {
+    no_method(err){
+        this.ipc.ws.json({
+            type: 'ipc_error',
+            cmd: this.msg.cmd,
+            cookie: this.msg.cookie,
+            msg: err,
+        });
+    }
+    pre_handle(){
+        if (!this.ipc.ws.mux)
+        {
+            return this.ipc.ws.json({
+                type: 'ipc_error',
+                cmd: this.msg.cmd,
+                cookie: this.msg.cookie,
+                msg: 'Mux is not defined',
+            });
+        }
+        const vfd = this.arg.shift();
+        const stream = this.ipc.ws.mux.open(vfd, this.ipc.mux.bytes_allowed,
+            this.ipc.mux);
+        stream.close = ()=>this.ipc.ws.mux.close(vfd);
+        this.arg.unshift(stream);
+        this.json({
+            type: 'ipc_result',
+            cmd: this.msg.cmd,
+            cookie: this.msg.cookie,
+        });
+    }
+    add_pending(et){
+        this.ipc.pending.add(et);
+        et.finally(()=>this.ipc.pending.delete(et));
+    }
+};
+const IPC_server_resp_mux_sync = ipcsr_mux_make(IPC_server_resp_sync);
+const IPC_server_resp_mux_async = ipcsr_mux_make(IPC_server_resp_async);
 
 // XXX vladislavl: remove _bp methods once ack version tested and ready
 class Mux {
@@ -1760,6 +1850,6 @@ function server_impl(opt){
     return l;
 }
 
-return {Client, Server, IPC_client, IPC_server, Mux, t: {WS}, ERROR_CODES};
+return {Client, Server, Mux, t: {WS, IPC_server_base}, ERROR_CODES};
 
 }); }());

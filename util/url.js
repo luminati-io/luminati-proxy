@@ -77,6 +77,24 @@ E.get_root_domain = function(domain){
     return root.join('.');
 };
 
+E.get_nth_level_domain = function(domain, level, strip_www){
+    if (E.is_ip(domain))
+        return domain;
+    var root = E.get_root_domain(domain);
+    var sub = domain.replace(root, '').split('.')
+        .filter(function(s){ return s; });
+    var www = '';
+    if (sub[0]=='www')
+        www = sub.shift()+'.';
+    sub = sub.length-level+1>0 ? sub.slice(sub.length-level+1) : sub;
+    sub = sub.join('.');
+    if (sub)
+        sub += '.';
+    if (!strip_www)
+        sub = www+sub;
+    return sub+root;
+};
+
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
     // XXX viktor: /^[\p{L}0-9_.\-+*%!]+@(.*)$/u works only in ES9

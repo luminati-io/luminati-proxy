@@ -932,4 +932,8 @@ E.metronome = function(delay, cb){
     metronomes[delay].push(cb);
 };
 
+E.to_unix_secs = function(v){
+    return Math.floor(+date_get(v)/E.ms.SEC);
+};
+
 return E; }); }());
