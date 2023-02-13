@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.358.906 Stable
+- :bug: Apply log level for daily rotate file
+
 ## 1.357.632 Stable
 - :bug: Fix docker image build
 - :sparkles: Better startup logging

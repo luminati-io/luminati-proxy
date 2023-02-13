@@ -1555,29 +1555,6 @@ var extend_regions = function(regions, country_code){
 for (var region_country in E.regions)
     extend_regions(E.regions[region_country], region_country);
 
-E.hidden_list = {
-    AQ: 1,
-    CU: 1,
-    EU: 1,
-    IQ: 1,
-    IR: 1,
-    KP: 1,
-    LB: 1,
-    PS: 1,
-    SD: 1,
-    SY: 1,
-};
-
-E.resi_hidden = {BD: 1};
-
-E.is_hidden = function(c){
-    return !!E.hidden_list[c];
-};
-
-E.is_resi_hidden = function(c){
-    return !!E.resi_hidden[c] || E.is_hidden(c);
-};
-
 E.is_country_code = function(c){
     return typeof c=='string'&&c.length==2
         &&this.country_codes_lowered.includes(c.toLowerCase());

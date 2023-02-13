@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.357.632/luminati-proxy-manager-v1.357.632-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.358.906/luminati-proxy-manager-v1.358.906-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -135,158 +135,166 @@ Usage:
   proxy-manager [options] config1 config2 ...
 
 Options:
-  --help, -h, -?                Show help                              [boolean]
-  --version, -v                 Show version number                    [boolean]
-  --port, -p                    Port for the HTTP proxy                 [number]
-  --proxy_type                  Set to "persist" to save proxy into the
-                                configuration file.                     [string]
-  --multiply                    Multiply the port definition given number of
-                                times                      [number] [default: 0]
-  --multiply_users                                    [boolean] [default: false]
-  --users                       List of users. This option has to be used along
-                                with "multiply_users"                    [array]
-  --ssl                         Enable SSL analyzing  [boolean] [default: false]
-  --tls_lib                     SSL library       [string] [default: "open_ssl"]
-  --iface                       Interface or IP to listen on            [string]
-  --customer                    Customer name                           [string]
-  --zone                        Zone name           [string] [default: "static"]
-  --password                    Zone password                           [string]
-  --proxy                       Hostname or IP of super proxy
+  -h, -?, --help                   Show help                           [boolean]
+  -v, --version                    Show version number                 [boolean]
+  -p, --port                       Port for the HTTP proxy              [number]
+      --proxy_type                 Set to "persist" to save proxy into the
+                                   configuration file.                  [string]
+      --multiply                   Multiply the port definition given number of
+                                   times                   [number] [default: 0]
+      --multiply_users                                [boolean] [default: false]
+      --users                      List of users. This option has to be used
+                                   along with "multiply_users"           [array]
+      --ssl                        Enable SSL analyzing
+                                                      [boolean] [default: false]
+      --tls_lib                    SSL library    [string] [default: "open_ssl"]
+      --iface                      Interface or IP to listen on         [string]
+      --customer                   Customer name                        [string]
+      --zone                       Zone name        [string] [default: "static"]
+      --password                   Zone password                        [string]
+      --proxy                      Hostname or IP of super proxy
                                   [string] [default: "zproxy.lum-superproxy.io"]
-  --proxy_port                  Super proxy port       [number] [default: 22225]
-  --proxy_connection_type       Determines what kind of connection will be used
-                                between Proxy Manager and Super Proxy
+      --proxy_port                 Super proxy port    [number] [default: 22225]
+      --proxy_connection_type      Determines what kind of connection will be
+                                   used between Proxy Manager and Super Proxy
                                                       [string] [default: "http"]
-  --proxy_retry                 Automatically retry on super proxy failure
+      --proxy_retry                Automatically retry on super proxy failure
                                                            [number] [default: 2]
-  --insecure                    Enable SSL connection/analyzing to insecure
-                                hosts                                  [boolean]
-  --country                     Country                                 [string]
-  --state                       State                                   [string]
-  --city                        City                                    [string]
-  --asn                         ASN                                     [string]
-  --ip                          Data Center IP                          [string]
-  --vip                         gIP                                     [number]
-  --ext_proxies                 A list of proxies from external vendors. Format:
-                                [username:password@]ip[:port]            [array]
-  --ext_proxy_username          Default username for external vendor ips[string]
-  --ext_proxy_password          Default password for external vendor ips[string]
-  --ext_proxy_port              Default port for external vendor ips    [number]
-  --dns                         DNS resolving        [string] [default: "local"]
-  --reverse_lookup_dns          Process reverse lookup via DNS
+      --insecure                   Enable SSL connection/analyzing to insecure
+                                   hosts                               [boolean]
+      --country                    Country                              [string]
+      --state                      State                                [string]
+      --city                       City                                 [string]
+      --asn                        ASN                                  [string]
+      --ip                         Data Center IP                       [string]
+      --vip                        gIP                                  [number]
+      --ext_proxies                A list of proxies from external vendors.
+                                   Format: [username:password@]ip[:port] [array]
+      --ext_proxy_username         Default username for external vendor ips
+                                                                        [string]
+      --ext_proxy_password         Default password for external vendor ips
+                                                                        [string]
+      --ext_proxy_port             Default port for external vendor ips [number]
+      --dns                        DNS resolving     [string] [default: "local"]
+      --reverse_lookup_dns         Process reverse lookup via DNS
                                                       [boolean] [default: false]
-  --reverse_lookup_file         Process reverse lookup via file         [string]
-  --reverse_lookup_values       Process reverse lookup via value         [array]
-  --session                     Session for all proxy requests
+      --reverse_lookup_file        Process reverse lookup via file      [string]
+      --reverse_lookup_values      Process reverse lookup via value      [array]
+      --session                    Session for all proxy requests
                                                         [string] [default: true]
-  --sticky_ip                   Use session per requesting host to maintain IP
-                                per host              [boolean] [default: false]
-  --pool_size                                                           [number]
-  --rotate_session              Session pool size     [boolean] [default: false]
-  --throttle                    Throttle requests above given number
+      --sticky_ip                  Use session per requesting host to maintain
+                                   IP per host        [boolean] [default: false]
+      --pool_size                                                       [number]
+      --rotate_session             Session pool size  [boolean] [default: false]
+      --throttle                   Throttle requests above given number
                                                           [number] [default: ""]
-  --rules                       Proxy request rules                      [array]
-  --route_err                   Block or allow requests to be automatically sent
-                                through super proxy on error
+      --rules                      Proxy request rules                   [array]
+      --route_err                  Block or allow requests to be automatically
+                                   sent through super proxy on error
                                                   [string] [default: "pass_dyn"]
-  --smtp                                                                 [array]
-  --override_headers                                                   [boolean]
-  --os                          Operating System of the Peer IP         [string]
-  --headers                     Request headers                          [array]
-  --debug                       Request debug info default value
+      --smtp                                                             [array]
+      --override_headers                                               [boolean]
+      --os                         Operating System of the Peer IP      [string]
+      --headers                    Request headers                       [array]
+      --debug                      Request debug info default value
                                                       [string] [default: "none"]
-  --lpm_auth                    x-lpm-authorization header
+      --lpm_auth                   x-lpm-authorization header
                                                       [string] [default: "none"]
-  --const                                             [boolean] [default: false]
-  --socket_inactivity_timeout                         [number] [default: 120000]
-  --multiply_ips                                      [boolean] [default: false]
-  --multiply_vips                                     [boolean] [default: false]
-  --max_ban_retries                                       [number] [default: 10]
-  --preset                                    [string] [default: "session_long"]
-  --ua                          Unblocker Mobile UA   [boolean] [default: false]
-  --timezone                    Timezone ID to be used by the browser   [string]
-  --resolution                  Browser screen size                     [string]
-  --webrtc                      WebRTC plugin behavior in the browser   [string]
-  --bw_limit                    BW limit params
-  --whitelist_ips               Default for all proxies whitelist ip list for
-                                granting access to them    [array] [default: []]
-  --www_whitelist_ips           Whitelist ip list for granting access to browser
-                                admin UI                   [array] [default: []]
-  --www                         HTTP and WebSocket port used for browser admin
-                                UI and request logs             [default: 22999]
-  --config                      Config file containing proxy definitions[string]
-  --mode                        Defines a set of permissible operations within
-                                the UI/API                              [string]
-  --dropin                      Create dropin mode proxy port (default: 22225)
-                                                       [boolean] [default: true]
-  --dropin_port                 Port for dropin mode            [default: 22225]
-  --no_usage_stats              Disable collection of usage statistics
+      --const                                         [boolean] [default: false]
+      --socket_inactivity_timeout                     [number] [default: 120000]
+      --multiply_ips                                  [boolean] [default: false]
+      --multiply_vips                                 [boolean] [default: false]
+      --max_ban_retries                                   [number] [default: 10]
+      --preset                                [string] [default: "session_long"]
+      --ua                         Unblocker Mobile UA[boolean] [default: false]
+      --timezone                   Timezone ID to be used by the browser[string]
+      --resolution                 Browser screen size                  [string]
+      --webrtc                     WebRTC plugin behavior in the browser[string]
+      --bw_limit                   BW limit params
+      --whitelist_ips              Default for all proxies whitelist ip list for
+                                   granting access to them [array] [default: []]
+      --www_whitelist_ips          Whitelist ip list for granting access to
+                                   browser admin UI        [array] [default: []]
+      --www                        HTTP and WebSocket port used for browser
+                                   admin UI and request logs    [default: 22999]
+      --config                     Config file containing proxy definitions
+                                                                        [string]
+      --mode                       Defines a set of permissible operations
+                                   within the UI/API                    [string]
+      --dropin                     Create dropin mode proxy port (default:
+                                   22225)              [boolean] [default: true]
+      --dropin_port                Port for dropin mode         [default: 22225]
+      --no_usage_stats             Disable collection of usage statistics
                                                       [boolean] [default: false]
-  --lpm_token                   An authorization token                  [string]
-  --high_perf                                         [boolean] [default: false]
-  --zagent                                            [boolean] [default: false]
-  --reseller                                          [boolean] [default: false]
-  --cluster                                             [string] [default: true]
-  --sync_config                 Synchronize Proxy Manager configuration with the
-                                cloud                 [boolean] [default: false]
-  --sync_zones                                         [boolean] [default: true]
-  --sync_stats                                         [boolean] [default: true]
-  --request_stats               Enable requests statistics
+      --lpm_token                  An authorization token               [string]
+      --high_perf                                     [boolean] [default: false]
+      --zagent                                        [boolean] [default: false]
+      --reseller                                      [boolean] [default: false]
+      --cluster                                         [string] [default: true]
+      --sync_config                Synchronize Proxy Manager configuration with
+                                   the cloud          [boolean] [default: false]
+      --sync_zones                                     [boolean] [default: true]
+      --sync_stats                                     [boolean] [default: true]
+      --request_stats              Enable requests statistics
                                                        [boolean] [default: true]
-  --test_url                    Url for testing proxy
+      --test_url                   Url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
-  --log                         Log level           [string] [default: "notice"]
-  --logs                        Number of request logs to store
+      --log                        Log level        [string] [default: "notice"]
+      --logs                       Number of request logs to store
                                                         [number] [default: 1000]
-  --logs_settings               Settings for logs remote delivery  [default: {}]
-  --har_limit                   Number of bytes to store[number] [default: 1024]
-  --ports_limit                 Limit the numer of open proxy ports at the same
-                                time                            [default: 10000]
-  --ui_ws                       Enable live logs preview and other live data
-                                communication on the UI[boolean] [default: true]
-  --force                       Kill other instances of Proxy Manager if there
-                                are any               [boolean] [default: false]
-  --session_termination         Stop sending new requests when the peer IP
-                                becomes unavailable and redirect to confimration
-                                page before new IP is taken
+      --logs_settings              Settings for logs remote delivery
+                                                                   [default: {}]
+      --har_limit                  Number of bytes to store
+                                                        [number] [default: 1024]
+      --ports_limit                Limit the numer of open proxy ports at the
+                                   same time                    [default: 10000]
+      --ui_ws                      Enable live logs preview and other live data
+                                   communication on the UI
+                                                       [boolean] [default: true]
+      --force                      Kill other instances of Proxy Manager if
+                                   there are any      [boolean] [default: false]
+      --session_termination        Stop sending new requests when the peer IP
+                                   becomes unavailable and redirect to
+                                   confimration page before new IP is taken
                                                       [boolean] [default: false]
-  --api                         Alternative url to luminati API         [string]
-  --api_domain                  Alternative domain url to luminati API
+      --api                        Alternative url to luminati API      [string]
+      --api_domain                 Alternative domain url to luminati API
                                                [string] [default: "lum-lpm.com"]
-  --pmgr_domain                 Alternative domain url to Proxy Manager [string]
-  --local_login                 Requires each browser to authenticate against
-                                Proxy Manager         [boolean] [default: false]
-  --read_only                   Avoid saving current config in the config file
-                                                      [boolean] [default: false]
-  --extra_ssl_ips               List of IPs to add to SSL certificate
+      --pmgr_domain                Alternative domain url to Proxy Manager
+                                                                        [string]
+      --local_login                Requires each browser to authenticate against
+                                   Proxy Manager      [boolean] [default: false]
+      --read_only                  Avoid saving current config in the config
+                                   file               [boolean] [default: false]
+      --extra_ssl_ips              List of IPs to add to SSL certificate
                                                            [array] [default: []]
-  --bw_limit_webhook_url        URL to send webhook messages to when BW limit is
-                                reached                                 [string]
-  --bw_th_webhook_url           URL to send webhook messages to when BW limit
-                                threshold is reached                    [string]
-  --no-www                      Disable local web
-  --no-config                   Working without a config file
-  --daemon, -d, --start-daemon  Start as a daemon
-  --restart-daemon              Restart running daemon
-  --stop-daemon                 Stop running daemon
-  --delete-daemon               Delete daemon instance
-  --upgrade                     Upgrade proxy manager
-  --downgrade                   Downgrade proxy manager (if backup exists on
-                                disk)
-  --dir                         Path to the directory with database and
-                                configuration files
-  --status                      Show proxy manager processes current status
-  --gen-cert                    Generate cert
-  --auto-upgrade                Enable auto upgrade
-  --start-upgrader              Install CRON process that checks upgrades
-  --stop-upgrader               Removes CRON process that checks upgrades
-  --insecure-http-parser        Disables the strict checks
-  --proxy_country                                                  [default: ""]
-  --resolve_proxies_interval                                    [default: 10000]
-  --info                                                        [default: false]
-  --cn                                                          [default: false]
-  --api_body_limit                                              [default: "2mb"]
-  --api_domain_fallback                                   [default: "l-lpm.com"]
+      --bw_limit_webhook_url       URL to send webhook messages to when BW limit
+                                   is reached                           [string]
+      --bw_th_webhook_url          URL to send webhook messages to when BW limit
+                                   threshold is reached                 [string]
+      --no-www                     Disable local web
+      --no-config                  Working without a config file
+  -d, --daemon, --start-daemon     Start as a daemon
+      --restart-daemon             Restart running daemon
+      --stop-daemon                Stop running daemon
+      --delete-daemon              Delete daemon instance
+      --upgrade                    Upgrade proxy manager
+      --downgrade                  Downgrade proxy manager (if backup exists on
+                                   disk)
+      --dir                        Path to the directory with database and
+                                   configuration files
+      --status                     Show proxy manager processes current status
+      --gen-cert                   Generate cert
+      --auto-upgrade               Enable auto upgrade
+      --start-upgrader             Install CRON process that checks upgrades
+      --stop-upgrader              Removes CRON process that checks upgrades
+      --insecure-http-parser       Disables the strict checks
+      --proxy_country                                              [default: ""]
+      --resolve_proxies_interval                                [default: 10000]
+      --info                                                    [default: false]
+      --cn                                                      [default: false]
+      --api_body_limit                                          [default: "2mb"]
+      --api_domain_fallback                               [default: "l-lpm.com"]
 ```
 
 ### Docker

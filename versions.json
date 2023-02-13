@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.358.906",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Apply log level for daily rotate file"
+            }
+        ]
+    },
+    {
         "ver": "1.357.632",
         "type": "stable",
         "changes": [

@@ -130,6 +130,8 @@ function unshift_pipe(stdio, data){
 }
 function handle_stdio(child, redir, logger){
     let io_names = ['stdin', 'stdout', 'stderr'];
+    if (!child || !child.stdio)
+        return;
     child.stdio.forEach((stdio, i)=>{
         if (i<1||!stdio)
            return;
@@ -140,12 +142,9 @@ function handle_stdio(child, redir, logger){
 }
 function close_fds(child, fds){
     fds.forEach(fs.closeSync);
-    if (!child)
+    if (!child || !child.stdio)
         return;
-    child.stdio.forEach(stdio=>{
-        if (stdio)
-            stdio.destroy();
-    });
+    child.stdio.forEach(stdio=>stdio && stdio.destroy());
 }
 
 // XXX vladimir: check about platforms other than x86/arm from signal(7)

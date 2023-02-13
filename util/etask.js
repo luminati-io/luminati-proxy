@@ -1542,17 +1542,15 @@ E._fn = function(opt, states){ return etask_fn(opt, states, true); };
 E._generator = function(gen, ctor, opt){
     opt.name = opt.name || ctor && ctor.name || 'generator';
     opt.cancel = opt.cancel===undefined ? true : opt.cancel;
-    opt.init = function(){
+    let done = false;
+    return new Etask(opt, [function(){
         this.generator = gen = gen||ctor.apply(this, opt.state0_args||[]);
         this.generator_ctor = ctor;
-    };
-    let done = false;
-    let ret = undefined;
-    let err = undefined;
-    return new Etask(opt, [function try_catch$loop(){
+        return {ret: undefined, err: undefined};
+    }, function try_catch$loop(rv){
         '@jsdefender { localDeclarations: false }';
-        let res;
-        try { res = err ? gen.throw(err) : gen.next(ret); }
+        var res;
+        try { res = rv.err ? gen.throw(rv.err) : gen.next(rv.ret); }
         catch(e){ return this.return(E.err(e)); }
         if (res.done)
         {
@@ -1560,10 +1558,9 @@ E._generator = function(gen, ctor, opt){
             return this.return(res.value);
         }
         return res.value;
-    }, function(_ret){
-        ret = _ret;
-        err = this.error;
-        return this.goto('loop');
+    }, function(ret){
+        return this.goto('loop', this.error ?
+            {ret: undefined, err: this.error} : {ret: ret, err: undefined});
     }, function finally$(){
         '@jsdefender { localDeclarations: false }';
         // https://kangax.github.io/compat-table/es6/#test-generators_%GeneratorPrototype%.return
