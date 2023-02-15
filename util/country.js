@@ -1557,7 +1557,7 @@ for (var region_country in E.regions)
 
 E.is_country_code = function(c){
     return typeof c=='string'&&c.length==2
-        &&this.country_codes_lowered.includes(c.toLowerCase());
+        &&E.country_codes_lowered.includes(c.toLowerCase());
 };
 
 E.non_iso = {GB: 1, EU: 1};

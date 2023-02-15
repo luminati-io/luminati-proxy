@@ -82,7 +82,7 @@ E.meminfo = function(){
         return {memtotal: os.totalmem(), memfree_all: os.freemem()};
     var info = cyg_read(`${PROC_DIR}/meminfo`);
     var mem = E.meminfo_parse(info);
-    mem.buffers = mem.buffers||0; // openvz does not always have Buffers
+    mem.buffers = mem.buffers||0;
     mem.cached = mem.cached||0; // cygwin does not have Cached
     mem.memfree_all = mem.memfree_all||mem.memfree+mem.buffers+mem.cached;
     return mem;
@@ -172,7 +172,6 @@ E.swapon = function(){
             return;
         cli.exec_rt_e('mkswap '+swapfile);
     }
-    // XXX sergey: some openvz does not support swapon, ignore it
     cli.exec_rt('swapon '+swapfile);
 };
 E.swapoff = function(){ cli.exec_rt('swapoff '+swapfile); };

@@ -8,9 +8,9 @@ var is_rn = typeof global=='object' && !!global.nativeRequire ||
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
-        require('/util/array.js'), require('/util/date.js'),
-        require('/util/util.js'), require('/util/sprintf.js'),
-        require('/util/rate_limit.js'), require('/util/escape.js'));
+        require('/util/date.js'), require('/util/util.js'),
+        require('/util/sprintf.js'), require('/util/rate_limit.js'),
+        require('/util/escape.js'));
     process = {
         nextTick: function(fn){ setTimeout(fn, 0); },
         env: {},
@@ -37,9 +37,9 @@ else
         version = require('./version.js').version;
     }
 }
-define(['/util/array.js', '/util/date.js', '/util/util.js',
-    '/util/sprintf.js', '/util/rate_limit.js', '/util/escape.js'],
-    function(array, date, zutil, sprintf, rate_limit, zescape){
+define(['/util/date.js', '/util/util.js', '/util/sprintf.js',
+    '/util/rate_limit.js', '/util/escape.js'],
+    function(date, zutil, sprintf, rate_limit, zescape){
 var E, _zerr;
 var env = process.env;
 var zerr = function(msg){ _zerr(L.ERR, arguments); };

@@ -144,6 +144,14 @@ const generate_sec_ch_rules_chromium = ({ver_from, ver_to, browser_name,
                 'sec-ch-ua-platform': '"Windows"',
             },
         },
+        110: {match: {browser: browser_name, https: true, version_min: 110},
+            rules: {
+                'sec-ch-ua': `"Chromium";v="110", `
+                    +`"Not A(Brand";v="24", "${browser_full_name}";v="110"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
     };
     const versions_array = Array.from({length: ver_to - ver_from + 1},
         (_, idx)=>idx+ver_from);
@@ -194,6 +202,8 @@ const rules_headers = [
         rules: {'sec-fetch-dest': 'document'}},
     {match: {browser: 'chrome', version_min: 85},
         rules: {accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'}},
+    {match: {browser: 'chrome', version_min: 110},
+        rules: {accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'}},
     {match: {browser: 'chrome', type: 'image'},
         rules: {accept: 'image/webp,image/apng,image/*,*/*;q=0.8'}},
     {match: {browser: 'chrome', type: 'image', version_min: 85},

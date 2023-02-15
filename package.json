@@ -24,7 +24,7 @@
         "provider": "generic",
         "url": "http://lum-lpm.com/static/lpm"
       },
-      "publisherName": "Luminati Networks Ltd",
+      "publisherName": "Bright Data Ltd.",
       "target": "nsis",
       "timeStampServer": "http://timestamp.digicert.com/?alg=sha1",
       "rfc3161TimeStampServer": "http://timestamp.digicert.com/?alg=sha256"
@@ -51,6 +51,7 @@
   "dependencies": {
     "user-agents": "~1.0.1056",
     "colors": "1.4.0",
+    "snyk": "1.1100.0",
     "body-parser": "1.19.0",
     "check-node-version": "4.0.1",
     "electron-updater": "4.3.1",
@@ -144,8 +145,7 @@
     "webpack": "4.44.0",
     "webpack-cli": "3.3.12",
     "webpack-merge": "5.2.0",
-    "prop-types": "15.8.1",
-    "snyk": "1.1019.0"
+    "prop-types": "15.8.1"
   },
   "engines": {
     "node": ">=12.0.0"
@@ -407,7 +407,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "8bc556411865eb6bf4c1781490c7b978"
+    "md5": "fb646344c72538e90ec60f0e88e27fea"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -439,5 +439,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.358.906"
+  "version": "1.359.448"
 }

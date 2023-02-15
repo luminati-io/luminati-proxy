@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.359.448 Stable
+- :bug: Fix windows version upgrade
+
 ## 1.358.906 Stable
 - :bug: Apply log level for daily rotate file
 

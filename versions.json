@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.359.448",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix windows version upgrade"
+            }
+        ]
+    },
+    {
         "ver": "1.358.906",
         "type": "stable",
         "changes": [
