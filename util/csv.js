@@ -154,7 +154,7 @@ E.escape_field = function(v, opt){
                 .replace(/\s+/g, ' ');
         }
     }
-    var quote_needed = /["'\n,]/.test(v) ||
+    var quote_needed = opt && opt.quote_needed || /["'\n,]/.test(v) ||
         opt && opt.quote_spaces && v && v.includes(' ');
     return quote_needed ? '"'+v.replace(/"/g, '""')+'"' : v;
 };

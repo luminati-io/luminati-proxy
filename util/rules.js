@@ -38,8 +38,11 @@ E.make_rules_object = (rules, selector)=>{
         all: ()=>Object.assign({}, rules),
         merge: new_rules=>_.merge(rules, new_rules, E.rule_merge_customizer),
         clone_and_merge: new_rules=>{
-            return E.make_rules_object(_.merge({}, rules, new_rules,
+            const r = E.make_rules_object(_.merge({}, rules, new_rules,
                 E.rule_merge_customizer), selector);
+            if (this.info)
+                r.info = {...this.info};
+            return r;
         },
     };
 };

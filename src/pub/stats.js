@@ -3,17 +3,18 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
 import filesaver from 'file-saver';
-import {status_codes, bytes_format} from './util.js';
+import React_tooltip from 'react-tooltip';
 import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
-import {Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
-import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
 import {capitalize} from '../../util/string.js';
 import {to_blob} from '../../util/csv.js';
+import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
-import React_tooltip from 'react-tooltip';
+import {status_codes, bytes_format} from './util.js';
+import {Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
+import ws from './ws.js';
 
 export const Logs_context = React.createContext(true);
 
@@ -78,7 +79,7 @@ const Stats_off_btn = props=>
 
 const Empty_row = ()=>
     <tr className="empty_row">
-      <td>—</td><td>—</td><td>—</td><td>—</td>
+      <td>{'—'}</td><td>{'—'}</td><td>{'—'}</td><td>{'—'}</td>
     </tr>;
 
 // XXX krzysztof: merge with enable_ssl in har/viewer.js
@@ -261,6 +262,7 @@ class Toolbar extends Pure_component {
     download_csv = key=>{
         if (typeof key!='string' || !key)
         {
+            ws.post_event('Download Statistic');
             this.download_csv('status_code');
             this.download_csv('hostname');
             this.download_csv('protocol');

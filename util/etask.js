@@ -154,7 +154,6 @@ function Etask(opt, states){
     this._stack = Etask.use_bt ? stack_get() : undefined;
     this._finally = -1;
     this._cancel = -1;
-    this.notified_cancel = false;
     if (opt.zexit_on_err!=null)
         this.info.zexit_on_err = opt.zexit_on_err;
     if (opt.skip_err_metrics!=null)
@@ -475,7 +474,8 @@ E.prototype._set_down = function(down){
     if (down.parent_guess)
         down._parent_guess_remove();
     assert(!down.parent, 'returned etask already has a spawn parent');
-    assert(!down.up, 'returned etask already has a caller parent');
+    assert(!down.up, 'returned etask already has a caller parent, '
+        + 'consider using wait_ext');
     down._parent_remove();
     this.down = down;
     down.up = this;
@@ -700,10 +700,7 @@ E.prototype.continue = function(promise, sync){
     if (this.tm_completed)
         return promise;
     if (this.down)
-    {
-        this.down._notify_cancel();
         this.down._ecancel();
-    }
     this._del_wait_timer();
     var rv = {ret: promise, err: undefined};
     if (this.running)
@@ -732,15 +729,6 @@ E.prototype.continue = function(promise, sync){
     return promise;
 };
 
-E.prototype._notify_cancel = function(){
-    if (this.tm_completed || this.notified_cancel)
-        return this;
-    this.emit_safe('cancelling');
-    this.notified_cancel = true;
-    if (this.down)
-        this.down._notify_cancel();
-};
-
 E.prototype._ecancel = function(){
     if (this.tm_completed)
         return this;
@@ -755,11 +743,9 @@ E.prototype._ecancel_child = function(){
     if (!this.child.size)
         return;
     // copy array, since ecancel has side affects and can modify array
-    let child = Array.from(this.child.values());
-    for (let c of child)
-        c._notify_cancel();
-    for (let c of child)
-        c._ecancel();
+    let children = Array.from(this.child.values());
+    for (let child of children)
+        child._ecancel();
 };
 
 E.prototype.return_fn = function(){

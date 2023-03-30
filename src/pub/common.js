@@ -10,16 +10,17 @@ import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import $ from 'jquery';
-import {bytes_format, report_exception} from './util.js';
+import conv from '../../util/conv.js';
+import date from '../../util/date.js';
 import presets from './common/presets.js';
 import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
     Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
 import {T, t, Language} from './common/i18n.js';
-import conv from '../../util/conv.js';
-import date from '../../util/date.js';
+import {bytes_format, report_exception} from './util.js';
 
 export const www_api = 'https://brightdata.com';
+export const www_help = 'https://help.brightdata.com';
 
 export const Tooltip_bytes = props=>{
     let {bytes, bytes_out, bytes_in, cost} = props;
@@ -199,15 +200,19 @@ export const with_www_api = Component=>{
         componentDidMount(){
             this.setdb_on('head.defaults', defaults=>{
                 if (defaults)
-                    this.setState({www_api: defaults.www_api});
+                {
+                    this.setState({
+                        www_api: defaults.www_api,
+                        www_help: defaults.www_help
+                    });
+                }
             });
         }
         render(){
-            let _www_api = www_api;
-            if (this.state.www_api)
-                _www_api = this.state.www_api;
+            let _www_api = this.state.www_api || www_api;
+            let _www_help = this.state.www_help || www_help;
             return React.createElement(Component,
-                {...this.props, www_api: _www_api});
+                {...this.props, www_api: _www_api, www_help: _www_help});
         }
     }
     return With_www_api;

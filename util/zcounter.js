@@ -7,6 +7,7 @@ const conf = require('./conf.js');
 const date = require('./date.js');
 const etask = require('./etask.js');
 const file = require('./file.js');
+const zurl = require('./url.js');
 const queue = require('./queue.js');
 const zerr = require('./zerr.js');
 const zutil = require('./util.js');
@@ -564,9 +565,13 @@ function run(){
     }
     else if (env.ZCOUNTER_STATS_URL && env.ZCOUNTER_LUM_URL)
     {
-        env.ZCOUNTER_STATS_URL.split(';')
-            .forEach(x=>create_client('stats', x));
-        env.ZCOUNTER_LUM_URL.split(';').forEach(x=>create_client('lum', x));
+        let [stats, lum] = [env.ZCOUNTER_STATS_URL, env.ZCOUNTER_LUM_URL]
+            .map(x=>x.split(';').filter(url=>{
+                let host = zurl.parse(url).hostname;
+                return host=='zs-graphite-log.luminati.io' ? !+env.LXC : url;
+            }));
+        stats.forEach(u=>create_client('stats', u));
+        lum.forEach(u=>create_client('lum', u));
     }
     else
     {

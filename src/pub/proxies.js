@@ -2,18 +2,20 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
+import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
+import {AutoSizer, Table, Column} from 'react-virtualized';
 import ReactDOM from 'react-dom';
 import {withRouter} from 'react-router-dom';
+import classnames from 'classnames';
+import filesaver from 'file-saver';
+import $ from 'jquery';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zescape from '../../util/escape.js';
 import csv from '../../util/csv.js';
 import etask from '../../util/etask.js';
 import zutil from '../../util/util.js';
-import classnames from 'classnames';
-import filesaver from 'file-saver';
 import {get_static_country, report_exception, is_local} from './util.js';
-import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title, No_zones,
     Tooltip_bytes, Loader_small, Toolbar_button, Warnings} from './common.js';
@@ -21,10 +23,9 @@ import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
 import {T, t} from './common/i18n.js';
 import {Search_box} from './chrome_widgets.js';
-import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
-import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
+import ws from './ws.js';
 import './css/proxies.less';
 
 const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog,
@@ -125,6 +126,7 @@ class Browser_cell extends Pure_component {
     open_browser = e=>{
         e.stopPropagation();
         const _this = this;
+        ws.post_event('Browser Click');
         this.etask(function*(){
             const url = `/api/browser/${_this.props.proxy.port}`;
             const res = yield window.fetch(url);
@@ -719,9 +721,13 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return val;
             });
         }));
+        ws.post_event('Toolbar Download CVS Clicked');
         filesaver.saveAs(csv.to_blob(data), 'proxies.csv');
     };
-    edit_columns = ()=>$('#edit_columns').modal('show');
+    edit_columns = ()=>{
+        ws.post_event('Toolbar Edit Columns Clicked');
+        $('#edit_columns').modal('show');
+    };
     update_selected_columns = new_columns=>
         this.setState({selected_cols: new_columns});
     select_renderer = function Select_renderer(props){
@@ -770,6 +776,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return;
         if (proxy.master_port)
             return;
+        ws.post_event('Proxy Port Click', {port: proxy.port});
         this.props.history.push(`/proxy/${proxy.port}`);
     };
     get_cols = ()=>{
@@ -952,13 +959,17 @@ class Toolbar extends Pure_component {
     };
     open_delete_dialog_with_proxies = e=>{
         e.stopPropagation();
-        this.props.open_delete_dialog(this.get_to_delete());
+        const to_delete = this.get_to_delete();
+        ws.post_event('Toolbar Action Remove Click', {ports: to_delete});
+        this.props.open_delete_dialog(to_delete);
     };
     get_to_delete = ()=>{
         const {selected} = this.props;
         return Object.values(selected).filter(p=>p.proxy_type=='persist');
     };
     toggle_filters(){
+        if (!this.state.filters)
+            ws.post_event('Toolbar Filters Clicked');
         this.setState({filters: !this.state.filters});
     }
     render(){
@@ -995,6 +1006,7 @@ class Cell extends React.Component {
         if (p.master_port)
             return;
         e.stopPropagation();
+        ws.post_event('Proxy Port Click', {port: p.port});
         this.props.history.push({
             pathname: `/proxy/${p.port}`,
             state: {field: this.props.dataKey},
@@ -1077,6 +1089,10 @@ class Actions extends Pure_component {
             setdb.emit_path('head.proxies_running');
         });
     };
+    post_action(action){
+        ws.post_event(`Port Action ${action} Click`,
+            {port: this.props.proxy.port});
+    }
     refresh_sessions = e=>{
         e.stopPropagation();
         const _this = this;
@@ -1084,6 +1100,7 @@ class Actions extends Pure_component {
             const url = '/api/refresh_sessions/'+_this.props.proxy.port;
             yield ajax.json({url, method: 'POST'});
             yield _this.get_status({force: true});
+            _this.post_action('Refresh');
         });
     };
     duplicate = event=>{
@@ -1101,11 +1118,13 @@ class Actions extends Pure_component {
             const resp = yield raw_resp.json();
             if (resp.errors)
                 _this.props.show_error_ntf(resp.errors);
+            _this.post_action('Duplicate');
             yield _this.props.update_proxies();
         });
     };
     open_delete_dialog_with_port = e=>{
         e.stopPropagation();
+        this.post_action('Remove');
         this.props.open_delete_dialog([this.props.proxy]);
     };
     render(){

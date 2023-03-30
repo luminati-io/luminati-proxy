@@ -117,7 +117,8 @@ class Code_instructions extends Pure_component {
             </span>;
         const to_copy = instructions.code(port, lpm_token, hostname)[lang];
         const code = prism.highlight(to_copy, prism.languages.clike);
-        const api_url = this.props.www_api+'/doc/api#lpm_endpoints';
+        const api_url = this.props.www_help+'/hc/en-us/articles/13595498290065'
+            +'-API';
         return <div className="code_instructions">
               <div className="options">
                 <Lang_btn_clickable lang="shell" text="Shell"/>

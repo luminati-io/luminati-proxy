@@ -3,6 +3,7 @@
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Route, withRouter, Link} from 'react-router-dom';
 import React from 'react';
+import _ from 'lodash';
 import $ from 'jquery';
 import classnames from 'classnames';
 import etask from '../../util/etask.js';
@@ -17,6 +18,7 @@ import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {Language} from './common/i18n.js';
 import {with_www_api} from './common.js';
+import ws from './ws.js';
 import './css/nav.less';
 
 class Nav extends Pure_component {
@@ -42,58 +44,56 @@ class Nav extends Pure_component {
 }
 
 const Nav_left = with_www_api(withRouter(props=>{
-    const zagent = props.zagent;
-    if (zagent)
+    if (props.zagent)
         return null;
-    const faq_url = props.www_api+'/faq#proxy';
-    const api_url = props.www_api+'/doc/api#lpm_endpoints';
+    const faq_url = props.www_help+'/hc/en-us/sections/12571042542737'
+        +'-Proxy-Manager';
+    const api_url = props.www_help+'/hc/en-us/articles/13595498290065-API';
+    const howto_click = ()=>ws.post_event('Howto Nav Left Click');
     return <div className="nav_left">
           <div className={classnames('menu', {lock: props.lock})}>
-            <Nav_link to="/overview" name="overview" label="Overview"/>
-            <Nav_link to="/howto" name="howto"
+            <Nav_link to="/overview" name="overview" label="Overview" />
+            <Nav_link to="/howto" name="howto" on_click={howto_click}
               label="How to use Proxy Manager"/>
-            <Nav_link to="/logs" name="logs" label="Request logs"/>
+            <Nav_link to="/logs" name="logs" label="Request logs" />
             <Nav_link to="/settings" name="general_config"
-              label="General settings"/>
-            {!zagent &&
-              <Nav_link to="/config" name="config"
-                label="Manual configuration"/>
-            }
+              label="General settings" />
+            <Nav_link to="/config" name="config"
+                label="Manual configuration" />
             <Nav_link ext to={api_url} name="api"
-              label="API documentation"/>
-            {!zagent &&
-               <Nav_link ext to={faq_url} name="faq" label="FAQ"/>
-            }
+              label="API documentation" />
+            <Nav_link ext to={faq_url} name="faq" label="FAQ" />
           </div>
           <div className="menu_filler"/>
         </div>;
 }));
 
-const Nav_link = ({label, to, name, ext})=>
+const Nav_link = ({label, to, name, ext, on_click})=>
     <Route path={to}>
       {({match})=>
         <Nav_link_inner label={label} to={to} name={name} match={match}
-          ext={ext}/>}
+          ext={ext} on_click={on_click}/>}
     </Route>;
 
-const Nav_link_inner = ({label, to, name, match, ext})=>{
+const Nav_link_inner = ({label, to, name, match, ext, on_click})=>{
     if (ext)
     {
-        return <a href={to} target="_blank" rel="noopener noreferrer">
-              <div className="menu_item">
+        return <a href={to} target="_blank" rel="noopener noreferrer"
+            onClick={on_click||_.noop}>
+            <div className="menu_item">
                 <T>{t=><Tooltip title={t(label)} placement="right">
-                  <div className={classnames('icon', name)}/>
+                    <div className={classnames('icon', name)}/>
                 </Tooltip>}</T>
-              </div>
-            </a>;
+            </div>
+        </a>;
     }
-    return <Link to={{pathname: to}}>
-          <div className={classnames('menu_item', {active: match})}>
+    return <Link to={{pathname: to}} onClick={on_click||_.noop}>
+        <div className={classnames('menu_item', {active: match})}>
             <T>{t=><Tooltip title={t(label)} placement="right">
-              <div className={classnames('icon', name)}/>
+                <div className={classnames('icon', name)}/>
             </Tooltip>}</T>
-          </div>
-        </Link>;
+        </div>
+    </Link>;
 };
 
 class Nav_top extends Pure_component {

@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.370.592",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Updated links to FAQ pages"
+            },
+            {
+                "type": "bug",
+                "text": "Fix proxy port users change does not apply if multiply proxy port enabled"
+            },
+            {
+                "type": "star",
+                "text": "Update default installed node version to 14.19.0"
+            },
+            {
+                "type": "star",
+                "text": "Better UI to backend socket connection"
+            }
+        ]
+    },
+    {
         "ver": "1.359.448",
         "type": "stable",
         "changes": [

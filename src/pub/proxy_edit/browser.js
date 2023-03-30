@@ -8,13 +8,14 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import zcountry from '../../../util/country.js';
 import {qw} from '../../../util/string.js';
-import {Config, Tab_context} from './common.js';
+import {T} from '../common/i18n.js';
+import {Select_multiple} from '../common/controls.js';
 import {Remove_icon, Field_row_raw, Warning, Note} from '../common.js';
 import user_agents from '/www/util/pub/user_agent_gen.json';
 import {is_local} from '../util.js';
+import ws from '../ws.js';
 import Tooltip from '../common/tooltip.js';
-import {Select_multiple} from '../common/controls.js';
-import {T} from '../common/i18n.js';
+import {Config, Tab_context} from './common.js';
 
 const timezone_opt = [
     {key: 'Disabled (default)', value: ''},
@@ -92,6 +93,7 @@ export default class Browser extends Pure_component {
     open_browser = e=>{
         e.stopPropagation();
         const _this = this;
+        ws.post_event('Browser Click');
         this.etask(function*(){
             const url = `/api/browser/${_this.state.form.port}`;
             const res = yield window.fetch(url);

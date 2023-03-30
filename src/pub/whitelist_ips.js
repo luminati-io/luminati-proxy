@@ -10,19 +10,19 @@ import {get_location_port} from './util.js';
 import './css/whitelist_ips.less';
 
 export default class Whitelist_ips extends Pure_component {
-    state = {};
+    constructor(props){
+        super(props);
+        this.state = {};
+    }
     componentDidMount(){
         this.setdb_on('head.blocked_ip', ip=>this.setState({ip}));
-        ws.addEventListener('message', this.on_message);
+        ws.addEventListener('whitelisted', this.on_whitelisted);
     }
     willUnmount(){
-        ws.removeEventListener('message', this.on_message);
+        ws.removeEventListener('whitelisted', this.on_whitelisted);
     }
-    on_message = event=>{
-        const json = JSON.parse(event.data);
-        if (json.msg!='whitelisted')
-            return;
-        if (this.state.ip==json.ip)
+    on_whitelisted = ({data})=>{
+        if (this.state.ip==data.ip)
             window.location.reload();
     };
     render(){

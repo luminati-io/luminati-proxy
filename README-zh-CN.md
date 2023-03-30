@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.359.448-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.370.592-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -267,7 +267,7 @@ docker run luminati/luminati-proxy pmgr --version
 
 ## 帮助
 
-常见问题 [FAQ](https://lum-lpm.com/faq#proxy)
+常见问题 [FAQ](https://help.lum-lpm.com/hc/en-us/sections/12571042542737-Proxy-Manager)
 
 如果你在Bright Data 常见问题找不着解决方式，可以在 [github 上提问](https://github.com/luminati-io/luminati-proxy/issues).
 
@@ -277,7 +277,7 @@ docker run luminati/luminati-proxy pmgr --version
 
 API的解说文件能在APP里找着
 
-详细解释能在 [这里](https://lum-lpm.com/doc/api#lpm_endpoints) 找到
+详细解释能在 [这里](https://help.lum-lpm.com/hc/en-us/articles/13595498290065-API) 找到
 
 ## Node.js API
 

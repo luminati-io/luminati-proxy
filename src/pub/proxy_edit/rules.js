@@ -12,11 +12,11 @@ import {ms} from '../../../util/date.js';
 import zutil from '../../../util/util.js';
 import {Labeled_controller, with_proxy_ports, Cm_wrapper,
     Warning, Faq_link} from '../common.js';
-import {tabs} from './fields.js';
 import Proxy_tester from '../proxy_tester.js';
 import Tooltip from '../common/tooltip.js';
 import {T} from '../common/i18n.js';
 import Toggle_on_off from '../common/toggle_on_off.js';
+import {tabs} from './fields.js';
 
 const rule_prepare = rule=>{
     const action = {};
@@ -116,7 +116,7 @@ export const map_rule_to_form = rule=>{
     return result;
 };
 
-export default class Rules extends Pure_component {
+export class Rules extends Pure_component {
     state = {rules: [{id: 0}], max_id: 0, disabled_fields: {}, defaults: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
     goto_field = setdb.get('head.proxy_edit.goto_field');

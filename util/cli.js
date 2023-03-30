@@ -20,7 +20,7 @@ const L = E.L = {
     require: function(name, lib){
         this.__defineGetter__(name, function(){
             delete this[name];
-            return this[name] = require(lib);
+            return this[name] = require(/* brd-build-deps ignore */lib);
         });
     }
 };
@@ -110,8 +110,8 @@ let get_exec_opt = opt=>
     assign({verbose: E.opt.verbose, dry_run: E.dry_run}, opt);
 E.exec_sys = (cmd, opt)=>exec.sys(cmd, get_exec_opt(opt));
 E.exec = (cmd, opt)=>exec.get(cmd, get_exec_opt(opt));
-E.exec_get_lines = cmd=>exec.get_lines(cmd, get_exec_opt());
-E.exec_get_line = cmd=>exec.get_line(cmd, get_exec_opt());
+E.exec_get_lines = (cmd, opt)=>exec.get_lines(cmd, get_exec_opt(opt));
+E.exec_get_line = (cmd, opt)=>exec.get_line(cmd, get_exec_opt(opt));
 E.exec_e = function(cmd, opt){
     let ret;
     if (ret = E.exec(cmd, opt))

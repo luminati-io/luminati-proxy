@@ -38,7 +38,10 @@ window.setdb = setdb;
 setdb.setMaxListeners(50);
 
 const App = withRouter(class App extends Pure_component {
-    state = {i18n_loaded: false};
+    constructor(props){
+        super(props);
+        this.state = {i18n_loaded: false};
+    }
     componentDidMount(){
         setdb.set('head.save_settings', this.save_settings);
         const _this = this;
@@ -116,18 +119,14 @@ const App = withRouter(class App extends Pure_component {
                 lang = 'en';
             i18n.set_curr_lang(lang);
         });
-        ws.addEventListener('message', this.on_message);
+        ws.addEventListener('settings_updated', this.on_settings_updated);
     }
     willUnmount(){
-        ws.removeEventListener('message', this.on_message);
+        ws.removeEventListener('settings_updated', this.on_settings_updated);
     }
-    on_message = event=>{
-        const {msg, settings, defaults} = JSON.parse(event.data) || {};
-        if (msg=='settings_updated')
-        {
-            setdb.set('head.settings', settings);
-            setdb.set('head.defaults', defaults);
-        }
+    on_settings_updated = ({data})=>{
+        setdb.set('head.settings', data.settings);
+        setdb.set('head.defaults', data.defaults);
     };
     load_data = ()=>this.etask(function*(){
         const errors = [];

@@ -117,6 +117,41 @@ E.clone_deep = function(obj){
     return _clone_deep(obj);
 };
 
+// assumptions & shortcuts:
+// - only arrays & pojos will be deeply cloned
+// - we accept the risk of having shallow copy of Date/RegExp/ObjectId/etc
+// - we accept the risk of skipping hasOwnProperty checks
+// - we accept the risk of skipping xxx.constructor edge cases (e.g. iframes)
+// => result is about 10-100x faster than _.cloneDeep for large objects
+E.fast_unsafe_clone_deep = function(orig){
+    if (orig==null)
+        return orig;
+    var res = orig.constructor==Object ? Object.assign({}, orig)
+        : orig.constructor==Array ? orig.slice()
+        : orig;
+    if (res!==orig)
+    {
+        var stack = new Array(2500), len = 0, obj, k, v;
+        stack[len++] = res;
+        while (len>0)
+        {
+            obj = stack[--len];
+            for (k in obj)
+            {
+                v = obj[k];
+                if (typeof v==='object' && v!==null)
+                {
+                    if (v.constructor===Object)
+                        obj[k] = stack[len++] = Object.assign({}, v);
+                    else if (v.constructor===Array)
+                        obj[k] = stack[len++] = v.slice();
+                }
+            }
+        }
+    }
+    return res;
+};
+
 // prefer to normally Object.assign() instead of extend()
 E.extend = function(obj){ // like _.extend
     for (var i=1; i<arguments.length; i++)

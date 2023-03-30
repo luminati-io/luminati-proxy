@@ -1,10 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import _ from 'lodash';
 import classnames from 'classnames';
+import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
+import React_tooltip from 'react-tooltip';
+import Pure_component from '/www/util/pub/pure_component.js';
 import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
@@ -12,24 +14,22 @@ import {qw} from '../../../util/string.js';
 import {Loader, Loader_small, Preset_description, Ext_tooltip,
     Checkbox, Faq_link, Alert} from '../common.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
-import React_tooltip from 'react-tooltip';
-import {tabs, all_fields} from './fields.js';
 import presets from '../common/presets.js';
-import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
-import Rules from './rules.js';
+import Tooltip from '../common/tooltip.js';
+import {Modal} from '../common/modals.js';
+import {T} from '../common/i18n.js';
+import {Select_zone} from '../common/controls.js';
+import {report_exception, bind_all, is_local} from '../util.js';
+import ws from '../ws.js';
+import Warnings_modal from '../common/warnings_modal.js';
+import {Rules, map_rule_to_form} from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
 import Rotation from './rotation.js';
 import Browser from './browser.js';
 import Logs from './logs.js';
 import Alloc_modal from './alloc_modal.js';
-import {map_rule_to_form} from './rules.js';
-import Tooltip from '../common/tooltip.js';
-import {Modal} from '../common/modals.js';
-import {T} from '../common/i18n.js';
-import {Select_zone} from '../common/controls.js';
-import {report_exception, bind_all, is_local} from '../util.js';
-import Warnings_modal from '../common/warnings_modal.js';
+import {tabs, all_fields} from './fields.js';
 import '../css/proxy_edit.less';
 
 const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
@@ -408,9 +408,12 @@ const Index = withRouter(class Index extends Pure_component {
         return zone.plan || {};
     };
     back_func = ()=>this.props.history.push({pathname: '/overview'});
-    on_back_click = ()=>this.state.is_changed
-        ? $('#port_confirmation_modal').modal()
-        : this.back_func();
+    on_back_click = ()=>{
+        ws.post_event('Back to Overview Click',
+            {settings_changed: this.state.is_changed});
+        return this.state.is_changed ? $('#port_confirmation_modal').modal()
+            : this.back_func();
+    };
     render(){
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
@@ -493,6 +496,7 @@ const Nav_tabs_wrapper = withRouter(
 class Nav_tabs_wrapper extends Pure_component {
     tabs = ['logs', 'target', 'rotation', 'rules', 'browser', 'general'];
     set_tab = id=>{
+        ws.post_event('Tab Click', {tab: id});
         const port = this.props.match.params.port;
         const pathname = `/proxy/${port}/${id}`;
         this.props.history.push({pathname});
@@ -543,6 +547,7 @@ const Port_title = ({port, name, t})=>{
 class Open_browser_btn extends Pure_component {
     open_browser = ()=>{
         const _this = this;
+        ws.post_event('Browser Click');
         this.etask(function*(){
             const url = `/api/browser/${_this.props.port}`;
             const res = yield window.fetch(url);

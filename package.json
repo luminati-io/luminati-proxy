@@ -85,7 +85,7 @@
     "lum_socksv5": "0.0.13",
     "ps-list": "6.3.0",
     "extract-zip": "1.6.7",
-    "cookie": "0.4.0",
+    "cookie": "0.5.0",
     "winston": "3.2.1",
     "winston-transport": "4.3.0",
     "winston-daily-rotate-file": "4.5.0",
@@ -407,7 +407,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "fb646344c72538e90ec60f0e88e27fea"
+    "md5": "ff63873b88a630cc775e1286c1da3c5e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -439,5 +439,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.359.448"
+  "version": "1.370.592"
 }

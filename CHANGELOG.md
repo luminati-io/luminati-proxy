@@ -1,5 +1,11 @@
 Proxy manager - Change Log
 
+## 1.370.592 Stable
+- :sparkles: Updated links to FAQ pages
+- :bug: Fix proxy port users change does not apply if multiply proxy port enabled
+- :star: Update default installed node version to 14.19.0
+- :star: Better UI to backend socket connection
+
 ## 1.359.448 Stable
 - :bug: Fix windows version upgrade
 

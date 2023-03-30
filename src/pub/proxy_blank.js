@@ -4,9 +4,13 @@ import React from 'react';
 import $ from 'jquery';
 import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
+import ws from './ws.js';
 import './css/proxy_blank.less';
 
-const open_modal = ()=>{ $('#add_new_proxy_modal').modal(); };
+const open_modal = ()=>{
+  ws.post_event('Start Click');
+  $('#add_new_proxy_modal').modal();
+};
 
 const Proxy_blank = ()=>
     <div>

@@ -3,19 +3,20 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
 import classNames from 'classnames';
-import Proxies from './proxies.js';
-import {Logs_context, Stats} from './stats.js';
-import Har_viewer from './har_viewer.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {T} from './common/i18n.js';
-import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
-import {perr, get_last_versions, get_changes_tooltip} from './util.js';
-import Tooltip from './common/tooltip.js';
-import {Modal} from './common/modals.js';
 import zurl from '../../util/url.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import {perr, get_last_versions, get_changes_tooltip} from './util.js';
+import Tooltip from './common/tooltip.js';
+import {Modal} from './common/modals.js';
+import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
+import {T} from './common/i18n.js';
+import Har_viewer from './har_viewer.js';
+import {Logs_context, Stats} from './stats.js';
+import Proxies from './proxies.js';
+import ws from './ws.js';
 import './css/overview.less';
 
 class Overview extends Pure_component {
@@ -144,9 +145,10 @@ class Overview extends Pure_component {
     }
 }
 
-const Toolbar = ({request_stats, toggle_stats})=>
-  <div className="toolbar">
-    <Nav_icon id='how_to' link_to='/howto'
+const Toolbar = ({request_stats, toggle_stats})=>{
+  const howto_click = ()=>ws.post_event('Howto Nav Top Click');
+  return <div className="toolbar">
+    <Nav_icon id='how_to' link_to='/howto' on_click={howto_click}
       tooltip='How to use the Proxy Manager'/>
     <Nav_icon id='general_settings' link_to='/settings'
       tooltip='General settings'/>
@@ -155,9 +157,13 @@ const Toolbar = ({request_stats, toggle_stats})=>
       onClick={()=>toggle_stats(!request_stats)}/>
     <Add_proxy_btn/>
   </div>;
+};
 
 const Add_proxy_btn = ()=>{
-  const open_modal = ()=>$('#add_new_proxy_modal').modal('show');
+  const open_modal = ()=>{
+      ws.post_event('Add New Port Click');
+      return $('#add_new_proxy_modal').modal('show');
+  };
   return <T>{t=>
     <Tooltip title={t('Add new port')}>
       <button onClick={open_modal}
@@ -174,6 +180,8 @@ const Nav_icon = withRouter(props=>{
   const bg_classes = classNames('toolbar_icon_bg',
       props.filled ? 'btn_lpm_primary' : '');
   const navigate_to = path=>{
+      if (props.on_click)
+          props.on_click();
       props.history.push({pathname: path});
   };
   const on_click_navigate = {onClick: ()=>navigate_to(props.link_to)};

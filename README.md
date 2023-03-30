@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.359.448/luminati-proxy-manager-v1.359.448-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.370.592/luminati-proxy-manager-v1.370.592-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -365,7 +365,7 @@ The --ssl parameter is for SSL analyzing, HTTPS requests can be made without it.
 ## Help
 
 The FAQ can be found on the Bright Data
-[FAQ](https://brightdata.com/faq#proxy)
+[FAQ](https://help.brightdata.com/hc/en-us/sections/12571042542737-Proxy-Manager)
 
 If you do not find the answer there, feel free to open an
 [issue on github](issues).
@@ -376,4 +376,4 @@ Or contact [support@brightdata.com](mailto:support@brightdata.com).
 
 Working documentation of the API can be found inside the app.
 
-The API also can be found on the Bright Data [here](https://brightdata.com/doc/api#lpm_endpoints)
+The API also can be found on the Bright Data [here](https://help.brightdata.com/hc/en-us/articles/13595498290065-API)

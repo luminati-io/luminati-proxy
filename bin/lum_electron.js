@@ -170,6 +170,14 @@ const init_shared_cache = ()=>{
     } catch(e){ console.log('SETTING CACHE ERROR: '+e.message); }
 };
 
+const check_for_updates = ()=>{
+    try {
+        auto_updater.checkForUpdates();
+    } catch(e){
+        logger.error('Version update check fail: '+zerr.e2s(e));
+    }
+};
+
 const _run = argv=>etask(function*(){
     if (process.send)
     {
@@ -181,9 +189,13 @@ const _run = argv=>etask(function*(){
     init_shared_cache();
     manager = new Manager(argv);
     auto_updater.logger = manager.log;
-    setTimeout(()=>auto_updater.checkForUpdates(), 15000);
+    setTimeout(()=>check_for_updates(), 15000);
     manager.on('www_ready', url=>{
-        open(url, {url: true});
+        try {
+            open(url, {url: true});
+        } catch(e){
+            logger.error('Failed to auto open UI: '+zerr.e2s(e));
+        }
     })
     .on('upgrade', cb=>{
         upgrade_cb = cb;
@@ -191,7 +203,7 @@ const _run = argv=>etask(function*(){
         if (upgrade_available)
             upgrade();
         else
-            auto_updater.checkForUpdates();
+            check_for_updates();
     })
     .on('stop', ()=>{
         process.exit();

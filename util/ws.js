@@ -180,6 +180,7 @@ class WS extends EventEmitter {
         this.listen_bin_throttle = opt.listen_bin_throttle;
         this.zc_rx = opt.zcounter=='rx' || opt.zcounter=='all';
         this.zc_tx = opt.zcounter=='tx' || opt.zcounter=='all';
+        this.zc_tx_per_cmd = this.zc_tx && opt.zcounter_tx_per_cmd;
         this.zc_mux = opt.zcounter=='mux' || opt.zcounter=='all';
         this.msg_log = assign({}, {treshold_size: null, print_size: 100},
             opt.msg_log);
@@ -270,6 +271,13 @@ class WS extends EventEmitter {
             zcounter.inc(`${this.zc}_tx_bytes`, msg.length);
             zcounter.avg(`${this.zc}_tx_bytes_per_msg`, msg.length);
         }
+        if (this.zc_tx_per_cmd && opt && opt.cmd)
+        {
+            zcounter.inc(`${this.zc}.${opt.cmd}_tx_msg`);
+            zcounter.inc(`${this.zc}.${opt.cmd}_tx_bytes`, msg.length);
+            zcounter.avg(`${this.zc}.${opt.cmd}_tx_bytes_per_msg`,
+                msg.length);
+        }
         return true;
     }
     bin(data){
@@ -283,11 +291,13 @@ class WS extends EventEmitter {
         buf.writeUInt32BE(cmd.length, 12);
         buf.write(cmd, 16);
         data.msg.copy(buf, 16+cmd.length);
-        return this.send(buf);
+        return this.send(buf, {cmd: data.cmd});
     }
-    json(data){ return this.send(JSON.stringify(data)); }
+    json(data){ return this.send(JSON.stringify(data), {cmd: data.cmd}); }
     zjson(data){
-        return this.send(conv.JSON_stringify(data, this.zjson_opt_send)); }
+        return this.send(conv.JSON_stringify(data, this.zjson_opt_send),
+            {cmd: data.cmd});
+    }
     _check_status(){
         let prev = this.status;
         this.status = this.ws
@@ -361,12 +371,12 @@ class WS extends EventEmitter {
         {
             if (this.ws.terminate && (!this.connected || code==-2))
             {
-                zerr.notice(`${this}: ws.terminate`);
+                zerr.info(`${this}: ws.terminate`);
                 this.ws.terminate();
             }
             else
             {
-                zerr.notice(`${this}: ws.close`);
+                zerr.info(`${this}: ws.close`);
                 this.ws.close(code, reason);
             }
         }
@@ -656,6 +666,11 @@ class Client extends WS {
         this.headers = undefined;
         this.deflate = !!opt.deflate;
         this.agent = opt.agent;
+        if (opt.e1008_exit_reason)
+        {
+            this.e1008_exit_reason = opt.e1008_exit_reason;
+            this.e1008_ts_start = Date.now();
+        }
         this.reason = undefined;
         this.reconnect_timer = undefined;
         this.server_no_mask_support = false;
@@ -775,7 +790,17 @@ class Client extends WS {
         this._retry_count = 0;
         super._on_open();
     }
+    _handle_e1008(event){
+        if (!this.e1008_exit_reason)
+            return;
+        if (event.code != 1008 || this.e1008_exit_reason != event.reason)
+            return;
+        if (!this.no_retry && Date.now()-this.e1008_ts_start < 60000)
+            return;
+        zerr.zexit(`Got '${event.reason}' from ${event.target.url}`);
+    }
     _on_close(event){
+        this._handle_e1008(event);
         this._reconnect();
         super._on_close(event);
     }
@@ -1242,6 +1267,8 @@ class IPC_server_resp {
     add_pending(et){}
     response(rv){}
     fail(e){
+        if (is_node && +process.env.WS_ZEXIT_ON_TYPEERROR && zerr.on_exception)
+            zerr.on_exception(e);
         if (this.ipc.call_zerr)
             zerr(`${this.ipc.ws}: ${this.msg.cmd}: ${zerr.e2s(e)}`);
         this.ipc.ws.json({

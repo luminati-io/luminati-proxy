@@ -8,20 +8,20 @@ import {Waypoint} from 'react-waypoint';
 import classnames from 'classnames';
 import moment from 'moment';
 import React_tooltip from 'react-tooltip';
+import codemirror from 'codemirror/lib/codemirror';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import zescape from '../../util/escape.js';
 import setdb from '../../util/setdb.js';
 import zutil from '../../util/util.js';
+import {trigger_types, action_types} from '../../util/rules_util.js';
 import Tooltip from './common/tooltip.js';
 import {Har_viewer, Pane_headers, Pane_info, JSON_viewer,
     Img_viewer} from '/www/util/pub/har.js';
 import {Tooltip_bytes} from './common.js';
 import {get_troubleshoot} from './util.js';
-import {trigger_types, action_types} from '../../util/rules_util.js';
 import ws from './ws.js';
-import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
@@ -431,7 +431,8 @@ class Lpm_har_viewer extends Pure_component {
         this.set_new_params_debounced = _.debounce(this.set_new_params, 400);
     }
     componentDidMount(){
-        ws.addEventListener('message', this.on_message);
+        ws.addEventListener('har_viewer', this.on_request);
+        ws.addEventListener('har_viewer_start', this.on_request_started);
         this.setdb_on('head.proxies_running', proxies=>{
             if (proxies)
                 this.setState({proxies});
@@ -463,26 +464,20 @@ class Lpm_har_viewer extends Pure_component {
         });
     }
     willUnmount(){
-        ws.removeEventListener('message', this.on_message);
+        ws.removeEventListener('har_viewer', this.on_request);
+        ws.removeEventListener('har_viewer_start', this.on_request_started);
         setdb.set('head.har_viewer.reqs', []);
         setdb.set('head.har_viewer.stats', null);
         setdb.set('har_viewer', null);
         loader.end();
         this.take_reqs_from_pool.cancel();
     }
-    on_message = event=>{
-        const json = JSON.parse(event.data);
-        if (json.msg=='har_viewer')
-            this.on_request_message(json.req);
-        else if (json.msg=='har_viewer_start')
-            this.on_request_started_message(json.req);
+    on_request_started = event=>{
+        event.data.req.pending = true;
+        this.on_request(event);
     };
-    on_request_started_message = req=>{
-        req.pending = true;
-        this.on_request_message(req);
-    };
-    on_request_message = req=>{
-        this.reqs_to_render.push(req);
+    on_request = ({data})=>{
+        this.reqs_to_render.push(data.req);
         this.take_reqs_from_pool();
     };
     is_hidden = req=>{

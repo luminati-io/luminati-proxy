@@ -6,23 +6,23 @@ import ws from './ws.js';
 import {T} from './common/i18n.js';
 
 class Cpu_warning extends React.Component {
-    state = {usage: 0, level: null};
+    constructor(props){
+        super(props);
+        this.state = {usage: 0, level: null};
+    }
     componentDidMount(){
-        ws.addEventListener('message', this.on_message);
+        ws.addEventListener('cpu_usage', this.on_cpu_usage);
     }
     componentWillUnmount(){
-        ws.removeEventListener('message', this.on_message);
+        ws.removeEventListener('cpu_usage', this.on_cpu_usage);
     }
     shouldComponentUpdate(_, next_state){
         return this.state.usage!=next_state.usage;
     }
-    on_message = event=>{
-        const json = JSON.parse(event.data);
-        if (json.msg!='cpu_usage')
-            return;
-        const {usage, level} = json;
-        this.setState({usage, level});
-    };
+    on_cpu_usage = ({data})=>this.setState({
+        usage: data.usage,
+        level: data.level
+    });
     render(){
         const {usage, level} = this.state;
         if (!level)

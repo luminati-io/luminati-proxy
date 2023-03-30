@@ -223,6 +223,7 @@ E.list = {
     LK: 'Sri Lanka',
     SD: 'Sudan',
     SR: 'Suriname',
+    SJ: 'Svalbard and Jan Mayen',
     SZ: 'Swaziland',
     SE: 'Sweden',
     CH: 'Switzerland',
@@ -246,6 +247,7 @@ E.list = {
     AE: 'United Arab Emirates',
     UK: 'United Kingdom',
     US: 'United States',
+    UM: 'United States Minor Outlying Islands',
     UY: 'Uruguay',
     UZ: 'Uzbekistan',
     VU: 'Vanuatu',
@@ -1232,7 +1234,7 @@ E.timezone = {
 E.regions = {
     AD: ['Southern Europe', 'EMEA'],
     AE: ['Western Asia', 'EMEA'],
-    AF: ['Southern Asia', 'EMEA'],
+    AF: ['Southern Asia', 'APAC'],
     AG: ['Caribbean', 'AMER'],
     AI: ['Caribbean', 'AMER'],
     AL: ['South-Eastern Europe', 'EMEA'],
@@ -1258,7 +1260,7 @@ E.regions = {
     BJ: ['Western Africa', 'EMEA'],
     BL: ['Caribbean', 'AMER'],
     BM: ['Northern America', 'AMER'],
-    BN: ['South-Eastern Asia', 'EMEA'],
+    BN: ['South-Eastern Asia', 'APAC'],
     BO: ['South America', 'AMER'],
     BQ: ['Caribbean', 'AMER'],
     BR: ['South America', 'AMER'],
@@ -1277,7 +1279,7 @@ E.regions = {
     CK: ['Polynesia', 'APAC'],
     CL: ['South America', 'AMER'],
     CM: ['Middle Africa', 'EMEA'],
-    CN: ['Asia', 'China'],
+    CN: ['Asia', 'China', 'APAC'],
     CO: ['South America', 'AMER'],
     CR: ['South America', 'AMER'],
     CU: ['Caribbean', 'AMER'],
@@ -1325,13 +1327,13 @@ E.regions = {
     GU: ['Micronesia', 'APAC'],
     GW: ['Western Africa', 'EMEA'],
     GY: ['South America', 'AMER'],
-    HK: ['Eastern Asia', 'China'],
+    HK: ['Eastern Asia', 'APAC'],
     HN: ['South America', 'AMER'],
     HR: ['South-Eastern Europe', 'EMEA', 'EU'],
     HT: ['Caribbean', 'AMER'],
     HU: ['Eastern Europe', 'EMEA', 'EU'],
     ID: ['South-Eastern Asia', 'APAC'],
-    IO: ['Eastern Africa', 'EMEA'],
+    IO: ['Eastern Africa', 'AMER'],
     IE: ['Northern Europe', 'EMEA', 'EU'],
     IL: ['Western Asia', 'EMEA'],
     IM: ['Northern Europe', 'EMEA'],
@@ -1347,7 +1349,7 @@ E.regions = {
     KE: ['Eastern Africa', 'EMEA'],
     KG: ['Central Asia', 'EMEA'],
     KH: ['South-Eastern Asia', 'APAC'],
-    KI: ['Micronesia', 'EMEA'],
+    KI: ['Micronesia', 'APAC'],
     KM: ['Eastern Africa', 'EMEA'],
     KN: ['Caribbean', 'AMER'],
     KP: ['Eastern Asia', 'APAC'],
@@ -1377,9 +1379,9 @@ E.regions = {
     ML: ['Western Africa', 'EMEA'],
     MM: ['South-Eastern Asia', 'APAC'],
     MN: ['Eastern Asia', 'APAC'],
-    MO: ['Eastern Asia', 'APAC'],
+    MO: ['Eastern Asia', 'EMEA'],
     MP: ['Micronesia', 'APAC'],
-    MQ: ['Caribbean', 'EMEA'],
+    MQ: ['Caribbean', 'AMER'],
     MR: ['Western Africa', 'EMEA'],
     MS: ['Caribbean', 'AMER'],
     MT: ['Southern Europe', 'EMEA', 'EU'],
@@ -1399,15 +1401,15 @@ E.regions = {
     NO: ['Scandinavia', 'EMEA', 'Northern Europe'],
     NP: ['Southern Asia', 'APAC'],
     NR: ['Micronesia', 'APAC'],
-    NU: ['Polynesia', 'EMEA'],
+    NU: ['Polynesia', 'APAC'],
     NZ: ['Australia and New Zealand', 'APAC'],
     OM: ['Western Asia', 'EMEA'],
     PA: ['South America', 'AMER'],
     PE: ['South America', 'AMER'],
-    PF: ['Polynesia', 'EMEA'],
+    PF: ['Polynesia', 'APAC'],
     PG: ['Melanesia', 'APAC'],
     PH: ['South-Eastern Asia', 'APAC'],
-    PK: ['Southern Asia', 'EMEA'],
+    PK: ['Southern Asia', 'APAC'],
     PL: ['Eastern Europe', 'EMEA', 'EU'],
     PN: ['Polynesia', 'AMER', 'South America'],
     PM: ['Northern America', 'AMER'],
@@ -1417,19 +1419,20 @@ E.regions = {
     PW: ['Micronesia', 'APAC'],
     PY: ['South America', 'AMER'],
     QA: ['Western Asia', 'EMEA'],
-    RE: ['Eastern Africa', 'EMEA'],
+    RE: ['Eastern Africa', 'APAC'],
     RO: ['Eastern Europe', 'EMEA', 'EU'],
     RS: ['South-Eastern Europe', 'EMEA'],
     RU: ['Eastern Europe', 'EMEA'],
     RW: ['Eastern Africa', 'EMEA'],
     SA: ['Western Asia', 'EMEA'],
     SB: ['Melanesia', 'APAC'],
-    SC: ['Eastern Africa', 'APAC'],
+    SC: ['Eastern Africa', 'EMEA'],
     SD: ['Northern Africa', 'EMEA'],
     SE: ['Scandinavia', 'EMEA', 'Northern Europe', 'EU'],
     SG: ['South-Eastern Asia', 'APAC'],
     SH: ['Western Africa', 'EMEA'],
     SI: ['South-Eastern Europe', 'EMEA'],
+    SJ: ['Sourh America', 'AMER'],
     SK: ['Eastern Europe', 'EMEA', 'EU'],
     SL: ['Western Africa', 'EMEA', 'EU'],
     SM: ['Southern Europe', 'EMEA'],
@@ -1447,10 +1450,10 @@ E.regions = {
     TF: ['Antarctica', 'EMEA'],
     TG: ['Western Africa', 'EMEA'],
     TH: ['South-Eastern Asia', 'APAC'],
-    TJ: ['Central Asia', 'EMEA'],
-    TK: ['Polynesia', 'EMEA'],
+    TJ: ['Central Asia', 'APAC'],
+    TK: ['Polynesia', 'APAC'],
     TL: ['South-Eastern Asia', 'APAC'],
-    TM: ['Central Asia', 'EMEA'],
+    TM: ['Central Asia', 'APAC'],
     TN: ['Northern Africa', 'EMEA'],
     TO: ['Polynesia', 'APAC'],
     TR: ['South-Eastern Europe', 'EMEA'],
@@ -1461,6 +1464,7 @@ E.regions = {
     UA: ['Eastern Europe', 'EMEA'],
     UG: ['Eastern Africa', 'EMEA'],
     UK: ['Northern Europe', 'EMEA'],
+    UM: ['APAC'],
     US: ['Northern America', 'AMER'],
     UY: ['South America', 'AMER'],
     UZ: ['Central Asia', 'EMEA'],
@@ -1488,7 +1492,7 @@ for (var cn in E.regions)
     var code = codes.find(function(c){ return regions.includes(c); });
     if (code)
         E.region[cn] = code;
-    if (regions.includes('China'))
+    else if (regions.includes('China'))
         E.region[cn] = 'APAC';
 }
 
@@ -1524,6 +1528,39 @@ var supraregions = {
 };
 E.country_terr = {};
 var terr_country = {
+    apac_r: ['AF', 'AQ', 'AU', 'BT', 'BN', 'KH', 'CX', 'CC', 'CK', 'FJ',
+    'PF', 'GU', 'ID', 'JP', 'KI', 'KP', 'KR', 'LA', 'MY', 'MH', 'FM', 'MN',
+    'MM', 'NR', 'NP', 'NC', 'NZ', 'NU', 'NF', 'MP', 'PK', 'PW', 'PG', 'PH',
+    'WS', 'SG', 'SB', 'TW', 'TJ', 'TH', 'TL', 'TK', 'TO', 'TM', 'TV', 'UM',
+    'VU', 'VN', 'WF'],
+    emea_e: ['AL', 'DZ', 'AO', 'AM', 'AZ', 'BH', 'BY', 'BJ', 'BA', 'BW', 'BG',
+    'BF', 'BI', 'CV', 'CM', 'CF', 'TD', 'KM', 'CG', 'CD', 'CI', 'HR', 'CY',
+    'CZ', 'DJ', 'EG', 'GQ', 'ER', 'EE', 'SZ', 'ET', 'TF', 'GA', 'GM', 'GE',
+    'GH', 'GR', 'GN', 'GW', 'HU', 'IR', 'IQ', 'IL', 'JO', 'KZ', 'KE', 'KW',
+    'KG', 'LV', 'LB', 'LS', 'LR', 'LY', 'LT', 'MO', 'MG', 'MW', 'ML', 'MR',
+    'MU', 'YT', 'MD', 'ME', 'MA', 'MZ', 'NA', 'NL', 'NE', 'NG', 'MK', 'OM',
+    'PS', 'PL', 'QA', 'RO', 'RU', 'RW', 'SH', 'ST', 'SA', 'SN', 'RS', 'SC',
+    'SL', 'SK', 'SI', 'SO', 'ZA', 'SS', 'SD', 'SY', 'TZ', 'TG', 'TN', 'TR',
+    'UG', 'UA', 'AE', 'UZ', 'EH', 'YE', 'ZM', 'ZW', 'XK'],
+    emea_w: ['AX', 'AD', 'AT', 'BE', 'DK', 'FO', 'FI', 'FR', 'DE', 'GI', 'GL',
+    'GG', 'VA', 'IS', 'IE', 'IM', 'IT', 'JE', 'LI', 'LU', 'MT', 'MC', 'NO',
+    'PT', 'SM', 'ES', 'SE', 'CH', 'UK', 'GB'],
+    in: ['IN', 'BD', 'LK', 'RE', 'MV'],
+    amer_e: ['CA'],
+    amer_w: ['US'],
+    amer_s: ['AS', 'AI', 'AG', 'AR', 'AW', 'BS', 'BB', 'BZ', 'BM', 'BO', 'BQ',
+    'BV', 'BR', 'IO', 'KY', 'CL', 'CO', 'CR', 'CU', 'CW', 'DM', 'DO', 'EC',
+    'SV', 'FK', 'GF', 'GD', 'GP', 'GT', 'GY', 'HT', 'HM', 'HN', 'JM', 'MQ',
+    'MX', 'MS', 'NI', 'PA', 'PY', 'PE', 'PN', 'PR', 'BL', 'KN', 'LC', 'MF',
+    'PM', 'VC', 'SX', 'GS', 'SR', 'SJ', 'TT', 'TC', 'UY', 'VE', 'VG', 'VI'],
+    cn: ['CN', 'HK'],
+};
+Object.entries(terr_country).forEach(function(ct){
+    ct[1].forEach(function(c){ E.country_terr[c] = ct[0]; });
+});
+
+E.old_country_terr = {};
+var old_terr_country = {
     apac_rest: 'VN SG JP MY KR AU TH ID NP PH AE PK NZ TW SA KW BN AF CX KH '
     +'IR MM IQ YE OM LA MN PF BH KP NU NC BT VU WS FJ AQ CK CC KI PW TJ TM '
     +'MP GU MH PG UM AU TL SB FM NR NF TK TO TV WF',
@@ -1537,20 +1574,74 @@ var terr_country = {
     west_europe: 'FR ES NL IT PT BE AD MT MC MA LU TN DZ GI LI SE DK FI NO AX '
     +'IS GG JE EU GL VA FX FO',
 };
-Object.entries(terr_country).forEach(function(ct){
-    ct[1].split(' ').forEach(function(c){ E.country_terr[c] = ct[0]; });
+Object.entries(old_terr_country).forEach(function(ct){
+    ct[1].split(' ').forEach(function(c){ E.old_country_terr[c] = ct[0]; });
 });
 
-var extend_regions = function(regions, country_code){
-    for (var i = 0; i<regions.length; i++)
+E.state_terr = {
+    US: {
+        AK: 'amer_w',
+        AL: 'amer_e',
+        AR: 'amer_w',
+        AZ: 'amer_w',
+        CA: 'amer_w',
+        CO: 'amer_w',
+        CT: 'amer_e',
+        DC: 'amer_e',
+        DE: 'amer_e',
+        FL: 'amer_e',
+        GA: 'amer_e',
+        HI: 'amer_w',
+        IA: 'amer_w',
+        ID: 'amer_w',
+        IL: 'amer_e',
+        IN: 'amer_e',
+        KS: 'amer_w',
+        KY: 'amer_e',
+        LA: 'amer_w',
+        MA: 'amer_e',
+        MD: 'amer_e',
+        ME: 'amer_e',
+        MI: 'amer_e',
+        MN: 'amer_w',
+        MO: 'amer_w',
+        MS: 'amer_e',
+        MT: 'amer_w',
+        NC: 'amer_e',
+        ND: 'amer_w',
+        NE: 'amer_w',
+        NH: 'amer_e',
+        NJ: 'amer_e',
+        NM: 'amer_w',
+        NV: 'amer_w',
+        NY: 'amer_e',
+        OH: 'amer_e',
+        OK: 'amer_w',
+        OR: 'amer_w',
+        PA: 'amer_e',
+        RI: 'amer_e',
+        SC: 'amer_e',
+        SD: 'amer_w',
+        TN: 'amer_e',
+        TX: 'amer_w',
+        UT: 'amer_w',
+        VA: 'amer_e',
+        VT: 'amer_e',
+        WA: 'amer_w',
+        WI: 'amer_e',
+        WV: 'amer_e',
+        WY: 'amer_w',
+    },
+};
+
+var extend_regions = function(_regions, country_code){
+    for (var i = 0; i<_regions.length; i++)
     {
-        (supraregions[regions[i]]||[])
-        .filter(function(extra){ return !regions.includes(extra); })
-        .forEach(function(extra){ regions.push(extra); });
+        (supraregions[_regions[i]]||[])
+        .filter(function(extra){ return !_regions.includes(extra); })
+        .forEach(function(extra){ _regions.push(extra); });
     }
-    regions.push('All');
-    if (regions.includes('China')||E.country_terr[country_code]=='east_europe')
-        regions.push('China_ee');
+    _regions.push('All');
 };
 for (var region_country in E.regions)
     extend_regions(E.regions[region_country], region_country);
@@ -2675,15 +2766,15 @@ E.currency = {
     PR: 'USD', PS: 'ILS', PT: 'EUR', PW: 'USD', PY: 'PYG', QA: 'QAR',
     RE: 'EUR', RO: 'RON', RS: 'RSD', RU: 'RUB', RW: 'RWF', SA: 'SAR',
     SB: 'SBD', SC: 'SCR', SD: 'SDG', SE: 'SEK', SG: 'SGD', SH: 'SHP',
-    SI: 'EUR', SK: 'EUR', SL: 'SLL', SM: 'EUR', SN: 'XOF', SO: 'SOS',
-    SR: 'SRD', SS: 'SSP', ST: 'STN', SV: 'USD', SX: 'ANG', SY: 'SYP',
-    SZ: 'SZL', TC: 'USD', TD: 'XAF', TF: 'EUR', TG: 'XOF', TH: 'THB',
-    TJ: 'TJS', TK: 'NZD', TL: 'USD', TM: 'TMT', TN: 'TND', TO: 'TOP',
-    TR: 'TRY', TT: 'TTD', TV: 'AUD', TW: 'TWD', TZ: 'TZS', UA: 'UAH',
-    UG: 'UGX', UK: 'GBP', US: 'USD', UY: 'UYU', UZ: 'UZS', VA: 'EUR',
-    VC: 'XCD', VE: 'VES', VG: 'GBP', VI: 'USD', VN: 'VND', VU: 'VUV',
-    WF: 'XPF', WS: 'WST', XK: 'EUR', YE: 'YER', YT: 'EUR', ZA: 'ZAR',
-    ZM: 'ZMW', ZW: 'USD',
+    SI: 'EUR', SJ: 'NOK', SK: 'EUR', SL: 'SLL', SM: 'EUR', SN: 'XOF',
+    SO: 'SOS', SR: 'SRD', SS: 'SSP', ST: 'STN', SV: 'USD', SX: 'ANG',
+    SY: 'SYP', SZ: 'SZL', TC: 'USD', TD: 'XAF', TF: 'EUR', TG: 'XOF',
+    TH: 'THB', TJ: 'TJS', TK: 'NZD', TL: 'USD', TM: 'TMT', TN: 'TND',
+    TO: 'TOP', TR: 'TRY', TT: 'TTD', TV: 'AUD', TW: 'TWD', TZ: 'TZS',
+    UA: 'UAH', UG: 'UGX', UK: 'GBP', UM: 'USD', US: 'USD', UY: 'UYU',
+    UZ: 'UZS', VA: 'EUR', VC: 'XCD', VE: 'VES', VG: 'GBP', VI: 'USD',
+    VN: 'VND', VU: 'VUV', WF: 'XPF', WS: 'WST', XK: 'EUR', YE: 'YER',
+    YT: 'EUR', ZA: 'ZAR', ZM: 'ZMW', ZW: 'USD',
 };
 
 var gs1_countries_list = {

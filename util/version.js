@@ -5,7 +5,7 @@ var fs = require('fs');
 var version;
 var paths = ['.', __dirname, __dirname+'/../..', __dirname+'/../../..'];
 if (process.browser)
-    version = require('zon_config.js').ZON_VERSION;
+    version = require(/* brd-build-deps ignore */'zon_config.js').ZON_VERSION;
 else if (process.zon)
     version = process.zon.version;
 else if (!(version = zconf.ZON_VERSION))
