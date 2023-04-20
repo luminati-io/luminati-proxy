@@ -272,7 +272,7 @@ class Form extends Pure_component {
           </Labeled_controller>
           <Labeled_controller
             label="Admin whitelisted IPs"
-            faq_id="pmgr-whitelist-ui"
+            faq={{anchor: 'whitelisted_ips'}}
             tooltip={tooltips.www_whitelist_ips}>
             <Pins
               val={s.www_whitelist_ips}
@@ -283,7 +283,7 @@ class Form extends Pure_component {
           </Labeled_controller>
           <Labeled_controller
             type="pins"
-            faq_id="pmgr-whitelist-proxy"
+            faq={{anchor: 'whitelisted_ips'}}
             label="Proxy whitelisted IPs"
             tooltip={tooltips.whitelist_ips}>
             <Pins
@@ -354,7 +354,7 @@ class Form extends Pure_component {
             disabled={s.zagent}
             label="Log level / API logs"
             tooltip={tooltips.log_level}
-            faq_id="pmgr-logging"
+            faq={{article: '13596408374417', anchor: 'gathering_logs'}}
           />
           <Labeled_controller
             val={s.sync_config}
@@ -364,7 +364,7 @@ class Form extends Pure_component {
             default={!!s.zagent}
             tooltip={tooltips.sync_config}
             disabled={s.zagent}
-            faq_id="pmgr-sync-config"
+            faq={{anchor: 'sync_configuration'}}
           />
           {s.zagent && <Labeled_controller
             val={s.bw_limit_webhook_url || ''}

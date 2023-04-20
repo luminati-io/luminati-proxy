@@ -38,6 +38,16 @@ const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog,
 
 class Targeting_cell extends Pure_component {
     render(){
+        const title = (t_country, t_state, t_city, t_zip)=>{
+            let _val = t_country;
+            if (t_state)
+                _val += ` (${t_state})`;
+            if (t_state && t_city)
+                _val += `, ${t_city}`;
+            if (t_zip)
+                _val += ` (${t_zip})`;
+            return _val;
+        };
         const {proxy, mgr} = this.props;
         const zones = mgr.state.zones;
         const static_country = get_static_country(proxy, zones);
@@ -49,14 +59,8 @@ class Targeting_cell extends Pure_component {
         let val = proxy.country;
         if (!val||val=='any'||val=='*')
             return any_flag();
-        val = val.toUpperCase();
-        const state = proxy.state&&proxy.state.toUpperCase();
-        if (!state)
-            return flag_with_title(proxy.country, val);
-        if (!proxy.city)
-            return flag_with_title(proxy.country, `${val} (${state})`);
-        return flag_with_title(proxy.country,
-            `${val} (${state}), ${proxy.city}`);
+        return flag_with_title(proxy.country, title(val.toUpperCase(),
+            proxy.state && proxy.state.toUpperCase(), proxy.city, proxy.zip));
     }
 }
 

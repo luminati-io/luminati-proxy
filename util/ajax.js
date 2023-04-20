@@ -135,6 +135,8 @@ E.send = function(opt){
     }, function abort(){
         // reachable only via E.abort
         xhr.abort();
+        if (opt.abort_value)
+            return opt.abort_value;
     }]);
 };
 

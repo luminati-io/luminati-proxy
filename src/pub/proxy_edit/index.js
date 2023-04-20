@@ -169,7 +169,7 @@ const Index = withRouter(class Index extends Pure_component {
         {
             return false;
         }
-        if (['city', 'state'].includes(field_name) &&
+        if (['city', 'state', 'zip'].includes(field_name) &&
             (!form.country||form.country=='*'))
         {
             return false;
@@ -178,13 +178,14 @@ const Index = withRouter(class Index extends Pure_component {
         if (!zone || !zone.plan)
             return false;
         const permissions = zone.perm.split(' ') || [];
+        const perm_fields = ['country', 'state', 'city', 'asn', 'ip', 'zip'];
         if (field_name=='vip')
             return !!zone.plan.vip;
         if (field_name=='country' && zone.plan.ip_alloc_preset=='shared_block')
             return true;
         if (field_name=='country' && zone.plan.type=='static')
             return zone.plan.country || zone.plan.ip_alloc_preset;
-        if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
+        if (perm_fields.includes(field_name))
             return permissions.includes(field_name);
         if (field_name=='country' && (zone.plan.type=='static'||
             ['domain', 'domain_p'].includes(zone.plan.vips_type)))
@@ -220,7 +221,8 @@ const Index = withRouter(class Index extends Pure_component {
         const last_preset = form.preset ? presets.get(form.preset) : null;
         if (last_preset && last_preset.key!=preset && last_preset.clean)
             last_preset.clean(form_upd);
-        form_upd.preset = preset;
+        if (!is_mount)
+            form_upd.preset = preset;
         presets.get(preset)
             .set(form_upd, form, !last_preset || last_preset.key!=preset);
         const disabled_fields = presets.get(preset).disabled||{};
@@ -664,7 +666,7 @@ class Nav extends Pure_component {
             tooltip={
               <Preset_description preset={preset} rule_clicked={()=>0}/>
             }
-            faq_id="pmgr-presets"
+            faq={{article: '12583049659025', anchor: 'preset'}}
           />
           {is_local() &&
             <Open_browser_btn port={this.props.form.port}/>
@@ -716,19 +718,20 @@ class Confirmation_modal extends Pure_component {
 const Field = ({id, disabled, children, i18n, ext_tooltip, ...props})=>{
     const options = props.options||[];
     return <T>{t=><div className="field" data-tip data-for={id+'tip'}>
-      <React_tooltip id={id+'tip'} type="light" effect="solid"
-        place="bottom" delayHide={0} delayUpdate={300}>
-        {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
-      </React_tooltip>
-      <select value={props.value} disabled={disabled}
-        onChange={e=>props.on_change(e.target.value)}>
+        <React_tooltip id={id+'tip'} type="light" effect="solid"
+            place="bottom" delayHide={0} delayUpdate={300}>
+            {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
+        </React_tooltip>
+        <select value={props.value} disabled={disabled}
+            onChange={e=>props.on_change(e.target.value)}>
         {options.map(o=>
-          <option key={o.key} value={o.value}>
+            <option key={o.key} value={o.value}>
             {i18n ? t(o.key) : o.key}
-          </option>
+            </option>
         )}
-      </select>
-      {props.faq_id && <Faq_link id={props.faq_id}/>}
+        </select>
+        {props.faq && <Faq_link article={props.faq.article}
+            anchor={props.faq.anchor}/>}
     </div>}</T>;
 };
 

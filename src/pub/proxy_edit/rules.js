@@ -16,6 +16,7 @@ import Proxy_tester from '../proxy_tester.js';
 import Tooltip from '../common/tooltip.js';
 import {T} from '../common/i18n.js';
 import Toggle_on_off from '../common/toggle_on_off.js';
+import ws from '../ws.js';
 import {tabs} from './fields.js';
 
 const rule_prepare = rule=>{
@@ -117,9 +118,22 @@ export const map_rule_to_form = rule=>{
 };
 
 export class Rules extends Pure_component {
-    state = {rules: [{id: 0}], max_id: 0, disabled_fields: {}, defaults: {}};
-    set_field = setdb.get('head.proxy_edit.set_field');
-    goto_field = setdb.get('head.proxy_edit.goto_field');
+    constructor(props){
+        super(props);
+        this.state = {
+            rules: [{id: 0}],
+            max_id: 0,
+            disabled_fields: {},
+            defaults: {},
+        };
+        this.suggestions = {
+            custom: 'New custom rule',
+            savebw: 'Save bandwidth',
+            retry: 'Retry failed requests',
+        };
+        this.set_field = setdb.get('head.proxy_edit.set_field');
+        this.goto_field = setdb.get('head.proxy_edit.goto_field');
+    }
     componentDidMount(){
         this.setdb_on('head.proxy_edit.form', form=>{
             form && this.setState({form});
@@ -134,6 +148,9 @@ export class Rules extends Pure_component {
             disabled_fields&&this.setState({disabled_fields}));
         this.setdb_on('head.defaults',
             defaults=>this.setState({defaults: defaults||{}}));
+    }
+    suggestion_event(type){
+        ws.post_event('Rule Suggestion Click', {type});
     }
     update_rule = rule=>{
         if (!rule)
@@ -173,6 +190,7 @@ export class Rules extends Pure_component {
         }, this.rules_update);
     };
     rule_add_cb = ()=>{
+        this.suggestion_event(this.suggestions.custom);
         this.rule_add();
     };
     savebw_rule_exists = ()=>{
@@ -182,6 +200,7 @@ export class Rules extends Pure_component {
         });
     };
     savebw_rule_add = ()=>{
+        this.suggestion_event(this.suggestions.savebw);
         this.rule_add({
             action: 'bypass_proxy',
             trigger_type: 'url',
@@ -195,6 +214,7 @@ export class Rules extends Pure_component {
         });
     };
     retry_rule_add = ()=>{
+        this.suggestion_event(this.suggestions.retry);
         this.rule_add({
             action: 'retry',
             trigger_type: 'status',
@@ -206,6 +226,7 @@ export class Rules extends Pure_component {
         const {form, rules, disabled_fields, www} = this.state;
         if (!form)
             return null;
+        const {custom, savebw, retry} = this.suggestions;
         let {ssl} = form, def_ssl = this.state.defaults.ssl;
         let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
         return <div className="rules">
@@ -220,7 +241,7 @@ export class Rules extends Pure_component {
                       <a className="link" onClick={this.turn_ssl}>
                         <T>SSL analyzing</T>
                       </a>
-                      <Faq_link id="pmgr-ssl-analyzing"/>
+                      <Faq_link anchor="ssl_analyzing"/>
                     </span>
                   </React.Fragment>
                 }/>
@@ -228,17 +249,17 @@ export class Rules extends Pure_component {
               <New_rule_btn
                 disabled={disabled_fields.rules}
                 on_click={this.rule_add_cb}>
-                <T>New custom rule</T>
+                <T>{custom}</T>
               </New_rule_btn>
               <New_rule_btn
                 disabled={disabled_fields.rules || this.savebw_rule_exists()}
                 on_click={this.savebw_rule_add}>
-                <T>Save bandwidth</T>
+                <T>{savebw}</T>
               </New_rule_btn>
               <New_rule_btn
                 disabled={disabled_fields.rules || this.retry_rule_exists()}
                 on_click={this.retry_rule_add}>
-                <T>Retry failed requests</T>
+                <T>{retry}</T>
               </New_rule_btn>
               {rules.map(r=>
                 <Rule key={r.id}
@@ -268,7 +289,8 @@ const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
               <div className="nav_header" style={{marginBottom: 5}}>
                 <h3><T>Test rules</T></h3>
               </div>
-              <Proxy_tester port={this.props.match.params.port} no_labels/>
+              <Proxy_tester port={this.props.match.params.port} no_labels
+                test_event="Test Rules Click"/>
             </div>;
     }
 });

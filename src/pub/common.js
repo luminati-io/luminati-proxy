@@ -21,6 +21,7 @@ import {bytes_format, report_exception} from './util.js';
 
 export const www_api = 'https://brightdata.com';
 export const www_help = 'https://help.brightdata.com';
+export const lpm_faq_article = '12632549957649';
 
 export const Tooltip_bytes = props=>{
     let {bytes, bytes_out, bytes_in, cost} = props;
@@ -320,7 +321,9 @@ export class Cm_wrapper extends Pure_component {
 
 export const Faq_link = with_www_api(props=>{
     const click = ()=>{
-        const url = `${props.www_api}/faq/#${props.id}`;
+        const article = props.article || lpm_faq_article;
+        const anchor = props.anchor ? `#${props.anchor}` : '';
+        const url = `${props.www_help}/hc/en-us/articles/${article}${anchor}`;
         window.open(url, '_blank');
     };
     return <Tooltip title={t('Read more')}>
@@ -355,7 +358,8 @@ export const Labeled_controller = props=>
       inner_style={props.field_row_inner_style}>
         <div className="desc" style={props.desc_style}>
           <Tooltip title={t(props.tooltip)}>{t(props.label)}</Tooltip>
-          {props.faq_id && <Faq_link id={props.faq_id}/>}
+          {props.faq && <Faq_link article={props.faq.article}
+                anchor={props.faq.anchor}/>}
         </div>
         <div>
           <div className="field" data-tip data-for={props.id+'tip'}>

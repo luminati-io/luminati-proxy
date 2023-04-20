@@ -112,7 +112,8 @@
     "lum_crontab": "1.0.0",
     "js-cookie": "2.2.1",
     "styled-components": "5.2.1",
-    "cli-progress": "3.10.0"
+    "cli-progress": "3.10.0",
+    "lru-cache": "7.14.1"
   },
   "description": "A configurable local proxy for brightdata.com",
   "devDependencies": {
@@ -200,6 +201,7 @@
       "bin/pub/img/delete.svg",
       "bin/pub/img/down.svg",
       "bin/pub/img/faq.svg",
+      "bin/pub/img/flag.svg",
       "bin/pub/img/flag_any_country.svg",
       "bin/pub/img/general.svg",
       "bin/pub/img/google.svg",
@@ -239,6 +241,8 @@
       "bin/pub/img/logo_crawlera.svg",
       "bin/pub/img/logo_import.svg",
       "bin/pub/img/logs.svg",
+      "bin/pub/img/maps.svg",
+      "bin/pub/img/map_pin.svg",
       "bin/pub/img/medium_icons.png",
       "bin/pub/img/mobile.svg",
       "bin/pub/img/preset_icon.png",
@@ -262,6 +266,7 @@
       "bin/pub/img/treeoutline_triangles.png",
       "bin/pub/img/up.svg",
       "bin/pub/img/warning.svg",
+      "bin/pub/img/zipcode.svg",
       "bin/pub/img/zone_icon.png",
       "bin/upgrader.js",
       "changelog.json",
@@ -407,7 +412,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "ff63873b88a630cc775e1286c1da3c5e"
+    "md5": "5c75e38d4c926ebc3ed37000151d51f1"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -439,5 +444,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.370.592"
+  "version": "1.375.164"
 }

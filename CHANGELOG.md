@@ -1,5 +1,11 @@
 Proxy manager - Change Log
 
+## 1.375.164 Stable
+- :sparkles: Updated settings FAQ links
+- :star: Refresh connection to lpm_f by interval
+- :star: Introduced zip code targeting
+- :bug: Fix port's Whitelisted IPs are erased on settings update
+
 ## 1.370.592 Stable
 - :sparkles: Updated links to FAQ pages
 - :bug: Fix proxy port users change does not apply if multiply proxy port enabled

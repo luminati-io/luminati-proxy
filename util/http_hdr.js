@@ -159,7 +159,15 @@ const generate_sec_ch_rules_chromium = ({ver_from, ver_to, browser_name,
                 'sec-ch-ua-mobile': '?0',
                 'sec-ch-ua-platform': '"Windows"',
             },
-    },
+        },
+        112: {match: {browser: browser_name, https: true, version_min: 112},
+            rules: {
+                'sec-ch-ua': `"Chromium";v="112", `+
+                    `"${browser_full_name}";v="112", "Not:A-Brand";v="99"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+            },
+        },
     };
     const versions_array = Array.from({length: ver_to - ver_from + 1},
         (_, idx)=>idx+ver_from);

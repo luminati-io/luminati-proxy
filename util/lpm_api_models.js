@@ -42,6 +42,7 @@ E.proxy_fields = {
     country: {type: 'string', desc: 'Country'},
     state: {type: 'string', desc: 'State'},
     city: {type: 'string', desc: 'City'},
+    zip: {type: 'string', desc: 'Zip code'},
     asn: {type: 'string', desc: 'ASN'},
     ip: {type: 'string', desc: 'Data Center IP'},
     vip: {type: 'integer', desc: 'gIP'},

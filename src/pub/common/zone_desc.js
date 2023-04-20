@@ -2,9 +2,9 @@
 'use strict'; /*jslint react:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
-import Tooltip from './tooltip.js';
 import {get_static_country} from '../util.js';
 import {flag_with_title, any_flag} from '../common.js';
+import Tooltip from './tooltip.js';
 import {t} from './i18n.js';
 import {get_plan_network, network_types} from './network_types.js';
 import '../css/zone_desc.less';
@@ -94,9 +94,10 @@ class Perm_icons extends Pure_component {
         static_res: 'Static residential IPs',
         asn: 'Residential IPs - "Autonomous System Number" (ASN) resolution',
         city: 'Residential IPs - City resolution',
+        zip: 'Residential IPs - Zip code resolution',
         mobile: 'Mobile IPs',
     };
-    perm_icons = ['country', 'state', 'asn', 'city', 'vip'];
+    perm_icons = ['country', 'state', 'asn', 'city', 'vip', 'zip'];
     render(){
         const {perm_list} = this.props;
         if (!perm_list||!perm_list.length)

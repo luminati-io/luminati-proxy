@@ -40,6 +40,7 @@ const Howto = withRouter(class Howto extends Pure_component {
         const cur_title = this.option_to_text[option];
         const hostname = zagent ? cloud_url_address : undefined;
         const lpm_token_value = (lpm_token||'').split('|')[0];
+        let test_event;
         let Instructions = ()=>null;
         if (option=='browser')
             Instructions = Browser_instructions;
@@ -49,6 +50,7 @@ const Howto = withRouter(class Howto extends Pure_component {
         {
             example_port = undefined;
             Instructions = Proxy_tester;
+            test_event = 'Web Tester Test Click';
         }
         return <T>{t=><div className="howto">
             <div className="cp_panel vbox">
@@ -77,7 +79,8 @@ const Howto = withRouter(class Howto extends Pure_component {
                 <Instructions
                   hostname={hostname}
                   lpm_token={lpm_token_value}
-                  port={example_port}>
+                  port={example_port}
+                  test_event={test_event}>
                   {this.props.children}
                 </Instructions>
               </div>

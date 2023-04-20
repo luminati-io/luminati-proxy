@@ -1,11 +1,11 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {tabs} from './fields.js';
 import {Labeled_controller, Ext_tooltip} from '../common.js';
-import {withRouter} from 'react-router-dom';
+import {tabs} from './fields.js';
 
 export const Tab_context = React.createContext('logs');
 const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
@@ -95,7 +95,7 @@ export const Config = withRouter(class Config extends Pure_component {
                   <Ext_tooltip/>}
               exact={this.props.exact}
               filter_by={this.props.filter_by}
-              faq_id={this.props.faq_id}
+              faq={this.props.faq}
               no_any={this.props.no_any}/>;
     }
 });

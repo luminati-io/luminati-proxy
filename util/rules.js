@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true es9:true*/
 require('./config.js');
-const _ = require('lodash');
 const crypto = require('crypto');
+const _ = require('lodash');
 const zurl = require('./url.js');
 const E = exports;
 const MD5_RAND_MAX = parseInt('f'.repeat(32), 16);
@@ -86,10 +86,7 @@ E.rule_value_match = (rule_v, v, opts)=>{
     if (opts && opts.comparator)
         return !!opts.comparator(rule_v, v);
     if (Array.isArray(rule_v))
-    {
-        return rule_v.some(_rule_v=>E.rule_value_match(_rule_v, v,
-            opts));
-    }
+        return rule_v.some(_rule_v=>E.rule_value_match(_rule_v, v, opts));
     if (!_.isObject(rule_v))
     {
         if (typeof v!='string')

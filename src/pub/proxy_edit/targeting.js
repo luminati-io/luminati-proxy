@@ -4,8 +4,8 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {Note, Ext_tooltip, Faq_link, with_www_api} from '../common.js';
-import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
+import {Config, Tab_context} from './common.js';
 
 const carriers_note = (()=>{
     const subject = 'Add new carrier option';
@@ -19,16 +19,19 @@ const carriers_note = (()=>{
 })();
 
 export default with_www_api(class Targeting extends Pure_component {
-    state = {};
-    os_opt = [
-        {key: 'Any (default)', value: ''},
-        {key: 'Windows', value: 'win'},
-        {key: 'MacOS', value: 'mac'},
-        {key: 'Android', value: 'android'},
-    ];
-    set_field = setdb.get('head.proxy_edit.set_field');
-    is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
-    get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
+    constructor(props){
+        super(props);
+        this.state = {};
+        this.os_opt = [
+            {key: 'Any (default)', value: ''},
+            {key: 'Windows', value: 'win'},
+            {key: 'MacOS', value: 'mac'},
+            {key: 'Android', value: 'android'},
+        ];
+        this.set_field = setdb.get('head.proxy_edit.set_field');
+        this.is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
+        this.get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
+    }
     componentDidMount(){
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -47,8 +50,14 @@ export default with_www_api(class Targeting extends Pure_component {
             this.setState({carriers});
         });
         this.setdb_on('head.proxy_edit.form', form=>{
-            form && this.setState({form});
+            if (!form)
+                return;
+            this.initial_zip = form.zip;
+            this.setState({form});
         });
+    }
+    set_fields(val, fields=[]){
+        fields.forEach(f=>this.set_field(f, val));
     }
     allowed_countries = ()=>{
         let res = this.state.locations.countries.map(c=>({
@@ -69,11 +78,8 @@ export default with_www_api(class Targeting extends Pure_component {
             res = res.filter(r=>r.mob);
         return list.concat(res);
     };
-    country_changed = ()=>{
-        this.set_field('city', '');
-        this.set_field('state', '');
-        this.set_field('carrier', '');
-    };
+    country_changed = ()=>this.set_fields('', ['city', 'state', 'carrier',
+        'zip']);
     states = ()=>{
         const {country} = this.state.form;
         if (!country||country=='*')
@@ -84,7 +90,8 @@ export default with_www_api(class Targeting extends Pure_component {
         .map(r=>({label: r.region_name, id: r.region_id}));
         return res;
     };
-    state_changed = ()=>this.set_field('city', '');
+    state_changed = ()=>this.set_fields('', ['city', 'zip']);
+    city_id = (c, region={})=>`${c.city_name}|${region.id||c.region_id}`;
     cities = ()=>{
         const {country, state} = this.state.form;
         let res;
@@ -98,11 +105,28 @@ export default with_www_api(class Targeting extends Pure_component {
             res = res.filter(c=>c.region_id==state);
         const regions = this.states();
         res = res.map(c=>{
-            const region = regions.find(r=>r.id==c.region_id);
-            return {label: c.city_name+' ('+region.id+')',
-                id: c.city_name+'|'+region.id};
+            const r = regions.find(rg=>rg.id==c.region_id);
+            return {label: c.city_name+' ('+r.id+')', id: this.city_id(c, r)};
         });
         return res;
+    };
+    zips = ()=>{
+        const {country, city, state} = this.state.form;
+        const city_name = city && city.split('|')[0];
+        let zips = [];
+        if (!country)
+            return zips;
+        zips = this.state.locations.cities
+            .filter(c=>c.country_id==country&&c.zip&&c.zip.length);
+        if (state)
+            zips = zips.filter(c=>c.region_id==state);
+        if (city_name)
+            zips = zips.filter(c=>c.city_name==city_name);
+        let zips_flat = zips.map(z=>z.zip).flat();
+        if (this.initial_zip && !zips_flat.includes(this.initial_zip))
+            zips_flat.push(this.initial_zip);
+        this.initial_zip = null;
+        return zips_flat.map(z=>({id: z, label: z}));
     };
     asns = ()=>{
         const {country} = this.state.form;
@@ -125,10 +149,19 @@ export default with_www_api(class Targeting extends Pure_component {
         return carriers.filter(c=>res.has(c.label));
     };
     city_changed = e=>{
-        if (!e)
-            this.set_field('state', '');
-        else if (this.is_valid_field('state'))
+        if (e && this.is_valid_field('state'))
             this.set_field('state', e.split('|')[1]);
+        let filed_to_empty = e ? 'zip' : 'state';
+        this.set_field(filed_to_empty, '');
+    };
+    zip_changed = z=>{
+        const {country} = this.state.form;
+        let entry = this.state.locations.cities.find(c=>
+            c.country_id==country&&c.zip&&c.zip.includes(z));
+        if (entry && this.is_valid_field('city'))
+            this.set_field('city', this.city_id(entry));
+        if (entry && this.is_valid_field('state'))
+            this.set_field('state', entry.region_id);
     };
     render(){
         if (!this.state.locations || !this.state.carriers || !this.state.form)
@@ -189,6 +222,8 @@ export default with_www_api(class Targeting extends Pure_component {
                   on_change={this.state_changed}/>
                 <Config type="typeahead" id="city" data={this.cities()}
                   on_change={this.city_changed}/>
+                <Config type="typeahead" id="zip" data={this.zips()}
+                  on_change={this.zip_changed} update_on_input/>
                 <Config type="typeahead" id="asn" data={this.asns()}
                   disabled={!!this.state.form.carrier} update_on_input
                   filter_by={filter_by_asns}/>
@@ -198,7 +233,7 @@ export default with_www_api(class Targeting extends Pure_component {
                   disabled={is_static}/>
                 <Note>
                   Read more about Targeting here
-                  <Faq_link id="pmgr-targeting"/>
+                  <Faq_link anchor="targeting"/>
                 </Note>
               </Tab_context.Provider>
             </div>;

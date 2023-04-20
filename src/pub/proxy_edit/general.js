@@ -4,12 +4,12 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
-import {Config, Tab_context} from './common.js';
+import conv from '../../../util/conv.js';
 import {T} from '../common/i18n.js';
+import {with_www_api, Note} from '../common.js';
+import {Config, Tab_context} from './common.js';
 import Users_modal from './users_modal.js';
 import Bw_limit_modal from './bw_limit_modal.js';
-import {with_www_api, Note} from '../common.js';
-import conv from '../../../util/conv.js';
 
 const route_err_opt = [
     {key: 'pass_dyn (default)', value: 'pass_dyn'},
@@ -164,19 +164,19 @@ export default class General extends Pure_component {
               id="whitelist_ips"
               disabled_ips={disabled_wl}
               no_any={zagent}
-              faq_id="pmgr-whitelist-proxy"
+              faq={{anchor: 'whitelisted_ips'}}
             />
             <T>{t=><Config type="select"
               disabled={zagent}
               data={this.proxy_connection_type_opt(t)}
               id="proxy_connection_type"
-              faq_id="pmgr-conn-sp"
+              faq={{anchor: 'https'}}
             />}</T>
             <Config
               type="yes_no"
               id="ssl"
               on_change={this.ssl_changed}
-              faq_id="pmgr-ssl-analyzing"
+              faq={{anchor: 'ssl_analyzing'}}
             />
             {form.ssl &&
               <Config

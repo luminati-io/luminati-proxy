@@ -104,6 +104,17 @@ describe('username', ()=>{
                 city: 'california', state: 'md', state_perm: true},
                 un('country-us-state-md-city-california'));
         });
+        describe('zip', ()=>{
+            const t = (name, opt, expected)=>it(name, ()=>{
+                const res = username.calculate_username(opt);
+                assert.equal(res.username, expected);
+            });
+            t('should skip zip if permission is not granted',
+                {country: 'us', zip: 12345}, un('country-us'));
+            t('attach zip if zip permission is granted',
+                {country: 'us', zip: 12345, zip_perm: true},
+                un('country-us-zip-12345'));
+        });
     });
     describe('parse', ()=>{
         it('should not parse if not an auth header', ()=>{

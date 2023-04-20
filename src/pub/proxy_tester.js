@@ -17,6 +17,7 @@ import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {report_exception} from './util.js';
+import ws from './ws.js';
 import './css/proxy_tester.less';
 const {SEC} = date.ms;
 
@@ -36,6 +37,7 @@ export default class Proxy_tester extends Pure_component {
             no_labels={this.props.no_labels}
             port={this.props.port}
             hide_port={!!this.props.port}
+            test_event={this.props.test_event}
           />
           <Preview
             panes={panes}
@@ -105,6 +107,8 @@ class Request extends Pure_component {
     };
     go = ()=>{
         const port = this.state.params.port||this.props.def_port;
+        if (this.props.test_event)
+            ws.post_event(this.props.test_event, {port});
         const url = '/api/test/'+port;
         const data = {
             headers: this.state.headers.reduce((acc, el)=>{

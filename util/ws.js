@@ -550,7 +550,7 @@ class WS extends EventEmitter {
                 this.emit('raw', msg);
                 handled = true;
             }
-        } catch(e){ ef(e, this);
+        } catch(e){ ef(e);
             zerr(`${this}: ${zerr.e2s(e)}`);
             return this.abort(1011, e.message);
         }
@@ -943,7 +943,7 @@ class Server {
         {
             try {
                 zws.data = this.handler(zws, req);
-            } catch(e){ ef(e, this);
+            } catch(e){ ef(e);
                 zerr(zerr.e2s(e));
                 return zws.close(1011, String(e));
             }

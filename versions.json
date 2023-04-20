@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.375.164",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Updated settings FAQ links"
+            },
+            {
+                "type": "star",
+                "text": "Refresh connection to lpm_f by interval"
+            },
+            {
+                "type": "star",
+                "text": "Introduced zip code targeting"
+            },
+            {
+                "type": "bug",
+                "text": "Fix port's Whitelisted IPs are erased on settings update"
+            }
+        ]
+    },
+    {
         "ver": "1.370.592",
         "type": "stable",
         "changes": [

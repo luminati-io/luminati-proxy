@@ -28,6 +28,11 @@ export const tabs = {
                 tooltip: 'The city from which IP will be allocated',
                 placeholder: 'Type in city name',
             },
+            zip: {
+                label: 'Zip code',
+                tooltip: 'The zip code of which IP will be allocated',
+                placeholder: 'Type zip code e.g. 420012',
+            },
             asn: {
                 label: <span>
                     ISP/ASN (
