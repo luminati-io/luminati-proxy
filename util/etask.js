@@ -1344,7 +1344,7 @@ E.all_limit = function(limit, arr_iter, cb){
     var at = 0;
     var iter = !Array.isArray(arr_iter) ? arr_iter : function(){
         if (at<arr_iter.length)
-            return cb.call(this, arr_iter[at++]);
+            return cb.call(this, arr_iter[at], at++);
     };
     return new Etask({name: 'all_limit', cancel: true}, [function(){
         var next;

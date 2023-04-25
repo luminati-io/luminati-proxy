@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.376.167",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Support NodeJS 18"
+            }
+        ]
+    },
+    {
         "ver": "1.375.164",
         "type": "stable",
         "changes": [

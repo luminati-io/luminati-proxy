@@ -544,4 +544,11 @@ E.escape_path = function(path){
     return INVALID_PATH_REGEX.test(path) ? encodeURI(path) : path;
 };
 
+E.remove_protocol = function(url){
+    var any_protocol_regex = /(^\w+:|^)\/\//;
+    return url.replace(any_protocol_regex, '');
+};
+
+E.remove_www = function(url){ return url.replace('www.', ''); };
+
 return E; }); }());

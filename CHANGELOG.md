@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.376.167 Development Latest
+- :star: Support NodeJS 18
+
 ## 1.375.164 Stable
 - :sparkles: Updated settings FAQ links
 - :star: Refresh connection to lpm_f by interval
