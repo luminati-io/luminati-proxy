@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM node:14.19.0
+FROM node:14.19.3-bullseye
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 

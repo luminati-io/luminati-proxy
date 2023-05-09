@@ -4,6 +4,7 @@ require('./config.js');
 const crypto = require('crypto');
 const _ = require('lodash');
 const zurl = require('./url.js');
+const string = require('./string.js');
 const E = exports;
 const MD5_RAND_MAX = parseInt('f'.repeat(32), 16);
 
@@ -149,25 +150,12 @@ E.rule_merge_customizer = (dest, src)=>{
 };
 
 function unify_hostnames(hostname, selector){
-    const hostname_len = char_count(hostname, '.')+1;
-    const selector_len = char_count(selector, '.')+1;
-    if (hostname_len<selector_len)
-        hostname = 'www.'+hostname;
-    else if (selector_len<hostname_len)
-        selector = 'www.'+selector;
-    return [hostname, selector];
-}
-
-function char_count(str, char){
-    if (!str)
-        return 0;
-    let count = 0;
-    for (let i=0; i<str.length; i++)
-    {
-        if (str[i]==char)
-            count++;
-    }
-    return count;
+    const hostname_level = hostname ? string.count(hostname, '.') : 0;
+    const selector_level = selector ? string.count(selector, '.') : 0;
+    return [
+        hostname_level<selector_level ? 'www.'+hostname : hostname,
+        hostname_level>selector_level ? 'www.'+selector : selector,
+    ];
 }
 
 function hostname_lookup(haystack, v){

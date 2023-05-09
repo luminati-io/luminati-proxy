@@ -1,6 +1,16 @@
 [
     {
-        "ver": "1.376.167",
+        "ver": "1.379.317",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Prevent writing to closed stream on rules chain apply"
+            }
+        ]
+    },
+    {
+        "ver": "1.376.171",
         "type": "dev",
         "changes": [
             {

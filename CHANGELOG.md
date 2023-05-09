@@ -1,6 +1,9 @@
 Proxy manager - Change Log
 
-## 1.376.167 Development Latest
+## 1.379.317 Stable
+- :bug: Prevent writing to closed stream on rules chain apply
+
+## 1.376.171 Development Latest
 - :star: Support NodeJS 18
 
 ## 1.375.164 Stable
