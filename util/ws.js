@@ -168,6 +168,21 @@ const make_ipc_client_class = ws_opt=>{
         ws_opt.ipc_client_class = IPC_client_base.build(ws_opt);
 };
 
+const counter_cache = {};
+const make_counter = opt=>{
+    const zcounter_glob = opt && opt.zcounter_glob;
+    const cache_key = zcounter_glob ? 'glob_counter' : 'local_counter';
+    if (counter_cache[cache_key])
+        return counter_cache[cache_key];
+    const counter = {};
+    ['inc', 'inc_level', 'avg', 'max', 'min', 'set_level'].forEach(m=>{
+        counter[m] = zcounter_glob ? zcounter[`glob_${m}`] : zcounter[m];
+        counter[m] = counter[m].bind(zcounter);
+    });
+    counter_cache[cache_key] = counter;
+    return counter;
+};
+
 class WS extends EventEmitter {
     constructor(opt){
         super();
@@ -208,6 +223,7 @@ class WS extends EventEmitter {
             this.ping_last = 0;
         }
         this.pong_received = true;
+        this.refresh_ping_on_msg = opt.refresh_ping_on_msg!==false;
         this.idle_timeout = opt.idle_timeout;
         this.idle_timer = undefined;
         this.ipc = opt.ipc_client_class ? new opt.ipc_client_class(this)
@@ -219,6 +235,8 @@ class WS extends EventEmitter {
         this.mux = opt.mux ? new Mux(this) : undefined;
         if ((this.zc || this.zc_mux) && !zcounter)
             zcounter = require('./zcounter.js');
+        if (zcounter)
+            this._counter = make_counter(opt);
         this._send_throttle_t = undefined;
         this._buffers = undefined;
     }
@@ -267,15 +285,15 @@ class WS extends EventEmitter {
             this.ws.send(msg, opt);
         if (this.zc_tx)
         {
-            zcounter.inc(`${this.zc}_tx_msg`);
-            zcounter.inc(`${this.zc}_tx_bytes`, msg.length);
-            zcounter.avg(`${this.zc}_tx_bytes_per_msg`, msg.length);
+            this._counter.inc(`${this.zc}_tx_msg`);
+            this._counter.inc(`${this.zc}_tx_bytes`, msg.length);
+            this._counter.avg(`${this.zc}_tx_bytes_per_msg`, msg.length);
         }
         if (this.zc_tx_per_cmd && opt && opt.cmd)
         {
-            zcounter.inc(`${this.zc}.${opt.cmd}_tx_msg`);
-            zcounter.inc(`${this.zc}.${opt.cmd}_tx_bytes`, msg.length);
-            zcounter.avg(`${this.zc}.${opt.cmd}_tx_bytes_per_msg`,
+            this._counter.inc(`${this.zc}.${opt.cmd}_tx_msg`);
+            this._counter.inc(`${this.zc}.${opt.cmd}_tx_bytes`, msg.length);
+            this._counter.avg(`${this.zc}.${opt.cmd}_tx_bytes_per_msg`,
                 msg.length);
         }
         return true;
@@ -338,7 +356,7 @@ class WS extends EventEmitter {
         this._close(true, code, reason);
         zerr.warn(msg);
         if (this.zc && code)
-            zcounter.inc(`${this.zc}_err_${code}`);
+            this._counter.inc(`${this.zc}_err_${code}`);
         this._check_status();
     }
     _close(close, code, reason){
@@ -435,7 +453,7 @@ class WS extends EventEmitter {
         this.reason = event.message||'Network error';
         zerr(`${this}: ${this.reason}`);
         if (this.zc)
-            zcounter.inc(`${this.zc}_err`);
+            this._counter.inc(`${this.zc}_err`);
         this._close();
         this._check_status();
     }
@@ -483,10 +501,10 @@ class WS extends EventEmitter {
         }
         if (this.zc_rx)
         {
-            zcounter.inc(`${this.zc}_rx_msg`);
-            zcounter.inc(`${this.zc}_rx_bytes`, msg.length);
-            zcounter.avg(`${this.zc}_rx_bytes_per_msg`, msg.length);
-            zcounter.max(`${this.zc}_rx_bytes_per_msg_max`, msg.length);
+            this._counter.inc(`${this.zc}_rx_msg`);
+            this._counter.inc(`${this.zc}_rx_bytes`, msg.length);
+            this._counter.avg(`${this.zc}_rx_bytes_per_msg`, msg.length);
+            this._counter.max(`${this.zc}_rx_bytes_per_msg_max`, msg.length);
         }
         try {
             if (is_bin)
@@ -503,7 +521,7 @@ class WS extends EventEmitter {
                     {
                         const t = Date.now();
                         parsed = conv.JSON_parse(msg, this.zjson_opt_receive);
-                        zcounter.inc(`${this.zc}_parse_zjson_ms`,
+                        this._counter.inc(`${this.zc}_parse_zjson_ms`,
                             Date.now()-t);
                     }
                     else
@@ -517,7 +535,8 @@ class WS extends EventEmitter {
                     {
                         const t = Date.now();
                         parsed = parsed||JSON.parse(msg);
-                        zcounter.inc(`${this.zc}_parse_json_ms`, Date.now()-t);
+                        this._counter.inc(`${this.zc}_parse_json_ms`,
+                            Date.now()-t);
                     }
                     else
                         parsed = parsed||JSON.parse(msg);
@@ -557,14 +576,15 @@ class WS extends EventEmitter {
         if (!handled)
             this.abort(1003, 'Unexpected message');
         this._update_idle();
-        this._refresh_ping_timers();
+        if (this.refresh_ping_on_msg)
+            this._refresh_ping_timers();
     }
     _on_pong(){
         this.pong_received = true;
         if (zerr.is.debug())
             zerr.debug(`${this}< pong (rtt ${Date.now()-this.ping_last}ms)`);
         if (this.zc)
-            zcounter.avg(`${this.zc}_ping_ms`, Date.now()-this.ping_last);
+            this._counter.avg(`${this.zc}_ping_ms`, Date.now()-this.ping_last);
     }
     _ping(){
         // don't send new ping if ping_timeout > ping_interval (weird case)
@@ -607,7 +627,7 @@ class WS extends EventEmitter {
     }
     _idle(){
         if (this.zc)
-            zcounter.inc(`${this.zc}_idle_timeout`);
+            this._counter.inc(`${this.zc}_idle_timeout`);
         this.emit('idle_timeout');
         this.abort(1002, 'Idle timeout');
     }
@@ -626,7 +646,7 @@ class WS extends EventEmitter {
         this._close(true, code, reason);
         zerr.notice(msg);
         if (this.zc && code)
-            zcounter.inc(`${this.zc}_err_${code}`);
+            this._counter.inc(`${this.zc}_err_${code}`);
         this._check_status();
     }
     inspect(){
@@ -678,7 +698,7 @@ class Client extends WS {
             ? 50000 : opt.handshake_timeout;
         this.handshake_timer = undefined;
         if (this.zc)
-            zcounter.inc_level(`level_${this.zc}_online`, 0, 'sum');
+            this._counter.inc_level(`level_${this.zc}_online`, 0, 'sum');
         if (opt.proxy)
         {
             let _lib = require('https-proxy-agent');
@@ -701,7 +721,7 @@ class Client extends WS {
             this.server_no_mask_support ? {mask: false} : undefined);
     }
     _on_message(ev){
-        if (!this.server_no_mask_support && ev.data==SERVER_NO_MASK_SUPPORT)
+        if (!this.server_no_mask_support && ev.data===SERVER_NO_MASK_SUPPORT)
         {
             this.server_no_mask_support = true;
             return void this.emit(SERVER_NO_MASK_SUPPORT);
@@ -711,11 +731,11 @@ class Client extends WS {
     _assign(ws){
         super._assign(ws);
         if (this.zc)
-            zcounter.inc_level(`level_${this.zc}_online`, 1, 'sum');
+            this._counter.inc_level(`level_${this.zc}_online`, 1, 'sum');
     }
     _close(close, code, reason){
         if (this.zc && this.ws)
-            zcounter.inc_level(`level_${this.zc}_online`, -1, 'sum');
+            this._counter.inc_level(`level_${this.zc}_online`, -1, 'sum');
         if (this.handshake_timer)
             this.handshake_timer = clearTimeout(this.handshake_timer);
         super._close(close, code, reason);
@@ -747,7 +767,7 @@ class Client extends WS {
             }
         }
         if (this.zc)
-            zcounter.inc(`${this.zc}_fallback`, url==this.url ? 0 : 1);
+            this._counter.inc(`${this.zc}_fallback`, url==this.url ? 0 : 1);
         zerr.notice(`${this}: connecting to ${url}`);
         this._assign(new this.impl(url, undefined, opt));
         if (this.handshake_timeout)
@@ -871,9 +891,10 @@ class Server {
             zerr.notice(`${this}: listening on port ${opt.port}`);
         if (!zcounter)
             zcounter = require('./zcounter.js');
+        this._counter = make_counter(opt);
         // ensure the metric exists, even if 0
         if (this.zc)
-            zcounter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
+            this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
     }
     toString(){ return this.label ? `${this.label} WS server` : 'WS server'; }
     upgrade(req, socket, head){
@@ -931,13 +952,13 @@ class Server {
         this.connections.add(zws);
         if (this.zc)
         {
-            zcounter.inc(`${this.zc}_conn`);
-            zcounter.inc_level(`level_${this.zc}_conn`, 1, 'sum');
+            this._counter.inc(`${this.zc}_conn`);
+            this._counter.inc_level(`level_${this.zc}_conn`, 1, 'sum');
         }
         zws.addListener('disconnected', ()=>{
             this.connections.delete(zws);
             if (this.zc)
-                zcounter.inc_level(`level_${this.zc}_conn`, -1, 'sum');
+                this._counter.inc_level(`level_${this.zc}_conn`, -1, 'sum');
         });
         if (this.handler)
         {
@@ -1475,6 +1496,7 @@ class Mux {
             suspended();
             suspended = undefined;
         };
+        stream.setNoDelay = ()=>{};
         // XXX vladimir: rm custom '_close' event
         // not using 'close' event due to confusion with socket close event
         // which is emitted async after handle closed
@@ -1484,13 +1506,19 @@ class Mux {
                 zerr.info(`${this.ws}: vfd ${vfd} closed`);
                 let zc = this.ws.zc;
                 if (zc)
-                    zcounter.inc_level(`level_${zc}_mux_vfd`, -1, 'sum');
+                {
+                    this.ws._counter.inc_level(`level_${zc}_mux_vfd`,
+                        -1, 'sum');
+                }
             }
         });
         this.streams.set(vfd, stream);
         zerr.info(`${this.ws}: vfd ${vfd} open`);
         if (this.ws.zc)
-            zcounter.inc_level(`level_${this.ws.zc}_mux_vfd`, 1, 'sum');
+        {
+            this.ws._counter.inc_level(`level_${this.ws.zc}_mux_vfd`,
+                1, 'sum');
+        }
         return stream;
     }
     open_ack(vfd, opt={}){
@@ -1676,7 +1704,7 @@ class Mux {
             if (pending)
                 pending.continue();
             if (_this.ws.zc_mux)
-                zcounter.inc(`${_this.ws.zc||'unknown'}_mux_on_ack`);
+                this.ws._counter.inc(`${_this.ws.zc||'unknown'}_mux_on_ack`);
         };
         stream.send_win_size = ()=>{
             if (stream.win_size_sent)
@@ -1712,7 +1740,7 @@ class Mux {
         stream.on_fin = msg=>{
             stream.fin_got = true;
             if (_this.ws.zc_mux)
-                zcounter.inc(`${_this.ws.zc||'unknown'}_mux_on_fin`);
+                this.ws._counter.inc(`${_this.ws.zc||'unknown'}_mux_on_fin`);
             const fn = ()=>next_tick(()=>zfin_pending ?
                 zfin_pending.continue() : zfinish(true, false));
             etask(function*_mux_stream_on_fin(){
@@ -1744,6 +1772,7 @@ class Mux {
             };
             stream._unused_tm = setTimeout(stream._unused_tm_fn, timeout);
         };
+        stream.setNoDelay = ()=>{};
         // XXX vladislavl: rm custom '_close' event: svc_bridge uses it
         stream.on('_close', ()=>{
             if (!this.streams.delete(vfd))
@@ -1752,13 +1781,13 @@ class Mux {
                 zerr.info(`${this.ws}: vfd ${vfd} closed`);
             let zc = this.ws.zc;
             if (zc)
-                zcounter.inc_level(`level_${zc}_mux`, -1, 'sum');
+                this.ws._counter.inc_level(`level_${zc}_mux`, -1, 'sum');
         });
         this.streams.set(vfd, stream);
         if (zerr.is.info())
             zerr.info(`${this.ws}: vfd ${vfd} open`);
         if (this.ws.zc)
-            zcounter.inc_level(`level_${this.ws.zc}_mux`, 1, 'sum');
+            this.ws._counter.inc_level(`level_${this.ws.zc}_mux`, 1, 'sum');
         if (opt.compress || opt.decompress)
         {
             if (!SnappyStream || !UnsnappyStream)
@@ -1833,7 +1862,7 @@ class Mux {
         stream.emit('unexpected_ack', msg);
         zerr(`${this.ws}: unexpected json_ack %O`, msg);
         if (this.ws.zc)
-            zcounter.inc('mux_unexpected_ack');
+            this.ws._counter.inc('mux_unexpected_ack');
     }
     _on_disconnected(){
         let err = new Error(this.ws.reason || 'disconnected');
@@ -1873,7 +1902,8 @@ function server_impl(opt){
         throw new Error(`WS server is not available`);
     const impl = opt.impl || (is_win || is_darwin ? 'ws' : 'uws');
     const l = lib(impl);
-    l.server_no_mask_support = l.server_no_mask_support || impl=='ws';
+    // XXX mikhailpo: disabled due to SIGSEGV err
+    l.server_no_mask_support = false; // l.server_no_mask_support||impl=='ws';
     return l;
 }
 

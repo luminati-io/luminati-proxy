@@ -84,6 +84,10 @@ E.matches_rule = (match, selector, opts)=>{
 };
 
 E.rule_value_match = (rule_v, v, opts)=>{
+    if (rule_v && rule_v.$not)
+        return !E.rule_value_match(rule_v.$not, v, opts);
+    if (rule_v && rule_v.$and)
+        return rule_v.$and.every(_rule=>E.rule_value_match(_rule, v, opts));
     if (opts && opts.comparator)
         return !!opts.comparator(rule_v, v);
     if (Array.isArray(rule_v))

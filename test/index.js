@@ -6,17 +6,18 @@ const net = require('net');
 const https = require('https');
 const http = require('http');
 const tls = require('tls');
+const {Readable, Writable} = require('stream');
+const request = require('request');
 const socks = require('lum_socksv5');
 const {Netmask} = require('netmask');
-const {Readable, Writable} = require('stream');
 const lolex = require('lolex');
 const sinon = require('sinon');
 const ssl = require('../lib/ssl.js');
-const request = require('request');
 const etask = require('../util/etask.js');
 const {ms} = require('../util/date.js');
 const zutil = require('../util/util.js');
 const lpm_config = require('../util/lpm_config.js');
+const qw = require('../util/string.js').qw;
 const Server = require('../lib/server.js');
 const Worker = require('../lib/worker.js');
 const Manager = require('../lib/manager.js');
@@ -25,7 +26,6 @@ const {Timeline, decode_body} = require('../lib/util.js');
 const consts = require('../lib/consts.js');
 const common = require('./common.js');
 const {assert_has, http_proxy, smtp_test_server, http_ping, keys} = common;
-const qw = require('../util/string.js').qw;
 const test_url = {http: 'http://lumtest.com/test',
     https: 'https://lumtest.com/test'};
 const customer = 'abc';
@@ -326,6 +326,16 @@ describe('proxy', ()=>{
                             .toString('base64'),
                 }});
                 assert.equal(res.statusCode, 407);
+            }));
+            it('zone auth allowed for dropin', ()=>
+            etask(function*(){
+                l = yield lum({port: 22225});
+                const res = yield l.test({no_usage: 1, headers: {
+                    'proxy-authorization': 'Basic '+
+                        Buffer.from(`lum-customer-abc-zone-static:xyz`)
+                            .toString('base64'),
+                }});
+                assert.equal(res.statusCode, 200);
             }));
         });
         describe('password is optional', ()=>{

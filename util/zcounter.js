@@ -628,7 +628,7 @@ E.submit_raw = (data, ttl)=>{
 E.flush = ()=>etask(function*zcounter_flush(){
     if (cluster.isWorker)
         zerr.zexit('zcounter.flush must be called from the master');
-    const dir = env.ZCOUNTER_DIR||'/run/shm/zcounter';
+    const dir = env.ZCOUNTER_DIR||(env.SHM_PATH||'/run/shm')+'/zcounter';
     let data = yield prepare();
     for (let world of ['lum', 'stats'])
     {

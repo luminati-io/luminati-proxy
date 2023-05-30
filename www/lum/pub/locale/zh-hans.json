@@ -3787,7 +3787,7 @@
   "Enter user name": "输入用户名",
   "user name": "用户名",
   "Enter Skype": "输入Skype账号",
-  "Valid phone starts with a digit or \"+\" and contains 11-17 number digits": "有效电话以数字或“+”开头，并包含11-17位数。",
+  "Valid phone starts with a digit or \"+\" and contains 10-17 number digits": "有效电话以数字或“+”开头，并包含10-17位数。",
   "email": "电子邮件",
   "Enter email": "输入电子邮件地址",
   "Can manage all aspects of the account": "可以全方位管理帐户",

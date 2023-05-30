@@ -3232,7 +3232,7 @@
   "Click to export data to CSV": "Нажмите, чтобы экспортировать данные в CSV",
   "Error fetching app metrics": "Ошибка выборки метрик приложения ",
   "Error loading data": "Ошибка загрузки данных",
-  "Valid phone starts with a digit or \"+\" and contains 11-17 number digits": "Действителен телефон, начинающейся с цифры или «+» и содержащий 11-17 число цифр",
+  "Valid phone starts with a digit or \"+\" and contains 10-17 number digits": "Действителен телефон, начинающейся с цифры или «+» и содержащий 10-17 число цифр",
   "Can use the account. Can't see billing.": "Использование аккаунта без доступа к биллингу",
   "Change permission": "Изменение разрешений",
   "Remove user": "Удалить пользователя",

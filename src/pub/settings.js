@@ -14,6 +14,7 @@ import Warnings_modal from './common/warnings_modal.js';
 import {Modal} from './common/modals.js';
 import Logs_settings_modal from './common/logs_settings_modal.js';
 import {Back_btn} from './proxy_edit/index.js';
+import {tips} from './proxy_edit/fields.js';
 import './css/settings.less';
 import {T} from './common/i18n.js';
 
@@ -89,6 +90,7 @@ const tooltips = {
     bw_th_webhook_url: `URL to send webhook messages to when BW limit threshold
         is reached`,
 };
+
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
 
@@ -395,6 +397,9 @@ class Form extends Pure_component {
             title="Accept save changes"
             ok_btn_title="Yes"
             click_ok={this.save}>
+            {s.sync_config && !s.zagent && <span>
+              {tips.sync_config_warn}
+            </span>}
           </Modal>
         </div>;
     }

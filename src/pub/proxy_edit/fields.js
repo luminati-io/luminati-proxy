@@ -359,3 +359,9 @@ Object.keys(tabs).forEach(t=>{
 export const all_fields = Object.keys(tabs)
     .map(k=>tabs[k].fields)
     .reduce((acc, el)=>({...acc, ...el}), {});
+
+export const tips = {
+    sync_config_warn: 'Sync configuration is On. Changes will immediately'
+    +' spread to all pmgr instances with same sync configuration setting'
+    +' and cloud.',
+};

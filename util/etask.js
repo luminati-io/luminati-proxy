@@ -1512,7 +1512,7 @@ function etask_fn(opt, states, push_this){
     }
     let is_gen = typeof states=='function' && states.constructor.name==GEN_FN;
     let arg_start = +push_this;
-    return function(){
+    let wrap = function(){
         const _opt = assign({}, opt);
         _opt.state0_args = new Array(arg_start+arguments.length);
         _opt.state0_args[0] = this;
@@ -1522,6 +1522,12 @@ function etask_fn(opt, states, push_this){
             return E._generator(null, states, _opt);
         return new Etask(_opt, typeof states=='function' ? [states] : states);
     };
+    if (states.name)
+    {
+        Object.defineProperty(wrap, 'name',
+            {value: states.name, writable: false});
+    }
+    return wrap;
 }
 E.fn = function(opt, states){ return etask_fn(opt, states, false); };
 E._fn = function(opt, states){ return etask_fn(opt, states, true); };

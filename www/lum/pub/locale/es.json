@@ -2801,7 +2801,7 @@
   "User saved": "usuario guardado",
   "Add funds to enable account": "Añadir fondos para habilitar la cuenta",
   "Limited": "Limitado",
-  "Valid phone starts with a digit or \"+\" and contains 11-17 number digits": "teléfono válido comienza con un dígito o \"+\" y contiene 11-17 dígitos de los números",
+  "Valid phone starts with a digit or \"+\" and contains 10-17 number digits": "teléfono válido comienza con un dígito o \"+\" y contiene 10-17 dígitos de los números",
   "Can use the account. Can't see billing.": "Se puede utilizar la cuenta. No se puede ver la facturación.",
   "Can't modify users nor permissions. But can manage all the other aspects of the account, including billing.": "No puede modificar los usuarios ni los permisos. Pero puede gestionar todos los otros aspectos de la cuenta, incluyendo facturación.",
   "Add new user": "Añadir nuevo usuario",

@@ -1,13 +1,13 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
-const nock = require('nock');
+const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const assert = require('assert');
 const request = require('request');
 const sinon = require('sinon');
 const winston = require('winston');
+const nock = require('nock');
 // needed to make lpm_file.js to set work dir to tmp dir
 process.argv.push('--dir', os.tmpdir());
 const lpm_file = require('../util/lpm_file.js');
@@ -868,12 +868,12 @@ describe('manager', function(){
         describe('har logs[lum]', etask._fn(function*(_this){
             yield har_log_tests(_this, 'lum');
         }));
-        describe('add_wip', ()=>{
+        describe('wip', ()=>{
             it('forbidden when token is not set',
             etask._fn(function*(_this){
                 app = yield app_with_config({config: {}});
-                const res = yield api_json('api/add_wip', {
-                    method: 'POST',
+                const res = yield api_json('api/wip', {
+                    method: 'PUT',
                     headers: {Authorization: 'aaa'},
                 });
                 assert.equal(res.statusMessage, 'Forbidden');
@@ -883,15 +883,15 @@ describe('manager', function(){
             etask._fn(function*(_this){
                 const config = {_defaults: {token_auth: 'aaa'}};
                 app = yield app_with_config({config});
-                const res = yield api_json('api/add_wip', {method: 'POST'});
+                const res = yield api_json('api/wip', {method: 'PUT'});
                 assert.equal(res.statusMessage, 'Forbidden');
                 assert.equal(res.statusCode, 403);
             }));
             it('bad requests if no IP is passed', etask._fn(function*(_this){
                 const config = {_defaults: {token_auth: 'aaa'}};
                 app = yield app_with_config({config});
-                const res = yield api_json('api/add_wip', {
-                    method: 'POST',
+                const res = yield api_json('api/wip', {
+                    method: 'PUT',
                     headers: {Authorization: 'aaa'},
                 });
                 assert.equal(res.statusMessage, 'Bad Request');
@@ -900,8 +900,8 @@ describe('manager', function(){
             it('adds IP without a mask', etask._fn(function*(_this){
                 const config = {_defaults: {token_auth: 'aaa'}};
                 app = yield app_with_config({config});
-                const res = yield api_json('api/add_wip', {
-                    method: 'POST',
+                const res = yield api_json('api/wip', {
+                    method: 'PUT',
                     headers: {Authorization: 'aaa'},
                     body: {ip: '1.1.1.1'},
                 });
@@ -913,8 +913,8 @@ describe('manager', function(){
             it('adds IP with a mask', etask._fn(function*(_this){
                 const config = {_defaults: {token_auth: 'aaa'}};
                 app = yield app_with_config({config});
-                const res = yield api_json('api/add_wip', {
-                    method: 'POST',
+                const res = yield api_json('api/wip', {
+                    method: 'PUT',
                     headers: {Authorization: 'aaa'},
                     body: {ip: '1.1.1.1/20'},
                 });
@@ -922,6 +922,57 @@ describe('manager', function(){
                 assert.equal(app.manager._defaults.whitelist_ips.length, 1);
                 assert.equal(app.manager._defaults.whitelist_ips[0],
                     '1.1.0.0/20');
+            }));
+            it('not found on remove if IP is not whitelsited',
+            etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa',
+                    whitelist_ips: ['1.1.1.2']}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/wip', {
+                    method: 'DELETE',
+                    headers: {Authorization: 'aaa'},
+                    body: {ip: '1.1.1.1'},
+                });
+                assert.equal(res.statusMessage, 'Not Found');
+                assert.equal(res.statusCode, 404);
+            }));
+            it('removes IP without a mask', etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa',
+                    whitelist_ips: ['1.1.1.1', '1.1.1.2']}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/wip', {
+                    method: 'DELETE',
+                    headers: {Authorization: 'aaa'},
+                    body: {ip: '1.1.1.1'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert.equal(app.manager._defaults.whitelist_ips.length, 1);
+            }));
+            it('removes IP with a mask', etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa',
+                    whitelist_ips: ['1.1.0.0/20', '1.2.0.0/20']}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/wip', {
+                    method: 'DELETE',
+                    headers: {Authorization: 'aaa'},
+                    body: {ip: '1.1.1.1/20'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert.equal(app.manager._defaults.whitelist_ips.length, 1);
+            }));
+        });
+        describe('add_wip', ()=>{
+            it('adds deprecation header',
+            etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa'}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/add_wip', {
+                    method: 'POST',
+                    headers: {Authorization: 'aaa'},
+                    body: {ip: '1.1.1.1'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert(res.headers.deprecation);
             }));
         });
         describe('open browser with custom opts', ()=>{

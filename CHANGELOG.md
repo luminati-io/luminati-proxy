@@ -1,5 +1,12 @@
 Proxy manager - Change Log
 
+## 1.384.439 Stable
+- :sparkles: Alert before save about config spread
+- :star: Deprecate POST /add_whitelist_ip /add_wip
+- :star: Add PUT /whitelist_ip /wip
+- :star: Add DELETE /whitelist_ip /wip
+- :star: Allow zone type auth on premise
+
 ## 1.379.317 Stable
 - :bug: Prevent writing to closed stream on rules chain apply
 

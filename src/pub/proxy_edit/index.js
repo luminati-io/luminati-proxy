@@ -29,7 +29,7 @@ import Rotation from './rotation.js';
 import Browser from './browser.js';
 import Logs from './logs.js';
 import Alloc_modal from './alloc_modal.js';
-import {tabs, all_fields} from './fields.js';
+import {tabs, all_fields, tips} from './fields.js';
 import '../css/proxy_edit.less';
 
 const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
@@ -79,6 +79,7 @@ const Index = withRouter(class Index extends Pure_component {
         let state;
         if ((state = this.props.location.state) && state.field)
             this.goto_field(state.field);
+        this.setdb_on('head.settings', s=>this.setState({global_settings: s}));
     }
     willUnmount(){
         setdb.set('head.proxy_edit.form', undefined);
@@ -426,6 +427,7 @@ const Index = withRouter(class Index extends Pure_component {
             type = 'vips';
         const zone = this.state.form.zone ||
             this.state.zones && this.state.zones.def;
+        const gs = this.state.global_settings || {};
         return <div className="proxy_edit vbox">
           <div className="cp_panel vbox">
             <Loader show={this.state.show_loader||this.state.loading}/>
@@ -483,12 +485,18 @@ const Index = withRouter(class Index extends Pure_component {
             <h4>Looks like you did not save the changes you made to port
                 &nbsp;{this.props.match.params.port}.
                 Would you like to save them?</h4>
+            {gs.sync_config && !gs.zagent && <span>
+              {tips.sync_config_warn}
+            </span>}
           </Modal>
           <Modal
             id="save_port_confirmation_modal"
             title="Accept save changes"
             ok_btn_title="Yes"
             click_ok={this.start_saving}>
+            {gs.sync_config && !gs.zagent && <span>
+              {tips.sync_config_warn}
+            </span>}
           </Modal>
         </div>;
     }

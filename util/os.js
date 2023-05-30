@@ -467,6 +467,26 @@ E.sockets_count = proto=>etask(function*(){
     return v;
 });
 
+E.netstat = ()=>{
+    const netstat_path = `${PROC_DIR}/net/netstat`;
+    const ll = file.read_lines_e(netstat_path), data = {};
+    for (let i = 0; i<ll.length; i += 2)
+    {
+        const counters = ll[i].split(' ');
+        const values = ll[i+1].split(' ');
+        if (counters[0]!=values[0])
+            throw new Error(`Can't parse ${netstat_path} lines ${i}, ${i+1}`);
+        const ext_name = string.to_snake_case(counters[0].slice(0, -1));
+        data[ext_name] = {};
+        for (let j = 1; j<values.length; j++)
+        {
+            data[ext_name][string.to_snake_case(counters[j])] =
+                parseInt(values[j], 10);
+        }
+    }
+    return data;
+};
+
 E.tcp_stats = ()=>{
     let ll = file.read_lines_e(`${PROC_DIR}/net/snmp`), i = 0;
     for (; i<ll.length && !ll[i].startsWith('Tcp'); i++);

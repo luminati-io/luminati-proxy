@@ -1,5 +1,31 @@
 [
     {
+        "ver": "1.384.439",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Alert before save about config spread"
+            },
+            {
+                "type": "star",
+                "text": "Deprecate POST /add_whitelist_ip /add_wip"
+            },
+            {
+                "type": "star",
+                "text": "Add PUT /whitelist_ip /wip"
+            },
+            {
+                "type": "star",
+                "text": "Add DELETE /whitelist_ip /wip"
+            },
+            {
+                "type": "star",
+                "text": "Allow zone type auth on premise"
+            }
+        ]
+    },
+    {
         "ver": "1.379.317",
         "type": "stable",
         "changes": [

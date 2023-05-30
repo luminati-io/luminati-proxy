@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.379.317",
+        "version": "1.384.439",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -168,6 +168,7 @@
         },
         "/add_wip": {
             "post": {
+                "deprecated": true,
                 "description": "An alternative to adding IPs to whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
                 "tags": ["Manager"],
                 "parameters": [
@@ -210,8 +211,98 @@
                 }
             }
         },
+        "/wip": {
+            "put": {
+                "description": "An alternative to adding IPs to whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "type": "string"
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to whitelist",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "403": {
+                        "description": "Forbidden. No authentication provided"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            },
+            "delete": {
+                "description": "An alternative to removing IP from whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "type": "string"
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to remove",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "403": {
+                        "description": "Forbidden. No authentication provided"
+                    },
+                    "404": {
+                        "description": "Not Found. IP is not whitelisted"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            }
+        },
         "/add_whitelist_ip": {
             "post": {
+                "deprecated": true,
                 "description": "Grants access to an IP to browse admin UI",
                 "tags": ["Manager"],
                 "parameters": [
@@ -238,6 +329,77 @@
                     },
                     "400": {
                         "description": "Bad request. No IP was passed"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            }
+        },
+        "/whitelist_ip": {
+            "put": {
+                "description": "Grants access to an IP to browse admin UI",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to whitelist",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove access to browse admin UI for IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to remove",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "404": {
+                        "description": "Not Found. IP is not whitelisted"
                     },
                     "422": {
                         "description": "Unprocessable entity. Invalid IP was passed"

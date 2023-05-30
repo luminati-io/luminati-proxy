@@ -551,4 +551,16 @@ E.remove_protocol = function(url){
 
 E.remove_www = function(url){ return url.replace('www.', ''); };
 
+E.is_same_domain = function(domain, urls){
+    var hostname = E.parse(domain).hostname;
+    var _domain = E.get_root_domain(hostname);
+    for (var i=0; i<urls.length; i++)
+    {
+        var d = E.get_root_domain(E.parse(urls[i]).hostname);
+        if (!(d==_domain || d.endsWith(_domain)))
+            return false;
+    }
+    return true;
+};
+
 return E; }); }());

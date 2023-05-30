@@ -3202,7 +3202,7 @@
   "Account id to add credits to": "ID de conta para adicionar créditos para",
   "Payoneer account id": "ID de conta Payoneer",
   "Your commission payment request was successfully sent": "O seu pedido de pagamento de comissão foi enviada com sucesso",
-  "Valid phone starts with a digit or \"+\" and contains 11-17 number digits": "telefone válido começa com um dígito ou \"+\" e contém 11-17 número de dígitos",
+  "Valid phone starts with a digit or \"+\" and contains 10-17 number digits": "telefone válido começa com um dígito ou \"+\" e contém 10-17 número de dígitos",
   "Add funds to enable account": "Adicionar fundos para ativar a conta",
   "Not defined": "Não definido",
   "active": "ativo",
