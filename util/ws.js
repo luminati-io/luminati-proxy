@@ -1527,6 +1527,7 @@ class Mux {
         const bin_throttle_opt = opt && opt.bin_throttle ?
             {bin_throttle: opt.bin_throttle} : null;
         opt.fin_timeout = opt.fin_timeout||10*SEC;
+        const zasync = opt.zasync||false;
         const w_log = (e, str)=>
             zerr.warn(`${_this.ws}: ${str}: ${vfd}-${zerr.e2s(e)}`);
         let pending, zfin_pending, send_ack_timeout, send_ack_ts = 0;
@@ -1547,12 +1548,17 @@ class Mux {
                         +`ack ${stream.ack} win_size ${stream.win_size}`);
                 }
                 if (!buf_pending || !buf_pending.length)
-                    return void cb();
+                    return void (zasync ? next_tick(cb) : cb());
                 pending = etask(function*_mux_stream_pending(){
                     yield this.wait();
                     pending = null;
                     stream._write(buf_pending, encoding, cb);
                 });
+            },
+            // only Buffer chuncks supported
+            writev: opt.decodeStrings===false ? null : function(chunks, cb){
+                stream._write(Buffer.concat(chunks.map(item=>item.chunk)),
+                    null, cb);
             },
             destroy(err, cb){ return etask(function*_mux_stream_destroy(){
                 if (stream.zdestroy)

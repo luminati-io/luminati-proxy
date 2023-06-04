@@ -22,8 +22,22 @@ function make_csv_error(msg){
 E.to_arr = function(data, opt){
     opt = assign({field: ',', quote: '"', line: '\n'}, opt);
     var line = opt.line, field = opt.field, quote = opt.quote;
-    var i = 0, c = data[i], row = 0, array = [];
+    var i = 0, c = data[i], row = 0, array = [], row_start_pos = i;
     var stopped_because_of_fail = false;
+    var num_cols = opt.num_cols || 0;
+    function check_strict(){
+        if (!opt.strict)
+            return;
+        if (num_cols>0 && row<array.length &&
+            (array[row].length>1 || array[row][0]) &&
+            num_cols!=array[row].length)
+        {
+            if (opt.return_succesful_rows)
+                return stopped_because_of_fail = true;
+            throw make_csv_error('Number of columns differs on row '
+                +row+': '+array[row].length+'<>'+num_cols);
+        }
+    }
     while (c)
     {
         while (opt.trim && (c==' ' || c=='\t' || c=='\r') ||
@@ -99,15 +113,30 @@ E.to_arr = function(data, opt){
         // go to the next row or column
         if (c==field);
         else if (c==line)
+        {
+            if (check_strict())
+                break;
+            if (!num_cols && array[row].length>1)
+                num_cols = array[row].length;
             row++;
+            row_start_pos = i+1;
+        }
         else if (c)
             throw make_csv_error('Delimiter expected after character '+i);
         c = data[++i];
     }
     if (i && data[i-1]==field)
         array[row].push('');
+    if (!stopped_because_of_fail)
+        check_strict();
     if (stopped_because_of_fail)
-        array.pop();
+    {
+        // pop only if row was already added to array
+        if (row<array.length)
+            array.pop();
+        if (opt.return_last_good_position)
+            return {array: array, i: i, row_start_pos: row_start_pos};
+    }
     return array;
 };
 

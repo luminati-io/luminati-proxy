@@ -56,6 +56,7 @@
     "check-node-version": "4.0.1",
     "electron-updater": "4.3.1",
     "express": "4.17.1",
+    "express-rate-limit": "6.7.0",
     "flag-icons": "6.4.4",
     "http-shutdown": "1.2.1",
     "json-stable-stringify": "1.0.1",
@@ -297,6 +298,7 @@
       "lib/perr.js",
       "lib/proxy_port.js",
       "lib/puppeteer.js",
+      "lib/rate_limit.js",
       "lib/requester.js",
       "lib/router.js",
       "lib/rules.js",
@@ -412,7 +414,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "5a37d9916810eef16710b641ffa85e07"
+    "md5": "77d3cb6f62ee6d0a4c45abbe4fb54862"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -444,5 +446,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.384.439"
+  "version": "1.385.646"
 }

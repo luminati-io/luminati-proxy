@@ -319,7 +319,7 @@ describe('proxy', ()=>{
             it('no zone auth if cust out of whitelist lum', ()=>
             etask(function*(){
                 let cust = customer_out_of_zone_auth_whitelist;
-                l = yield lum();
+                l = yield lum({proxy_type: 'persist'});
                 const res = yield l.test({no_usage: 1, headers: {
                     'proxy-authorization': 'Basic '+
                         Buffer.from(`lum-customer-${cust}-zone-static:xyz`)
@@ -329,7 +329,7 @@ describe('proxy', ()=>{
             }));
             it('zone auth allowed for dropin', ()=>
             etask(function*(){
-                l = yield lum({port: 22225});
+                l = yield lum();
                 const res = yield l.test({no_usage: 1, headers: {
                     'proxy-authorization': 'Basic '+
                         Buffer.from(`lum-customer-abc-zone-static:xyz`)

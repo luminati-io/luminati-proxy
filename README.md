@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.384.439/luminati-proxy-manager-v1.384.439-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.385.646/luminati-proxy-manager-v1.385.646-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -50,12 +50,16 @@ curl -L https://brightdata.com/static/lpm/luminati-proxy-latest-setup.sh | bash
 ### Linux/MacOS - Manual install
 - Install Node.js ([nodejs.org](https://nodejs.org/en/download/))
   Node.js version for the proxy manager should be at least 12.18.3 and not
-  newer than version 14.18.1
+  newer than version 18.16.0
 - Make sure npm version at least is 6.14.6 and not newer than version 8.1.3
   - if not, run: `sudo npm install -g npm@6.14.6`
 - Install Proxy Manager from the terminal prompt:
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy
+```
+- If you use npm version higher then 6 please add '--legacy-peer-deps' flag:
+```sh
+sudo npm install -g @luminati-io/luminati-proxy --legacy-peer-deps
 ```
 If you are trying to install the Proxy Manager from china on Mac/Linux please run the following command first to make sure npm is installing with allowed registry:
 ```sh

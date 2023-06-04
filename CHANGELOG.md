@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.385.646 Stable
+- :star: Add rate limit for API state changing calls
+
 ## 1.384.439 Stable
 - :sparkles: Alert before save about config spread
 - :star: Deprecate POST /add_whitelist_ip /add_wip
