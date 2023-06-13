@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM node:14.19.3-bullseye
+FROM node:18.16.0-bullseye
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
@@ -24,11 +24,11 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN rm google-chrome-stable_current_amd64.deb
 
 USER root
+RUN npm install -g npm@7.19.1
 RUN npm config set user root
-RUN npm install -g npm@6.14.13
 
 # Install Proxy Manager
-RUN npm install -g @luminati-io/luminati-proxy
+RUN npm install -g @luminati-io/luminati-proxy --legacy-peer-deps
 
 # Mark environment as Docker for CLI output
 ENV DOCKER 1

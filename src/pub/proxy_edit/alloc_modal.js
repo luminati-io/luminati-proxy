@@ -3,15 +3,15 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import _ from 'lodash';
+import _ from 'lodash4';
 import setdb from '../../../util/setdb.js';
-import ajax from '../../../util/ajax.js';
 import {Modal} from '../common/modals.js';
 import {report_exception} from '../util.js';
 import {Infinite_chrome_table} from '../chrome_widgets.js';
 import conv from '../../../util/conv.js';
 import zcountry from '../../../util/country.js';
 import {flag_with_title} from '../common.js';
+import {main as Api} from '../api.js';
 import {Filter} from '/www/util/pub/har.js';
 
 export default class Alloc_modal extends Pure_component {
@@ -54,17 +54,17 @@ export default class Alloc_modal extends Pure_component {
         this.loading(true);
         let endpoint;
         if (type=='ips')
-            endpoint = '/api/allocated_ips';
+            endpoint = 'allocated_ips';
         else
-            endpoint = '/api/allocated_vips';
-        const url = `${endpoint}?zone=${this.props.zone}`;
+            endpoint = 'allocated_vips';
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'alloc_modal.Alloc_modal.load');
                 _this.loading(false);
             }));
-            const res = yield ajax.json({url});
+            const res = yield Api.json.get(endpoint,
+                {qs: {zone: _this.props.zone}});
             const _available_list = type=='ips' ? res.ips_cn : res.vips_cn;
             const available_hash = _available_list.reduce((acc, value)=>{
                 acc[value.ip] = value;
@@ -162,8 +162,7 @@ export default class Alloc_modal extends Pure_component {
                 data.ips = vals;
             else
                 data.vips = vals;
-            const url = '/api/refresh_ips';
-            const res = yield ajax.json({method: 'POST', url, data});
+            const res = yield Api.json.post('refresh_ips', data);
             if (res.error || !res.ips && !res.vips)
             {
                 return void (yield report_exception(res.error,
@@ -203,7 +202,7 @@ export default class Alloc_modal extends Pure_component {
                 const proxy = proxies_to_update[i];
                 const new_vals = proxy[_this.props.type].map(v=>map[v]);
                 const data = {port: proxy.port, [_this.props.type]: new_vals};
-                yield ajax({method: 'POST', url: '/api/update_ips', data});
+                yield Api.post('update_ips', data);
             }
         });
     };

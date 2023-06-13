@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.388.252 Stable
+- :star: introduce lpm token protected API v2
+- :sparkles: update dependencies
+- :sparkles: update docker base image to node:18.16.0-bullseye
+
 ## 1.385.646 Stable
 - :star: Add rate limit for API state changing calls
 

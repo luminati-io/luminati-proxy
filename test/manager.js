@@ -809,7 +809,8 @@ describe('manager', function(){
                     const proxy = Object.assign({port: 24000}, opt);
                     app = yield app_with_proxies([proxy], {});
                     const refresh_sessions_res =
-                        yield api_json(`api/refresh_sessions/${proxy.port}`);
+                        yield api_json(`api/refresh_sessions/${proxy.port}`,
+                        {method: 'post'});
                     assert.equal(refresh_sessions_res.statusCode, eq.code);
                     assert.deepEqual(refresh_sessions_res.body, eq.body);
                 }));

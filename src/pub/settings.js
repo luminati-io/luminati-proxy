@@ -4,10 +4,9 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import React, {useState} from 'react';
 import {Labeled_controller, Loader_small, Alert} from './common.js';
 import setdb from '../../util/setdb.js';
-import ajax from '../../util/ajax.js';
 import zurl from '../../util/url.js';
 import {report_exception} from './util.js';
-import _ from 'lodash';
+import _ from 'lodash4';
 import $ from 'jquery';
 import {Select_zone, Pins} from './common/controls.js';
 import Warnings_modal from './common/warnings_modal.js';
@@ -17,6 +16,7 @@ import {Back_btn} from './proxy_edit/index.js';
 import {tips} from './proxy_edit/fields.js';
 import './css/settings.less';
 import {T} from './common/i18n.js';
+import {main as Api} from './api.js';
 
 export default function Settings(props){
     const [show_alert, set_show_alert] = useState(false);
@@ -230,7 +230,7 @@ class Form extends Pure_component {
             _this.props.show_conf(false);
             if (_this.state.settings.sync_config)
             {
-                const proxies = yield ajax.json({url: '/api/proxies_running'});
+                const proxies = yield Api.json.get('proxies_running');
                 setdb.set('head.proxies_running', proxies);
             }
         });

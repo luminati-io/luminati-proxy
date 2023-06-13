@@ -1,7 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import etask from '../../util/etask.js';
-import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
@@ -20,6 +19,7 @@ import {Textarea, Select_zone} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal} from './common/modals.js';
 import {T, t} from './common/i18n.js';
+import {main as Api} from './api.js';
 import {Instructions, Li} from '/www/util/pub/bullets.js';
 import './css/proxy_add.less';
 
@@ -77,12 +77,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 yield report_exception(e, 'proxy_add.Proxy_add.persist');
                 _this.setState({show_loader: false});
             }));
-            const raw_resp = yield window.fetch('/api/proxies', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({proxy: form}),
-            });
-            const resp = yield raw_resp.json();
+            const resp = yield Api.json.post('proxies', {proxy: form});
             if (resp.errors)
                 return resp;
             return {port: resp.data.port};
@@ -110,7 +105,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 _this.setState({created_port: resp.port});
             if (!resp.errors)
             {
-                const proxies = yield ajax.json({url: '/api/proxies_running'});
+                const proxies = yield Api.json.get('proxies_running');
                 setdb.set('head.proxies_running', proxies);
             }
         });

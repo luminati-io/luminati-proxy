@@ -10,7 +10,7 @@ module.exports = {
     context: `${__dirname}/src/pub`,
     entry: {
         app: './app.js',
-        vendor: ['jquery', 'lodash', 'moment', 'bootstrap',
+        vendor: ['jquery', 'lodash4', 'moment', 'bootstrap',
             'bootstrap/dist/css/bootstrap.css', 'codemirror/lib/codemirror',
             'codemirror/lib/codemirror.css', 'react-bootstrap', 'react',
             'codemirror/mode/javascript/javascript', 'react-dom',

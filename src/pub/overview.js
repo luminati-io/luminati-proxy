@@ -7,7 +7,6 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import zurl from '../../util/url.js';
 import setdb from '../../util/setdb.js';
-import ajax from '../../util/ajax.js';
 import {perr, get_last_versions, get_changes_tooltip} from './util.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
@@ -17,6 +16,7 @@ import Har_viewer from './har_viewer.js';
 import {Logs_context, Stats} from './stats.js';
 import Proxies from './proxies.js';
 import ws from './ws.js';
+import {main as Api} from './api.js';
 import './css/overview.less';
 
 class Overview extends Pure_component {
@@ -80,7 +80,7 @@ class Overview extends Pure_component {
             yield _this.save_settings({sync_config: val});
             if (!val)
                 return;
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            const proxies = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies);
         });
     };

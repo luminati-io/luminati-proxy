@@ -1,17 +1,17 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import ajax from '../../util/ajax.js';
-import etask from '../../util/etask.js';
+import codemirror from 'codemirror/lib/codemirror';
 import classnames from 'classnames';
 import Pure_component from '/www/util/pub/pure_component.js';
-import {Nav, Link_icon} from './common.js';
-import codemirror from 'codemirror/lib/codemirror';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/lib/codemirror.css';
 import filesaver from 'file-saver';
 import $ from 'jquery';
+import etask from '../../util/etask.js';
+import {Nav, Link_icon} from './common.js';
+import {main as Api} from './api.js';
 import {Modal} from './common/modals.js';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/lib/codemirror.css';
 import './css/config.less';
 
 class Config extends Pure_component {
@@ -24,7 +24,7 @@ class Config extends Pure_component {
         this.cm.on('change', this.on_cm_change);
         const _this = this;
         this.etask(function*(){
-            const config = yield ajax.json({url: '/api/config'});
+            const config = yield Api.json.get('config');
             _this.setState({persisted_config: config.config});
             _this.cm.doc.setValue(config.config);
         });
@@ -56,7 +56,7 @@ class Config extends Pure_component {
         const retry = ()=>{ setTimeout(_this.check_reload, 500); };
         return etask(function*(){
             this.on('uncaught', retry);
-            yield ajax.json({url: 'api/proxies_running'});
+            yield Api.json.get('proxies_running');
             window.location.reload();
         });
     };
@@ -64,13 +64,7 @@ class Config extends Pure_component {
         this.set_editable(false);
         const _this = this;
         this.etask(function*(){
-            const save_url = '/api/config';
-            // XXX krzysztof: switch fetch->ajax
-            yield window.fetch(save_url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({config: _this.cm.doc.getValue()}),
-            });
+            yield Api.json.post('config', {config: _this.cm.doc.getValue()});
             $('#restarting').modal({backdrop: 'static', keyboard: false});
             yield etask.sleep(3000);
             yield _this.check_reload();

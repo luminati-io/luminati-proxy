@@ -3,13 +3,13 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {Modal_dialog} from './modals.js';
-import {Loader, Labeled_controller} from '../common.js';
-import etask from '../../../util/etask.js';
-import ajax from '../../../util/ajax.js';
 import classnames from 'classnames';
 import {Instructions, Li} from '/www/util/pub/bullets.js';
+import etask from '../../../util/etask.js';
+import {Loader, Labeled_controller} from '../common.js';
+import {main as Api} from '../api.js';
 import '../css/api_url_modal.less';
+import {Modal_dialog} from './modals.js';
 
 export default class Api_url_modal extends Pure_component {
     state = {url: '', saving: false};
@@ -32,8 +32,7 @@ export default class Api_url_modal extends Pure_component {
                 _this.setState({saving: false});
             });
             _this.setState({saving: true});
-            let resp = yield ajax.put('/api/api_url',
-                {data: {url: _this.state.url}});
+            let resp = yield Api.put('api_url', {url: _this.state.url});
             if (!resp.res)
                 return _this.setState({error: true});
             $('#restarting').modal({backdrop: 'static', keyboard: false});
@@ -45,7 +44,7 @@ export default class Api_url_modal extends Pure_component {
         const retry = ()=>{ setTimeout(_this.check_reload.bind(_this), 500); };
         return etask(function*(){
             this.on('uncaught', retry);
-            yield ajax.json({url: 'api/proxies_running'});
+            yield Api.json.get('proxies_running');
             window.location.reload();
         });
     }

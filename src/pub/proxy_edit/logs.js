@@ -1,17 +1,17 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import ajax from '../../../util/ajax.js';
-import {Chrome_table} from '../chrome_widgets.js';
-import Pure_component from '/www/util/pub/pure_component.js';
-import {Note, Ext_tooltip} from '../common.js';
 import moment from 'moment';
 import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
+import Pure_component from '/www/util/pub/pure_component.js';
+import {Chrome_table} from '../chrome_widgets.js';
+import {Note, Ext_tooltip} from '../common.js';
 import Har_viewer from '../har_viewer.js';
 import setdb from '../../../util/setdb.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import Tooltip from '../common/tooltip.js';
 import {T} from '../common/i18n.js';
+import {main as Api} from '../api.js';
 
 moment.relativeTimeThreshold('ss', 60);
 moment.relativeTimeThreshold('s', 50);
@@ -62,9 +62,8 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
     fetch_ips_data = ()=>{
         const _this = this;
         return this.etask(function*(){
-            const port = _this.props.match.params.port;
-            const url = `/api/banlist/${port}?full=true`;
-            const data = yield ajax.json({url});
+            const data = yield Api.json.get('banlist/'
+                +_this.props.match.params.port, {qs: {full: true}});
             _this.setState({ips: data.ips});
         });
     };
@@ -74,11 +73,8 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
         return this.etask(function*(){
             this.on('finally', ()=>_this.setState({unbanning: false}));
             const port = _this.props.match.params.port;
-            const data = yield ajax.json({
-                url: `/api/proxies/${port}/unbanip`,
-                method: 'POST',
-                data: {ip, domain},
-            });
+            const data = yield Api.json.post(`proxies/${port}/unbanip`,
+                {ip, domain});
             _this.setState({ips: data.ips});
         });
     };
@@ -88,8 +84,7 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
         return this.etask(function*(){
             this.on('finally', ()=>_this.setState({unbanning: false}));
             const port = _this.props.match.params.port;
-            yield ajax.json({url: `/api/proxies/${port}/unbanips`,
-                method: 'POST'});
+            yield Api.json.post(`proxies/${port}/unbanips`);
             _this.setState({ips: []});
         });
     };

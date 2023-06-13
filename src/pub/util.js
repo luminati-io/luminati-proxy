@@ -3,6 +3,7 @@
 import React from 'react';
 import semver from 'semver';
 import etask from '../../util/etask.js';
+import {main as Api} from './api.js';
 
 export const bytes_format = (bytes, number)=>{
     if (!bytes||isNaN(parseFloat(bytes))||!isFinite(bytes))
@@ -267,11 +268,7 @@ export const report_exception = (error, context)=>etask(function*(){
 });
 
 export const perr = (type, message, stack, context)=>etask(function*(){
-    yield window.fetch('/api/perr', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({type, message, stack, context}),
-    });
+    yield Api.json.post('perr', {type, message, stack, context});
 });
 
 export const get_location_port = ()=>window.location.port ||

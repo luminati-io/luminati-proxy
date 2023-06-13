@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.388.252",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "introduce lpm token protected API v2"
+            },
+            {
+                "type": "sparkles",
+                "text": "update dependencies"
+            },
+            {
+                "type": "sparkles",
+                "text": "update docker base image to node:18.16.0-bullseye"
+            }
+        ]
+    },
+    {
         "ver": "1.385.646",
         "type": "stable",
         "changes": [

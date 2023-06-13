@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 import React from 'react';
-import _ from 'lodash';
+import _ from 'lodash4';
 import setdb from '../../../util/setdb.js';
 
 const E = {};

@@ -56,14 +56,17 @@
     "check-node-version": "4.0.1",
     "electron-updater": "4.3.1",
     "express": "4.17.1",
+    "helmet": "7.0.0",
     "express-rate-limit": "6.7.0",
+    "express-session": "1.14.1",
+    "connect-loki": "1.2.0",
     "flag-icons": "6.4.4",
     "http-shutdown": "1.2.1",
     "json-stable-stringify": "1.0.1",
-    "lodash": "4.17.20",
+    "lodash4": "npm:@luminati-io/lodash4@4.17.21",
     "node-forge": "0.10.0",
     "pac-resolver": "5.0.0",
-    "pm2": "4.3.0",
+    "pm2": "5.3.0",
     "request": "2.88.0",
     "lum_request-stats": "3.2.0",
     "semver": "6.3.0",
@@ -75,7 +78,7 @@
     "prismjs": "1.25.0",
     "classnames": "2.2.6",
     "netmask": "2.0.1",
-    "uuid": "3.3.3",
+    "uuid": "8.3.2",
     "compression": "1.7.4",
     "ws": "7.4.6",
     "diacritic": "0.0.2",
@@ -85,7 +88,7 @@
     "lum_lokijs": "1.5.11",
     "lum_socksv5": "0.0.13",
     "ps-list": "6.3.0",
-    "extract-zip": "1.6.7",
+    "extract-zip": "2.0.1",
     "cookie": "0.5.0",
     "winston": "3.2.1",
     "winston-transport": "4.3.0",
@@ -139,7 +142,7 @@
     "less": "2.7.2",
     "less-loader": "4.0.5",
     "lolex": "2.1.1",
-    "mocha": "5.2.0",
+    "mocha": "8.2.0",
     "nock": "9.0.11",
     "style-loader": "0.18.2",
     "file-loader": "2.0.0",
@@ -150,7 +153,7 @@
     "prop-types": "15.8.1"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=12.18.3"
   },
   "homepage": "https://brightdata.com",
   "api_domain": "lum-lpm.com",
@@ -294,11 +297,11 @@
       "lib/lpm_f.js",
       "lib/manager.js",
       "lib/md5_util.js",
+      "lib/middleware.js",
       "lib/migration.js",
       "lib/perr.js",
       "lib/proxy_port.js",
       "lib/puppeteer.js",
-      "lib/rate_limit.js",
       "lib/requester.js",
       "lib/router.js",
       "lib/rules.js",
@@ -319,6 +322,7 @@
       "publish_validate.js",
       "scripts/changelog_validate.js",
       "scripts/stress_test.js",
+      "src/pub/api.js",
       "src/pub/app.js",
       "src/pub/chrome_widgets.js",
       "src/pub/common/api_url_modal.js",
@@ -414,7 +418,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "77d3cb6f62ee6d0a4c45abbe4fb54862"
+    "md5": "a0d43c925e2bc0f288f094bfea3018e6"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -432,7 +436,7 @@
     "uws": "@luminati-io/lum-uws#10.148.0-lum.12"
   },
   "preferGlobal": true,
-  "recommendedNode": ">=12.0.0",
+  "recommendedNode": ">=12.18.3",
   "repository": {
     "type": "git",
     "url": "git://github.com/luminati-io/luminati-proxy.git"
@@ -446,5 +450,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.385.646"
+  "version": "1.388.252"
 }

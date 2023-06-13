@@ -4,11 +4,11 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
-import ajax from '../../../util/ajax.js';
 import {Modal} from '../common/modals.js';
 import {Chrome_table} from '../chrome_widgets.js';
 import {Checkbox} from '../common.js';
 import {report_exception} from '../util.js';
+import {main as Api} from '../api.js';
 
 export default class Users_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -32,7 +32,6 @@ export default class Users_modal extends Pure_component {
     }
     close = ()=>$('#users_modal').modal('hide');
     load = ()=>{
-        const url = '/api/lpm_users';
         const _this = this;
         this.etask(function*(){
             this.on('finally', ()=>{
@@ -41,7 +40,7 @@ export default class Users_modal extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'users_modal.Users_modal.load');
             }));
-            const users = yield ajax.json({url});
+            const users = yield Api.json.get('lpm_users');
             _this.setState({users});
         });
     };

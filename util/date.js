@@ -521,7 +521,7 @@ E.strptime = function(str, fmt){
         ff.push(d[1]);
         return '('+d[0]+')';
     })+'\\s*$', 'i');
-    var matched = str.match(re);
+    var matched = (''+str).match(re);
     if (!matched)
         return;
     var d = new Date(0);

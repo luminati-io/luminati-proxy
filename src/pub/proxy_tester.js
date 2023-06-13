@@ -5,7 +5,6 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import classnames from 'classnames';
 import {withRouter} from 'react-router-dom';
-import ajax from '../../util/ajax.js';
 import date from '../../util/date.js';
 import {Loader, Warnings, with_proxy_ports, Add_icon, No_zones,
     Remove_icon} from './common.js';
@@ -18,6 +17,7 @@ import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {report_exception} from './util.js';
 import ws from './ws.js';
+import {main as Api} from './api.js';
 import './css/proxy_tester.less';
 const {SEC} = date.ms;
 
@@ -109,7 +109,7 @@ class Request extends Pure_component {
         const port = this.state.params.port||this.props.def_port;
         if (this.props.test_event)
             ws.post_event(this.props.test_event, {port});
-        const url = '/api/test/'+port;
+        const url = 'test/'+port;
         const data = {
             headers: this.state.headers.reduce((acc, el)=>{
                 if (!el.header)
@@ -125,8 +125,7 @@ class Request extends Pure_component {
                 yield report_exception(e, 'proxy_tester.Request.go');
             }));
             this.on('finally', ()=>_this.setState({show_loader: false}));
-            const resp = yield ajax.json({method: 'POST', url, data,
-                timeout: 120*SEC});
+            const resp = yield Api.json.post(url, data, {timeout: 120*SEC});
             if (resp.error)
             {
                 _this.setState({warnings: [{msg: resp.error}]});

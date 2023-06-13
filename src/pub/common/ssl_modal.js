@@ -2,11 +2,10 @@
 'use strict'; /*jslint react:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
-import ajax from '../../../util/ajax.js';
-import {Instructions, Li} from '/www/util/pub/bullets.js';
 import {Loader, with_www_api} from '../common.js';
-import {Modal} from './modals.js';
 import {report_exception} from '../util.js';
+import {main as Api} from '../api.js';
+import {Modal} from './modals.js';
 
 export default with_www_api(class Enable_ssl_modal extends Pure_component {
     state = {loading: false};
@@ -18,7 +17,7 @@ export default with_www_api(class Enable_ssl_modal extends Pure_component {
                     'ssl_modal.Enable_ssl_modal.enable_ssl');
             }));
             _this.setState({loading: true});
-            yield ajax({url: '/api/enable_ssl', method: 'POST'});
+            yield Api.post('enable_ssl');
             _this.setState({loading: false});
         });
     };
@@ -33,28 +32,3 @@ export default with_www_api(class Enable_ssl_modal extends Pure_component {
         </React.Fragment>;
     }
 });
-
-class Install_cert_modal extends Pure_component {
-    faq_cert_url = `${this.props.www_api}/faq#proxy-certificate`;
-    render(){
-        return <Modal id="install_cert_modal">
-              <p className="cert_info">
-                You need to add a certificate file to browsers.
-                Gathering stats for HTTPS requests requires setting a
-                certificate key.
-              </p>
-              <Instructions>
-                <Li>Download our free certificate key
-                  <a href="/ssl" target="_blank" download> here</a>
-                </Li>
-                <Li>
-                  Add the certificate to your browser.
-                  You can find more detailed
-                  instructions <a className="link" href={this.faq_cert_url}
-                    rel="noopener noreferrer" target="_blank">here</a>
-                </Li>
-                <Li>Refresh the page</Li>
-              </Instructions>
-            </Modal>;
-    }
-}

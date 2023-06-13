@@ -2,13 +2,12 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import $ from 'jquery';
-import _ from 'lodash';
+import _ from 'lodash4';
 import classnames from 'classnames';
 import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import React_tooltip from 'react-tooltip';
 import Pure_component from '/www/util/pub/pure_component.js';
 import etask from '../../../util/etask.js';
-import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import {qw} from '../../../util/string.js';
 import {Loader, Loader_small, Preset_description, Ext_tooltip,
@@ -21,6 +20,7 @@ import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
 import {report_exception, bind_all, is_local} from '../util.js';
 import ws from '../ws.js';
+import {main as Api} from '../api.js';
 import Warnings_modal from '../common/warnings_modal.js';
 import {Rules, map_rule_to_form} from './rules.js';
 import Targeting from './targeting.js';
@@ -52,8 +52,7 @@ const Index = withRouter(class Index extends Pure_component {
     componentDidMount(){
         setdb.set('head.proxies_running', null);
         this.etask(function*(){
-            const proxies_running = yield ajax.json(
-                {url: '/api/proxies_running'});
+            const proxies_running = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies_running);
         });
         this.setdb_on('head.proxies_running', proxies=>{
@@ -286,7 +285,7 @@ const Index = withRouter(class Index extends Pure_component {
     };
     update_proxies = ()=>{
         return etask(function*(){
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            const proxies = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies);
         });
     };
@@ -310,18 +309,13 @@ const Index = withRouter(class Index extends Pure_component {
                 _this.setState({saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
             });
-            const update_url = '/api/proxies/'+_this.props.match.params.port;
-            const raw_resp = yield window.fetch(update_url, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({proxy: data}),
-            });
-            const json_resp = yield raw_resp.json();
-            if (json_resp.errors)
+            const update_url = `proxies/${_this.props.match.params.port}`;
+            const resp = yield Api.json.put(update_url, {proxy: data});
+            if (resp.errors)
             {
-                _this.set_errors(json_resp.errors);
+                _this.set_errors(resp.errors);
                 $('#save_proxy_errors').modal('show');
-                return json_resp.errors;
+                return resp.errors;
             }
             const c_form = _.cloneDeep(_this.state.form);
             _this.set_default_mgr_proxy_shared_fields(c_form);
@@ -559,9 +553,8 @@ class Open_browser_btn extends Pure_component {
         const _this = this;
         ws.post_event('Browser Click');
         this.etask(function*(){
-            const url = `/api/browser/${_this.props.port}`;
-            const res = yield window.fetch(url);
-            if (res.status==206)
+            const res = yield Api.get(`browser/${_this.props.port}`);
+            if ((res||'').includes('Fetching'))
                 $('#fetching_chrome_modal').modal();
         });
     };

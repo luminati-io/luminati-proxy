@@ -1,11 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import etask from '../../util/etask.js';
 import React from 'react';
+import $ from 'jquery';
+import etask from '../../util/etask.js';
 import {Loader} from './common.js';
+import {main as Api} from './api.js';
 import {get_last_versions, get_changes_tooltip} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
-import $ from 'jquery';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
@@ -29,22 +30,12 @@ class Index extends Pure_component {
         const desc = this.state.desc;
         const _this = this;
         return etask(function*(){
-            this.on('uncaught', ()=>{ _this.setState({sending: false}); });
+            this.on('uncaught', e=>_this.setState({sending: false,
+                modal_msg: `Something went wrong: [${resp||e.message}]`}));
             _this.setState({sending: true});
-            const resp = yield window.fetch('/api/report_bug', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({desc, email: _this.state.email}),
-            });
-            _this.setState({sending: false});
-            if (resp.status==200)
-                _this.setState({modal_msg: _this.success_msg});
-            else
-            {
-                const resp_json = yield resp.json();
-                const modal_msg = `Something went wrong: [${resp_json}]`;
-                _this.setState({modal_msg});
-            }
+            const report = {desc, email: _this.state.email};
+            const resp = yield Api.json.post('report_bug', report);
+            _this.setState({sending: false, modal_msg: _this.success_msg});
             window.setTimeout(()=>$('#finish_modal').modal(), 500);
         });
     };

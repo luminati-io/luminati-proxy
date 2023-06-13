@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import _ from 'lodash';
+import _ from 'lodash4';
 import $ from 'jquery';
 import {Route, Link, withRouter} from 'react-router-dom';
 import {Waypoint} from 'react-waypoint';
@@ -10,9 +10,7 @@ import moment from 'moment';
 import React_tooltip from 'react-tooltip';
 import codemirror from 'codemirror/lib/codemirror';
 import Pure_component from '/www/util/pub/pure_component.js';
-import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
-import zescape from '../../util/escape.js';
 import setdb from '../../util/setdb.js';
 import zutil from '../../util/util.js';
 import {trigger_types, action_types} from '../../util/rules_util.js';
@@ -22,6 +20,7 @@ import {Har_viewer, Pane_headers, Pane_info, JSON_viewer,
 import {Tooltip_bytes} from './common.js';
 import {get_troubleshoot} from './util.js';
 import ws from './ws.js';
+import {main as Api} from './api.js';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
@@ -36,12 +35,8 @@ const enable_ssl_click = port=>etask(function*(){
         loader.end();
     });
     loader.start();
-    yield window.fetch('/api/enable_ssl', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({port}),
-    });
-    const proxies = yield ajax.json({url: '/api/proxies_running'});
+    yield Api.json.post('enable_ssl', {port});
+    const proxies = yield Api.json.get('proxies_running');
     setdb.set('head.proxies_running', proxies);
 });
 
@@ -422,7 +417,6 @@ class Lpm_har_viewer extends Pure_component {
                 protocol: this.props.protocol||false,
             },
         };
-        this.uri = '/api/logs';
         this.batch_size = 30;
         this.loaded = {from: 0, to: 0};
         this.reqs_to_render = [];
@@ -457,8 +451,7 @@ class Lpm_har_viewer extends Pure_component {
                 this.setState({stats});
         });
         this.etask(function*(){
-            const suggestions = yield ajax.json(
-                {url: '/api/logs_suggestions'});
+            const suggestions = yield Api.json.get('logs_suggestions');
             suggestions.status_codes.unshift(...[2, 3, 4, 5].map(v=>`${v}**`));
             setdb.set('head.logs_suggestions', suggestions);
         });
@@ -625,8 +618,7 @@ class Lpm_har_viewer extends Pure_component {
                 loader.end();
             });
             loader.start();
-            const url = zescape.uri(_this.uri, params);
-            const res = yield ajax.json({url});
+            const res = yield Api.json.get('logs', {qs: params});
             const reqs = res.log.entries;
             const new_reqs = [...opt.replace ? [] : _this.state.reqs, ...reqs];
             const uuids = new Set();
@@ -652,10 +644,9 @@ class Lpm_har_viewer extends Pure_component {
         const params = {};
         if (this.props.match && this.props.match.params.port)
             params.port = this.props.match.params.port;
-        const url = zescape.uri('/api/logs_reset', params);
         this.etask(function*(){
             loader.start();
-            yield ajax({url});
+            yield Api.put('logs_reset', {}, {qs: params});
             loader.end();
             if (cb)
                 cb();

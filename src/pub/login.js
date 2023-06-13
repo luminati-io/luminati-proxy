@@ -4,12 +4,12 @@ import React from 'react';
 import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
-import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {Loader, Logo, with_www_api} from './common.js';
 import {get_location_port} from './util.js';
+import {main as Api} from './api.js';
 import {T} from './common/i18n.js';
 import './css/login.less';
 
@@ -78,12 +78,8 @@ const Login = withRouter(class Login extends Pure_component {
             });
             this.on('finally', ()=>_this.setState({loading: false}));
             _this.setState({loading: true});
-            const res = yield ajax.json({
-                url: '/api/creds_user',
-                method: 'POST',
-                data: creds,
-                timeout: 60000,
-            });
+            const res = yield Api.json.post('creds_user', creds,
+                {timeout: 60000});
             if (res.error)
             {
                 _this.setState({
@@ -113,12 +109,7 @@ const Login = withRouter(class Login extends Pure_component {
                 two_step_pending: !_this.state.two_step_verified};
             if (_this.token)
                 creds.token = _this.token;
-            const res = yield ajax.json({
-                url: '/api/creds_user',
-                method: 'POST',
-                data: creds,
-                no_throw: true,
-            });
+            const res = yield Api.json.post('creds_user', creds, {safe: true});
             if (res && res.error)
             {
                 _this.setState({loading: false, error_message:
@@ -136,28 +127,27 @@ const Login = withRouter(class Login extends Pure_component {
             });
             const ets = [];
             ets.push(etask(function*_get_settings(){
-                const settings = yield ajax.json({url: '/api/settings'});
+                const settings = yield Api.json.get('settings');
                 setdb.set('head.settings', settings);
             }));
             ets.push(etask(function*_get_consts(){
-                const consts = yield ajax.json({url: '/api/consts'});
+                const consts = yield Api.json.get('consts');
                 setdb.set('head.consts', consts);
             }));
             const curr_locations = setdb.get('head.locations');
             if (!curr_locations || !curr_locations.shared_countries)
             {
                 ets.push(etask(function*_get_locations(){
-                    const locations = yield ajax.json(
-                        {url: '/api/all_locations'});
+                    const locations = yield Api.json.get('all_locations');
                     setdb.set('head.locations', locations);
                 }));
             }
             ets.push(etask(function*_get_zones(){
-                const zones = yield ajax.json({url: '/api/zones'});
+                const zones = yield Api.json.get('zones');
                 setdb.set('ws.zones', zones);
             }));
             ets.push(etask(function*_get_proxies_running(){
-                const proxies = yield ajax.json({url: '/api/proxies_running'});
+                const proxies = yield Api.json.get('proxies_running');
                 setdb.set('head.proxies_running', proxies);
             }));
             yield etask.all(ets);

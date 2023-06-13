@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.385.646",
+        "version": "1.388.252",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -9,7 +9,7 @@
         }
     },
     "host": "127.0.0.1:22999",
-    "basePath": "/api",
+    "basePath": "/api/v2",
     "schemes": ["http"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
@@ -965,6 +965,7 @@
         },
         "/refresh_sessions/{port}": {
             "get": {
+                "deprecated": true,
                 "description": "Switch luminati sessions to new sessions (get new IPs)",
                 "tags": ["Proxy"],
                 "parameters": [

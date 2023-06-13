@@ -4,7 +4,6 @@ import React from 'react';
 import {withRouter} from 'react-router-dom';
 import filesaver from 'file-saver';
 import React_tooltip from 'react-tooltip';
-import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
@@ -15,6 +14,7 @@ import {T} from './common/i18n.js';
 import {status_codes, bytes_format} from './util.js';
 import {Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
 import ws from './ws.js';
+import {main as Api} from './api.js';
 
 export const Logs_context = React.createContext(true);
 
@@ -84,11 +84,8 @@ const Empty_row = ()=>
 
 // XXX krzysztof: merge with enable_ssl in har/viewer.js
 const enable_ssl_click = port=>etask(function*(){
-    yield window.fetch('/api/enable_ssl', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-    });
-    const proxies = yield ajax.json({url: '/api/proxies_running'});
+    yield Api.json.post('enable_ssl');
+    const proxies = yield Api.json.get('proxies_running');
     setdb.set('head.proxies_running', proxies);
 });
 
@@ -255,7 +252,7 @@ Row.WrappedComponent.contextType = Logs_context;
 class Toolbar extends Pure_component {
     clear = ()=>{
         this.etask(function*(){
-            yield ajax({url: '/api/logs_reset'});
+            yield Api.put('logs_reset');
             setdb.emit_path('head.har_viewer.reset_reqs');
         });
     };

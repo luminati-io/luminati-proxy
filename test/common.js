@@ -3,15 +3,16 @@
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
-const http_shutdown = require('http-shutdown');
 const net = require('net');
 const url = require('url');
 const zlib = require('zlib');
 const request = require('request');
+const http_shutdown = require('http-shutdown');
 const {Netmask} = require('netmask');
 const forge = require('node-forge');
 const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
+const {SSL_OP_NO_TLSv1_1} = require('../lib/consts.js');
 const etask = require('../util/etask.js');
 const date = require('../util/date.js');
 const zutil = require('../util/util.js');
@@ -105,7 +106,8 @@ E.http_proxy = port=>etask(function*(){
             if (!proxy.https)
             {
                 proxy.https = https.createServer(
-                    Object.assign({requestCert: false}, ssl(E.keys)),
+                    Object.assign({requestCert: false}, ssl(E.keys),
+                    {secureOptions: SSL_OP_NO_TLSv1_1}),
                     (_req, _res, _head)=>{
                         zutil.defaults(_req.headers,
                             headers[_req.socket.remotePort]||{});

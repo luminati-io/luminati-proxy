@@ -3,7 +3,7 @@
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Route, withRouter, Link} from 'react-router-dom';
 import React from 'react';
-import _ from 'lodash';
+import _ from 'lodash4';
 import $ from 'jquery';
 import classnames from 'classnames';
 import etask from '../../util/etask.js';
@@ -19,6 +19,7 @@ import {T} from './common/i18n.js';
 import {Language} from './common/i18n.js';
 import {with_www_api} from './common.js';
 import ws from './ws.js';
+import {main as Api} from './api.js';
 import './css/nav.less';
 
 class Nav extends Pure_component {
@@ -188,21 +189,13 @@ class Upgrade_downgrade_modal extends Pure_component {
                     setdb.set('head.upgrading', false);
                 }
             });
+            const {action} = _this.props;
             setdb.set('head.upgrading', true);
-            if (_this.props.action=='upgrade')
-            {
-                yield ajax({url: '/api/upgrade', method: 'POST',
-                    timeout: 600000});
-            }
-            else
-            {
-                yield ajax({url: '/api/downgrade', method: 'POST',
-                    timeout: 100000});
-            }
-            yield ajax({url: '/api/restart', method: 'POST'});
+            yield Api.post(action=='upgrade' ? 'upgrade' : 'downgrade');
+            yield Api.post('restart');
             $(loading_modal).modal('hide');
             show_reload();
-            if (_this.props.action=='upgrade')
+            if (action=='upgrade')
                 setdb.set('head.upgrading', false);
             setTimeout(function _check_reload(){
                 const retry_cb = ()=>{ setTimeout(_check_reload, 500); };
@@ -227,7 +220,7 @@ class Upgrade_downgrade_modal extends Pure_component {
 class Shutdown_modal extends Pure_component {
     confirm(){
         this.etask(function*(){
-            yield ajax({url: '/api/shutdown', method: 'POST'});
+            yield Api.post('shutdown');
             window.setTimeout(()=>{
                 $('#shutdown').modal({
                     backdrop: 'static',
@@ -257,7 +250,7 @@ const Account = withRouter(class Account extends Pure_component {
     logout = ()=>{
         const _this = this;
         this.etask(function*(){
-            yield ajax({url: '/api/logout', method: 'POST'});
+            yield Api.post('logout');
             _this.props.history.push('/login');
         });
     };

@@ -11,7 +11,6 @@ import filesaver from 'file-saver';
 import $ from 'jquery';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
-import zescape from '../../util/escape.js';
 import csv from '../../util/csv.js';
 import etask from '../../util/etask.js';
 import zutil from '../../util/util.js';
@@ -26,6 +25,7 @@ import {Search_box} from './chrome_widgets.js';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
 import ws from './ws.js';
+import {main as Api} from './api.js';
 import './css/proxies.less';
 
 const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog,
@@ -132,9 +132,8 @@ class Browser_cell extends Pure_component {
         const _this = this;
         ws.post_event('Browser Click');
         this.etask(function*(){
-            const url = `/api/browser/${_this.props.proxy.port}`;
-            const res = yield window.fetch(url);
-            if (res.status==206)
+            const res = yield Api.get(`browser/${_this.props.proxy.port}`);
+            if ((res||'').includes('Fetching'))
                 $('#fetching_chrome_modal').modal();
         });
     };
@@ -650,9 +649,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxies.Proxies.req_status');
             }));
-            const params = {};
-            const url = zescape.uri('/api/recent_stats', params);
-            const stats = yield ajax.json({url});
+            const stats = yield Api.json.get('recent_stats');
             setdb.set('head.recent_stats', stats);
             if (!_this.state.proxies.length ||
                 zutil.equal_deep(stats, _this.state.stats))
@@ -710,7 +707,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     update = ()=>{
         this.setState({selected_proxies: {}, checked_all: false});
         return this.etask(function*(){
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            const proxies = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies);
         });
     };
@@ -932,11 +929,7 @@ class Delete_dialog extends Pure_component {
         const _this = this;
         const ports = _this.props.proxies.map(p=>p.port);
         this.etask(function*(){
-            yield window.fetch('/api/proxies/delete', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ports}),
-            });
+            yield yield Api.json.post('proxies/delete', {ports});
             yield _this.props.update_proxies();
             _this.props.close_dialog();
         });
@@ -1070,9 +1063,8 @@ class Actions extends Pure_component {
             }
             if (proxy.status=='testing')
                 setdb.emit_path('head.proxies_running');
-            const uri = '/api/proxy_status/'+proxy.port;
-            const url = zescape.uri(uri, params);
-            _this.status_req = ajax.json({url, timeout: 25000});
+            _this.status_req = yield Api.json.get('proxy_status/'+proxy.port,
+                {qs: params});
             const res = yield _this.status_req;
             delete _this.status_req;
             if (res===undefined)
@@ -1101,8 +1093,7 @@ class Actions extends Pure_component {
         e.stopPropagation();
         const _this = this;
         this.etask(function*(){
-            const url = '/api/refresh_sessions/'+_this.props.proxy.port;
-            yield ajax.json({url, method: 'POST'});
+            yield Api.json.post('refresh_sessions/'+_this.props.proxy.port);
             yield _this.get_status({force: true});
             _this.post_action('Refresh');
         });
@@ -1114,12 +1105,8 @@ class Actions extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxies.Actions.duplicate');
             }));
-            const raw_resp = yield window.fetch('/api/proxy_dup', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({port: _this.props.proxy.port}),
-            });
-            const resp = yield raw_resp.json();
+            const resp = yield Api.json.post('proxy_dup',
+                {port: _this.props.proxy.port});
             if (resp.errors)
                 _this.props.show_error_ntf(resp.errors);
             _this.post_action('Duplicate');

@@ -3,14 +3,14 @@
 import React from 'react';
 import $ from 'jquery';
 import Pure_component from '/www/util/pub/pure_component.js';
-import ajax from '../../../util/ajax.js';
 import etask from '../../../util/etask.js';
+import {Labeled_controller, Warning} from '../common.js';
+import {main as Api} from '../api.js';
+import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import {Modal} from './modals.js';
 import Tooltip from './tooltip.js';
 import {Input, Yes_no} from './controls.js';
 import {T} from './i18n.js';
-import {Labeled_controller, Warning} from '../common.js';
-import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 const {entries, assign} = Object;
 const remote_field = 'logs_settings';
 
@@ -192,8 +192,8 @@ export default class Logs_settings_modal extends Pure_component {
     test_remote(){
         let _this = this, {cur_tab, remote} = this.state;
         return etask(function*(){
-            const test_res = yield ajax({url: '/api/test_logs_remote',
-                method: 'POST', data: assign({}, remote, {type: cur_tab})});
+            const test_res = yield Api.post('test_logs_remote',
+                assign({}, remote, {type: cur_tab}));
             if (test_res != 'ok')
                 return _this.setState({error: test_res});
             _this.setState({is_submit_disabled: false});

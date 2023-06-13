@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import $ from 'jquery';
-import _ from 'lodash';
+import _ from 'lodash4';
 import moment from 'moment-timezone';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
@@ -14,6 +14,7 @@ import {Remove_icon, Field_row_raw, Warning, Note} from '../common.js';
 import user_agents from '/www/util/pub/user_agent_gen.json';
 import {is_local} from '../util.js';
 import ws from '../ws.js';
+import {main as Api} from '../api.js';
 import Tooltip from '../common/tooltip.js';
 import {Config, Tab_context} from './common.js';
 
@@ -95,9 +96,8 @@ export default class Browser extends Pure_component {
         const _this = this;
         ws.post_event('Browser Click');
         this.etask(function*(){
-            const url = `/api/browser/${_this.state.form.port}`;
-            const res = yield window.fetch(url);
-            if (res.status==206)
+            const res = yield Api.get(`browser/${_this.state.form.port}`);
+            if ((res||'').includes('Fetching'))
                 $('#fetching_chrome_modal').modal();
         });
     };

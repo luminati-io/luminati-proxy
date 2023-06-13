@@ -10,7 +10,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'flag-icons/css/flag-icons.css';
 import 'es6-shim';
 import setdb from '../../util/setdb.js';
-import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import zurl from '../../util/url.js';
 import Proxy_edit from './proxy_edit/index.js';
@@ -24,6 +23,7 @@ import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
 import ws from './ws.js';
+import {main as Api} from './api.js';
 import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
@@ -46,7 +46,7 @@ const App = withRouter(class App extends Pure_component {
         setdb.set('head.save_settings', this.save_settings);
         const _this = this;
         this.etask(function*(){
-            const version = yield ajax.json({url: '/api/version'});
+            const version = yield Api.json.get('version');
             setdb.set('head.version', version.version);
             setdb.set('head.is_upgraded', version.is_upgraded);
             setdb.set('head.backup_exist', version.backup_exist);
@@ -54,35 +54,32 @@ const App = withRouter(class App extends Pure_component {
         });
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
+                console.error('App mount error', e);
                 yield report_exception(e, 'app.App.componentDidMount');
             }));
             const url_o = zurl.parse(document.location.href);
             const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
             if (qs_o.lpm_token)
             {
-                yield window.fetch('/api/cloud_auth', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        lpm_token: qs_o.lpm_token,
-                        username: qs_o.user,
-                    }),
+                yield Api.json.post('cloud_auth', {
+                    lpm_token: qs_o.lpm_token,
+                    username: qs_o.user,
                 });
             }
             if (qs_o.lang)
                 i18n.set_curr_lang(qs_o.lang);
-            const mode = yield window.fetch('/api/mode');
+            const mode = yield Api.json.get('mode', {safe: true,
+                exp_hdr: ['x-lpm-block-ip', 'x-lpm-local-login']});
             let block_ip;
-            if (block_ip = mode.headers.get('x-lpm-block-ip'))
+            if (block_ip = mode.headers['x-lpm-block-ip'])
             {
                 setdb.set('head.blocked_ip', block_ip);
                 return _this.props.history.replace('/whitelist_ips');
             }
             _this.load_data();
-            if (mode.headers.get('x-lpm-local-login'))
+            if (mode.headers['x-lpm-local-login'])
                 return _this.props.history.replace('/login');
-            const data = yield mode.json();
-            if (data.logged_in)
+            if (mode.data.logged_in)
             {
                 if (!['/login', '/whitelist_ips'].includes(
                     _this.props.location.pathname))
@@ -136,57 +133,66 @@ const App = withRouter(class App extends Pure_component {
         });
         this.spawn(etask(function*(){
             this.on('uncaught', err_handler('Error fetching locations'));
-            const locations = yield ajax.json({url: '/api/all_locations'});
+            const locations = yield Api.json.get('all_locations');
             setdb.set('head.locations', locations);
         }));
         this.spawn(etask(function*(){
             this.on('uncaught', err_handler('Error fetching carriers'));
-            const carriers = yield ajax.json({url: '/api/all_carriers'});
+            const carriers = yield Api.json.get('all_carriers');
             setdb.set('head.carriers', carriers);
         }));
         etask(function*(){
             this.on('uncaught', err_handler('Error fetching lang data'));
             this.finally(()=>setdb.set('i18n_loaded', true));
-            const res = yield ajax.json({url: '/api/i18n'});
+            const res = yield Api.json.get('i18n');
             Object.keys(res).forEach(lang_code=>{
                 if (i18n.langs[lang_code])
                     i18n.langs[lang_code].t = res[lang_code];
             });
         });
         etask(function*(){
-            const settings = yield ajax.json({url: '/api/settings'});
+            this.on('uncaught', err_handler('Error fetching settings'));
+            const settings = yield Api.json.get('settings');
             setdb.set('head.settings', settings);
         });
         etask(function*(){
-            const conn = yield ajax.json({url: '/api/conn'});
+            this.on('uncaught', err_handler('Error fetching conn'));
+            const conn = yield Api.json.get('conn');
             setdb.set('head.conn', conn);
         });
         etask(function*(){
-            const version = yield ajax.json({url: '/api/last_version'});
+            this.on('uncaught', err_handler('Error fetching last_version'));
+            const version = yield Api.json.get('last_version');
             setdb.set('head.ver_last', version);
         });
         etask(function*(){
-            const defaults = yield ajax.json({url: '/api/defaults'});
+            this.on('uncaught', err_handler('Error fetching defaults'));
+            const defaults = yield Api.json.get('defaults');
             setdb.set('head.defaults', defaults);
         });
         etask(function*(){
-            const node = yield ajax.json({url: '/api/node_version'});
+            this.on('uncaught', err_handler('Error fetching node_version'));
+            const node = yield Api.json.get('node_version');
             setdb.set('head.ver_node', node);
         });
         etask(function*(){
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            this.on('uncaught', err_handler('Error fetching proxies_running'));
+            const proxies = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies);
         });
         etask(function*(){
-            const consts = yield ajax.json({url: '/api/consts'});
+            this.on('uncaught', err_handler('Error fetching consts'));
+            const consts = yield Api.json.get('consts');
             setdb.set('head.consts', consts);
         });
         etask(function*(){
-            const zones = yield ajax.json({url: '/api/zones'});
+            this.on('uncaught', err_handler('Error fetching zones'));
+            const zones = yield Api.json.get('zones');
             setdb.set('ws.zones', zones);
         });
         etask(function*(){
-            const w = yield ajax.json({url: '/api/tls_warning'});
+            this.on('uncaught', err_handler('Error fetching tls_warning'));
+            const w = yield Api.json.get('tls_warning');
             setdb.set('ws.tls_warning', w);
         });
         yield this.wait_child('all');
@@ -194,18 +200,15 @@ const App = withRouter(class App extends Pure_component {
             setdb.set('head.app_errors', errors);
     });
     save_settings = settings=>{
-      return this.etask(function*(){
-          const raw = yield window.fetch('/api/settings', {
-              method: 'PUT',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify(settings),
-          });
-          if (raw.status!=200)
-              return {err: yield raw.text()};
-          const new_settings = yield raw.json();
-          setdb.set('head.settings', new_settings);
-          return new_settings;
-      });
+        return this.etask(function*(){
+            this.on('uncaught', e=>{
+                console.error('Settings save error', e);
+                this.return({err: new_settings || e.message});
+            });
+            const new_settings = yield Api.json.put('settings', settings);
+            setdb.set('head.settings', new_settings);
+            return new_settings;
+        });
     };
     render(){
       const {i18n_loaded, curr_lang} = this.state;
