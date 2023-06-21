@@ -172,4 +172,35 @@ E.internalize_pool = typeof Map=='function' ? function(){
     };
 } : function(v){ return v; };
 
+E.wrap = function wrap(str, width, nbsp_to_space){
+    nbsp_to_space = nbsp_to_space!==false;
+    var lines = str.split('\n');
+    if (lines.length>1)
+    {
+        return lines.map(function(line){
+            return wrap(line, width);
+        }).join('\n');
+    }
+    var words = str.split(' ');
+    var output = '';
+    var cur_line = '';
+    for (var i = 0; i < words.length; i++)
+    {
+        var word = words[i];
+        var possible_line = cur_line ? cur_line+' '+word : word;
+        if (possible_line[width])
+        {
+            output += cur_line+'\n';
+            cur_line = word;
+        }
+        else
+            cur_line = possible_line;
+    }
+    output += cur_line;
+    return nbsp_to_space ? output.replace(/\u00A0/g, ' ') : output;
+};
+E.sp2nbsp = function(){
+    return E.es6_str(arguments).replace(/ /g, '\u00A0');
+};
+
 return E; }); }());

@@ -8,13 +8,13 @@ var is_rn = typeof global=='object' && !!global.nativeRequire ||
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
-        require('lodash'), require('/util/events.js'));
+        require('lodash4'), require('/util/events.js'));
 }
 else if (!is_node_ff)
     define = self.define;
 else
     define = require('./require_node.js').define(module, '../');
-define(['lodash', 'events'], (_, EventEmitter)=>{
+define(['lodash4', 'events'], (_, EventEmitter)=>{
 
 const RECURSIVE = '.';
 

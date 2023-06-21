@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.390.445",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix unable update port to number less then UI port"
+            },
+            {
+                "type": "bug",
+                "text": "fix wrong responce for CONNECT request errors"
+            },
+            {
+                "type": "bug",
+                "text": "fix unable to change boolean port settings via UI"
+            }
+        ]
+    },
+    {
         "ver": "1.388.252",
         "type": "stable",
         "changes": [

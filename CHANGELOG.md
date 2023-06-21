@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.390.445 Stable
+- :bug: fix unable update port to number less then UI port
+- :bug: fix wrong responce for CONNECT request errors
+- :bug: fix unable to change boolean port settings via UI
+
 ## 1.388.252 Stable
 - :star: introduce lpm token protected API v2
 - :sparkles: update dependencies

@@ -318,7 +318,6 @@
       "lib/ws.js",
       "lib/zagent_api.js",
       "lib/zones.js",
-      "publish_cn.js",
       "publish_validate.js",
       "scripts/changelog_validate.js",
       "scripts/stress_test.js",
@@ -418,7 +417,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "a0d43c925e2bc0f288f094bfea3018e6"
+    "md5": "57dceea6659f137cd78e905c33e280b1"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -450,5 +449,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.388.252"
+  "version": "1.390.445"
 }
