@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.390.445/luminati-proxy-manager-v1.390.445-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.391.155/luminati-proxy-manager-v1.391.155-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -152,6 +152,8 @@ Options:
       --ssl                        Enable SSL analyzing
                                                       [boolean] [default: false]
       --tls_lib                    SSL library    [string] [default: "open_ssl"]
+      --av_check                   Enable antivirus check
+                                                      [boolean] [default: false]
       --iface                      Interface or IP to listen on         [string]
       --customer                   Customer name                        [string]
       --zone                       Zone name        [string] [default: "static"]
@@ -297,6 +299,7 @@ Options:
       --proxy_country                                              [default: ""]
       --resolve_proxies_interval                                [default: 10000]
       --info                                                    [default: false]
+      --av_server                                               [default: false]
       --cn                                                      [default: false]
       --api_body_limit                                          [default: "2mb"]
       --api_domain_fallback                               [default: "l-lpm.com"]

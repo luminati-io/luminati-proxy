@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.391.155 Stable
+- :star: Checking traffic for malware option on cloud lpm agents
+
 ## 1.390.445 Stable
 - :bug: fix unable update port to number less then UI port
 - :bug: fix wrong responce for CONNECT request errors

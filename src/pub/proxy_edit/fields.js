@@ -272,6 +272,11 @@ export const tabs = {
                     SSL analyzing and you are getting blocked`,
                 ext: true,
             },
+            av_check: {
+                label: 'Antivirus check',
+                tooltip: `Checking traffic for malware`,
+                ext: true,
+            },
             proxy_connection_type: {
                 label: 'Connection to Super Proxy',
                 tooltip: `Connection type between Proxy Manager and Super

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.391.155",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Checking traffic for malware option on cloud lpm agents"
+            }
+        ]
+    },
+    {
         "ver": "1.390.445",
         "type": "stable",
         "changes": [

@@ -106,14 +106,19 @@ export default class General extends Pure_component {
         this.set_field('pool_size', size);
         this.set_field('multiply', 1);
     };
-    ssl_changed = val=>!val && this.set_field('tls_lib', 'open_ssl');
+    ssl_changed = val=>{
+        if (val)
+            return;
+        this.set_field('tls_lib', 'open_ssl');
+        this.set_field('av_check', false);
+    };
     open_static_modal = ()=>$('#allocated_ips').modal('show');
     open_users_modal = ()=>$('#users_modal').modal('show');
     open_bw_limit_modal = ()=>$('#bw_limit_modal').modal('show');
     render(){
         if (!this.state.form || !this.state.proxy || !this.state.settings)
             return null;
-        const {zagent} = this.state.settings;
+        const {zagent, av_server} = this.state.settings;
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
         const is_render_plan = curr_plan.type=='unblocker' || !!curr_plan.serp;
@@ -185,6 +190,14 @@ export default class General extends Pure_component {
                 disabled={!zagent}
                 note={!zagent && <Limit_zagent_note/>}
                 data={tls_lib_opt}
+              />
+            }
+            {form.ssl && av_server &&
+              <Config
+                type="yes_no"
+                id="av_check"
+                note={!zagent && <Limit_zagent_note/>}
+                disabled={!zagent}
               />
             }
             <Config type="select" data={route_err_opt} id="route_err"/>
