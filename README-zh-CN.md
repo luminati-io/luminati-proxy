@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.391.155-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.391.825-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -107,7 +107,7 @@ Options:
       --zone                       Zone name        [string] [default: "static"]
       --password                   Zone password                        [string]
       --proxy                      Hostname or IP of super proxy
-                                  [string] [default: "zproxy.lum-superproxy.io"]
+                                         [string] [default: "brd.superproxy.io"]
       --proxy_port                 Super proxy port    [number] [default: 22225]
       --proxy_connection_type      Determines what kind of connection will be
                                    used between Proxy Manager and Super Proxy

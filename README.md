@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.391.155/luminati-proxy-manager-v1.391.155-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.391.825/luminati-proxy-manager-v1.391.825-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -159,7 +159,7 @@ Options:
       --zone                       Zone name        [string] [default: "static"]
       --password                   Zone password                        [string]
       --proxy                      Hostname or IP of super proxy
-                                  [string] [default: "zproxy.lum-superproxy.io"]
+                                         [string] [default: "brd.superproxy.io"]
       --proxy_port                 Super proxy port    [number] [default: 22225]
       --proxy_connection_type      Determines what kind of connection will be
                                    used between Proxy Manager and Super Proxy

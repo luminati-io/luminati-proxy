@@ -10,12 +10,12 @@ const E = {};
 
 E.code = (proxy=22225, lpm_token, hostname=document.location.hostname)=>({
     shell: `curl --proxy ${hostname}:${proxy} ${!is_local() && lpm_token ?
-        `--proxy-user lum-auth-token:${lpm_token} ` : ''}`
+        `--proxy-user brd-auth-token:${lpm_token} ` : ''}`
         +`"http://lumtest.com/myip.json"`,
     node: `#!/usr/bin/env node
 require('request-promise')({
     url: 'https://lumtest.com/myip.json',
-    proxy: 'http://${!is_local() && lpm_token ? `lum-auth-token:${lpm_token}@`
+    proxy: 'http://${!is_local() && lpm_token ? `brd-auth-token:${lpm_token}@`
         : ''}${hostname}:${proxy}',
     rejectUnauthorized: false
 }).then(function(data){
@@ -49,7 +49,7 @@ public class Example {
             new InetSocketAddress("${hostname}", ${proxy}));
         URLConnection yc = url.openConnection(proxy);${!is_local() &&
             lpm_token ? `
-        String auth = "lum-auth-token:${lpm_token}";
+        String auth = "brd-auth-token:${lpm_token}";
         String encoded_auth = Base64.getEncoder().encodeToString(
             auth.getBytes());
         yc.setRequestProperty("Proxy-Authorization", "Basic "+encoded_auth);`
@@ -74,7 +74,7 @@ class Example
         let client = new WebClient();
         client.Proxy = new WebProxy("${hostname}:${proxy}");${!is_local() &&
             lpm_token? `
-        client.Proxy.Credentials = new NetworkCredential("lum-auth-token", "${lpm_token}");` : ''};
+        client.Proxy.Credentials = new NetworkCredential("brd-auth-token", "${lpm_token}");` : ''};
         Console.WriteLine(client.DownloadString(
             "https://lumtest.com/myip.json"));
     }
@@ -86,7 +86,7 @@ Module Example
         Dim Client As New WebClient
         Client.Proxy = New WebProxy("http://${hostname}:${proxy}")${
             !is_local() && lpm_token ? `
-        Client.Proxy.Credentials = New NetworkCredential("lum-auth-token", "${lpm_token}")` : ''}
+        Client.Proxy.Credentials = New NetworkCredential("brd-auth-token", "${lpm_token}")` : ''}
         Console.WriteLine(Client.DownloadString(
             "http://lumtest.com/myip.json"))
     End Sub
@@ -103,7 +103,7 @@ if sys.version_info[0]==2:
     ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = request.build_opener(
         request.ProxyHandler({'http': 'http://${!is_local && lpm_token ?
-        `lum-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
+        `brd-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
         request.HTTPSHandler(context=ctx))
     print(opener.open('https://lumtest.com/myip.json').read())
 if sys.version_info[0]==3:
@@ -112,7 +112,7 @@ if sys.version_info[0]==3:
     ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = urllib.request.build_opener(
         urllib.request.ProxyHandler({'http': 'http://${!is_local() && lpm_token
-            ? `lum-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
+            ? `brd-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
         urllib.request.HTTPSHandler(context=ctx))
     print(opener.open('https://lumtest.com/myip.json').read())`,
     ruby: `#!/usr/bin/ruby
@@ -122,7 +122,7 @@ require 'net/http'
 
 uri = URI.parse('{{example.user_url}}')
 proxy = Net::HTTP::Proxy('${hostname}', ${proxy}${!is_local() && lpm_token ?
-    `, 'lum-auth-token', '${lpm_token}'` : ''})
+    `, 'brd-auth-token', '${lpm_token}'` : ''})
 
 req = Net::HTTP::Get.new(uri.path)
 
@@ -134,7 +134,7 @@ puts result.body`,
     php: `<?php
     $curl = curl_init('https://lumtest.com/myip.json');
     curl_setopt($curl, CURLOPT_PROXY, 'http://${hostname}:${proxy}');${!is_local() && lpm_token ? `
-    curl_setopt($curl, CURLOPT_PROXYUSERPWD, 'lum-auth-token:${lpm_token}')` : ''}
+    curl_setopt($curl, CURLOPT_PROXYUSERPWD, 'brd-auth-token:${lpm_token}')` : ''}
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_exec($curl);
 ?>`,
@@ -142,7 +142,7 @@ puts result.body`,
 use LWP::UserAgent;
 my $agent = LWP::UserAgent->new();
 $agent->proxy(['http', 'https'], "http://${!is_local() && lpm_token ?
-    `lum-auth-token:${lpm_token}\\@` : ''}${hostname}:${proxy}");
+    `brd-auth-token:${lpm_token}\\@` : ''}${hostname}:${proxy}");
 print $agent->get('http://lumtest.com/myip.json')->content();`,
 });
 
@@ -157,7 +157,7 @@ const Auth_step = ({lpm_token, type})=>{
     if (is_local() || !lpm_token)
         return null;
     const creds = <React.Fragment>
-      <code><T>Username</T></code>:<Code>lum-auth-token</Code><br/>
+      <code><T>Username</T></code>:<Code>brd-auth-token</Code><br/>
       <code><T>Password</T></code>:<Code>{lpm_token}</Code>
     </React.Fragment>;
     if (type=='mac')

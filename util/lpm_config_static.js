@@ -65,7 +65,7 @@ conf.server_default = {
     tls_lib: 'open_ssl',
     av_check: false,
     test_url: 'http://lumtest.com/myip.json',
-    proxy: 'zproxy.lum-superproxy.io',
+    proxy: 'brd.superproxy.io',
     proxy_port: 22225,
     proxy_retry: 2,
     proxy_country: '',

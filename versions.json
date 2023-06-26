@@ -1,11 +1,11 @@
 [
     {
-        "ver": "1.391.155",
+        "ver": "1.391.825",
         "type": "stable",
         "changes": [
             {
-                "type": "star",
-                "text": "Checking traffic for malware option on cloud lpm agents"
+                "type": "bug",
+                "text": "fix update general settings via UI"
             }
         ]
     },

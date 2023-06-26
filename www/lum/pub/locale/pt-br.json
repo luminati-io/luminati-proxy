@@ -195,7 +195,7 @@
   "Install the Bright Data Proxy Manager":
   "Instale o Gerenciador de Proxies Bright Data ",
   "here": "Aqui",
-  "Change the code to send HTTP requests directly to the specified port (for example, 127.0.0.1:24000) instead of to zproxy.lum-superproxy.io:22225": "Altere o código para enviar solicitações HTTP diretamente para a porta especificada (por exemplo, 127.0.0.1:24000) em vez de para zproxy.lum-superproxy.io:22225",
+  "Change the code to send HTTP requests directly to the specified port (for example, 127.0.0.1:24000) instead of to brd.superproxy.io:22225": "Altere o código para enviar solicitações HTTP diretamente para a porta especificada (por exemplo, 127.0.0.1:24000) em vez de para brd.superproxy.io:22225",
   "Configure the settings for your custom proxies and Zones through the LPM dashboard. You do not need to send the user parameter (brd-customer-customer_name-zone-zone_name…) alongside your requests, as all the needed data is wrapped within the manual proxy configuration.": "Configure as configurações para os seus proxies e zonas por meio do painel do LPM. Você não precisa enviar o parâmetro do usuário (brd-customer-customer_name-zone-zone_name ...) juntamente com suas solicitações, pois todos os dados necessários são agrupados na configuração do proxy manual.",
   "How to configure Bright Data raw API with iPhone":
   "Como configurar o API Bright Data com iPhone",

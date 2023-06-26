@@ -98,7 +98,8 @@ E.get_nth_level_domain = function(domain, level, strip_www){
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
     // XXX viktor: /^[\p{L}0-9_.\-+*%!]+@(.*)$/u works only in ES9
-    var match = (email||'').toLowerCase().match(/^[a-z0-9_.\-+*%!ö]+@(.*)$/);
+    var match = String(email||'').toLowerCase()
+        .match(/^[a-z0-9_.\-+*%!ö]+@(.*)$/);
     return match && match[1];
 };
 

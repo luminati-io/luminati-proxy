@@ -1,9 +1,22 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
+import _ from 'lodash4';
 import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import date from '../../util/date.js';
-const {assign} = Object;
+const {assign, keys} = Object;
+
+const process_payload = payload=>{
+    if (!payload || _.isEmpty(payload))
+        return payload;
+    let new_pl = _.cloneDeep(payload);
+    keys(new_pl).forEach(k=>{
+        // jquery omit empty arrays in req body payload
+        if (Array.isArray(new_pl[k]) && !new_pl[k].length)
+            new_pl[k] = [''];
+    });
+    return new_pl;
+};
 
 const Requester = etask._class(class Requester {
     constructor(json, base_url, qs, headers){
@@ -35,7 +48,7 @@ const Requester = etask._class(class Requester {
                 method,
                 qs: _qs,
                 headers: _headers,
-                data: body,
+                data: process_payload(body),
                 json: !!_this.json,
                 timeout,
                 return_headers: exp_hdr,
