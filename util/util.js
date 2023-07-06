@@ -665,4 +665,7 @@ function get_map_fn(v){
     return function(it){ return E.get(it, path); };
 }
 
+E.make_error = (message, code, extra)=>
+    Object.assign(new Error(message), code&&{code}, extra&&{extra});
+
 return E; }); }());

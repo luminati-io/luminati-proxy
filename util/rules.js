@@ -11,13 +11,16 @@ const MD5_RAND_MAX = parseInt('f'.repeat(32), 16);
 E.find_matches = (all_rules, selector)=>
     (all_rules||[]).filter(x=>E.matches_rule(x.match, selector, x.opts));
 
-E.select_rules = (all_rules, selector, overrides=[], opts)=>{
-    let matches = E.find_matches(all_rules, selector);
-    matches = opts && opts.matches_preprocessor ?
-        opts.matches_preprocessor(matches) : matches;
-    let merged = _.merge({}, ...matches.map(x=>x.rules), ...overrides,
+E.merge_matches = (matches, overrides=[], opts)=>{
+    if (opts && opts.matches_preprocessor)
+        matches = opts.matches_preprocessor(matches);
+    return _.merge({}, ...matches.map(x=>x.rules), ...overrides,
         E.rule_merge_customizer);
-    return merged;
+};
+
+E.select_rules = (all_rules, selector, overrides=[], opts)=>{
+    const matches = E.find_matches(all_rules, selector);
+    return E.merge_matches(matches, overrides, opts);
 };
 
 E.make_rules_object = (rules, selector)=>{

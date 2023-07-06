@@ -293,22 +293,55 @@ E.ZEXIT_LOG_DIR = env.ZEXIT_LOG_DIR||'/tmp/zexit_logs';
 E.prefix = '';
 
 E.level = L.NOTICE;
+
+var flush_timer;
 E.flush = function(){};
 E.set_log_buffer = function(on){
     if (!on)
     {
-        if (E.log_buffer)
-        {
-            E.flush();
-            E.log_buffer(0);
-        }
+        if (!E.log_buffer)
+            return;
+        E.flush();
+        write_log = E.log_buffer.destroy();
+        E.flush = function(){};
+        clearInterval(flush_timer);
         return;
     }
-    E.log_buffer = require('log-buffer');
-    E.log_buffer(32*1024);
-    E.flush = function(){ E.log_buffer.flush(); };
-    setInterval(E.flush, 1000).unref();
+    E.log_buffer = Log_buffer();
+    write_log = E.log_buffer(write_log, 32*1024);
+    E.flush = function log_buffer_flush(){ E.log_buffer.flush(); };
+    flush_timer = setInterval(E.flush, 1000).unref();
 };
+
+var Log_buffer = function(){
+    var orig_func;
+    var size = 0;
+    var buf = [];
+    var instance = function log_patch(func, limit){
+        orig_func = func;
+        process.on('exit', instance.flush);
+        return function log_write(string){
+            size += Buffer.byteLength(string);
+            buf.push(string);
+            if (size > limit)
+                instance.flush();
+        };
+    };
+    instance.flush = function log_flush(){
+        if (size)
+            orig_func(buf.join('\n'));
+        buf.length = 0;
+        size = 0;
+    };
+    instance.destroy = function log_destroy(){
+        process.off('exit', instance.flush);
+        buf.length = 0;
+        size = 0;
+        return orig_func;
+    };
+    return instance;
+};
+
 var node_init = function(){
     if (zutil.is_mocha())
     {
@@ -341,13 +374,13 @@ var __zerr = function(level, args){
     var msg = zerr_format(args);
     var ts = E.hide_timestamp ? '' : date.to_sql_ms()+' ';
     var res = systemd_level(level)+E.prefix+ts+level_prefix[level]+msg;
-    console_error(res);
+    write_log(res);
     log_tail_push(res);
 };
 
 // simplified nodejs console.error
 // https://github.com/nodejs/node/blob/5fad0b93667ffc6e4def52996b9529ac99b26319/lib/internal/console/constructor.js#L381
-var console_error = function(string){
+var write_log = function(string){
     // There may be an error occurring synchronously (e.g. for files or TTYs
     // on POSIX systems) or asynchronously (e.g. pipes on POSIX systems), so
     // handle both situations.

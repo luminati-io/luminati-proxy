@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.394.442 Stable
+- :bug: fix logs noice if recent stats disabled on lpm first run
+
 ## 1.391.825 Stable
 - :bug: fix update general settings via UI
 

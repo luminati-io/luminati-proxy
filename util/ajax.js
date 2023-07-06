@@ -13,6 +13,16 @@ define(['jquery', '/util/etask.js', '/util/date.js', '/util/escape.js',
 var assign = Object.assign;
 var E = function(){ return E.send.apply(this, arguments); };
 
+var fields_to_hide = ['password', 'new_pass'];
+var hide_fields = function(data){
+    var _data = assign({}, data);
+    fields_to_hide.forEach(function(field){
+        if (_data[field])
+            _data[field] = _data[field].toString().replace(/./g, '*');
+    });
+    return _data;
+};
+
 E.send = function(opt){
     var timeout = typeof opt.timeout=='number' ? opt.timeout : 20*date.ms.SEC;
     var slow = opt.slow||2*date.ms.SEC;
@@ -72,8 +82,10 @@ E.send = function(opt){
         return this.wait();
     }, function catch$(err){
         xhr = xhr||{};
+        var data_log = hide_fields(data);
+        var opt_log = assign({}, opt, {data: data_log});
         zerr('ajax('+data_type+') failed url '+url+' data '+
-            zerr.json(data).substr(0, 200)+' status: '+xhr.status+' '+
+            zerr.json(data_log).substr(0, 200)+' status: '+xhr.status+' '+
             xhr.statusText+'\nresponseText: '+
             (xhr.responseText||'').substr(0, 200));
         if (retry && (!opt.should_retry||opt.should_retry(err, xhr, ajopt)))
@@ -83,7 +95,7 @@ E.send = function(opt){
         if (xhr.status==403 && !opt.no_emit_err)
         {
             if (typeof console!=='undefined' && console.error)
-                console.error('unauthorized debug '+JSON.stringify(opt));
+                console.error('unauthorized debug '+JSON.stringify(opt_log));
             E.events.emit('unauthorized', this, xhr);
         }
         if (xhr.status==406 && !opt.no_emit_err)

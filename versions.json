@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.394.442",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix logs noice if recent stats disabled on lpm first run"
+            }
+        ]
+    },
+    {
         "ver": "1.391.825",
         "type": "stable",
         "changes": [
