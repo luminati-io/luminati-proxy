@@ -1,5 +1,12 @@
 Proxy manager - Change Log
 
+## 1.399.639 Stable
+- :bug: Fix mem leak on tls sockets
+- :bug: Fix overflowed General Settings page display
+- :star: Default rule action refresh_ip
+- :star: Ban IP rule actions unavailable if Request details disabled
+- :sparkles: UI design changes
+
 ## 1.394.442 Stable
 - :bug: fix logs noice if recent stats disabled on lpm first run
 

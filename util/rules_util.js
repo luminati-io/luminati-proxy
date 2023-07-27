@@ -132,18 +132,3 @@ E.migrate_trigger = rule=>{
     return Object.assign({}, rule, {type,
         trigger_code: gen_function('trigger', body)});
 };
-
-const stringify_obj = obj=>{
-    let str = '{';
-    const keys = Object.keys(obj);
-    for (let i=0; i<keys.length; ++i)
-    {
-        const k = keys[i], v = obj[k];
-        const val = typeof v=='object' ?
-            stringify_obj(v) : JSON.stringify(v);
-        str += `${k}: ${val}`;
-        if (i<keys.length-1)
-            str += ', ';
-    }
-    return str + '}';
-};

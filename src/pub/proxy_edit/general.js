@@ -231,7 +231,12 @@ export default class General extends Pure_component {
               data={this.state.proxy.iface.values}
             />
             <Config type="pins" id="smtp" exact no_any/>
-            <Config type="select" id="debug" data={yes_no_select_opt}/>
+            <Config
+              type="select"
+              id="debug"
+              data={yes_no_select_opt}
+              faq={{anchor: 'request_details'}}
+            />
             <Config type="select" id="lpm_auth" data={yes_no_select_opt}/>
             <Config type="yes_no" id="const" />
             <Config

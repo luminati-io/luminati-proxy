@@ -328,7 +328,7 @@ export const tabs = {
             },
             debug: {
                 label: 'Request details',
-                tooltip: `Luminati request details like response timeline or
+                tooltip: `Bright Data request details like response timeline or
                     peer IP that was used to send a final request`,
             },
             const: {

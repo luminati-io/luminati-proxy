@@ -340,6 +340,7 @@
       "src/pub/common.js",
       "src/pub/config.js",
       "src/pub/cpu_warning.js",
+      "src/pub/cp_ipc.js",
       "src/pub/css/api_url_modal.less",
       "src/pub/css/app.less",
       "src/pub/css/chrome_widgets.less",
@@ -411,12 +412,13 @@
       "util/lpm_file.js",
       "util/lpm_util.js",
       "util/rules_util.js",
+      "util/takeup_util.js",
       "webpack.common.js",
       "webpack.config.js",
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "df970ae7970e7b5fc9561876bf0c8c8b"
+    "md5": "45c51e39b274b266e869e16c8f1b525c"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -448,5 +450,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.394.442"
+  "version": "1.399.639"
 }

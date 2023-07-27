@@ -112,9 +112,10 @@ E.hash = function(s){
     return hash;
 };
 
-var alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
-E.generate = function(len){
+var def_alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
+E.generate = function(len, alphabet){
     len = len||12;
+    alphabet = alphabet||def_alphabet;
     var ret = '';
     for (var i=0; i<len; i++)
         ret += alphabet[Math.random()*alphabet.length|0];

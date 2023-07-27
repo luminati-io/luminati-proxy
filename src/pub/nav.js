@@ -115,17 +115,18 @@ class Nav_top extends Pure_component {
         this.setdb_on('head.settings', settings=>this.setState({settings}));
     }
     render(){
-        if (!this.state.settings)
+        const {ver, settings, embedded} = this.state;
+        if (!settings)
             return null;
-        const {ver} = this.state;
         const tooltip = `Proxy Manager v.${ver}`;
         return <div className="nav_top">
-              <Tooltip title={tooltip} placement="right">
-                <div><Logo lock={this.state.lock}/></div>
-              </Tooltip>
-              <Nav_right settings={this.state.settings}
-                embedded={this.state.embedded}/>
-            </div>;
+            {!settings.zagent &&
+                <Tooltip title={tooltip} placement="right">
+                    <div><Logo lock={this.state.lock}/></div>
+                </Tooltip>
+            }
+            <Nav_right settings={settings} embedded={embedded}/>
+        </div>;
     }
 }
 
@@ -135,7 +136,7 @@ const Logo = withRouter(({lock})=>
 const Nav_right = props=>
     <div className="nav_top_right">
       <div className="schema"><Schema/></div>
-      <Certificate custom={props.settings.use_custom_cert}/>
+      {props.settings.use_custom_cert && <Custom_certificate />}
       {props.embedded && <Language hidden/>}
       {!props.embedded &&
         <React.Fragment>
@@ -157,9 +158,8 @@ const Patent = with_www_api(props=>
     </div>
 );
 
-const Certificate = ({custom})=>
-  <Tooltip title={(custom ? 'User' : 'System')+' certificate'}
-    placement="left" >
+const Custom_certificate = ({custom})=>
+  <Tooltip title="User certificate" placement="left" >
     <span className={classnames('glyphicon', 'glyphicon-certificate', 'cert',
       custom ? 'custom' : '')}/>
   </Tooltip>;

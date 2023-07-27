@@ -109,7 +109,7 @@ const Static_ip_cell = ({proxy, mgr})=>{
 class Type_cell extends React.Component {
     render(){
         if (this.props.scrolling)
-            return 'Luminati';
+            return 'Bright Data';
         const proxy = this.props.proxy;
         let val, tip;
         if (proxy.ext_proxies)
@@ -119,8 +119,8 @@ class Type_cell extends React.Component {
         }
         else
         {
-            val = 'Luminati';
-            tip = 'Proxy port using your Luminati account';
+            val = 'Bright Data';
+            tip = 'Proxy port using your Bright Data account';
         }
         return <Tooltip title={t(tip)}>{t(val)}</Tooltip>;
     }
@@ -268,8 +268,8 @@ const columns = [
         key: 'proxy_type',
         title: 'Type',
         render: Type_cell,
-        tooltip: 'Type of connected proxy - Luminati proxy or external proxy '
-            +'(non-Luminati)',
+        tooltip: 'Type of connected proxy - Bright Data proxy or external'
+            +' proxy (non Bright Data)',
         ext: true,
         width: 70,
     },
@@ -319,7 +319,7 @@ const columns = [
         title: 'Zone',
         type: 'options',
         default: true,
-        tooltip: 'Specific Luminati zone configured for this proxy. Switch '
+        tooltip: 'Specific Bright Data zone configured for this proxy. Switch '
             +'zones in proxy configuration page.',
         render: Zone_cell,
     },

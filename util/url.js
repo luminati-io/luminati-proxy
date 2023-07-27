@@ -550,7 +550,7 @@ E.remove_protocol = function(url){
     return url.replace(any_protocol_regex, '');
 };
 
-E.remove_www = function(url){ return url.replace('www.', ''); };
+E.remove_www = function(url){ return url.replace(/^www\./, ''); };
 
 E.is_same_domain = function(domain, urls){
     var hostname = E.parse(domain).hostname;

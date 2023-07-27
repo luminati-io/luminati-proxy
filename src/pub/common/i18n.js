@@ -3,30 +3,14 @@
 import React from 'react';
 import _ from 'lodash4';
 import setdb from '../../../util/setdb.js';
+import CP_ipc from '../cp_ipc.js';
 
 const E = {};
 
 export const TranslationContext = React.createContext('en');
 
-let top_origin, notify;
-const origins = {
-    cn: 'luminati-china.biz',
-    lum: 'luminati.io',
-    rest: 'brightdata.com',
-};
+let notify;
 const except_paths = ['/whitelist_ips'];
-if (window != window.parent)
-{
-    if (!(top_origin = window.localStorage.getItem('cp_host'))) // dev purpose
-    {
-        const host = window.location.host;
-        if (host.includes(origins.cn))
-            top_origin = `https://${origins.cn}`;
-        else if (host.includes(origins.lum) || host.includes(origins.rest))
-            top_origin = `https://${origins.rest}`;
-    }
-    notify = !!top_origin;
-}
 const msgs = [];
 const missing_cache = {};
 const notify_missing_key = (key, lang)=>{
@@ -40,7 +24,6 @@ const notify_missing_key = (key, lang)=>{
         lpm_token = sp.get('lpm_token');
     }
     msgs.push(JSON.parse(JSON.stringify({
-        type: 'pmgr.i18n_missing_key',
         key,
         lang,
         path: window.location.pathname,
@@ -57,7 +40,7 @@ const flushMessages = _.debounce(()=>{
     flushInterval = setInterval(()=>{
         if (!(msg = msgs.pop()))
             return clearInterval(flushInterval);
-        window.parent.postMessage(msg, top_origin);
+        CP_ipc.post('pmgr.i18n_missing_key', msg);
     }, 100);
 }, 250);
 

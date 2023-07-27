@@ -18,6 +18,7 @@ import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
 import Tooltip from './common/tooltip.js';
 import {T, t, Language} from './common/i18n.js';
 import {bytes_format, report_exception} from './util.js';
+import CP_ipc from './cp_ipc.js';
 
 export const www_api = 'https://brightdata.com';
 export const www_help = 'https://help.brightdata.com';
@@ -491,7 +492,7 @@ export const Ext_tooltip = with_www_api(props=>
           target="_blank"
           rel="noopener noreferrer"
           href={`${props.www_api}/cp/zones`}>
-            proxies by Luminati network
+            proxies by Bright Data network
         </a>
     </div>);
 
@@ -512,8 +513,7 @@ export const No_zones = with_www_api(class No_zones extends Pure_component {
         if (!this.state.settings)
             return null;
         const link_props = this.state.settings.zagent && window.parent ?
-            {onClick: ()=>window.parent.postMessage('no_zones',
-                this.props.www_api)} :
+            {onClick: ()=>CP_ipc.post('no_zones')} :
             {target: '_blank', rel: 'noopener noreferrer',
                 href: `${this.props.www_api}/cp/zones`};
         return <div>
@@ -547,7 +547,8 @@ export const Alert = props=>{
         transition={false}
         closeLabel="Close"
         onClose={()=>{ clearTimeout(close_tm); props.on_close(); }}>
-        <div>{props.text}</div>
+        {props.heading && <RB_Alert.Heading>{props.heading}</RB_Alert.Heading>}
+        {props.text && <div>{props.text}</div>}
       </RB_Alert>
     </div>;
 };

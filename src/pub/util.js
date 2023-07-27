@@ -299,3 +299,7 @@ export const is_local = ()=>{
 };
 
 export const in_cp = ()=>window.location!==window.parent.location;
+
+export const with_zagent_fn = zagent=>Comp=>function with_zagent(props){
+    return <Comp {...props} zagent={zagent} />;
+};

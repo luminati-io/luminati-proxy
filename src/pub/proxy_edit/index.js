@@ -8,6 +8,7 @@ import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import React_tooltip from 'react-tooltip';
 import Pure_component from '/www/util/pub/pure_component.js';
 import etask from '../../../util/etask.js';
+import {ms} from '../../../util/date.js';
 import setdb from '../../../util/setdb.js';
 import {qw} from '../../../util/string.js';
 import {Loader, Loader_small, Preset_description, Ext_tooltip,
@@ -33,6 +34,14 @@ import {tabs, all_fields, tips} from './fields.js';
 import '../css/proxy_edit.less';
 
 const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
+const redirect_timeout = 5*ms.SEC;
+
+const get_mount_error_message = error=>
+<React.Fragment>
+    {error}<br />
+    There may be an error in configuration file<br />
+    Anto redirect to overview
+</React.Fragment>;
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
@@ -61,15 +70,19 @@ const Index = withRouter(class Index extends Pure_component {
             const port = this.props.match.params.port;
             const proxy = proxies.filter(p=>p.port==port)[0];
             if (!proxy)
-                return this.props.history.push('/overview');
+                return this.back_func();
             const form = Object.assign({}, proxy);
-            this.apply_preset(form, undefined, true);
+            try {
+                this.apply_preset(form, undefined, true);
+            } catch(e){
+                console.error(e);
+                return this.setState({mount_error: e.message}, ()=>
+                    setTimeout(this.back_func.bind(this), redirect_timeout));
+            }
             this.setState({proxies}, this.delayed_loader());
         });
-        this.setdb_on('ws.zones', zones=>{
-            if (zones)
-                this.setState({zones}, this.delayed_loader());
-        });
+        this.setdb_on('ws.zones', zones=>zones &&
+            this.setState({zones}, this.delayed_loader()));
         this.setdb_on('head.defaults', defaults=>
             this.setState({defaults}, this.delayed_loader()));
         this.setdb_on('head.callbacks', callbacks=>this.setState({callbacks}));
@@ -144,7 +157,7 @@ const Index = withRouter(class Index extends Pure_component {
             .some(k=>!this.isEmpty(new_obj[k]));
         return is_changed || diffs;
     };
-    set_field = (field_name, value, opt={})=>{
+    set_field = (field_name, value)=>{
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
             const pending_form = {...prev_state.pending_form,
@@ -427,6 +440,7 @@ const Index = withRouter(class Index extends Pure_component {
             <Loader show={this.state.show_loader||this.state.loading}/>
             <div>
               <Header
+                zagent={gs.zagent}
                 match={this.props.match}
                 internal_name={this.state.form.internal_name}
                 is_saving={this.state.saving}
@@ -460,6 +474,13 @@ const Index = withRouter(class Index extends Pure_component {
               dismissible
               text="Port changes saved"
               on_close={()=>this.setState({show_alert: false})}
+            />
+          }
+          {this.state.mount_error &&
+            <Alert
+              variant="danger"
+              heading="Initialization error"
+              text={get_mount_error_message(this.state.mount_error)}
             />
           }
           <Modal
@@ -513,18 +534,20 @@ class Nav_tabs_wrapper extends Pure_component {
     }
 });
 
-const Header = props=>
-  <T>{t=>
-    <div className="cp_panel_header">
-      <Back_btn click={props.on_back_click}/>
-      <Port_title port={props.match.params.port}
-        name={props.internal_name} t={t}/>
-      <Loader_small saving={props.is_saving}
-        std_msg={t('All changes saved in Proxy Manager')}
-        std_tooltip=
-        {t('All changes are automatically saved to Proxy Manager')}/>
-    </div>
-  }</T>;
+const Header = props=>{
+    let title = props.zagent ? 'the Cloud' : 'Proxy Manager';
+    return <T>{t=>
+        <div className="cp_panel_header">
+        {!props.zagent && <Back_btn click={props.on_back_click}/>}
+        <Port_title port={props.match.params.port}
+            name={props.internal_name} t={t}/>
+        <Loader_small saving={props.is_saving}
+            std_msg={t(`All changes saved in ${title}`)}
+            std_tooltip=
+            {t(`All changes are automatically saved to ${title}`)}/>
+        </div>
+    }</T>;
+};
 
 export class Back_btn extends Pure_component {
     state = {lock: false};

@@ -88,7 +88,7 @@ class Overview extends Pure_component {
         const {show_logs, zagent, request_stats, reseller,
             remote_logs_enabled} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
-        const title = <T>Proxy Manager Dashboard</T>;
+        const title = zagent ? <span></span> : <T>Proxy Manager Dashboard</T>;
         return <div className="overview_page">
           <div className="warnings">
             {!this.state.embedded &&
@@ -103,8 +103,11 @@ class Overview extends Pure_component {
           </div>
           <div className="proxies nav_header">
             <h3>{title}</h3>
-            <Toolbar request_stats={request_stats}
-              toggle_stats={this.toggle_stats}/>
+            <Toolbar
+              request_stats={request_stats}
+              toggle_stats={this.toggle_stats}
+              zagent={zagent}
+            />
           </div>
           <div className="panels" style={panels_style}>
             <div className="proxies proxies_wrapper">
@@ -145,13 +148,17 @@ class Overview extends Pure_component {
     }
 }
 
-const Toolbar = ({request_stats, toggle_stats})=>{
+const Toolbar = ({request_stats, toggle_stats, zagent})=>{
   const howto_click = ()=>ws.post_event('Howto Nav Top Click');
   return <div className="toolbar">
-    <Nav_icon id='how_to' link_to='/howto' on_click={howto_click}
-      tooltip='How to use the Proxy Manager'/>
-    <Nav_icon id='general_settings' link_to='/settings'
-      tooltip='General settings'/>
+    {!zagent &&
+      <React.Fragment>
+        <Nav_icon id='how_to' link_to='/howto' on_click={howto_click}
+          tooltip='How to use the Proxy Manager'/>
+        <Nav_icon id='general_settings' link_to='/settings'
+          tooltip='General settings'/>
+      </React.Fragment>
+    }
     <Nav_icon id='stats' filled={request_stats}
       tooltip={`Recent stats are ${request_stats ? 'enabled' : 'disabled'}`}
       onClick={()=>toggle_stats(!request_stats)}/>

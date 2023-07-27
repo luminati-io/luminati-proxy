@@ -2,7 +2,6 @@
 'use strict'; /*jslint react:true, es6:true*/
 import 'prismjs/themes/prism.css';
 import React from 'react';
-import classnames from 'classnames';
 import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
@@ -55,7 +54,7 @@ const Howto = withRouter(class Howto extends Pure_component {
         return <T>{t=><div className="howto">
             <div className="cp_panel vbox">
               <div className="cp_panel_header">
-                <Back_btn click={this.back_btn_click}/>
+                {!zagent && <Back_btn click={this.back_btn_click}/>}
                 <h2>{t(cur_title)}</h2>
               </div>
               <div className="panel_inner vbox">
@@ -84,19 +83,8 @@ const Howto = withRouter(class Howto extends Pure_component {
                   {this.props.children}
                 </Instructions>
               </div>
-              {false && <Animated_instructions/>}
             </div></div>}</T>;
     }
-});
-
-const Animated_instructions = withRouter(props=>{
-    const option = props.match.params.option||'code';
-    const browser = props.match.params.suboption||'chrome_win';
-    if (option!='browser')
-        return null;
-    return <div className="gifs_inner vbox">
-          <div className={classnames('gif', browser)}/>
-        </div>;
 });
 
 const Lang_btn = props=>{

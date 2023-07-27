@@ -16,7 +16,7 @@ const {SSL_OP_NO_TLSv1_1} = require('../lib/consts.js');
 const etask = require('../util/etask.js');
 const date = require('../util/date.js');
 const zutil = require('../util/util.js');
-const restore_case = require('../util/http_hdr.js').restore_case;
+const restore_case = require('../util/takeup_util.js').restore_case;
 const customer = 'abc';
 const password = 'xyz';
 

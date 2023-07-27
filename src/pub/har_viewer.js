@@ -892,7 +892,7 @@ class Cell_value extends React.Component {
             else
                 val = '';
             const tip = ext_proxy ? 'This feature is only available when '
-                +'using proxies by Luminati network' : ip;
+                +'using proxies by Bright Data network' : ip;
             return <Tooltip_and_value
               val={val}
               tip={tip}

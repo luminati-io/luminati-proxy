@@ -1,10 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
+import _ from 'lodash4';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
+import {createGlobalStyle} from 'styled-components';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'flag-icons/css/flag-icons.css';
@@ -24,12 +26,12 @@ import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
 import ws from './ws.js';
 import {main as Api} from './api.js';
+import CP_ipc from './cp_ipc.js';
 import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
-import {report_exception, in_cp} from './util.js';
-import {createGlobalStyle} from 'styled-components';
+import {report_exception, in_cp, with_zagent_fn} from './util.js';
 import i18n, {TranslationContext, is_except_path} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
@@ -37,12 +39,20 @@ import '../../www/util/pub/css/har.less';
 window.setdb = setdb;
 setdb.setMaxListeners(50);
 
+const history_listener = _.debounce(
+    ({pathname})=>CP_ipc.post('route_change', {pathname}),
+    250
+);
+
 const App = withRouter(class App extends Pure_component {
     constructor(props){
         super(props);
         this.state = {i18n_loaded: false};
     }
     componentDidMount(){
+        this.rm_history_listener = this.props.history.listen(history_listener);
+        this.rm_change_route_listener = CP_ipc.listen('change_route',
+            ({mode})=>mode&&this.props.history.replace('/'+mode));
         setdb.set('head.save_settings', this.save_settings);
         const _this = this;
         this.etask(function*(){
@@ -120,6 +130,8 @@ const App = withRouter(class App extends Pure_component {
     }
     willUnmount(){
         ws.removeEventListener('settings_updated', this.on_settings_updated);
+        this.rm_history_listener();
+        this.rm_change_route_listener();
     }
     on_settings_updated = ({data})=>{
         setdb.set('head.settings', data.settings);
@@ -238,6 +250,7 @@ const Global_styles_brd = createGlobalStyle`
     --cp-border: rgba(82,99,115,0.1);
     --cp-border-dark: rgba(82,99,115,0.2);
     --cp-dark: #EDEFF1;
+    --cp-white: #FFFFFF;
     --cp-second: rgba(82,99,115,0.5);
     --cp-third: rgba(82,99,115,0.7);
 
@@ -325,6 +338,7 @@ class Page extends Pure_component {
     render(){
         const {settings} = this.state;
         const {zagent} = settings;
+        const with_zagent = with_zagent_fn(zagent);
         return <div>
           <Nav/>
           <Proxy_add settings={settings}/>
@@ -332,14 +346,14 @@ class Page extends Pure_component {
             <Error_boundry>
               <Validator zagent={zagent}/>
               <Switch>
-                <Route path="/overview" exact component={Overview}/>
-                <Route path="/proxy/:port" component={Proxy_edit}/>
+                <Route path="/overview" exact render={with_zagent(Overview)} />
+                <Route path="/proxy/:port" render={with_zagent(Proxy_edit)} />
                 <Route path="/howto/:option?/:suboption?" exact
-                  component={Howto}/>
-                <Route path="/logs" exact component={Logs}/>
-                <Route path="/config" exact component={Config}/>
-                <Route path="/settings" exact component={Settings}/>
-                <Route path="/" component={Overview}/>
+                  render={with_zagent(Howto)} />
+                <Route path="/logs" exact render={with_zagent(Logs)} />
+                <Route path="/config" exact render={with_zagent(Config)} />
+                <Route path="/settings" exact render={with_zagent(Settings)} />
+                <Route path="/" render={with_zagent(Overview)} />
               </Switch>
             </Error_boundry>
           </div>

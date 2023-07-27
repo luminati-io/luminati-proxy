@@ -23,8 +23,16 @@ var hide_fields = function(data){
     return _data;
 };
 
+function def_timeout(){
+    try {
+        if (window.location.hostname.match(/\.cn$/))
+            return 60*date.ms.SEC;
+    } catch(e){ /* nodejs */ }
+    return 20*date.ms.SEC;
+}
+
 E.send = function(opt){
-    var timeout = typeof opt.timeout=='number' ? opt.timeout : 20*date.ms.SEC;
+    var timeout = typeof opt.timeout=='number' ? opt.timeout : def_timeout();
     var slow = opt.slow||2*date.ms.SEC;
     var retry = opt.retry, data = opt.data, qs = zescape.qs(opt.qs);
     var url = zescape.uri(opt.url, qs), perr = opt.perr;
@@ -32,7 +40,7 @@ E.send = function(opt){
     var method = opt.method||opt.type||'GET';
     var data_type = opt.json ? 'json' : 'text';
     var t0 = Date.now();
-    var ajopt, xhr;
+    var ajopt, xhr, xhr_data;
     zerr.debug('ajax('+data_type+') url '+url+' retry '+retry);
     return etask([function(){
         ajopt = {type: method, url: url, headers: assign({}, opt.headers),
@@ -77,7 +85,14 @@ E.send = function(opt){
             }
             if (!err && _xhr && _xhr.responseText && !_xhr.responseJSON)
                 err = _xhr.responseText;
-            _this.throw(err instanceof Error ? err : new Error(''+err));
+            if (!(err instanceof Error))
+                err = new Error(''+err);
+            xhr_data = get_res_data(xhr);
+            if (opt.restore_dates && xhr_data && typeof xhr_data=='object')
+                zescape.restore_dates(xhr_data);
+            err.xhr_info = {url: url, method: method, status: xhr.status,
+                data: xhr_data, response_text: xhr.responseText};
+            _this.throw(err);
         });
         return this.wait();
     }, function catch$(err){
@@ -102,9 +117,6 @@ E.send = function(opt){
             E.events.emit('maintenance', this, xhr);
         if (xhr.status==500 && !opt.no_emit_err)
             E.events.emit('unhandledException', this, xhr);
-        var xhr_data = get_res_data(xhr);
-        if (opt.restore_dates && xhr_data && typeof xhr_data=='object')
-            zescape.restore_dates(xhr_data);
         if (opt.no_throw)
         {
             return {
@@ -118,8 +130,6 @@ E.send = function(opt){
                 error: xhr.statusText||'no_status', message: xhr.responseText,
             };
         }
-        err.xhr_info = {url: url, method: method, status: xhr.status,
-            data: xhr_data, response_text: xhr.responseText};
         err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
         throw err;

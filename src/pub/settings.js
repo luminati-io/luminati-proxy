@@ -24,10 +24,10 @@ export default function Settings(props){
     const back_func = ()=>props.history.push({pathname: '/overview'});
     const btn_click = ()=>show_conf ? $('#settings_confirmation_modal').modal()
         : back_func();
-    return <div className="settings">
-          <div className="cp_panel">
+    return <div className="settings vbox">
+          <div className="cp_panel vbox">
             <div className="cp_panel_header">
-              <Back_btn click={btn_click}/>
+              {!props.zagent && <Back_btn click={btn_click}/>}
               <h2><T>General settings</T></h2>
             </div>
             <Form show_alert={set_show_alert}
@@ -69,8 +69,8 @@ const tooltips = {
         limit may be set as a number or maximum database size.`,
     har_limit: `Define the limit for the size of the response body to save in
         the logs`,
-    debug: `Default value for luminati request details like response timeline
-        or peer IP that was used to send a final request`,
+    debug: `Default value for Bright Data request details like response
+        timeline or peer IP that was used to send a final request`,
     lpm_auth: 'Default value for "Set x-lpm-authorization header" setting',
     log_level: `Define how much log you want to see in the terminal</br>
         <ul>
@@ -335,6 +335,7 @@ class Form extends Pure_component {
           <Labeled_controller
             val={s.debug}
             type="select"
+            faq={{anchor: 'request_details'}}
             on_change_wrapper={this.on_change_handler('debug')}
             data={this.default_yes_no_select_opts}
             label="Default requests details"

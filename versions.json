@@ -1,5 +1,31 @@
 [
     {
+        "ver": "1.399.639",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix mem leak on tls sockets"
+            },
+            {
+                "type": "bug",
+                "text": "Fix overflowed General Settings page display"
+            },
+            {
+                "type": "star",
+                "text": "Default rule action refresh_ip"
+            },
+            {
+                "type": "star",
+                "text": "Ban IP rule actions unavailable if Request details disabled"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI design changes"
+            }
+        ]
+    },
+    {
         "ver": "1.394.442",
         "type": "stable",
         "changes": [

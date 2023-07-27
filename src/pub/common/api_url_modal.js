@@ -63,14 +63,14 @@ export default class Api_url_modal extends Pure_component {
         return <React.Fragment>
               <Loader show={this.state.saving}/>
               <Modal_dialog open={open}
-                title="Cannot connect to Luminati"
+                title="Cannot connect to Bright Data"
                 ok_clicked={this.click_ok} ok_disabled={!this.valid_url()}
                 no_cancel_btn>
                 <div className="api_url_modal">
                 <Instructions>
                   <Li>
-                    Please contact Luminati support to receive an alternative
-                    domain
+                    Please contact Bright Data support to receive an
+                    alternative domain
                     <Contact_btn href={phone_link} type="fas" id="phone">
                       +1-888-538-9204
                     </Contact_btn>

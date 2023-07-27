@@ -70,7 +70,7 @@ const Guest_steps = ({ip})=>
 const user_types = {
     admin: {
         title: 'Admin',
-        desc: 'Use your Luminati account email & password.',
+        desc: 'Use your Bright Data account email & password.',
         steps: Admin_steps,
     },
     guest: {

@@ -19,8 +19,12 @@ import Toggle_on_off from '../common/toggle_on_off.js';
 import ws from '../ws.js';
 import {tabs} from './fields.js';
 
-const rule_prepare = rule=>{
-    const action = {};
+const DEFAULT_ACTION = 'refresh_ip';
+
+const rule_prepare = (rule={})=>{
+    let action = {};
+    if (!rule.action)
+        rule.action = DEFAULT_ACTION;
     if (['retry_same', 'retry', 'refresh_ip'].includes(rule.action))
         action.retry = true;
     if (rule.action=='retry_same')
@@ -117,6 +121,27 @@ export const map_rule_to_form = rule=>{
     return result;
 };
 
+const Rule_warning = props=>{
+    const {text, link_title, link_click, faq_anchor, faq_article} = props;
+    const show_faq = !!faq_anchor || !!faq_article;
+    return <Warning text={
+        <React.Fragment>
+            <span>
+                {text&&<T>{text}</T>}
+                {' '}
+                {link_title && link_click &&
+                    <a className="link" onClick={link_click}>
+                        <T>{link_title}</T>
+                    </a>
+                }
+                {show_faq &&
+                    <Faq_link article={faq_article} anchor={faq_anchor}/>
+                }
+            </span>
+        </React.Fragment>
+    }/>;
+};
+
 export class Rules extends Pure_component {
     constructor(props){
         super(props);
@@ -180,6 +205,7 @@ export class Rules extends Pure_component {
         this.set_field('rules', rules);
     };
     turn_ssl = ()=>this.set_field('ssl', true);
+    turn_debug = ()=>this.set_field('debug', 'full');
     rule_add = (rule={})=>{
         this.setState(prev=>{
             rule.id = prev.max_id+1;
@@ -227,24 +253,22 @@ export class Rules extends Pure_component {
         if (!form)
             return null;
         const {custom, savebw, retry} = this.suggestions;
-        let {ssl} = form, def_ssl = this.state.defaults.ssl;
-        let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
+        let {ssl, debug: dbg} = form, def_ssl = this.state.defaults.ssl;
+        let def_dbg = this.state.defaults.debug;
+        let ssl_analyzing_enabled = ssl||ssl!==false&&def_ssl;
+        let req_details_enabled = dbg=='full'||dbg!='none'&&def_dbg=='full';
         return <div className="rules">
               {!ssl_analyzing_enabled &&
-                <Warning text={
-                  <React.Fragment>
-                    <span>
-                      <T>
-                        Most of the options here are available only when using
-                      </T>
-                      {' '}
-                      <a className="link" onClick={this.turn_ssl}>
-                        <T>SSL analyzing</T>
-                      </a>
-                      <Faq_link anchor="ssl_analyzing"/>
-                    </span>
-                  </React.Fragment>
-                }/>
+                <Rule_warning link_title="SSL analyzing"
+                  link_click={this.turn_ssl} faq_anchor="ssl_analyzing"
+                  text="Most of the options here are available only when using"
+                />
+              }
+              {!req_details_enabled &&
+                <Rule_warning link_title="Request details"
+                  link_click={this.turn_debug} faq_anchor="request_details"
+                  text="Ban IP actions are available only with enabled"
+                />
               }
               <New_rule_btn
                 disabled={disabled_fields.rules}
@@ -267,6 +291,7 @@ export class Rules extends Pure_component {
                   rule_del={this.rule_del}
                   www={www}
                   ssl={ssl_analyzing_enabled}
+                  req_details={req_details_enabled}
                   disabled={disabled_fields.rules}
                 />
               )}
@@ -378,7 +403,7 @@ class Rule extends Pure_component {
         this.setState({expanded: false});
     };
     render(){
-        let {rule_del, rule, ssl, disabled} = this.props;
+        let {rule_del, rule, ssl, disabled, req_details} = this.props;
         const active = rule.active===undefined||rule.active;
         const {ui_blocked} = this.state;
         const trigger = trigger_types.find(t=>t.value==rule.trigger_type);
@@ -410,7 +435,8 @@ class Rule extends Pure_component {
                   set_rule_field={this.set_rule_field} disabled={disabled}
                   change_ui_block={this.change_ui_block}/>
                 <Action rule={rule} set_rule_field={this.set_rule_field}
-                  change_ui_block={this.change_ui_block}/>
+                  change_ui_block={this.change_ui_block}
+                  req_details={req_details}/>
               </React.Fragment>
             }
             {!this.state.expanded &&
@@ -502,7 +528,7 @@ class Action extends Pure_component {
         return _action_types;
     };
     render(){
-        const {rule, match, ports_opt} = this.props;
+        const {rule, match, ports_opt, req_details} = this.props;
         const {defaults, settings, zones, curr_zone, form} = this.state;
         if (!rule.trigger_type || !settings || !defaults || !form)
             return null;
@@ -527,7 +553,7 @@ class Action extends Pure_component {
         }
         else
             _action_types = _action_types.filter(at=>at.value!='refresh_ip');
-        if (form.pool_size==1)
+        if (form.pool_size==1 || !req_details)
         {
             _action_types = _action_types.filter(({value: v})=>
                 !v.startsWith('ban_ip'));
