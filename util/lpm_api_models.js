@@ -100,6 +100,7 @@ E.proxy_fields = {
                 +'of period is reached. Default is true'}
         }
     },
+    follow_redirect: {type: 'boolean', desc: 'Auto redirect requests'},
 };
 
 E.manager_fields = {

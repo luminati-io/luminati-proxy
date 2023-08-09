@@ -254,6 +254,7 @@ export default class General extends Pure_component {
               disabled={!is_render_plan}
               note={!is_render_plan && <Limit_zone_note zones={render_zones}/>}
             />
+            <Config type="yes_no" id="follow_redirect" />
           </Tab_context.Provider>
         </div>;
     }

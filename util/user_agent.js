@@ -2,8 +2,8 @@
 'use strict'; /*jslint node:true, browser:true*/
 (function(){
 var define;
-var is_node_ff = typeof module=='object' && module.exports;
-if (!is_node_ff)
+var is_node = typeof module=='object' && module.exports;
+if (!is_node)
     define = self.define;
 else
     define = function(setup){ module.exports = setup(); };
@@ -33,7 +33,7 @@ var check_xbox = /\bxbox\b/i;
 var check_ucbrowser = /\bUCBrowser\b\/(\d+)/i;
 var check_webview = / Version\/(\d+)(\.\d)/;
 
-var is_browser = !is_node_ff && typeof window!='undefined';
+var is_browser = !is_node && typeof window!='undefined';
 
 // starting iOS13 iPad returns the same user-agent as MacOS Safari, but
 // we still need to detect it as mobile (install links to AppStore etc)

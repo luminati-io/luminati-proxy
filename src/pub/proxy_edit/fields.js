@@ -348,6 +348,10 @@ export const tabs = {
                 label: 'Render',
                 tooltip: 'Add -render- flag to the request, to process'
                     +' scripts from HTML pages',
+            },
+            follow_redirect: {
+                label: 'Follow redirect',
+                tooltip: 'Auto redirect requests on status code 30x',
             }
         },
     },

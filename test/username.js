@@ -115,6 +115,17 @@ describe('username', ()=>{
                 {country: 'us', zip: 12345, zip_perm: true},
                 un('country-us-zip-12345'));
         });
+        describe('dns', ()=>{
+            const t = (name, opt, expected)=>it(name, ()=>{
+                const res = username.calculate_username(opt);
+                assert.equal(res.username, expected);
+            });
+            t('should skip dns if value is "local"',
+                {country: 'us', dns: 'local'}, un('country-us'));
+            t('attach dns if value is not "local"',
+                {country: 'us', dns: 'someval'},
+                un('country-us-dns-someval'));
+        });
     });
     describe('parse', ()=>{
         it('should not parse if not an auth header', ()=>{

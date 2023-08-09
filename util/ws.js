@@ -11,7 +11,8 @@ if (is_rn)
     define = require('./require_node.js').define(module, '../',
         require('/util/conv.js'), require('/util/etask.js'),
         require('/util/events.js'), require('/util/string.js'),
-        require('/util/zerr.js'), require('/util/util.js'));
+        require('/util/zerr.js'), require('/util/util.js'),
+        require('/util/date.js'));
 }
 else if (!is_node)
 {
@@ -51,8 +52,8 @@ else
     define = require('./require_node.js').define(module, '../');
 next_tick = next_tick || process.nextTick;
 define(['/util/conv.js', '/util/etask.js', '/util/events.js',
-    '/util/string.js', '/util/zerr.js', '/util/util.js'],
-    function(conv, etask, events, string, zerr, zutil){
+    '/util/string.js', '/util/zerr.js', '/util/util.js', '/util/date.js'],
+    function(conv, etask, events, string, zerr, zutil, date){
 
 const ef = etask.ef, assign = Object.assign;
 // for security reasons 'func' is disabled by default
@@ -134,7 +135,7 @@ class Buffers_array {
         let new_bytes_size = this._bytes_size+1+BUFFER_MESSAGES_BIN_SZ
             +value.length;
         if (new_bytes_size>BUFFER_MESSAGES_MAX_LENGTH)
-            throw `Buffers_array overflow ${new_bytes_size}`;
+            throw new Error(`Buffers_array overflow ${new_bytes_size}`);
         this._bytes_size += 1+BUFFER_MESSAGES_BIN_SZ+value.length;
         this._buffer.push({type, value});
     }
@@ -239,6 +240,10 @@ class WS extends EventEmitter {
             this._counter = make_counter(opt);
         this._send_throttle_t = undefined;
         this._buffers = undefined;
+    }
+    get_bin_prefix(msg){
+        return this.bin_methods && msg instanceof Buffer &&
+            msg.readUInt32BE(0)===0 ? msg.readUInt32BE(4) : undefined;
     }
     _clean_throttle(){
         if (this._send_throttle_t)
@@ -468,31 +473,10 @@ class WS extends EventEmitter {
             msg = Buffer.from(Buffer.from(msg)); // make a copy
         if (!this.listen_bin_throttle || !Buffers_array.is_buffer(msg))
             return this._on_message_base(msg);
-        const messages = Buffers_array.parse(msg);
-        for (let data of messages)
+        for (const data of Buffers_array.parse(msg))
             this._on_message_base(data);
     }
     _on_message_base(msg){
-        let handled = false, is_bin, bin_event;
-        if (this.bin_methods && msg instanceof Buffer &&
-            msg.readUInt32BE(0)===0 && msg.readUInt32BE(4)==BUFFER_CONTENT)
-        {
-            is_bin = true;
-            let bin_event_len = msg.readUInt32BE(VFD_SZ);
-            bin_event = JSON.parse(msg.slice(VFD_BIN_SZ,
-                VFD_BIN_SZ+bin_event_len).toString());
-            bin_event.msg = msg.slice(VFD_BIN_SZ+bin_event_len);
-        }
-        if (this.bin_methods && msg instanceof Buffer &&
-            msg.readUInt32BE(0)===0 && msg.readUInt32BE(4)==BUFFER_IPC_CALL)
-        {
-            is_bin = true;
-            let cookie = msg.readUInt32BE(8);
-            let cmd_length = msg.readUInt32BE(12);
-            let cmd = msg.slice(16, 16+cmd_length).toString();
-            let res = msg.slice(16+cmd_length, msg.length - 16+cmd_length + 1);
-            bin_event = {type: 'ipc_call', cookie, cmd, msg: res, bin: true};
-        }
         if (zerr.is.debug())
         {
             zerr.debug(typeof msg=='string'
@@ -507,84 +491,113 @@ class WS extends EventEmitter {
             this._counter.max(`${this.zc}_rx_bytes_per_msg_max`, msg.length);
         }
         try {
-            if (is_bin)
-            {
-                this.emit('json', bin_event);
-                handled = true;
-            }
-            if (typeof msg=='string')
-            {
-                let parsed;
-                if (this._events.zjson)
-                {
-                    if (this.zc && this.time_parse)
-                    {
-                        const t = Date.now();
-                        parsed = conv.JSON_parse(msg, this.zjson_opt_receive);
-                        this._counter.inc(`${this.zc}_parse_zjson_ms`,
-                            Date.now()-t);
-                    }
-                    else
-                        parsed = conv.JSON_parse(msg, this.zjson_opt_receive);
-                    this.emit('zjson', parsed);
-                    handled = true;
-                }
-                if (this._events.json)
-                {
-                    if (this.zc && this.time_parse)
-                    {
-                        const t = Date.now();
-                        parsed = parsed||JSON.parse(msg);
-                        this._counter.inc(`${this.zc}_parse_json_ms`,
-                            Date.now()-t);
-                    }
-                    else
-                        parsed = parsed||JSON.parse(msg);
-                    this.emit('json', parsed);
-                    handled = true;
-                }
-                if (this._events.text)
-                {
-                    this.emit('text', msg);
-                    handled = true;
-                }
-                if (this.msg_log.treshold_size &&
-                    msg.length>=this.msg_log.treshold_size)
-                {
-                     zerr.warn(`${this}: Message length treshold`
-                         +` ${this.msg_log.treshold_size} exceeded:`
-                         +` ${msg.substr(0, this.msg_log.print_size)}`);
-                }
-            }
-            else
-            {
-                if (this._events.bin)
-                {
-                    this.emit('bin', msg);
-                    handled = true;
-                }
-            }
-            if (this._events.raw)
-            {
-                this.emit('raw', msg);
-                handled = true;
-            }
+            if (!this._parse_message(msg))
+                this.abort(1003, 'Unexpected message');
+            this._update_idle();
+            if (this.refresh_ping_on_msg)
+                this._refresh_ping_timers();
         } catch(e){ ef(e);
             zerr(`${this}: ${zerr.e2s(e)}`);
             return this.abort(1011, e.message);
         }
-        if (!handled)
-            this.abort(1003, 'Unexpected message');
-        this._update_idle();
-        if (this.refresh_ping_on_msg)
-            this._refresh_ping_timers();
+    }
+    _parse_message(msg){
+        let handled = false;
+        const bin_event = this._parse_bin_message(msg);
+        if (bin_event)
+        {
+            this.emit('json', bin_event);
+            handled = true;
+        }
+        if (typeof msg=='string')
+        {
+            let parsed;
+            if (this._events.zjson)
+            {
+                if (this.zc && this.time_parse)
+                {
+                    const t = date.monotonic();
+                    parsed = conv.JSON_parse(msg, this.zjson_opt_receive);
+                    const d = date.monotonic()-t;
+                    this._counter.avg(`${this.zc}_parse_zjson_ms`, d);
+                    this._counter.max(`${this.zc}_parse_zjson_max_ms`, d);
+                }
+                else
+                    parsed = conv.JSON_parse(msg, this.zjson_opt_receive);
+                this.emit('zjson', parsed);
+                handled = true;
+            }
+            if (this._events.json)
+            {
+                if (this.zc && this.time_parse && !parsed)
+                {
+                    const t = date.monotonic();
+                    parsed = JSON.parse(msg);
+                    const d = date.monotonic()-t;
+                    this._counter.avg(`${this.zc}_parse_json_ms`, d);
+                    this._counter.max(`${this.zc}_parse_json_max_ms`, d);
+                }
+                else
+                    parsed = parsed||JSON.parse(msg);
+                this.emit('json', parsed);
+                handled = true;
+            }
+            if (this._events.text)
+            {
+                this.emit('text', msg);
+                handled = true;
+            }
+            if (this.msg_log.treshold_size &&
+                msg.length>=this.msg_log.treshold_size)
+            {
+                zerr.warn(`${this}: Message length treshold`
+                    +` ${this.msg_log.treshold_size} exceeded:`
+                    +` ${msg.substr(0, this.msg_log.print_size)}`);
+            }
+        }
+        else if (this._events.bin)
+        {
+            this.emit('bin', msg);
+            handled = true;
+        }
+        if (this._events.raw)
+        {
+            this.emit('raw', msg);
+            handled = true;
+        }
+        return handled;
+    }
+    _parse_bin_message(msg){
+        const type = this.get_bin_prefix(msg);
+        if (type==BUFFER_CONTENT)
+        {
+            const bin_event_len = msg.readUInt32BE(VFD_SZ);
+            const bin_event = JSON.parse(
+                msg.slice(VFD_BIN_SZ, VFD_BIN_SZ+bin_event_len).toString());
+            bin_event.msg = msg.slice(VFD_BIN_SZ+bin_event_len);
+            return bin_event;
+        }
+        if (type==BUFFER_IPC_CALL)
+        {
+            const cookie = msg.readUInt32BE(8);
+            const cmd_length = msg.readUInt32BE(12);
+            const cmd = msg.slice(16, 16+cmd_length).toString();
+            const res = msg.slice(16+cmd_length);
+            return {type: 'ipc_call', cookie, cmd, msg: res, bin: true};
+        }
     }
     _on_pong(){
         this.pong_received = true;
         if (zerr.is.debug())
-            zerr.debug(`${this}< pong (rtt ${Date.now()-this.ping_last}ms)`);
+        {
+            zerr.debug(
+                `${this}< pong (rtt ${date.monotonic()-this.ping_last}ms)`);
+        }
         if (this.zc)
-            this._counter.avg(`${this.zc}_ping_ms`, Date.now()-this.ping_last);
+        {
+            this._counter.avg(
+                `${this.zc}_ping_ms`, date.monotonic()-this.ping_last);
+        }
     }
     _ping(){
         // don't send new ping if ping_timeout > ping_interval (weird case)
@@ -601,7 +614,7 @@ class WS extends EventEmitter {
                 +` ${JSON.stringify(this.inspect())} ${zerr.e2s(e)}`);
         }
         this._refresh_ping_timers();
-        this.ping_last = Date.now();
+        this.ping_last = date.monotonic();
         if (zerr.is.debug())
             zerr.debug(`${this}> ping (max ${this.ping_timeout}ms)`);
     }
@@ -689,7 +702,7 @@ class Client extends WS {
         if (opt.e1008_exit_reason)
         {
             this.e1008_exit_reason = opt.e1008_exit_reason;
-            this.e1008_ts_start = Date.now();
+            this.e1008_ts_start = date.monotonic();
         }
         this.reason = undefined;
         this.reconnect_timer = undefined;
@@ -815,7 +828,7 @@ class Client extends WS {
             return;
         if (event.code != 1008 || this.e1008_exit_reason != event.reason)
             return;
-        if (!this.no_retry && Date.now()-this.e1008_ts_start < 60000)
+        if (!this.no_retry && date.monotonic()-this.e1008_ts_start < 60000)
             return;
         zerr.zexit(`Got '${event.reason}' from ${event.target.url}`);
     }
@@ -1015,6 +1028,7 @@ class IPC_client_base {
         const ipc_opt = {
             zjson: ws_opt.ipc_zjson,
             mux: ws_opt.mux,
+            timeout: ws_opt.ipc_timeout,
         };
         class IPC_client extends IPC_client_base {
             constructor(zws){
@@ -1078,12 +1092,8 @@ class IPC_client_base {
     _call(opt, cmd, arg){
         const _this = this;
         const send_retry_timeout = 3*SEC;
-        let timeout;
-        if (opt.timeout!==null)
-        {
-            timeout = typeof opt.timeout=='function' ? opt.timeout()
-                : opt.timeout||5*MIN;
-        }
+        const timeout = opt.timeout!==null ? typeof opt.timeout=='function' ?
+            opt.timeout() : opt.timeout||5*MIN : undefined;
         return etask(function*IPC_client_call(){
             let req = {
                 type: opt.type=='mux' ? 'ipc_mux' : 'ipc_call',
@@ -1446,7 +1456,7 @@ class Mux {
                 data.copy(buf, VFD_SZ);
                 cb(_this.ws.send(buf) ? undefined
                     : new Error(_this.ws.reason || _this.ws.status));
-                this.last_use_ts = Date.now();
+                this.last_use_ts = date.monotonic();
             },
             destroy(err, cb){
                 // XXX viktor: fix once it is clear what happens. ignore this
@@ -1461,9 +1471,9 @@ class Mux {
                 next_tick(cb, err);
             }
         }, opt));
-        stream.create_ts = Date.now();
+        stream.create_ts = date.monotonic();
         stream.prependListener('data', function(chunk){
-            this.last_use_ts = Date.now();
+            this.last_use_ts = date.monotonic();
             if (!this._httpMessage || this.parser && this.parser.socket===this
                 || is_rn)
             {
@@ -1540,7 +1550,7 @@ class Mux {
                     if (!_this.ws.send(buf, bin_throttle_opt))
                         return cb(new Error(_this.ws.reason||_this.ws.status));
                     stream.sent += buf.length-VFD_SZ;
-                    stream.last_use_ts = Date.now();
+                    stream.last_use_ts = date.monotonic();
                 }
                 if (zerr.is.debug())
                 {
@@ -1554,6 +1564,7 @@ class Mux {
                     pending = null;
                     stream._write(buf_pending, encoding, cb);
                 });
+                pending.buf_size = buf_pending.length;
             },
             // only Buffer chuncks supported
             writev: opt.decodeStrings===false ? null : function(chunks, cb){
@@ -1577,13 +1588,9 @@ class Mux {
                 });
                 if (zfin_pending)
                     zfin_pending.continue();
-                if (err) // don't try to end/finish stream gracefully if error
-                    yield zfinish(false, false, err);
-                else
-                {
-                    yield zfinish(true, false);
+                yield zfinish(false, err);
+                if (!err)
                     try { stream.push(null); } catch(e){}
-                }
                 next_tick(()=>{
                     cb(err);
                     stream.emit('_close');
@@ -1611,21 +1618,22 @@ class Mux {
             data.copy(buf_pending, 0, bytes);
             return {buf, buf_pending};
         };
-        const zfinish = (end_write, wait_rmt, err)=>etask(function*_zfinish(){
+        const zfinish = (wait_rmt, err)=>etask(function*_zfinish(){
             if (stream.zfin)
                 return yield this.wait_ext(stream.zfin);
             stream.zfin = this;
             if (zerr.is.info())
+                zerr.info(`${_this.ws}:vfd:${vfd}:${wait_rmt}`);
+            if (pending)
             {
-                zerr.info(`${_this.ws}:vfd:${vfd}:`
-                    +`zfin:${end_write}:${wait_rmt}`);
+                // always flush buffer to remote
+                stream.win_size += pending.buf_size;
+                pending.continue(null, true);
             }
-            // XXX vladislavl: use writableFinished from node v12
-            if (end_write && (!stream._writableState ||
-                !stream._writableState.finished))
+            // XXX vladislavl: use writableFinished from node v12 (webOS)
+            if (!stream.destroyed && stream._writableState
+                && !stream._writableState.finished)
             {
-                if (pending)
-                    pending.continue();
                 stream.once('finish', this.continue_fn());
                 try { yield this.wait(opt.fin_timeout/2); }
                 catch(e){
@@ -1652,15 +1660,15 @@ class Mux {
             if (stream.destroy)
                 stream.destroy();
         });
-        stream.create_ts = Date.now();
+        stream.create_ts = date.monotonic();
         stream.win_size = DEFAULT_WIN_SIZE;
         stream.sent = stream.ack = stream.zread = 0;
         stream.fin_got = false;
-        stream.prependListener('finish', ()=>zfinish(false, true));
+        stream.prependListener('finish', ()=>zfinish(true));
         stream.prependListener('data', function(chunk){
             this.zread += chunk.length;
             this.send_ack();
-            this.last_use_ts = Date.now();
+            this.last_use_ts = date.monotonic();
             if (!this._httpMessage || this.parser && this.parser.socket===this
                 || is_rn)
             {
@@ -1689,15 +1697,15 @@ class Mux {
         const _send_ack = ()=>{
             _this.ws.send(`{"vfd":${vfd},"ack":${stream.zread}}`,
                 bin_throttle_opt);
-            send_ack_ts = Date.now();
+            send_ack_ts = date.monotonic();
         };
         stream.send_ack = !throttle_ack ? _send_ack : ()=>{
             if (send_ack_timeout)
                 return;
             // XXX igors: send ack in throttle ms
             if (!send_ack_ts && opt.delayed_ack)
-                send_ack_ts = Date.now();
-            const delta = Date.now()-send_ack_ts;
+                send_ack_ts = date.monotonic();
+            const delta = date.monotonic()-send_ack_ts;
             if (delta>=throttle_ack)
                 return _send_ack();
             send_ack_timeout = setTimeout(()=>{
@@ -1708,7 +1716,7 @@ class Mux {
         stream.on_ack = ack=>{
             stream.ack = ack;
             if (pending)
-                pending.continue();
+                pending.continue(null, true);
             if (_this.ws.zc_mux)
                 this.ws._counter.inc(`${_this.ws.zc||'unknown'}_mux_on_ack`);
         };
@@ -1724,7 +1732,7 @@ class Mux {
             stream.win_size = size;
             stream.win_size_got = true;
             if (pending)
-                pending.continue();
+                pending.continue(null, true);
         };
         stream.send_fin = error=>{
             if (send_ack_timeout)
@@ -1748,7 +1756,7 @@ class Mux {
             if (_this.ws.zc_mux)
                 this.ws._counter.inc(`${_this.ws.zc||'unknown'}_mux_on_fin`);
             const fn = ()=>next_tick(()=>zfin_pending ?
-                zfin_pending.continue() : zfinish(true, false));
+                zfin_pending.continue() : zfinish(false));
             etask(function*_mux_stream_on_fin(){
                 stream.once('end', this.continue_fn());
                 try {
@@ -1770,7 +1778,7 @@ class Mux {
             if (!timeout || stream.zdestroy)
                 return;
             stream._unused_tm_fn = ()=>{
-                const delta = Date.now()-(stream.last_use_ts||0);
+                const delta = date.monotonic()-(stream.last_use_ts||0);
                 if (delta>=timeout)
                     return stream.emit('timeout');
                 stream._unused_tm = setTimeout(stream._unused_tm_fn,
@@ -1828,11 +1836,8 @@ class Mux {
         return true;
     }
     _on_bin(buf){
-        if (this.ws.bin_methods && buf.readUInt32BE(0)===0 &&
-            buf.readUInt32BE(4)==BUFFER_CONTENT)
-        {
+        if (this.ws.get_bin_prefix(buf)==BUFFER_CONTENT)
             return;
-        }
         if (this.listen_bin_throttle && Buffers_array.is_buffer(buf))
             return zerr(`${this.ws}: unexpected Buffers_array on bin event`);
         if (buf.length<VFD_SZ)

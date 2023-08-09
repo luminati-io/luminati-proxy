@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, browser:true*//*global Map*/
+'use strict'; /*jslint node:true, browser:true*//*global Map, BigInt*/
 (function(){
 var define, hash, assert, zerr, vm;
 var is_node = typeof module=='object' && module.exports && module.children;
@@ -479,8 +479,8 @@ function replace_inf(k, v){
 }
 
 E.JSON_stringify = function(obj, opt){
-    var s, prev_date, _date, prev_func, prev_re;
-    var date_class, func_class, re_class;
+    var s, prev_date, _date, prev_func, prev_re, prev_bigint;
+    var date_class, func_class, re_class, bigint_class;
     opt = opt||{};
     if (opt.date)
         _date = typeof opt.date=='function' ? opt.date : date_stringify;
@@ -508,6 +508,16 @@ E.JSON_stringify = function(obj, opt){
         prev_re = re_class.prototype.toJSON;
         Object.defineProperty(re_class.prototype, 'toJSON', {
             value: function(){ return {__RegExp__: this.toString()}; },
+            writable: true,
+        });
+    }
+    if (opt.bigint)
+    {
+        bigint_class = opt.vm_context ?
+            vm.runInContext('BigInt', opt.vm_context) : BigInt;
+        prev_bigint = bigint_class.prototype.toJSON;
+        Object.defineProperty(bigint_class.prototype, 'toJSON', {
+            value: function(){ return {__BigInt__: this.toString()}; },
             writable: true,
         });
     }
@@ -576,6 +586,8 @@ E.JSON_stringify = function(obj, opt){
             func_class.prototype.toJSON = prev_func;
         if (opt.re)
             re_class.prototype.toJSON = prev_re;
+        if (opt.bigint)
+            bigint_class.prototype.toJSON = prev_bigint;
     }
     if (opt.mongo||opt.mongoku)
     {
@@ -606,6 +618,10 @@ var leaf_type = {
                 throw new Error('failed parsing regexp');
             return new RegExp(parsed[1], parsed[2]);
         },
+    ],
+    __BigInt__: [
+        function(opt){ return opt.bigint; },
+        function(v, opt){ return BigInt(v.__BigInt__); },
     ],
     __Infinity__: [
         function(opt){ return opt.inf; },
@@ -675,8 +691,8 @@ function deref_obj(obj){
 }
 
 E.JSON_parse = function(s, opt){
-    opt = Object.assign({date: true, re: true, func: true, inf: true,
-        circular: true}, opt);
+    opt = Object.assign({date: true, re: true, bigint: true, func: true,
+        inf: true, circular: true}, opt);
     var has_circular, ret = {};
     var reviver = function(k, v){
         v = parse_leaf(v, opt);
@@ -697,7 +713,8 @@ E.JSON_parse = function(s, opt){
 };
 
 E.JSON_parse_obj = function(v, opt){
-    opt = Object.assign({date: true, re: true, func: true, inf: true}, opt);
+    opt = Object.assign({date: true, re: true, bigint: true, func: true,
+        inf: true}, opt);
     return parse_obj(v, opt);
 };
 

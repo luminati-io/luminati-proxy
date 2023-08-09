@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.402.365 Stable
+- :star: Introduce follow redirect port option
+
 ## 1.399.639 Stable
 - :bug: Fix mem leak on tls sockets
 - :bug: Fix overflowed General Settings page display

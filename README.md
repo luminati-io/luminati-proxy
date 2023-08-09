@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.399.639/luminati-proxy-manager-v1.399.639-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.402.365/luminati-proxy-manager-v1.402.365-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -218,6 +218,8 @@ Options:
       --resolution                 Browser screen size                  [string]
       --webrtc                     WebRTC plugin behavior in the browser[string]
       --bw_limit                   BW limit params
+      --follow_redirect            Auto redirect requests
+                                                      [boolean] [default: false]
       --whitelist_ips              Default for all proxies whitelist ip list for
                                    granting access to them [array] [default: []]
       --www_whitelist_ips          Whitelist ip list for granting access to

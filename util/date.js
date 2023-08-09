@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, browser:true*/
+'use strict'; /*jslint node:true, browser:true*//* global BigInt */
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports && module.children;
@@ -103,7 +103,7 @@ E.dur_to_gs_str = function(dur, opt){
 };
 
 E.monotonic = undefined;
-E.init = function(){
+var monotonic_init = function(){
     var adjust, last;
     if (typeof window=='object' && window.performance
         && window.performance.now)
@@ -134,7 +134,21 @@ E.init = function(){
         };
     }
 };
-E.init();
+monotonic_init();
+
+E.microsec = undefined;
+var microsec_init = function(){
+    var adjust;
+    if (is_node)
+    {
+        /* jshint -W119 */
+        var now_fn = function(){ return process.hrtime.bigint()/1000n; };
+        adjust = BigInt(Date.now())*1000n - now_fn();
+        E.microsec = function(){ return now_fn()+adjust; };
+        /* jshint +W119 */
+    }
+};
+microsec_init();
 
 E.str_to_dur = function(str, opt){
     opt = opt||{};

@@ -397,7 +397,7 @@ describe('proxy', ()=>{
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
             t('mobile', {zone: 'mobile', mobile: 'true'});
-            t('DNS', {dns: 'local'});
+            t('DNS', {dns: 'remote'});
             t('raw', {raw: true});
             t('direct', pre_rule('direct'), {direct: true});
             t('session explicit', {session: 'test_session'});

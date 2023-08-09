@@ -86,6 +86,7 @@ conf.server_default = {
     info: false,
     const: false,
     dns: 'local',
+    follow_redirect: false,
 };
 conf.manager_default = Object.assign({}, conf.server_default, {
     www: 22999,
