@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-define(['react', 'jquery', 'moment', 'classnames',
-    '/www/util/pub/pure_component.js', '/util/util.js', '/util/setdb.js'],
-    function(React, $, moment, classnames, Pure_component, zutil,
+define(['react', 'jquery', 'classnames', '/www/util/pub/pure_component.js',
+    '/util/util.js', '/util/setdb.js'],
+    function(React, $, classnames, Pure_component, zutil,
     setdb)
 {
 

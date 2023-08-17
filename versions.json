@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.404.212",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Use correct port in intermediary sockets for SSL"
+            },
+            {
+                "type": "bug",
+                "text": "Allow Refresh IP rule for request dur actions"
+            },
+            {
+                "type": "star",
+                "text": "Default rule action 'Retry with the same IP'"
+            }
+        ]
+    },
+    {
         "ver": "1.402.365",
         "type": "stable",
         "changes": [

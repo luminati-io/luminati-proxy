@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.404.212 Stable
+- :bug: Use correct port in intermediary sockets for SSL
+- :bug: Allow Refresh IP rule for request dur actions
+- :star: Default rule action 'Retry with the same IP'
+
 ## 1.402.365 Stable
 - :star: Introduce follow redirect port option
 

@@ -11,7 +11,7 @@ const parent_origin = qs_o.parent || location.ancestorOrigins &&
 class CP_ipc {
     static listen(type, callback){
         if (!parent_origin)
-            return false;
+            return _.noop;
         const handler = event=>{
             let data;
             if (event.origin!=parent_origin || !event.data)

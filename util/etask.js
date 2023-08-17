@@ -146,6 +146,7 @@ function Etask(opt, states){
     this.child_guess = new Set();
     this.cur_state = -1;
     this.next_state = -1;
+    this.state0_args = opt.state0_args;
     this.states_idx = {};
     this.tm_create = Date.now();
     this.use_retval = false;
@@ -163,11 +164,8 @@ function Etask(opt, states){
     this.retval = this.down = this.up = this.parent = this._alarm =
     this.tm_completed = this.parent_type = this.parent_guess =
     this.wait_retval = this.generator = this.generator_ctor = undefined;
-    const funcs = [];
-    const types = [];
-    for (let i=0; i<states.length; i++)
-    {
-        const func = states[i];
+    this.funcs = states;
+    this.states = states.map((func, i)=>{
         assert(typeof func=='function', 'invalid state type');
         const type = this._get_state_type(func.name, undefined);
         if (type.label)
@@ -182,14 +180,8 @@ function Etask(opt, states){
             assert(this._cancel==-1, 'more than 1 cancel$');
             this._cancel = i;
         }
-        funcs[i] = i==0 && opt.state0_args
-            ? func.bind.apply(func, [this].concat(opt.state0_args))
-            : func;
-        types[i] = type;
-    }
-    // keep PACKED_ELEMENTS array type with capacity equal to length
-    this.funcs = Array.from(funcs);
-    this.states = Array.from(types);
+        return type;
+    });
     E.root.add(this);
     let in_run;
     if (opt.spawn_parent)
@@ -415,11 +407,9 @@ E.in_run = [];
 E.in_run_top = function(){ return E.in_run[E.in_run.length-1]; };
 E.prototype._run = function(){
     var rv = {ret: undefined, err: undefined};
+    var _cb_ctx;
     while (1)
     {
-        var _cb_ctx;
-        var arg = this.error && !this.use_retval ? this.error : this.retval;
-        this.use_retval = false;
         this.running = true;
         rv.ret = rv.err = undefined;
         E.in_run.push(this);
@@ -427,12 +417,17 @@ E.prototype._run = function(){
             zerr.debug(this.shortname()+':S'+this.cur_state+': running');
         if (cb_pre)
             _cb_ctx = cb_pre(this);
-        try { rv.ret = this.funcs[this.cur_state].call(this, arg); }
-        catch(e){
+        try {
+            rv.ret = this.state0_args && this.cur_state==0
+                ? this.funcs[this.cur_state].apply(this, this.state0_args)
+                : this.funcs[this.cur_state].call(this,
+                    this.error && !this.use_retval ? this.error : this.retval);
+        } catch(e){
             rv.err = e;
             if (rv.err instanceof Error)
                 rv.err.etask = this;
         }
+        this.use_retval = false;
         if (cb_post)
             cb_post(this, _cb_ctx);
         this.running = false;
@@ -1536,7 +1531,7 @@ E._generator = function(gen, ctor, opt){
     opt.cancel = opt.cancel===undefined ? true : opt.cancel;
     let done = false;
     return new Etask(opt, [function(){
-        this.generator = gen = gen||ctor.apply(this, opt.state0_args||[]);
+        this.generator = gen = gen||ctor.apply(this, arguments);
         this.generator_ctor = ctor;
         return {ret: undefined, err: undefined};
     }, function try_catch$loop(rv){

@@ -130,7 +130,10 @@ const App = withRouter(class App extends Pure_component {
     }
     willUnmount(){
         ws.removeEventListener('settings_updated', this.on_settings_updated);
-        this.rm_history_listener();
+        if (typeof this.rm_history_listener == 'function')
+            this.rm_history_listener();
+        if (typeof this.rm_change_route_listener == 'function')
+            this.rm_change_route_listener();
         this.rm_change_route_listener();
     }
     on_settings_updated = ({data})=>{

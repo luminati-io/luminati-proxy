@@ -54,7 +54,7 @@ E.action_types = [
     {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
         Data Center IP with new allocated IP. This action contain
         additional charges. View the cost of IP refreshing in your zones
-        page ${E.WWW_API}/cp/zones`, type: 'post'},
+        page ${E.WWW_API}/cp/zones`, type: 'post', min_req_time: true},
     {key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: `Save
         the current IP to a pool of reserved IPs.  you can then download all
         the IPs at a later time.`, type: 'post'},

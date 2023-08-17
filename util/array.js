@@ -188,8 +188,14 @@ E.enumerate = function(arr){
     return Array.from(arr).map(function(e, i){ return [i, e]; });
 };
 
-E.range = function(length){
-    return Array.from({length: length}).map(function(_, i){ return i; });
+E.range = function(start_or_length, stop){
+    if (stop===undefined)
+    {
+        return Array.from({length: start_or_length})
+            .map(function(_, i){ return i; });
+    }
+    return Array.from({length: stop-start_or_length})
+        .map(function(_, i){ return i+start_or_length; });
 };
 
 var proto = {};

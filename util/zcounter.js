@@ -508,7 +508,7 @@ function ws_client(world, url){
         let zws = require('./ws.js');
         const label = url.split(':')[1].replace(/^\/\//, '');
         ws = new zws.Client(url, {label: `zcounter-${label}`,
-            retry_interval: 3*ms.SEC});
+            retry_interval: process.env.LXC ? 5*ms.MIN : 3*ms.SEC});
         all_conns.set(url, {ws, worlds: [world]});
     }
     let conns = ws_conn[world];

@@ -1287,64 +1287,45 @@ class IPC_server_resp {
     constructor(ipc, msg){
         this.ipc = ipc;
         this.msg = msg;
-        if (typeof ipc.methods[msg.cmd] != 'function')
-            return void this.no_method(`Method ${msg.cmd} not defined`);
         this.arg = msg.arg||[msg.msg];
-        this.pre_handle();
-        this.handle();
     }
-    pre_handle(){}
-    handle(){}
-    add_pending(et){}
-    response(rv){}
-    fail(e){
-        if (is_node && +process.env.WS_ZEXIT_ON_TYPEERROR && zerr.on_exception)
-            zerr.on_exception(e);
-        if (this.ipc.call_zerr)
-            zerr(`${this.ipc.ws}: ${this.msg.cmd}: ${zerr.e2s(e)}`);
-        this.ipc.ws.json({
-            type: 'ipc_error',
-            cmd: this.msg.cmd,
-            cookie: this.msg.cookie,
-            msg: e.message || String(e),
-            err_code: e.code,
-        });
+    exec(){
+        return this.ipc.methods[this.msg.cmd](this.arg);
+    }
+    assign_info(et){
+        et.info.label = ()=>this.ipc.ws.toString();
+        et.info.cmd = this.msg.cmd;
+        et.info.cookie = this.msg.cookie;
     }
     json(res){
         if (this.ipc.zjson)
             return void this.ipc.ws.zjson(res);
         this.ipc.ws.json(res);
     }
-}
-class IPC_server_resp_sync extends IPC_server_resp {
-    handle(){
-        try { this.response(this.ipc.methods[this.msg.cmd](this.arg)); }
-        catch(e){ this.fail(e); }
+    add_pending(et){
+        this.ipc.pending.add(et);
+        et.finally(()=>this.ipc.pending.delete(et));
     }
-}
-class IPC_server_resp_async extends IPC_server_resp {
-    handle(){ const _this = this; etask(function*IPC_server_handle(){
-        _this.add_pending(this);
-        this.info.label = ()=>_this.ipc.ws.toString();
-        this.info.cmd = _this.msg.cmd;
-        this.info.cookie = _this.msg.cookie;
-        try { _this.response(
-            yield _this.ipc.methods[_this.msg.cmd](_this.arg)); }
-        catch(e){ _this.fail(e); }
-    }); }
-}
-const ipcsr_call_make = parent=>class IPC_server_call extends parent {
-    no_method(err){
+    base_is_method_undefined(){
+        if (typeof this.ipc.methods[this.msg.cmd] == 'function')
+            return false;
         this.ipc.ws.json({
             type: 'ipc_error',
             cmd: this.msg.cmd,
             cookie: this.msg.cookie,
-            msg: err,
+            msg: `Method ${this.msg.cmd} not defined`,
         });
+        return true;
     }
-    response(rv){
+    post_is_method_undefined(){
+        if (typeof this.ipc.methods[this.msg.cmd] == 'function')
+            return false;
+        zerr(`${this.ipc.ws}: Method ${this.msg.cmd} not defined`);
+        return true;
+    }
+    call_response(rv){
         if (this.msg.bin && rv instanceof Buffer)
-            return void this.response_buf(rv);
+            return void this.call_response_buf(rv);
         this.json({
             type: 'ipc_result',
             cmd: this.msg.cmd,
@@ -1352,7 +1333,7 @@ const ipcsr_call_make = parent=>class IPC_server_call extends parent {
             msg: rv,
         });
     }
-    response_buf(rv){
+    call_response_buf(rv){
         const res_buf = Buffer.from(JSON.stringify({
             type: 'ipc_result',
             cmd: this.msg.cmd,
@@ -1367,33 +1348,23 @@ const ipcsr_call_make = parent=>class IPC_server_call extends parent {
         rv.copy(buf, VFD_BIN_SZ+res_buf.length);
         this.ipc.ws.send(buf);
     }
-};
-const IPC_server_resp_call_sync = ipcsr_call_make(IPC_server_resp_sync);
-const IPC_server_resp_call_async = ipcsr_call_make(IPC_server_resp_async);
-const ipcsr_post_make = parent=>class IPC_server_post extends parent {
-    no_method(err){
-        zerr(`${this.ipc.ws}: ${err}`);
-    }
-    add_pending(et){
-        this.ipc.pending.add(et);
-        et.finally(()=>this.ipc.pending.delete(et));
-    }
-    fail(e){
-        zerr(`${this.ipc.ws}: ${this.msg.cmd}: ${zerr.e2s(e)}`);
-    }
-};
-const IPC_server_resp_post_sync = ipcsr_post_make(IPC_server_resp_sync);
-const IPC_server_resp_post_async = ipcsr_post_make(IPC_server_resp_async);
-const ipcsr_mux_make = parent=>class IPC_server_mux extends parent {
-    no_method(err){
+    base_fail(e){
+        if (is_node && +process.env.WS_ZEXIT_ON_TYPEERROR && zerr.on_exception)
+            zerr.on_exception(e);
+        if (this.ipc.call_zerr)
+            zerr(`${this.ipc.ws}: ${this.msg.cmd}: ${zerr.e2s(e)}`);
         this.ipc.ws.json({
             type: 'ipc_error',
             cmd: this.msg.cmd,
             cookie: this.msg.cookie,
-            msg: err,
+            msg: e.message || String(e),
+            err_code: e.code,
         });
     }
-    pre_handle(){
+    post_fail(e){
+        zerr(`${this.ipc.ws}: ${this.msg.cmd}: ${zerr.e2s(e)}`);
+    }
+    mux_open(){
         if (!this.ipc.ws.mux)
         {
             return this.ipc.ws.json({
@@ -1403,24 +1374,88 @@ const ipcsr_mux_make = parent=>class IPC_server_mux extends parent {
                 msg: 'Mux is not defined',
             });
         }
-        const vfd = this.arg.shift();
+        const vfd = this.arg[0];
         const stream = this.ipc.ws.mux.open(vfd, this.ipc.mux.bytes_allowed,
             this.ipc.mux);
         stream.close = ()=>this.ipc.ws.mux.close(vfd);
-        this.arg.unshift(stream);
+        this.arg[0] = stream;
         this.json({
             type: 'ipc_result',
             cmd: this.msg.cmd,
             cookie: this.msg.cookie,
         });
     }
-    add_pending(et){
-        this.ipc.pending.add(et);
-        et.finally(()=>this.ipc.pending.delete(et));
+}
+class IPC_server_resp_call_sync extends IPC_server_resp {
+    constructor(ipc, msg){
+        super(ipc, msg);
+        if (this.base_is_method_undefined())
+            return;
+        try { this.call_response(this.exec()); }
+        catch(e){ this.base_fail(e); }
     }
-};
-const IPC_server_resp_mux_sync = ipcsr_mux_make(IPC_server_resp_sync);
-const IPC_server_resp_mux_async = ipcsr_mux_make(IPC_server_resp_async);
+}
+class IPC_server_resp_call_async extends IPC_server_resp {
+    constructor(ipc, msg){
+        super(ipc, msg);
+        if (this.base_is_method_undefined())
+            return;
+        const _this = this;
+        etask(function*IPC_server_handle(){
+            _this.assign_info(this);
+            try { _this.call_response(yield _this.exec()); }
+            catch(e){ _this.base_fail(e); }
+        });
+    }
+}
+class IPC_server_resp_post_sync extends IPC_server_resp {
+    constructor(ipc, msg){
+        super(ipc, msg);
+        if (this.post_is_method_undefined())
+            return;
+        try { this.exec(); }
+        catch(e){ this.post_fail(e); }
+    }
+}
+class IPC_server_resp_post_async extends IPC_server_resp {
+    constructor(ipc, msg){
+        super(ipc, msg);
+        if (this.post_is_method_undefined())
+            return;
+        const _this = this;
+        etask(function*IPC_server_handle(){
+            _this.add_pending(this);
+            _this.assign_info(this);
+            try { yield _this.exec(); }
+            catch(e){ _this.post_fail(e); }
+        });
+    }
+}
+class IPC_server_resp_mux_sync extends IPC_server_resp {
+    constructor(ipc, msg){
+        super(ipc, msg);
+        if (this.base_is_method_undefined())
+            return;
+        this.mux_open();
+        try { this.exec(); }
+        catch(e){ this.base_fail(e); }
+    }
+}
+class IPC_server_resp_mux_async extends IPC_server_resp {
+    constructor(ipc, msg){
+        super(ipc, msg);
+        if (this.base_is_method_undefined())
+            return;
+        this.mux_open();
+        const _this = this;
+        etask(function*IPC_server_handle(){
+            _this.add_pending(this);
+            _this.assign_info(this);
+            try { yield _this.exec(); }
+            catch(e){ _this.base_fail(e); }
+        });
+    }
+}
 
 // XXX vladislavl: remove _bp methods once ack version tested and ready
 class Mux {

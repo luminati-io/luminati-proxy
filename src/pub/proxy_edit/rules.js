@@ -11,7 +11,7 @@ import {migrate_trigger, no_ssl_trigger_types, trigger_types,
 import {ms} from '../../../util/date.js';
 import zutil from '../../../util/util.js';
 import {Labeled_controller, with_proxy_ports, Cm_wrapper,
-    Warning, Faq_link} from '../common.js';
+    Warning, Faq_link, with_www_api} from '../common.js';
 import Proxy_tester from '../proxy_tester.js';
 import Tooltip from '../common/tooltip.js';
 import {T} from '../common/i18n.js';
@@ -19,7 +19,7 @@ import Toggle_on_off from '../common/toggle_on_off.js';
 import ws from '../ws.js';
 import {tabs} from './fields.js';
 
-const DEFAULT_ACTION = 'refresh_ip';
+const DEFAULT_ACTION = 'retry_same';
 
 const rule_prepare = (rule={})=>{
     let action = {};
@@ -453,7 +453,7 @@ class Rule extends Pure_component {
     }
 }
 
-const Action = with_proxy_ports(withRouter(
+const Action = with_www_api(with_proxy_ports(withRouter(
 class Action extends Pure_component {
     state = {ports: []};
     componentDidMount(){
@@ -505,7 +505,7 @@ class Action extends Pure_component {
     };
     goto_tester = ()=>{
         this.props.history.push({pathname: `/proxy_tester`, state: {
-            url: `${this.state.defaults.www_api}/lpm/templates/product`,
+            url: `${this.props.www_api}/lpm/templates/product`,
             port: this.props.match.params.port,
         }});
     };
@@ -524,7 +524,7 @@ class Action extends Pure_component {
     action_types_with_updated_domain = ()=>{
         const _action_types = zutil.clone_deep(action_types);
         _action_types.forEach(at=>at.tooltip = (at.tooltip||'')
-            .replace(WWW_API, this.state.defaults.www_api));
+            .replace(WWW_API, this.props.www_api));
         return _action_types;
     };
     render(){
@@ -638,7 +638,7 @@ class Action extends Pure_component {
           </div>
         </React.Fragment>;
     }
-}));
+})));
 
 class Trigger extends Pure_component {
     trigger_changed = val=>{
