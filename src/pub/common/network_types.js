@@ -50,4 +50,8 @@ export const network_types = {
         tooltip: 'Disabled from control panel. Cannot be used for sending '
             +'traffic',
     },
+    fallback: {
+        label: 'Unknown zone type',
+        tooltip: 'Unknown zone type',
+    }
 };

@@ -36,12 +36,15 @@ export default class Zone_description extends Pure_component {
         if (static_country && static_country!='any' && static_country!='*')
             c = flag_with_title(static_country, static_country.toUpperCase());
         const plan_network = get_plan_network(plan);
+        let network_desc = network_types[plan_network];
+        if (!network_desc)
+            network_desc = network_types.fallback;
         return <div className="zone_settings">
           <ul className="bullets">
             <Zone_bullet atr="Network type"
               tip="The network accessible by this zone">
-              <Tooltip title={t(network_types[plan_network].tooltip)}>
-                {t(network_types[plan_network].label)}
+              <Tooltip title={t(network_desc.tooltip)}>
+                {t(network_desc.label)}
               </Tooltip>
             </Zone_bullet>
             <Zone_domains_bullet atr="IP exclusivity" plan={plan}

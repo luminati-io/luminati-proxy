@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.404.754 Stable
+- :bug: Fix UI crash on unknown zone type
+
 ## 1.404.212 Stable
 - :bug: Use correct port in intermediary sockets for SSL
 - :bug: Allow Refresh IP rule for request dur actions

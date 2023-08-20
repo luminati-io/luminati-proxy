@@ -138,6 +138,7 @@ function Etask(opt, states){
         return new Etask(opt, typeof states=='function' ? [states] : states);
     }
     assert(Array.isArray(states), 'states must be an array');
+    events.EventEmitter.call(this);
     // init fields
     this.name = opt.name;
     this.cancelable = opt.cancel;
@@ -165,7 +166,10 @@ function Etask(opt, states){
     this.tm_completed = this.parent_type = this.parent_guess =
     this.wait_retval = this.generator = this.generator_ctor = undefined;
     this.funcs = states;
-    this.states = states.map((func, i)=>{
+    this.states = [];
+    for (let i=0; i<states.length; ++i)
+    {
+        const func = states[i];
         assert(typeof func=='function', 'invalid state type');
         const type = this._get_state_type(func.name, undefined);
         if (type.label)
@@ -180,8 +184,8 @@ function Etask(opt, states){
             assert(this._cancel==-1, 'more than 1 cancel$');
             this._cancel = i;
         }
-        return type;
-    });
+        this.states.push(type);
+    }
     E.root.add(this);
     let in_run;
     if (opt.spawn_parent)
@@ -314,7 +318,7 @@ E.prototype._next = function(rv){
     {
         if (zerr.on_exception)
             zerr.on_exception(this.error, this);
-        if (this.cur_state>-1 && this.states[this.cur_state].try_catch)
+        if (this.cur_state>-1 && states[this.cur_state].try_catch)
         {
             this.use_retval = true;
             for (; state<states.length && states[state].sig; state++);
@@ -355,18 +359,21 @@ E.prototype._handle_rv = function(rv){
         rv.err = ret.error;
         rv.ret = undefined;
     }
-    else if (typeof ret.then=='function') // promise
+    else if (typeof ret=='object')
     {
-        wait_retval = this._set_wait_retval();
-        ret.then(function(_ret){ _this._got_retval(wait_retval, _ret); },
-            function(err){ _this._got_retval(wait_retval, E.err(err)); });
-        return true;
-    }
-    // generator
-    else if (typeof ret.next=='function' && typeof ret.throw=='function')
-    {
-        rv.ret = E._generator(ret, this.funcs[this.cur_state], {});
-        return this._handle_rv(rv);
+        if (typeof ret.then=='function') // promise
+        {
+            wait_retval = this._set_wait_retval();
+            ret.then(function(_ret){ _this._got_retval(wait_retval, _ret); },
+                function(err){ _this._got_retval(wait_retval, E.err(err)); });
+            return true;
+        }
+        // generator
+        else if (typeof ret.next=='function' && typeof ret.throw=='function')
+        {
+            rv.ret = E._generator(ret, this.funcs[this.cur_state], {});
+            return this._handle_rv(rv);
+        }
     }
     return false;
 };
@@ -469,8 +476,8 @@ E.prototype._set_down = function(down){
     if (down.parent_guess)
         down._parent_guess_remove();
     assert(!down.parent, 'returned etask already has a spawn parent');
-    assert(!down.up, 'returned etask already has a caller parent, '
-        + 'consider using wait_ext');
+    assert(!down.up,
+        'returned etask already has a caller parent, consider using wait_ext');
     down._parent_remove();
     this.down = down;
     down.up = this;

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.404.754",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix UI crash on unknown zone type"
+            }
+        ]
+    },
+    {
         "ver": "1.404.212",
         "type": "stable",
         "changes": [
