@@ -141,7 +141,10 @@ E.parse_fast = function(fmt){
                 arg_names |= 1;
                 var _keyword = keyword, kmatch;
                 if (!(kmatch = /^([a-z_][a-z_\d]*)/i.exec(_keyword)))
-                    throw 'sprintf: invalid keyword property name '+_keyword;
+                {
+                    throw new Error(
+                        'sprintf: invalid keyword property name '+_keyword);
+                }
                 keyword_list.push(kmatch[1]);
                 while (_keyword = _keyword.substring(kmatch[0].length))
                 {
@@ -150,15 +153,19 @@ E.parse_fast = function(fmt){
                     else if (kmatch = /^\[(\d+)\]/.exec(_keyword))
                         keyword_list.push(kmatch[1]);
                     else
-                        throw 'sprintf: invalid keyword format '+_keyword;
+                    {
+                        throw new Error(
+                            'sprintf: invalid keyword format '+_keyword);
+                    }
                 }
             }
             else
                 arg_names |= 2;
             if (arg_names===3)
             {
-                throw 'sprintf: mixing positional and named placeholders is '
-                    +'not (yet) supported';
+                throw new Error(
+                    'sprintf: mixing positional and named placeholders is '
+                    +'not (yet) supported');
             }
             f += 'sign = false;\n';
             if (keyword_list.length) // keyword argument
@@ -224,7 +231,7 @@ E.parse_fast = function(fmt){
             f += 'out += '+arg_padded+';\n';
         }
         else
-            throw 'sprintf invalid format '+_fmt+' ('+fmt+')';
+            throw new Error('sprintf invalid format '+_fmt+' ('+fmt+')');
     }
     f += 'return out;\n';
     return new Function(['sprintf', 'stringify', 'argv'], f)
@@ -261,8 +268,9 @@ E.parse_slow = function(fmt){
                     var _keyword = keyword, kmatch;
                     if (!(kmatch = /^([a-z_][a-z_\d]*)/i.exec(_keyword)))
                     {
-                        throw 'sprintf: invalid keyword property name '
-                            +_keyword;
+                        throw new Error(
+                            'sprintf: invalid keyword property name '
+                            +_keyword);
                     }
                     keyword_list.push(kmatch[1]);
                     while (_keyword = _keyword.substring(kmatch[0].length))
@@ -272,15 +280,19 @@ E.parse_slow = function(fmt){
                         else if (kmatch = /^\[(\d+)\]/.exec(_keyword))
                             keyword_list.push(kmatch[1]);
                         else
-                            throw 'sprintf: invalid keyword format '+_keyword;
+                        {
+                            throw new Error(
+                                'sprintf: invalid keyword format '+_keyword);
+                        }
                     }
                 }
                 else
                     arg_names |= 2;
                 if (arg_names===3)
                 {
-                    throw 'sprintf: mixing positional and named placeholders'
-                        +' is not (yet) supported';
+                    throw new Error(
+                        'sprintf: mixing positional and named placeholders'
+                        +' is not (yet) supported');
                 }
                 f(function(){ sign = false; });
                 if (keyword_list.length) // keyword argument
@@ -374,7 +386,7 @@ E.parse_slow = function(fmt){
                 });
             }
             else
-                throw 'sprintf invalid format '+_fmt+' ('+fmt+')';
+                throw new Error('sprintf invalid format '+_fmt+' ('+fmt+')');
         })();
     }
     return function(_argv){

@@ -1,0 +1,41 @@
+@import (reference) 'common.less';
+.config {
+    height: 100%;
+    font-size: 14px;
+    padding: 0 15px;
+    .btn { width: 140px; }
+    .nav_buttons {
+        position: absolute;
+        z-index: 10;
+        right: 15px;
+        top: 15px;
+        white-space: nowrap;
+        flex: 1;
+        .btn:last-child { margin-right: 0; }
+    }
+    .code_panel {
+        .panel_body {
+            background-color: @light_grey;
+            position: relative;
+            padding: 1px;
+            .CodeMirror {
+                flex: auto;
+                display: flex;
+                flex-direction: column;
+                .CodeMirror-scroll { flex: auto; }
+                &.cm-s-default {
+                    padding: 5px;
+                    background-color: @light_grey;
+                }
+            }
+            .nav_buttons { right: 25px; }
+        }
+    }
+    .code_panel.editable {
+        border-color: @first_color;
+        .panel_body {
+            background-color: transparent;
+            .CodeMirror.cm-s-default { background-color: white; }
+        }
+    }
+}

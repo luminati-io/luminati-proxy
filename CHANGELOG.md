@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.407.3 Stable
+- :bug: Fix Ban IP rules created from UI not apply
+
 ## 1.404.754 Stable
 - :bug: Fix UI crash on unknown zone type
 

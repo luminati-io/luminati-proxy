@@ -1,0 +1,72 @@
+@import (reference) 'common.less';
+.settings {
+    padding: 0 15px;
+    .settings_form {
+        .field_row {
+            align-items: baseline;
+            .desc {
+                width: 170px;
+                margin-right: 5px;
+                white-space: nowrap;
+            }
+        }
+    }
+    .cp_panel {
+        height: 100%;
+        overflow: auto;
+    }
+    &.vbox { overflow-y: hidden; }
+}
+.logs_settings_modal {
+    &_tabs{
+        margin-top: 10px;
+        margin-bottom: 10px;
+        .inputs_container {
+            display: flex;
+            input {
+                width: 100%;
+            }
+            margin-top: 10px;
+            .aggr_url {
+                flex: 1;
+                margin-right: 10px;
+                width: 100%;
+            }
+            .input_full {
+                flex: 1;
+                width: 100%;
+            }
+            .btn_test {
+                min-width: 80px;
+            }
+            .input_main{
+                width: 70%;
+                &_sub {
+                    width: 30%;
+                }
+            }
+            .input_second{
+                margin-left: 10px;
+                width: 30%;
+            }
+            .input_half{
+                width: 50%;
+                &_sub {
+                    width: 50%;
+                    margin-left: 10px;
+                }
+            }
+        }
+    }
+    .use_limit {
+        align-items: center;
+        display: flex;
+        margin-top: 10px;
+        &_tooltip {
+            margin-right: 15px;
+            font-size: 15px;
+        }
+    }
+}
+
+

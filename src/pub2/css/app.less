@@ -1,0 +1,111 @@
+@import 'common.less';
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Lato Regular'), local('Lato-Regular'),
+        url(/font/lato_regular.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA,
+        U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Lato Bold'), local('Lato-Bold'),
+        url(/font/lato_bold.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA,
+        U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-Regular.woff) format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-SemiBold.woff) format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-MediumItalic.woff) format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-Book.woff) format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-Medium.woff) format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-Italic.woff) format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-SemiBoldItalic.woff) format('woff');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gibson';
+    src: url(/font/Gibson-BookItalic.woff) format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+html,
+body {
+    line-height: 23px;
+    color: @first_color;
+}
+.old_modals { height: auto !important; }
+html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
+    height: 100%;
+}
+.page_body {
+    padding-left: 50px;
+    padding-top: 60px;
+    position: initial !important;
+    background-color: @cp_white;
+    &.zagent {
+        padding-left: 0;
+    }
+}
+.api_app {
+    margin-top: 50px;
+    text-align: center;
+    button { margin: 10px; }
+}
+.no_nav {
+    .page-body { margin-left: 0; }
+    .logo_wrapper { background-color: white !important; }
+    .version_filler { background-color: white !important; }
+    .notif { display: none; }
+    .nav_top {
+        background-color: white;
+        .schema {
+            margin-right: 50px;
+            .schema_component { margin-right: 0; }
+        }
+    }
+}

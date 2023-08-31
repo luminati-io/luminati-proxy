@@ -1678,6 +1678,16 @@ const interval_spawn = (opt, states)=>{
         }]);
 };
 
+// For now we're deliberately not supporting passing opt here to all
+// class fns.
+// The existing pattern to handle this kind of thing is like this:
+//
+// method(){ return etask(special_options, function*(){
+//    // code
+// }); }
+//
+// If you think you have a good reason to add opt passing, talk with @vadim
+// first
 E._class = function(cls){
     var proto = cls.prototype, keys = Reflect.ownKeys(proto);
     for (var i=0; i<keys.length; i++)

@@ -14,6 +14,7 @@ import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import etask from '../../util/etask.js';
 import zurl from '../../util/url.js';
+import {App_new} from '../pub2/app.js';
 import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
@@ -50,6 +51,8 @@ const App = withRouter(class App extends Pure_component {
         this.state = {i18n_loaded: false};
     }
     componentDidMount(){
+        console.log('Mount APP');
+        ws.connect();
         this.rm_history_listener = this.props.history.listen(history_listener);
         this.rm_change_route_listener = CP_ipc.listen('change_route',
             ({mode})=>mode&&this.props.history.replace('/'+mode));
@@ -129,12 +132,13 @@ const App = withRouter(class App extends Pure_component {
         ws.addEventListener('settings_updated', this.on_settings_updated);
     }
     willUnmount(){
+        console.log('Unmount APP');
         ws.removeEventListener('settings_updated', this.on_settings_updated);
         if (typeof this.rm_history_listener == 'function')
             this.rm_history_listener();
         if (typeof this.rm_change_route_listener == 'function')
             this.rm_change_route_listener();
-        this.rm_change_route_listener();
+        ws.disconnect();
     }
     on_settings_updated = ({data})=>{
         setdb.set('head.settings', data.settings);
@@ -370,11 +374,46 @@ const Validator = ({zagent})=>{
     return <React.Fragment></React.Fragment>;
 };
 
-const Root = ()=>
-    <BrowserRouter>
-      <Switch>
-        <Route path="/" component={App}/>
-      </Switch>
-    </BrowserRouter>;
+class Root extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {
+            use_new_ui: false,
+        };
+    }
+    componentDidMount(){
+        const url_o = zurl.parse(document.location.href);
+        const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+        if (+qs_o.new_ui && !this.state.use_new_ui)
+        {
+            console.log('qs ui switch');
+            this.setState({use_new_ui: true});
+        }
+        this.rm_change_ui_app_listener = CP_ipc.listen('ui_state', msg=>{
+            console.log('CP ipc ui switch');
+            this.handle_ui_state_event(msg);
+        });
+        this.setdb_on('head.settings', ({new_ui}={})=>{
+            if (!new_ui || this.state.use_new_ui)
+                return;
+            console.log('settings ui switch');
+            this.handle_ui_state_event({new_ui});
+        });
+    }
+    willUnmount(){
+        if (typeof this.rm_change_ui_app_listener == 'function')
+            this.rm_change_ui_app_listener();
+    }
+    handle_ui_state_event = ({new_ui})=>
+        this.setState({use_new_ui: !!+new_ui});
+    render(){
+        let app_comp = this.state.use_new_ui ? App_new : App;
+        return <BrowserRouter>
+            <Switch>
+                <Route path="/" component={app_comp}/>
+            </Switch>
+        </BrowserRouter>;
+    }
+}
 
 ReactDOM.render(<Root/>, document.getElementById('react_root'));

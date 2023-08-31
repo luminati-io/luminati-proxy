@@ -7,9 +7,9 @@ const mk_url_loader = mimetype=>[{
     options: {limit: '100000', fallback: 'file-loader', mimetype},
 }];
 module.exports = {
-    context: `${__dirname}/src/pub`,
+    context: `${__dirname}/src/`,
     entry: {
-        app: './app.js',
+        app: './pub/app.js',
         vendor: ['jquery', 'lodash4', 'moment', 'bootstrap',
             'bootstrap/dist/css/bootstrap.css', 'codemirror/lib/codemirror',
             'codemirror/lib/codemirror.css', 'react-bootstrap', 'react',
@@ -27,7 +27,7 @@ module.exports = {
             $: 'jquery',
             jQuery: 'jquery',
         }),
-        new html_webpack_plugin({inject: true, template: 'index.html'}),
+        new html_webpack_plugin({inject: true, template: './pub/index.html'}),
     ],
     optimization: {
         runtimeChunk: 'single',
@@ -37,6 +37,11 @@ module.exports = {
         rules: [
             {
                 test: /src[\\/]pub[\\/].+\.js$/,
+                exclude: /node_modules/,
+                use: ['babel-loader'],
+            },
+            {
+                test: /src[\\/]pub2[\\/].+\.js$/,
                 exclude: /node_modules/,
                 use: ['babel-loader'],
             },

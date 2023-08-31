@@ -12,7 +12,6 @@ class Ws_wrapper extends EventTarget {
         this.url = location.hostname;
         this.port = get_location_port();
         this.protocol = location.protocol=='https:' ? 'wss' : 'ws';
-        this.create_socket();
     }
     create_socket(){
         const ws_url = `${this.protocol}://${this.url}:${this.port}`;
@@ -33,6 +32,15 @@ class Ws_wrapper extends EventTarget {
             _this.global_handler(event);
         });
     }
+    connect(){
+        if (!this.socket || !this.socket.connected)
+            this.create_socket();
+    }
+    disconnect(){
+        if (!this.socket || !this.socket.connected)
+            return;
+        this.socket.close();
+    }
     global_handler(event){
         if (!event.data || !event.data.msg!='update_path')
             return;
@@ -42,6 +50,8 @@ class Ws_wrapper extends EventTarget {
         setdb.set('ws.'+path, payload);
     }
     post_event(name, payload={}){
+        if (!this.socket || !this.socket.connected)
+            return void console.error('pmgr ws not connected', name);
         if (!name || !_.isString(name))
             return void console.error('pmgr ws not valid event name', name);
         this.socket.ipc.ui_event(Object.assign(payload,

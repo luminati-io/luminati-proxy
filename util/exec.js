@@ -35,7 +35,7 @@ E.get_cmd = (cmd, opt)=>{
     let args = array.copy(array.to_array(cmd));
     // XXX vladimir: rm process.zon from hutil
     if (opt.node && process.zon && process.zon.main)
-        throw 'Unable to spawn node process from embedded Node';
+        throw new Error('Unable to spawn node process from embedded Node');
     let command = opt.cmd_shell ? `"${args.shift()}"` :
         opt.shell ? '/bin/bash' : opt.node ? process.argv[0] : args.shift();
     command = file.normalize(command);
@@ -192,7 +192,7 @@ E.sys = (cmd, opt)=>etask(function*exec(){
     opt = E.process_opt(opt||{});
     // XXX vladimir: rm process.zon from hutil
     if (opt.fork && process.zon && process.zon.main)
-        throw 'Unable to spawn node process from embedded Node';
+        throw new Error('Unable to spawn node process from embedded Node');
     cmd = E.get_cmd(cmd, opt);
     let status = {signal: 0, code: 0};
     let log = {stdout: '', stderr: '', stdall: ''};

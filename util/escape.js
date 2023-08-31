@@ -118,7 +118,7 @@ E.un_sh = function(s, keep_esc){
         argv.push(a);
     }
     if (cur_state!=state.PARSE_STATE_INIT)
-        throw 'error parsing shell';
+        throw new Error('error parsing shell');
     return argv;
 };
 

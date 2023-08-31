@@ -21,7 +21,7 @@ E.glob_to_regex = function(glob){
     return new RegExp(E.glob_to_regex_str(glob)); };
 E.glob_fn = function(glob){
     var re = E.glob_to_regex(glob);
-    return function(s){ return re.test(s); };
+    return function glob_fn_test(s){ return re.test(s); };
 };
 E.glob = function(glob, value){ return E.glob_fn(glob)(value); };
 
