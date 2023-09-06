@@ -136,7 +136,7 @@
     "@babel/plugin-transform-modules-amd": "7.18.6",
     "@babel/plugin-transform-block-scoping": "7.20.5",
     "css-loader": "0.28.4",
-    "electron": "12.2.1",
+    "electron": "22.3.21",
     "electron-builder": "16.6.1",
     "electron-rebuild": "1.8.4",
     "html-webpack-plugin": "4.3.0",
