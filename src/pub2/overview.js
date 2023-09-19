@@ -3,27 +3,24 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
-import styled from 'styled-components';
 import $ from 'jquery';
-import {Button, Tooltip, IconButton} from 'uikit';
+import {Tooltip} from 'uikit';
 import zurl from '../../util/url.js';
 import setdb from '../../util/setdb.js';
 import {perr, get_last_versions, get_changes_tooltip} from './util.js';
 import {Modal} from './common/modals.js';
-import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
+import {
+    Warning,
+    Warnings,
+    with_www_api,
+    Loader_small,
+} from './common.js';
 import {T} from './common/i18n.js';
 import Har_viewer from './har_viewer.js';
 import {Logs_context, Stats} from './stats.js';
 import Proxies from './proxies.js';
-import ws from './ws.js';
 import {main as Api} from './api.js';
 import './css/overview.less';
-
-const Inline_wrapper = styled.div`
-    display: flex;
-    align-items: center;
-    column-gap: 5px;
-`;
 
 class Overview extends Pure_component {
     constructor(props){
@@ -43,10 +40,13 @@ class Overview extends Pure_component {
             if (!settings)
                 return;
             let remote_settings = settings.logs_settings||{};
-            this.setState({show_logs: settings.logs>0,
+            this.setState({
+                show_logs: settings.logs>0,
                 remote_logs_enabled: !!remote_settings.type,
-                zagent: settings.zagent, reseller: settings.reseller,
-                request_stats: settings.request_stats});
+                zagent: settings.zagent,
+                reseller: settings.reseller,
+                request_stats: settings.request_stats,
+              });
             if (settings.ask_sync_config&&!settings.zagent)
                 $('#sync_config_modal').modal();
         });
@@ -91,10 +91,9 @@ class Overview extends Pure_component {
         });
     };
     render(){
-        const {show_logs, zagent, request_stats, reseller,
-            remote_logs_enabled} = this.state;
+        const {show_logs, zagent, reseller, remote_logs_enabled,
+            request_stats} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
-        const title = zagent ? <span></span> : <T>Proxy Manager Dashboard</T>;
         return <div className="overview_page">
           <div className="warnings">
             {!this.state.embedded &&
@@ -107,17 +106,12 @@ class Overview extends Pure_component {
             <Whitelist_warning/>
             <Warnings warnings={this.state.warnings}/>
           </div>
-          <div className="proxies nav_header">
-            <h3>{title}</h3>
-            <Toolbar
-              request_stats={request_stats}
-              toggle_stats={this.toggle_stats}
-              zagent={zagent}
-            />
-          </div>
           <div className="panels" style={panels_style}>
             <div className="proxies proxies_wrapper">
-              <Proxies/>
+              <Proxies
+                toggle_stats={this.toggle_stats}
+                request_stats={request_stats}
+              />
             </div>
             {!zagent &&
               <Logs_context.Provider value={!!show_logs}>
@@ -153,61 +147,6 @@ class Overview extends Pure_component {
         </div>;
     }
 }
-
-const Toolbar = ({request_stats, toggle_stats, zagent})=>{
-  const howto_click = ()=>ws.post_event('Howto Nav Top Click');
-  return <div className="toolbar">
-    <Inline_wrapper>
-      {!zagent &&
-        <React.Fragment>
-          <Nav_icon icon='Info' link_to='/howto' on_click={howto_click}
-            tooltip='How to use the Proxy Manager'/>
-          <Nav_icon icon='Settings' link_to='/settings'
-            tooltip='General settings'/>
-        </React.Fragment>
-      }
-      <Nav_icon icon='Statistic' filled={!!request_stats}
-        tooltip={`Recent stats are ${request_stats ? 'enabled' : 'disabled'}`}
-        on_click={()=>toggle_stats(!request_stats)}/>
-      <Add_proxy_btn/>
-    </Inline_wrapper>
-  </div>;
-};
-
-const Add_proxy_btn = ()=>{
-  const open_modal = ()=>{
-      ws.post_event('Add New Port Click');
-      return $('#add_new_proxy_modal').modal('show');
-  };
-  return <T>{t=>
-    <Tooltip tooltip={t('Add new port')}>
-      <Button
-        icon="Add"
-        onClick={open_modal}
-        size="sm"
-        text={t('Add new port')}
-      />
-    </Tooltip>
-  }</T>;
-};
-
-const Nav_icon = withRouter(props=>{
-  const navigate_to = path=>{
-      if (props.on_click)
-          props.on_click();
-      props.history.push({pathname: path});
-  };
-  const on_click_navigate = {onClick: ()=>navigate_to(props.link_to)};
-  return <T>{t=>
-    <IconButton
-      icon={props.icon}
-      active={!!props.filled}
-      onClick={props.on_click}
-      {...(props.link_to && on_click_navigate)}
-      tooltip={t(props.tooltip)}
-    />
-  }</T>;
-});
 
 const Logs_off_btn = props=>
   <Tooltip tooltip="Logs are disabled. Click here to turn it on again">

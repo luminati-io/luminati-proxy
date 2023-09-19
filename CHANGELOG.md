@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.410.597 Stable
+- :bug: Fix handling uninitialized port
+
 ## 1.407.3 Stable
 - :bug: Fix Ban IP rules created from UI not apply
 

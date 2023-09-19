@@ -1,6 +1,19 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, esnext:true*/
-const E = module.exports;
+'use strict'; /*jslint node:true, react:true*/
+let is_node = typeof module=='object' && module.exports;
+let define;
+if (is_node)
+{
+    try {
+        define = require('./require_node.js').define(module, '..');
+    } catch(e){
+        define = require('../../util/require_node.js').define(module, '..');
+    }
+}
+else
+    define = self.define;
+define([], ()=>{
+const E = {};
 
 E.WWW_API = 'https://brightdata.com';
 
@@ -132,3 +145,5 @@ E.migrate_trigger = rule=>{
     return Object.assign({}, rule, {type,
         trigger_code: gen_function('trigger', body)});
 };
+
+return E; }); // eslint-disable-line

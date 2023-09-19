@@ -11,7 +11,7 @@ module.exports = {
     entry: {
         app: './pub/app.js',
         vendor: ['jquery', 'lodash4', 'moment', 'bootstrap',
-            'bootstrap/dist/css/bootstrap.css', 'codemirror/lib/codemirror',
+        'bootstrap/dist/css/bootstrap.css', 'codemirror/lib/codemirror',
             'codemirror/lib/codemirror.css', 'react-bootstrap', 'react',
             'codemirror/mode/javascript/javascript', 'react-dom',
             'regenerator-runtime', 'es6-shim', 'animate.css'],
@@ -22,7 +22,10 @@ module.exports = {
         filename: '[chunkhash].[name].js',
     },
     plugins: [
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^\.\/locale$/,
+            contextRegExp: /moment$/
+        }),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
@@ -32,6 +35,10 @@ module.exports = {
     optimization: {
         runtimeChunk: 'single',
         minimize: false,
+    },
+    watchOptions: {
+        poll: true,
+        ignored: /node_modules/
     },
     module: {
         rules: [

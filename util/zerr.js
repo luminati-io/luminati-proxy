@@ -164,6 +164,7 @@ E.make_nodejs_perr_install_fn = function(prefix){
                 bt: opt.backtrace,
                 host: zos.hostname(),
                 ver: zversion.version,
+                cluster: env.CLUSTER_NAME,
             },
         });
     };

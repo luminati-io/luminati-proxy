@@ -32,3 +32,21 @@
         }
     }
 }
+
+div[role=columnheader], div[role=cell] {
+    white-space: nowrap;
+    div:not(.context-menu-wrapper + div) {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    div[role=tooltip] {
+        white-space: normal;
+        overflow: unset;
+        div {
+            overflow: unset;
+        }
+    }
+    div[role=button] > div {
+        overflow: unset;
+    }
+}

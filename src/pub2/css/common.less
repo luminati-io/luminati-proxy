@@ -734,7 +734,7 @@ span.icon_link {
     color: @dark;
     display: flex;
     align-items: center;
-    border-radius: 2px;
+    border-radius: 4px;
     padding: 10px 35px 10px 20px;
     position: relative;
     .warning_icon {
@@ -771,10 +771,13 @@ span.icon_link {
         height: 20px;
     }
 }
+
+.force_no_border {
+    border: none !important;
+}
+
 .cp_panel {
-    border: 1px solid @cp_border;
     background: white;
-    border-radius: 3px;
     padding: 20px;
     .cp_panel_header {
         display: flex;
@@ -1340,4 +1343,12 @@ span.icon_link {
 }
 .zagent .alert_wrapper {
     left: 10px;
+}
+
+.transparent {
+    background: transparent !important;
+}
+
+.padding_right_10 {
+    padding-right: 10px !important;
 }

@@ -1537,7 +1537,7 @@ var terr_country = {
     'BF', 'BI', 'CV', 'CM', 'CF', 'TD', 'KM', 'CG', 'CD', 'CI', 'HR', 'CY',
     'CZ', 'DJ', 'EG', 'GQ', 'ER', 'EE', 'SZ', 'ET', 'TF', 'GA', 'GM', 'GE',
     'GH', 'GR', 'GN', 'GW', 'HU', 'IR', 'IQ', 'IL', 'JO', 'KZ', 'KE', 'KW',
-    'KG', 'LV', 'LB', 'LS', 'LR', 'LY', 'LT', 'MO', 'MG', 'MW', 'ML', 'MR',
+    'KG', 'LV', 'LB', 'LS', 'LR', 'LY', 'LT', 'MG', 'MW', 'ML', 'MR',
     'MU', 'YT', 'MD', 'ME', 'MA', 'MZ', 'NA', 'NE', 'NG', 'MK', 'OM',
     'PS', 'PL', 'QA', 'RO', 'RU', 'RW', 'SH', 'ST', 'SA', 'SN', 'RS', 'SC',
     'SL', 'SK', 'SI', 'SO', 'ZA', 'SS', 'SD', 'SY', 'TZ', 'TG', 'TN', 'TR',
@@ -1553,7 +1553,7 @@ var terr_country = {
     'SV', 'FK', 'GF', 'GD', 'GP', 'GT', 'GY', 'HT', 'HM', 'HN', 'JM', 'MQ',
     'MX', 'MS', 'NI', 'PA', 'PY', 'PE', 'PN', 'PR', 'BL', 'KN', 'LC', 'MF',
     'PM', 'VC', 'SX', 'GS', 'SR', 'SJ', 'TT', 'TC', 'UY', 'VE', 'VG', 'VI'],
-    cn: ['CN', 'HK'],
+    cn: ['CN', 'HK', 'MO'],
 };
 Object.entries(terr_country).forEach(function(ct){
     ct[1].forEach(function(c){ E.country_terr[c] = ct[0]; });

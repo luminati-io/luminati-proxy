@@ -120,12 +120,12 @@ E.inc_level_eco = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
 
 // current in-progress counter read from elsewhere, or absolute value such
 // as %cpu or %disk usage
-E.set_level = (name, value, agg_mas='avg', agg_srv='avg')=>{
+E.set_level = (name, value, agg_mas='avg', agg_srv='avg', agg_tm='avg')=>{
     if (!Number.isFinite(value))
         return void report_invalid_val(name, value);
     let _type = type[agg_mas+'_level'], entry = _type[name];
     if (!entry)
-        entry = _type[name] = {v: 0, agg_srv};
+        entry = _type[name] = {v: 0, agg_srv, agg_tm};
     entry.v = value;
 };
 
@@ -193,8 +193,8 @@ E.ext_minc = (server, name, value, agg_srv)=>
     E.minc(server+'/'+name, value, agg_srv);
 E.ext_inc_level = (server, name, inc, agg_mas, agg_srv)=>
     E.inc_level(server+'/'+name, inc, agg_mas, agg_srv);
-E.ext_set_level = (server, name, value, agg_mas, agg_srv)=>
-    E.set_level(server+'/'+name, value, agg_mas, agg_srv);
+E.ext_set_level = (server, name, value, agg_mas, agg_srv, agg_tm)=>
+    E.set_level(server+'/'+name, value, agg_mas, agg_srv, agg_tm);
 E.ext_avg = (server, name, value, agg_srv)=>
     E.avg(server+'/'+name, value, agg_srv);
 E.ext_avgw = (server, name, value, weight, agg_srv)=>

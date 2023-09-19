@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 /* eslint-disable react/display-name */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_tooltip from 'react-tooltip';
 import {Alert as RB_Alert} from 'react-bootstrap';
@@ -10,6 +10,15 @@ import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import $ from 'jquery';
+import styled from 'styled-components';
+import {
+    Tooltip as UIKitTooltip,
+    withPopover,
+    IconButton,
+    Menu,
+    Icon,
+    theme,
+} from 'uikit';
 import conv from '../../util/conv.js';
 import date from '../../util/date.js';
 import presets from './common/presets.js';
@@ -23,6 +32,40 @@ import CP_ipc from './cp_ipc.js';
 export const www_api = 'https://brightdata.com';
 export const www_help = 'https://help.brightdata.com';
 export const lpm_faq_article = '12632549957649';
+
+export const Inline_wrapper = styled.div`
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+`;
+Inline_wrapper.displayName = 'Inline_wrapper';
+
+const uikit_from_theme = (pname, default_value)=>props=>{
+        let value = props[pname]||default_value;
+        if (value!=null)
+        {
+            if (pname.indexOf('padding')==0||pname.indexOf('margin')==0)
+                return theme.spacing[value]||value;
+            if (['font_weight', 'font_size', 'line_height', 'letter_spacing',
+                'color', 'box_shadow'].includes(pname))
+            {
+                return theme[pname][value];
+            }
+        }
+        return value;
+};
+
+export const Vertical_divider = styled.div`
+    width: 2px;
+    height: ${p=>p.height||'100%'};
+    background-color: ${theme.color.gray_5};
+    margin-top: ${uikit_from_theme('margin_top', '00')};
+    margin-bottom: ${uikit_from_theme('margin_bottom', '00')};
+    margin-left: ${uikit_from_theme('margin_left', '04')};
+    margin-right: ${uikit_from_theme('margin_right', '04')};
+    margin: ${uikit_from_theme('margin')};
+`;
+Vertical_divider.displayName = 'Vertical_divider';
 
 export const Tooltip_bytes = props=>{
     let {bytes, bytes_out, bytes_in, cost} = props;
@@ -43,11 +86,11 @@ export const Tooltip_bytes = props=>{
     const details = bytes_out&&bytes_in&&`(${bw_out} up | ${bw_in} down)` ||
         cost&&`(Estimated savings ${display_cost})` || '';
     const tooltip = `<div><strong>${bw}</strong> ${details}</div>`;
-    return <Tooltip title={bytes ? tooltip : ''}>
+    return <UIKitTooltip tooltip={bytes ? tooltip : ''}>
       <div className="disp_value">
         {display_cost||bytes_format(bytes)||'—'}
       </div>
-    </Tooltip>;
+    </UIKitTooltip>;
 };
 
 export const Warnings = props=>
@@ -78,18 +121,29 @@ export class Warning extends Pure_component {
         if (this.state.dismissed)
             return null;
         const content = this.props.text||this.props.children;
-        return <Tooltip className="wide"
+        return <UIKitTooltip className="wide"
           title={this.props.tooltip}
           placement="bottom">
           <div className="warning">
-            <div className="warning_icon"/>
+            <Icon
+              size="lg"
+              color="gray_10"
+              name="AttentionCircle"
+              className="padding_right_10"
+            />
             <div className="hbox">{content}</div>
             {this.props.id &&
-              <Toolbar_button tooltip="Dismiss" id="close_btn"
-                placement="left" on_click={this.dismiss}/>
+              <IconButton
+                aria-label="Warning dismiss"
+                icon="ChevronUp"
+                onClick={this.dismiss}
+                tooltip="Dismiss"
+                variant="ghost"
+                className="transparent"
+              />
             }
           </div>
-        </Tooltip>;
+        </UIKitTooltip>;
     }
 }
 
@@ -461,21 +515,39 @@ export const Logo = with_www_api(class Logo extends Pure_component {
     }
 });
 
-export const any_flag = props=><Tooltip title={t('Any')}>
-    <span>
-      <img src="/img/flag_any_country.svg" style={{height: 18}}/>
-        <span className="lit" style={{marginLeft: 2}}>{t('Any')}</span>
-      </span>
-    </Tooltip>;
+export const Icon_text = ({
+    fi,
+    name,
+    color,
+    size,
+    verticalAlign,
+    text
+})=>
+    <Inline_wrapper>
+        {fi ? <span className={'fi fi-'+fi}/>
+            : <Icon
+                color={color}
+                name={name}
+                size={size}
+                verticalAlign={verticalAlign}
+            />
+        }
+        <T>{text}</T>
+    </Inline_wrapper>;
 
-export const flag_with_title = (country, title, tooltip)=>{
-    return <Tooltip title={tooltip||country.toUpperCase()}>
-      <span>
-        <span className={'fi fi-'+country}/>
-        <span className="lit">{title}</span>
-      </span>
-    </Tooltip>;
-};
+export const Icon_check = ()=><Icon name="Check" color="green_11" />;
+
+export const Icon_close = ()=><Icon name="Close" color="gray_9" />;
+
+export const any_flag = ()=>
+    <UIKitTooltip tooltip={t('Any')}>
+        <Icon_text name="Globe" text="Any" color="gray_10" size="sm"/>
+    </UIKitTooltip>;
+
+export const flag_with_title = (country, title, tooltip)=>
+    <UIKitTooltip tooltip={tooltip||country.toUpperCase()}>
+        <Icon_text fi={country} text={title} />
+    </UIKitTooltip>;
 
 export const Preset_description = ({preset, rule_clicked})=>{
     if (!preset)
@@ -526,10 +598,10 @@ export const No_zones = with_www_api(class No_zones extends Pure_component {
 });
 
 export const Toolbar_button = props=>
-  <Tooltip title={props.tooltip}>
-    <div className={classnames('cp_icon', props.id)}
-      onClick={props.on_click}/>
-  </Tooltip>;
+    <UIKitTooltip tooltip={props.tooltip}>
+        <div className={classnames('cp_icon', props.id)}
+            onClick={props.on_click}/>
+    </UIKitTooltip>;
 
 export const Alert = props=>{
     const [close_tm, set_close_tm] = useState(null);
@@ -551,4 +623,39 @@ export const Alert = props=>{
         {props.text && <div>{props.text}</div>}
       </RB_Alert>
     </div>;
+};
+
+const Context_menu_button = props=>{
+    const {popover, tooltip} = props;
+    return <IconButton icon="DotsVertical" variant="icon" tooltip={tooltip}
+      onClick={e=>{
+        popover.toggle(e);
+        e.stopPropagation();
+    }} />;
+};
+
+const Context_menu_pop = props=>{
+    const {items, popover} = props;
+    const hide_on_click = cb=>(...args)=>{
+        cb(...args);
+        popover.hide();
+    };
+    const _items = items.map(i=>{
+        if (i.onClick)
+        {
+            return Object.assign({}, i,
+                {onClick: hide_on_click(i.onClick)});
+        }
+        return i;
+    });
+    return <Menu items={_items}/>;
+};
+
+const Context_menu_comp = withPopover(Context_menu_button, Context_menu_pop,
+    {wrapperClassName: 'context-menu-wrapper'});
+
+export const Context_menu = props=>{
+    const {items, tooltip} = props;
+    const popoverProps = useMemo(()=>({items, tooltip}), [items, tooltip]);
+    return <Context_menu_comp popoverProps={popoverProps}/>;
 };

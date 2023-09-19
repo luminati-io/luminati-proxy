@@ -1,8 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '/www/util/pub/pure_component.js';
+import {AutoSizer, Table, Column} from 'react-virtualized';
 import classnames from 'classnames';
+import Pure_component from '/www/util/pub/pure_component.js';
 import Tooltip from './common/tooltip.js';
 import {Checkbox} from './common.js';
 import './css/chrome_widgets.less';
@@ -18,7 +19,6 @@ export const Toolbar_button = ({id, tooltip, active, href, placement,
       </a>
     </Tooltip>;
 
-import {AutoSizer, Table, Column} from 'react-virtualized';
 export class Infinite_chrome_table extends Pure_component {
     state = {};
     cell_renderer = function Cell_renderer(props){
@@ -198,13 +198,4 @@ export const Toolbar_container = ({children})=>
 export const Toolbar_row = ({children})=>
     <div className="toolbar">
       {children}
-    </div>;
-
-export const Search_box = ({val, on_change})=>
-    <div className="search_box">
-      <input value={val}
-        onChange={on_change}
-        type="text"
-        placeholder="Filter"
-      />
     </div>;

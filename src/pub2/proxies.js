@@ -3,12 +3,18 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
-import {AutoSizer, Table, Column} from 'react-virtualized';
-import ReactDOM from 'react-dom';
 import {withRouter} from 'react-router-dom';
-import classnames from 'classnames';
 import filesaver from 'file-saver';
 import $ from 'jquery';
+import _ from 'lodash4';
+import {
+    Input,
+    Modal,
+    Tooltip,
+    Button,
+    Table,
+    Link,
+} from 'uikit';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import csv from '../../util/csv.js';
@@ -16,82 +22,108 @@ import etask from '../../util/etask.js';
 import zutil from '../../util/util.js';
 import {get_static_country, report_exception, is_local} from './util.js';
 import Proxy_blank from './proxy_blank.js';
-import {Checkbox, any_flag, flag_with_title, No_zones,
-    Tooltip_bytes, Loader_small, Toolbar_button, Warnings} from './common.js';
+import {
+    any_flag,
+    flag_with_title,
+    No_zones,
+    Inline_wrapper,
+    Toolbar_button,
+    Tooltip_bytes,
+    Warnings,
+    Icon_text,
+    Icon_check,
+    Icon_close,
+    Context_menu,
+} from './common.js';
 import Zone_description from './common/zone_desc.js';
-import {Modal_dialog, Modal} from './common/modals.js';
-import {T, t} from './common/i18n.js';
-import {Search_box} from './chrome_widgets.js';
+import {t} from './common/i18n.js';
 import 'react-virtualized/styles.css';
-import Tooltip from './common/tooltip.js';
 import ws from './ws.js';
 import {main as Api} from './api.js';
+import Toolbar from './proxies_toolbar.js';
 import './css/proxies.less';
 
-const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog,
-    show_error_ntf})=>{
-    return <Actions proxy={proxy} get_status={mgr.get_status}
-          update_proxies={mgr.update} scrolling={scrolling}
-          open_delete_dialog={open_delete_dialog}
-          show_error_ntf={show_error_ntf}/>;
+const {Popup} = Modal, {Checkbox} = Input, {keys} = Object;
+
+const Actions_cell = ({row, column})=>{
+    const {proxy, mgr} = row.original;
+    return <Actions proxy={proxy} open_delete_dialog={mgr.open_delete_dialog}
+          update_proxies={mgr.update} get_status={mgr.get_status}
+          show_error_ntf={mgr.show_error_ntf} tooltip={column.tooltip}/>;
 };
 
-class Targeting_cell extends Pure_component {
-    render(){
-        const title = (t_country, t_state, t_city, t_zip)=>{
-            let _val = t_country;
-            if (t_state)
-                _val += ` (${t_state})`;
-            if (t_state && t_city)
-                _val += `, ${t_city}`;
-            if (t_zip)
-                _val += ` (${t_zip})`;
-            return _val;
-        };
-        const {proxy, mgr} = this.props;
-        const zones = mgr.state.zones;
-        const static_country = get_static_country(proxy, zones);
-        if (static_country && static_country!='any' && static_country!='*')
-        {
-            return flag_with_title(static_country,
-                static_country.toUpperCase());
-        }
-        let val = proxy.country;
-        if (!val||val=='any'||val=='*')
-            return any_flag();
-        return flag_with_title(proxy.country, title(val.toUpperCase(),
-            proxy.state && proxy.state.toUpperCase(), proxy.city, proxy.zip));
+const Targeting_cell = props=>{
+    const {proxy, mgr} = props.row.original;
+    const title = (t_country, t_state, t_city, t_zip)=>{
+        let _val = t_country;
+        if (t_state)
+            _val += ` (${t_state})`;
+        if (t_state && t_city)
+            _val += `, ${t_city}`;
+        if (t_zip)
+            _val += ` (${t_zip})`;
+        return _val;
+    };
+    const zones = mgr.state.zones;
+    const static_country = get_static_country(proxy, zones);
+    if (static_country && static_country!='any' && static_country!='*')
+    {
+        return flag_with_title(static_country,
+            static_country.toUpperCase());
     }
-}
+    let val = proxy.country;
+    if (!val||val=='any'||val=='*')
+        return any_flag();
+    return flag_with_title(proxy.country, title(val.toUpperCase(),
+        proxy.state && proxy.state.toUpperCase(), proxy.city, proxy.zip));
+};
 
-const Status_cell = ({proxy})=>{
+const Status_cell = ({value: proxy})=>{
     const status = proxy.status;
     const status_details = proxy.status_details;
     let details = (status_details||[]).map(d=>d.msg).join(',');
     if (!details.length && status!='ok')
         details = status;
     if (status=='testing')
-        return <Tooltip title="Status is being tested">Testing</Tooltip>;
+    {
+        return <Tooltip tooltip="Status is being tested">
+            Testing
+        </Tooltip>;
+    }
     else if (status && status!='ok')
-        return <Tooltip title={details}>{details}</Tooltip>;
+    {
+        return <Tooltip tooltip={details}>
+            {details}
+        </Tooltip>;
+    }
     else if (status=='ok' && details)
     {
-        return <Tooltip title={details}>
-            <span>OK<div className="ic_warning"/></span>
-          </Tooltip>;
+        return <Tooltip tooltip={details}>
+            <Icon_text
+                name="Warning"
+                text="Ok"
+                color="gray_10"
+                size="xs"
+                verticalAlign="top"
+            />
+        </Tooltip>;
     }
     else if (status=='ok' && !details)
-        return <Tooltip title="This proxy works correctly">OK</Tooltip>;
-    return <Tooltip title="Status of this proxy is unknown">?</Tooltip>;
+    {
+        return <Tooltip tooltip="This proxy works correctly">
+            OK
+        </Tooltip>;
+    }
+   return <Tooltip tooltip="Status of this proxy is unknown">
+        ?
+    </Tooltip>;
 };
 
-const Boolean_cell = ({proxy, col})=>{
-    if (proxy[col]===true)
-        return <img src="/img/ic_checkmark.svg"/>;
-    return <img src="/img/ic_off.svg"/>;
-};
+const Boolean_cell = ({value})=>value===true ? <Icon_check />
+    : <Icon_close />;
 
-const Static_ip_cell = ({proxy, mgr})=>{
+const Static_ip_cell = props=>{
+    const {proxy, mgr} = props.row.original;
     if (proxy.ip)
         return proxy.ip;
     const curr_zone = mgr.state.zones.zones.find(z=>z.name==proxy.zone);
@@ -106,25 +138,20 @@ const Static_ip_cell = ({proxy, mgr})=>{
     return null;
 };
 
-class Type_cell extends React.Component {
-    render(){
-        if (this.props.scrolling)
-            return 'Bright Data';
-        const proxy = this.props.proxy;
-        let val, tip;
-        if (proxy.ext_proxies)
-        {
-            val = 'External';
-            tip = 'Proxy port configured with external IP and credentials';
-        }
-        else
-        {
-            val = 'Bright Data';
-            tip = 'Proxy port using your Bright Data account';
-        }
-        return <Tooltip title={t(tip)}>{t(val)}</Tooltip>;
+const Type_cell = ({value: ext_proxy})=>{
+    let val, tip;
+    if (ext_proxy)
+    {
+        val = 'External';
+        tip = 'Proxy port configured with external IP and credentials';
     }
-}
+    else
+    {
+        val = 'Bright Data';
+        tip = 'Proxy port using your Bright Data account';
+    }
+    return <Tooltip tooltip={t(tip)}>{t(val)}</Tooltip>;
+};
 
 class Browser_cell extends Pure_component {
     open_browser = e=>{
@@ -132,323 +159,334 @@ class Browser_cell extends Pure_component {
         const _this = this;
         ws.post_event('Browser Click');
         this.etask(function*(){
-            const res = yield Api.get(`browser/${_this.props.proxy.port}`);
+            const res = yield Api.get(`browser/${_this.props.value.port}`);
             if ((res||'').includes('Fetching'))
                 $('#fetching_chrome_modal').modal();
         });
     };
     render(){
-        const class_names = 'btn btn_lpm btn_lpm_small';
         const tooltip = 'Open browser configured with this port';
-        return is_local() && <Tooltip title={t(tooltip)}>
-              <button className={class_names}
-                onClick={this.open_browser}><T>Browser</T></button>
-            </Tooltip>;
+        return is_local() && <Tooltip tooltip={t(tooltip)}>
+            <Link
+                icon="ArrowUpRight"
+                onClick={this.open_browser}
+                text={t('Browser')}
+            />
+        </Tooltip>;
     }
 }
 
-class Port_cell extends Pure_component {
-    state = {expanded: this.props.proxy.expanded};
-    toggle = e=>{
-        e.stopPropagation();
-        const _this = this.props.mgr;
-        const proxies = _this.state.proxies.slice();
-        let master_proxy = proxies.find(p=>p.port==this.props.proxy.port);
-        master_proxy.expanded = !master_proxy.expanded;
-        const visible_proxies = _this.get_visible_proxies(proxies);
-        _this.setState({proxies, visible_proxies});
-        this.setState(prev=>({open: !prev.open}));
-    };
-    componentDidUpdate(){
-        this.setState({expanded: this.props.proxy.expanded});
-    }
-    render(){
-        const {proxy, scrolling} = this.props;
-        if (scrolling)
-            return proxy.port;
-        const is_multiplied_port = !proxy.master_port && proxy.multiply &&
-            proxy.multiply>1;
-        const val = is_multiplied_port ? proxy.port+':1..'+proxy.multiply :
-            proxy.port;
-        const title = `${proxy.port} is a proxy port that refers to a specific
-        virtual location on a computer. You can use it as a virtual proxy to
-        send requests`;
-        if (is_multiplied_port)
-        {
-            const c = this.state.expanded ? 'open' : 'before';
-            const classes = classnames('expandable', c);
-            return <Tooltip title={title}>
-                  <div className='port_cell master'>
-                    <div onClick={this.toggle} className={classes}/>
-                    <div>{val}</div>
-                  </div>
-                </Tooltip>;
-        }
-        const c = proxy.master_port ? 'port_cell multiplied' : null;
-        return <Tooltip title={title}>
-              <div className={c}>{val}</div>
-            </Tooltip>;
-    }
-}
+const Port_cell = ({value: proxy})=>{
+    const is_multiplied = !proxy.master_port && proxy.multiply &&
+        proxy.multiply>1;
+    const val = is_multiplied ? proxy.port+':1..'+proxy.multiply :
+        proxy.port;
+    const pl = is_multiplied ? 's' : '';
+    const tip = `${is_multiplied ? proxy.port+'-'+(proxy.port+proxy.multiply)
+        +' are' : proxy.port+' is a'} proxy port${pl} that refers to a specific
+        virtual location${pl} on a computer. You can use it as a virtual proxy
+        to send requests`;
+    return <Tooltip tooltip={tip}>{val}</Tooltip>;
+};
 
-const Success_rate_cell = ({proxy})=>{
+const Success_rate_cell = ({value: proxy})=>{
     const val = !proxy.reqs ? '—' :
         (proxy.success/proxy.reqs*100).toFixed(2)+'%';
-    return <Tooltip title={`${t('Total')}: ${proxy.reqs||0}, ${
-            t('Success')}: ${proxy.success||0}`}>{val}</Tooltip>;
+    const tip = `${t('Total')}: ${proxy.reqs||0}, ${t('Success')}:`
+        +proxy.success||0;
+    return <Tooltip title={tip}>
+        {val}
+    </Tooltip>;
 };
 
-const Reqs_cell = ({proxy})=>{
-    const reqs = proxy.reqs||0;
-    return <Tooltip title={`${reqs} requests sent through this proxy port`}>
-        {reqs}</Tooltip>;
+const Reqs_cell = ({value: reqs=0})=>{
+    const tip = `${+reqs} requests sent through this proxy port`;
+    return <Tooltip tooltip={tip}>
+        {+reqs}
+    </Tooltip>;
 };
 
-const Zone_cell = ({proxy, mgr, scrolling})=>{
-    if (scrolling)
-        return proxy.zone;
+const Zone_cell = props=>{
+    const {proxy, mgr} = props.row.original;
     const zones = mgr.state.zones;
     return <div>
-          <OverlayTrigger
-            placement="top"
-            overlay={
-              <B_tooltip id={`${proxy.port}-zone-tooltip`}>
-                <div className="zone_tooltip">
-                  <Zone_description zones={zones} zone_name={proxy.zone}/>
-                </div>
-              </B_tooltip>
-            }
-          >
-            <span>{proxy.zone}</span>
-          </OverlayTrigger>
-        </div>;
+        <OverlayTrigger
+        placement="top"
+        overlay={
+            <B_tooltip id={`${proxy.port}-zone-tooltip`}>
+            <div className="zone_tooltip">
+                <Zone_description zones={zones} zone_name={proxy.zone}/>
+            </div>
+            </B_tooltip>
+        }
+        >
+        <span>{proxy.zone}</span>
+        </OverlayTrigger>
+    </div>;
 };
 
-const Rules_cell = ({proxy: {rules=[]}})=>{
+const Rules_cell = ({value: {rules=[]}})=>{
     const tip = 'Number of defined rules for this proxy port';
     const val = rules.length;
-    return !!val && <Tooltip title={t(tip)}>{t(val)}</Tooltip>;
+    return !!val && <Tooltip tooltip={t(tip)}>{t(val)}</Tooltip>;
+};
+
+const DNS_cell = ({value})=>value||'local';
+
+const Header_cell = ({column})=>{
+    if (column.hide_col_title)
+        return '';
+    return <Tooltip tooltip={column.tooltip||column.title||column.id}>
+        {t(column.title||column.id)}
+    </Tooltip>;
+};
+
+const T_cell = ({value})=>{
+    return <Tooltip tooltip={value}>
+        {value}
+    </Tooltip>;
+};
+
+const Select_rows_header = ({column})=>{
+    const {mgr: {all_rows_select, state: {checked_all}}} = column;
+    return <Checkbox onChange={all_rows_select} checked={checked_all} />;
+};
+
+const Select_row_cell = props=>{
+    const {proxy, mgr} = props.row.original;
+    let checked = mgr.state.checked_all
+        || !!mgr.state.selected_proxies[proxy.port];
+    return <Checkbox
+        onChange={mgr.on_row_select.bind(mgr, proxy)}
+        checked={checked}
+    />;
 };
 
 const columns = [
     {
-        key: 'actions',
-        title: 'Actions',
-        tooltip: `Delete/duplicate/refresh sessions/open browser`,
-        ext: true,
-        sticky: true,
-        render: Actions_cell,
-        width: 80,
-        shrink: 0,
-        grow: 0,
-        csv: false,
-    },
-    {
-        key: 'internal_name',
+        id: 'internal_name',
+        Cell: T_cell,
         title: 'Internal name',
-        tooltip: `An internal name is used for proxy ports to be easily \
-            distinguished. Those don't change any proxy behavior and it's only
-            cosmetic`,
-        ext: true,
-        calc_show: proxies=>proxies.some(p=>p.internal_name),
+        tooltip: `An internal name is used for proxy ports to be easily
+            distinguished.\nThose don't change any proxy behavior and it's only
+            cosmetic.`,
+        maxWidth: 100,
+        minWidth: 70,
+        can_sort: true,
     },
     {
-        key: 'port',
+        id: 'port',
         title: 'Proxy port',
-        sticky: true,
-        render: Port_cell,
+        accessor: 'proxy',
+        Cell: Port_cell,
         tooltip: 'A proxy port is a number that refers to a specific virtual '
             +'location on a computer. Create and configure proxy ports, then '
             +'connect the crawler to send requests through the port',
+        sticky: true,
+        default: true,
         ext: true,
         dynamic: true,
-        width: 90,
+        maxWidth: 90,
+        minWidth: 50,
+        can_sort: true,
     },
     {
-        key: 'proxy_type',
+        id: 'proxy_type',
+        accessor: 'proxy.ext_proxy',
         title: 'Type',
-        render: Type_cell,
+        Cell: Type_cell,
         tooltip: 'Type of connected proxy - Bright Data proxy or external'
             +' proxy (non Bright Data)',
         ext: true,
-        width: 70,
+        maxWidth: 70,
+        minWidth: 50,
     },
     {
-        key: 'status',
+        id: 'status',
         title: 'Status',
-        type: 'status',
-        render: Status_cell,
-        default: true,
+        accessor: 'proxy',
+        Cell: Status_cell,
         tooltip: 'Real time proxy status',
+        default: true,
+        type: 'string',
         ext: true,
         dynamic: true,
-        width: 55,
+        width: 40,
+        can_sort: true,
     },
     {
-        key: 'iface',
+        id: 'iface',
         title: 'Interface',
-        type: 'options',
         tooltip: 'Specific network interface on which the local machine is '
             +'running. Switch interfaces in the proxy configuration page',
+        type: 'string',
         ext: true,
+        width: 50,
     },
     {
-        key: 'multiply',
+        id: 'multiply',
         title: 'Multiply',
-        type: 'number',
         tooltip: 'Number of multiplied proxy ports. A proxy port can be '
             +'multiplied in the proxy configuration page',
+        type: 'string',
         ext: true,
+        can_sort: true,
+        width: 50,
     },
     {
-        key: 'ssl',
+        id: 'ssl',
         title: 'SSL Analyzing',
-        render: Boolean_cell,
+        accessor: 'proxy.ssl',
+        Cell: Boolean_cell,
         tooltip: 'In order to log HTTPS requests, enable SSL request logs in '
             +'proxy configuration',
         ext: true,
+        width: 40,
     },
     {
-        key: 'proxy_connection_type',
-        title: 'Proxy connection type',
+        id: 'proxy_connection_type',
+        title: 'SP Protocol',
         tooltip: 'Connection type between Proxy Manager and Super Proxy',
         ext: true,
+        width: 30,
     },
     {
-        key: 'zone',
+        id: 'zone',
         title: 'Zone',
-        type: 'options',
         default: true,
+        Cell: Zone_cell,
         tooltip: 'Specific Bright Data zone configured for this proxy. Switch '
             +'zones in proxy configuration page.',
-        render: Zone_cell,
+        width: 30,
     },
     {
-        key: 'country',
+        id: 'country',
         title: 'Targeting',
-        type: 'options',
         default: true,
-        render: Targeting_cell,
+        Cell: Targeting_cell,
         tooltip: 'Exit node (IP) GEO location',
-        width: 62,
+        width: 30,
     },
     {
-        key: 'asn',
+        id: 'asn',
         title: 'ASN',
-        type: 'number',
         tooltip: 'ASN uniquely identifies each network on the internet. You '
             +'can target exit nodes (IPs) on specific ASNs',
     },
     {
-        key: 'rotate_session',
+        id: 'rotate_session',
         title: 'Rotate IPs',
-        render: Boolean_cell,
+        accessor: 'proxy.rotate_session',
+        Cell: Boolean_cell,
         ext: true,
     },
     {
-        key: 'pool_size',
+        id: 'pool_size',
         title: 'Pool size',
         type: 'number',
         ext: true,
     },
     {
-        key: 'sticky_ip',
+        id: 'sticky_ip',
         title: 'Sticky IP',
-        render: Boolean_cell,
+        accessor: 'proxy.sticky_ip',
+        Cell: Boolean_cell,
         ext: true,
     },
     {
-        key: 'rules',
+        id: 'rules',
         title: 'Rules',
-        render: Rules_cell,
+        accessor: 'proxy',
+        Cell: Rules_cell,
         ext: true,
     },
     {
-        key: 'dns',
+        id: 'dns',
         title: 'DNS',
-        type: 'options',
+        accessor: 'proxy.dns',
+        Cell: DNS_cell,
     },
     {
-        key: 'ip',
+        id: 'ip',
         title: 'Static IPs',
-        type: 'text',
         calc_show: proxies=>proxies.some(p=>p.multiply_ips),
-        render: Static_ip_cell,
+        Cell: Static_ip_cell,
     },
     {
-        key: 'user',
+        id: 'user',
         title: 'User',
-        type: 'text',
         ext: true,
         calc_show: proxies=>proxies.some(p=>p.multiply_users),
     },
     {
-        key: 'vip',
+        id: 'vip',
         title: 'gIP',
-        type: 'number',
         tooltip: 'A gIP is a group of exclusive residential IPs. Using gIPs '
             +'ensures that nobody else uses the same IPs with the same target '
             +'sites as you do.',
     },
     {
-        key: 'proxy',
-        title: 'Super Proxy',
-        type: 'text'
+        id: 'proxy',
+        title: 'SP',
+        tooltip: 'Super Proxy',
     },
     {
-        key: 'throttle',
+        id: 'throttle',
         title: 'Throttle concurrent connections',
-        type: 'number',
         ext: true,
     },
     {
-        key: 'success',
+        id: 'success',
         title: 'Success',
         tooltip: 'The ratio of successful requests out of total requests. A '
             +'request is considered as successful if the server of the '
             +'destination website responded',
-        render: Success_rate_cell,
+        accessor: 'proxy',
+        Cell: Success_rate_cell,
         default: true,
         ext: true,
         dynamic: true,
         width: 58,
     },
     {
-        key: 'in_bw',
+        id: 'in_bw',
         title: 'BW up',
-        render: ({proxy})=>Tooltip_bytes({bytes: proxy.out_bw}),
+        accessor: 'proxy',
+        Cell: ({value})=>Tooltip_bytes({bytes: value.out_bw}),
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
-        width: 90,
+        width: 60,
     },
     {
-        key: 'out_bw',
+        id: 'out_bw',
         title: 'BW down',
-        render: ({proxy})=>Tooltip_bytes({bytes: proxy.in_bw}),
+        accessor: 'proxy',
+        Cell: ({value})=>Tooltip_bytes({bytes: value.in_bw}),
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
-        width: 90,
+        width: 60,
     },
     {
-        key: 'bw',
+        id: 'bw',
         title: 'BW',
-        render: ({proxy})=>Tooltip_bytes({bytes: proxy.bw,
-            bytes_out: proxy.out_bw, bytes_in: proxy.in_bw}),
+        accessor: 'proxy',
+        Cell: ({value})=>Tooltip_bytes({bytes: value.bw,
+            bytes_out: value.out_bw, bytes_in: value.in_bw}),
         default: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
-        width: 90,
+        width: 60,
     },
     {
-        key: 'reqs',
+        id: 'reqs',
         title: 'Requests',
-        render: Reqs_cell,
+        Cell: Reqs_cell,
         default: true,
         ext: true,
         tooltip: 'Number of all requests sent from this proxy port',
@@ -456,24 +494,49 @@ const columns = [
         grow: 1,
         width: 60,
     },
-    {
-        key: 'browser',
+    ...is_local() ? [{
+        id: 'browser',
         title: 'Browser',
-        render: Browser_cell,
+        accessor: 'proxy',
+        Cell: Browser_cell,
         default: true,
         tooltip: 'Open browser configured with this port',
         width: 80,
         grow: 0,
         shrink: 0,
         hide_col_title: true,
+    }] : [],
+    {
+        id: 'actions',
+        title: 'Actions',
+        tooltip: `Delete/duplicate/refresh sessions/open browser`,
+        ext: true,
+        sticky: true,
+        Cell: Actions_cell,
+        width: 10,
+        maxWidth: 10,
+        minWidth: 10,
+        shrink: 0,
+        grow: 0,
+        csv: false,
+        hide_col_title: true,
     },
-];
 
-const columns_obj = Object.keys(columns)
-    .reduce((acc, col)=>({...acc, [columns[col].key]: columns[col]}), {});
+].map(col=>Object.assign({
+    Header: Header_cell,
+    accessor: ({proxy})=>proxy[col.id]||'',
+    width: 30,
+    maxWidth: 50,
+    minWidth: 50,
+}, col));
 
 class Columns_modal extends Pure_component {
-    state = {selected_cols: []};
+    constructor(props){
+        super(props);
+        this.state = {
+            selected_cols: [],
+        };
+    }
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
             if (!settings)
@@ -484,20 +547,23 @@ class Columns_modal extends Pure_component {
             Object.assign(acc, {[e]: true}), {});
         this.setState({selected_cols, saved_cols: selected_cols});
     }
-    on_change = ({target: {value}})=>{
+    on_change = value=>{
         this.setState(prev=>({selected_cols: {
             ...prev.selected_cols,
             [value]: !prev.selected_cols[value],
         }}));
     };
     click_ok = ()=>{
-        const new_columns = Object.keys(this.state.selected_cols).filter(c=>
+        const new_columns = keys(this.state.selected_cols).filter(c=>
             this.state.selected_cols[c]);
         this.props.update_selected_cols(new_columns);
         window.localStorage.setItem('columns', JSON.stringify(
             this.state.selected_cols));
+        this.props.on_hide();
     };
-    click_cancel = ()=>this.setState({selected_cols: this.state.saved_cols});
+    click_cancel = ()=>
+        this.setState({selected_cols: this.state.saved_cols},
+            this.props.on_hide);
     select_all = ()=>{
         this.setState({selected_cols: columns.filter(c=>!c.sticky)
             .reduce((acc, e)=>Object.assign(acc, {[e.key]: true}), {})});
@@ -508,29 +574,46 @@ class Columns_modal extends Pure_component {
             .reduce((acc, e)=>Object.assign(acc, {[e.key]: true}), {})});
     };
     render(){
-        const header = <div className="header_buttons">
-          <button onClick={this.select_all} className="btn btn_lpm">
-            <T>Check all</T></button>
-          <button onClick={this.select_none} className="btn btn_lpm">
-            <T>Uncheck all</T></button>
-          <button onClick={this.select_default} className="btn btn_lpm">
-            <T>Default</T></button>
-        </div>;
-        return <Modal id="edit_columns" custom_header={header}
-          click_ok={this.click_ok} cancel_clicked={this.click_cancel}>
-          <div className="row columns">
+        const header = <Inline_wrapper>
+          <Button
+            onClick={this.select_all}
+            text="Check all"
+            variant="secondary"
+            size="sm"
+          />
+          <Button
+            onClick={this.select_none}
+            text="Uncheck all"
+            variant="secondary"
+            size="sm"
+          />
+          <Button
+            onClick={this.select_default}
+            text="Default"
+            variant="secondary"
+            size="sm"
+          />
+        </Inline_wrapper>;
+        const content = <div className="row columns">
             {columns.filter(col=>!col.sticky).map(col=>
-              <div key={col.key} className="col-md-6">
-                  <Checkbox
-                    text={t(col.title)}
-                    value={col.key}
-                    on_change={this.on_change}
-                    checked={!!this.state.selected_cols[col.key]}
-                  />
-              </div>
+                <div key={col.id} className="col-md-6">
+                    <Checkbox
+                        label={t(col.title||col.id)}
+                        onChange={this.on_change.bind(this, col.id)}
+                        checked={!!this.state.selected_cols[col.id]}
+                    />
+                </div>
             )}
-          </div>
-        </Modal>;
+        </div>;
+        return <Popup
+            show={this.props.show}
+            onOk={this.click_ok}
+            onCancel={this.click_cancel}
+            title={header}
+            content={content}
+            shadow="sm"
+            size="lg"
+        />;
     }
 }
 
@@ -541,8 +624,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         super(props);
         let from_storage = JSON.parse(window.localStorage.getItem(
             'columns'))||{};
-        from_storage = Object.keys(from_storage).filter(c=>from_storage[c]);
-        const default_cols = columns.filter(c=>c.default).map(col=>col.key);
+        from_storage = keys(from_storage).filter(c=>from_storage[c]);
+        const default_cols = columns.filter(c=>c.default).map(col=>col.id);
         this.state = {
             selected_cols: from_storage.length && from_storage || default_cols,
             proxies: [],
@@ -556,7 +639,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             open_delete_dialog: false,
             delete_proxies: [],
             errors: [],
-            err_ntf_list: []
+            err_ntf_list: [],
+            show_errors_modal: false,
+            show_columns_modal: false,
         };
         setdb.set('head.proxies.update', this.update);
     }
@@ -599,6 +684,22 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     willUnmount(){
         window.clearTimeout(this.timeout_id);
         window.removeEventListener('resize', this.update_window_dimensions);
+    }
+    get select_rows_col(){
+        return {
+            id: 'select_rows',
+            Header: Select_rows_header,
+            Cell: Select_row_cell,
+            mgr: this,
+            ext: true,
+            sticky: true,
+            width: 20,
+            maxWidth: 20,
+            minWidth: 20,
+            shrink: 0,
+            grow: 0,
+            csv: false,
+        };
     }
     get_visible_proxies = (proxies, proxy_filter, sort)=>{
         if (proxy_filter===undefined)
@@ -727,29 +828,24 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     };
     edit_columns = ()=>{
         ws.post_event('Toolbar Edit Columns Clicked');
-        $('#edit_columns').modal('show');
+        this.setState({show_columns_modal: true});
+    };
+    hide_edit_columns = ()=>{
+        this.setState({show_columns_modal: false});
     };
     update_selected_columns = new_columns=>
         this.setState({selected_cols: new_columns});
-    select_renderer = function Select_renderer(props){
-        if (props.rowData=='filler')
-            return <div className="cp_td"></div>;
-        const {selected_proxies} = this.state;
-        const checked = !!selected_proxies[props.rowData.port];
-        return <Checkbox
-          checked={checked}
-          on_change={()=>this.on_row_select(props.rowData)}
-          on_click={e=>e.stopPropagation()}
-        />;
-    };
-    on_row_select = proxy=>{
-        const {selected_proxies} = this.state;
+    on_row_select = (proxy, value, e)=>{
+        e.stopPropagation();
+        const {selected_proxies, visible_proxies} = this.state;
         const new_selected = Object.assign({}, selected_proxies);
-        if (selected_proxies[proxy.port])
+        if (!value)
             delete new_selected[proxy.port];
         else
             new_selected[proxy.port] = proxy;
-        this.setState({selected_proxies: new_selected});
+        const checked_all = value &&
+            keys(new_selected).length==visible_proxies.length;
+        this.setState({selected_proxies: new_selected, checked_all});
     };
     all_rows_select = ()=>{
         const checked_all = !this.state.checked_all;
@@ -760,19 +856,13 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             }, {}) : {};
         this.setState({selected_proxies, checked_all});
     };
-    show_error_ntf = err_ntf_list=>{
-        this.setState({err_ntf_list});
-        $('#proxy_errors').modal('show');
-    };
-    cell_renderer = function Cell_renderer(props){
-        return <Cell {...props}
-            mgr={this}
-            history={this.props.history}
-            open_delete_dialog={this.open_delete_dialog}
-            show_error_ntf={this.show_error_ntf}/>;
-    };
-    on_row_click = e=>{
-        const proxy = e.rowData;
+    show_error_ntf = err_ntf_list=>
+        this.setState({err_ntf_list, show_errors_modal: true});
+    hide_error_ntf = ()=>
+        this.setState({err_ntf_list: [], show_errors_modal: false});
+    on_row_click = ({proxy})=>{
+        if (!document.getSelection().isCollapsed)
+            return;
         if (proxy.proxy_type!='persist')
             return;
         if (proxy.master_port)
@@ -780,34 +870,27 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         ws.post_event('Proxy Port Click', {port: proxy.port});
         this.props.history.push(`/proxy/${proxy.port}`);
     };
-    get_cols = ()=>{
-        if (!is_local())
-        {
-            const actions_idx = columns.findIndex(col=>col.key=='actions');
-            columns[actions_idx].width = 60;
-        }
-        return columns.filter(col=>{
-            if (col.sticky)
-                return true;
-            if (col.calc_show && col.calc_show(this.state.visible_proxies||[]))
-                return true;
-            if (col.calc_available && !col.calc_available(this.state.settings))
-                return false;
-            return this.state.selected_cols.includes(col.key);
-        });
-    };
+    get_cols = ()=>[this.select_rows_col, ...columns].filter(col=>{
+        if (col.sticky)
+            return true;
+        if (col.calc_show && col.calc_show(this.state.visible_proxies||[]))
+            return true;
+        return this.state.selected_cols.includes(col.id);
+    });
     open_delete_dialog = proxies=>{
         this.setState({delete_proxies: proxies, open_delete_dialog: true});
     };
     close_delete_dialog = ()=>{
         this.setState({open_delete_dialog: false});
     };
-    set_proxy_filter(e){
-        let proxy_filter = e.target.value;
-        const visible_proxies = this.get_visible_proxies(this.state.proxies,
-            proxy_filter);
-        this.setState({proxy_filter, visible_proxies, selected_proxies: {}});
-    }
+    set_proxy_filter = value=>{
+        this.setState({
+            visible_proxies: this.get_visible_proxies(this.state.proxies,
+                value),
+            proxy_filter: value,
+            selected_proxies: {},
+        });
+    };
     set_sort({sortBy: sort_by, sortDirection: sort_direction}){
         if (sort_by=='select')
             return;
@@ -817,9 +900,15 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             undefined, sort);
         this.setState({sort, visible_proxies, selected_proxies: {}});
     }
+    get_row_data = proxy=>({
+        proxy,
+        mgr: this,
+    });
     render(){
-        let {proxies, visible_proxies, proxy_filter} = this.state;
-        const cols = this.get_cols();
+        let {proxies, visible_proxies, show_columns_modal, proxy_filter}
+            = this.state;
+        let is_loading = !this.state.zones || !this.state.countries
+            || !visible_proxies;
         if (this.state.errors.length)
         {
             return this.state.errors.map(e=>
@@ -827,99 +916,73 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                   {e}
                 </div>);
         }
-        if (!this.state.zones || !this.state.countries || !visible_proxies)
-        {
-            return <div className="proxies_panel">
-              <div className="main_panel vbox">
-                <Loader_small show loading_msg="Loading..."/>
-              </div>
-            </div>;
-        }
-        let {sort_by, sort_direction} = this.state.sort;
         let show_table = !!proxies.length;
-        if (!this.state.zones.zones.length)
+        if (this.state.zones && !this.state.zones.zones.length)
             return <No_zones/>;
         if (this.state.loaded && !show_table)
             return <Proxy_blank/>;
         return <React.Fragment>
-            <div className="main_panel vbox cp_panel proxies_panel">
-              <Header_panel edit_columns={this.edit_columns}
-                download_csv={this.download_csv}
+            <div className="main_panel vbox cp_panel proxies_panel
+                force_no_border">
+              <Header_panel
                 selected={this.state.selected_proxies}
                 open_delete_dialog={this.open_delete_dialog}
+                download_csv={this.download_csv}
+                edit_columns={this.edit_columns}
+                set_proxy_filter={this.set_proxy_filter}
                 proxy_filter={proxy_filter}
-                on_proxy_filter_change={e=>this.set_proxy_filter(e)}/>
+                toggle_stats={this.props.toggle_stats||_.noop}
+                request_stats={this.props.request_stats}
+              />
               {this.state.loaded && show_table &&
-                <div className="main_panel vbox">
-                  <div className="main_panel flex">
-                  <AutoSizer>
-                    {({height, width})=>
-                      <Table width={width}
-                        height={height}
+                <Table.Provider
+                    fullWidth
+                    hideFooter
+                    disableEditing
+                    disablePinning
+                    manualPagination
+                    disableHiding
+                    isLoading={is_loading}
+                    columns={this.get_cols()}
+                    data={visible_proxies.map(this.get_row_data)}
+                >
+                    <Table
+                        rowDensity="busy_bee"
                         onRowClick={this.on_row_click}
-                        onHeaderClick={({dataKey})=>dataKey=='select' &&
-                          this.all_rows_select()}
-                        headerHeight={30}
-                        headerClassName="cp_th"
-                        rowClassName={({index})=>
-                            visible_proxies[index] &&
-                            visible_proxies[index].master_port ?
-                            'cp_tr disabled filler' : 'cp_tr'}
-                        rowHeight={40}
-                        sort={sort=>this.set_sort(sort)}
-                        sortBy={sort_by}
-                        sortDirection={sort_direction.toUpperCase()}
-                        rowCount={visible_proxies.length}
-                        rowGetter={({index})=>
-                          visible_proxies[index]||'filler'}>
-                        <Column key="select"
-                          cellRenderer={this.select_renderer.bind(this)}
-                          label={
-                            <Checkbox
-                              checked={this.state.checked_all}
-                              on_change={()=>null}
-                            />
-                          }
-                          dataKey="select"
-                          className="cp_td"
-                          flexGrow={0}
-                          flexShrink={0}
-                          width={14}/>
-                        {cols.map(col=>
-                          <Column key={col.key}
-                            cellRenderer={this.cell_renderer.bind(this)}
-                            label={col.hide_col_title ? '' : t(col.title)}
-                            className="cp_td"
-                            dataKey={col.key}
-                            flexGrow={col.grow!==undefined ? col.grow : 1}
-                            flexShrink={col.shrink!==undefined ?
-                              col.shrink : 1}
-                            width={col.width||100}/>
-                        )}
-                      </Table>
-                    }
-                  </AutoSizer>
-                  </div>
-                </div>
+                    />
+                </Table.Provider>
               }
             </div>
             <Columns_modal selected_cols={this.state.selected_cols}
-              update_selected_cols={this.update_selected_columns}/>
+              update_selected_cols={this.update_selected_columns}
+              show={show_columns_modal} on_hide={this.hide_edit_columns}/>
             <Delete_dialog open={this.state.open_delete_dialog}
               close_dialog={this.close_delete_dialog}
               proxies={this.state.delete_proxies}
               update_proxies={this.update}/>
-            <Modal className="warnings_modal" id="proxy_errors"
-                   title="Errors:" no_cancel_btn>
-                <Warnings warnings={this.state.err_ntf_list}/>
-            </Modal>
+            <Popup
+                show={this.state.show_errors_modal}
+                onOk={this.hide_error_ntf}
+                cancelDisabled
+                title="Errors"
+                content={<Warnings warnings={this.state.err_ntf_list}/>}
+                shadow="sm"
+                size="lg"
+            />
           </React.Fragment>;
     }
 });
 
 const Header_panel = props=>
     <div className="cp_panel_header">
-      <h2><T>Proxy ports</T></h2>
+      <h2>
+        <Icon_text
+          color="gray_11"
+          name="MenuExpand"
+          verticalAlign="middle"
+          text="All ports"
+        />
+      </h2>
       <Toolbar {...props}/>
     </div>;
 
@@ -941,19 +1004,19 @@ class Delete_dialog extends Pure_component {
             title += `proxy port ${proxies[0].port}?`;
         else
             title += `${proxies.length} proxy ports?`;
-        return <Portal>
-          <Modal_dialog open={open}
+        return <Popup
+            show={open}
+            onOk={this.delete_proxies}
+            onCancel={close_dialog}
             title={title}
-            ok_clicked={this.delete_proxies}
-            cancel_clicked={close_dialog} />
-        </Portal>;
+            content={null}
+            shadow="sm"
+            size="lg"
+        />;
     }
 }
 
-class Toolbar extends Pure_component {
-    state = {
-        filters: false,
-    };
+class Toolbar_old extends Pure_component {
     open_delete_dialog_with_proxies = e=>{
         e.stopPropagation();
         const to_delete = this.get_to_delete();
@@ -964,71 +1027,14 @@ class Toolbar extends Pure_component {
         const {selected} = this.props;
         return Object.values(selected).filter(p=>p.proxy_type=='persist');
     };
-    toggle_filters(){
-        if (!this.state.filters)
-            ws.post_event('Toolbar Filters Clicked');
-        this.setState({filters: !this.state.filters});
-    }
     render(){
-        const {edit_columns, download_csv} = this.props;
         const to_delete = this.get_to_delete();
         return <div className="toolbar">
-            {this.state.filters &&
-              <Search_box val={this.props.proxy_filter}
-                on_change={this.props.on_proxy_filter_change}/>
-            }
-            <Toolbar_button tooltip="Filters"
-              on_click={()=>this.toggle_filters()} id="filters"/>
-            <Toolbar_button tooltip="Edit columns" on_click={edit_columns}
-              id="columns"/>
-            <Toolbar_button tooltip="Download all proxy ports as CSV"
-              on_click={download_csv} id="download"/>
             {!!to_delete.length &&
               <Toolbar_button tooltip="Delete selected proxies"
                 on_click={this.open_delete_dialog_with_proxies} id="remove"/>
             }
           </div>;
-    }
-}
-
-class Cell extends React.Component {
-    shouldComponentUpdate(next_props){
-        if (this.props.dataKey=='last_req.url')
-            return true;
-        return this.props.cellData!=next_props.cellData ||
-            this.props.rowData!=next_props.rowData;
-    }
-    cell_clicked = e=>{
-        const p = this.props.rowData;
-        if (p.master_port)
-            return;
-        e.stopPropagation();
-        ws.post_event('Proxy Port Click', {port: p.port});
-        this.props.history.push({
-            pathname: `/proxy/${p.port}`,
-            state: {field: this.props.dataKey},
-        });
-    };
-    render(){
-        const props = this.props;
-        const col = columns_obj[props.dataKey];
-        const proxy = props.rowData;
-        if (props.rowData=='filler')
-            return <div className="cp_td"></div>;
-        else if (!col.ext && proxy.ext_proxies)
-            return '—';
-        else if (col.render)
-        {
-            const S_cell = col.render;
-            return <span onClick={this.cell_clicked}>
-                <S_cell proxy={props.rowData}
-                  mgr={props.mgr}
-                  col={props.dataKey}
-                  open_delete_dialog={props.open_delete_dialog}
-                  show_error_ntf={props.show_error_ntf}/>
-              </span>;
-        }
-        return props.cellData||'';
     }
 }
 
@@ -1040,6 +1046,36 @@ class Actions extends Pure_component {
     componentWillUnmount(){
         if (this.status_req)
             ajax.abort(this.status_req);
+    }
+    get items(){
+        const persist = this.props.proxy.proxy_type=='persist';
+        return [
+            ...persist ? [
+                {
+                    key: '1',
+                    icon: 'Refresh',
+                    text: 'Refresh',
+                    onClick: this.refresh_sessions,
+                },
+                {
+                    key: '2',
+                    icon: 'Copy',
+                    text: 'Duplicate',
+                    onClick: this.duplicate,
+                },
+                {
+                    key: '1-divider',
+                    type: 'divider'
+                },
+            ] : [],
+            {
+                key: '3',
+                icon: 'Trash',
+                text: 'Delete',
+                onClick: this.open_delete_dialog_with_port,
+                variant: 'negative'
+            }
+        ];
     }
     // XXX krzysztof: this logic is a mess, rewrite it
     get_status = (opt={})=>{
@@ -1119,38 +1155,11 @@ class Actions extends Pure_component {
         this.props.open_delete_dialog([this.props.proxy]);
     };
     render(){
-        const persist = this.props.proxy.proxy_type=='persist';
-        return <div className={is_local() ? 'proxies_actions' :
-          'proxies_actions_local'}>
-            {!!persist &&
-              <React.Fragment>
-                <Action_icon id="remove" scrolling={this.props.scrolling}
-                  on_click={this.open_delete_dialog_with_port}
-                  tooltip="Delete" invisible={!persist}/>
-                <Action_icon id="duplicate" on_click={this.duplicate}
-                  tooltip="Duplicate proxy port" invisible={!persist}
-                  scrolling={this.props.scrolling}/>
-              </React.Fragment>
-            }
-            <Action_icon id="refresh" scrolling={this.props.scrolling}
-              on_click={this.refresh_sessions}
-              tooltip="Refresh Sessions"/>
-          </div>;
+        return <Context_menu
+            tooltip={this.props.tooltip}
+            items={this.items}
+        />;
     }
 }
-
-const Portal = props=>ReactDOM.createPortal(props.children,
-    document.getElementById('del_modal'));
-
-const Action_icon = props=>{
-    let {on_click, invisible, id, tooltip, scrolling} = props;
-    const classes = classnames('action_icon', 'cp_icon', id,
-        {invisible});
-    if (scrolling)
-        return <div className={classes}/>;
-    return <Tooltip title={t(tooltip)}>
-          <div onClick={on_click} className={classes}/>
-        </Tooltip>;
-};
 
 export default Proxies;

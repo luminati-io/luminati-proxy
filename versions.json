@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.410.597",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix handling uninitialized port"
+            }
+        ]
+    },
+    {
         "ver": "1.407.3",
         "type": "stable",
         "changes": [
