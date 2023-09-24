@@ -11,18 +11,40 @@ define(['/util/util.js', '/util/array.js'], function(zutil, zarray){
 var E = {};
 var assign = Object.assign;
 
+function make_csv_error(msg){
+    var e = new Error(msg);
+    e.code = 'csv_error';
+    return e;
+}
+
 // Returns an array of arrays:
 // [['field1', 'field2', 'field3'], ['1','2','3'], [..], ..]
 E.to_arr = function(data, opt){
     opt = assign({field: ',', quote: '"', line: '\n'}, opt);
-    if (opt.cr_as_new_line)
-        data = data.replace(/\r([^\n])/g, '\n$1');
     var line = opt.line, field = opt.field, quote = opt.quote;
-    var i = 0, c = data[i], row = 0, array = [];
+    var i = 0, c = data[i], row = 0, array = [], row_start_pos = i;
+    var stopped_because_of_fail = false;
+    var num_cols = opt.num_cols || 0;
+    function check_strict(){
+        if (!opt.strict)
+            return;
+        if (num_cols>0 && row<array.length &&
+            (array[row].length>1 || array[row][0]) &&
+            num_cols!=array[row].length)
+        {
+            if (opt.return_succesful_rows)
+                return stopped_because_of_fail = true;
+            throw make_csv_error('Number of columns differs on row '
+                +row+': '+array[row].length+'<>'+num_cols);
+        }
+    }
     while (c)
     {
-        while (opt.trim && (c==' ' || c=='\t' || c=='\r'))
+        while (opt.trim && (c==' ' || c=='\t' || c=='\r') ||
+            opt.trim_cr && c=='\r')
+        {
             c = data[++i];
+        }
         var value = '';
         if (c==quote)
         {
@@ -49,7 +71,18 @@ E.to_arr = function(data, opt){
                 }
             } while (c && (c!=quote || data[i+1]==quote));
             if (!c)
-                throw 'Unexpected end of data, no closing quote found';
+            {
+                if (opt.return_succesful_rows)
+                {
+                    stopped_because_of_fail = true;
+                    break;
+                }
+                else
+                {
+                    throw make_csv_error(
+                        'Unexpected end of data, no closing quote found');
+                }
+            }
             c = data[++i];
         }
         else
@@ -67,6 +100,12 @@ E.to_arr = function(data, opt){
             if (c=='\r')
                 c = data[++i];
         }
+        if (opt.trim_cr)
+        {
+            value = value.replace(/\r+$/, '');
+            if (c=='\r')
+                c = data[++i];
+        }
         // add the value to the array
         if (array.length<=row)
             array.push([]);
@@ -74,13 +113,30 @@ E.to_arr = function(data, opt){
         // go to the next row or column
         if (c==field);
         else if (c==line)
+        {
+            if (check_strict())
+                break;
+            if (!num_cols && array[row].length>1)
+                num_cols = array[row].length;
             row++;
+            row_start_pos = i+1;
+        }
         else if (c)
-            throw 'Delimiter expected after character '+i;
+            throw make_csv_error('Delimiter expected after character '+i);
         c = data[++i];
     }
     if (i && data[i-1]==field)
         array[row].push('');
+    if (!stopped_because_of_fail)
+        check_strict();
+    if (stopped_because_of_fail)
+    {
+        // pop only if row was already added to array
+        if (row<array.length)
+            array.pop();
+        if (opt.return_last_good_position)
+            return {array: array, i: i, row_start_pos: row_start_pos};
+    }
     return array;
 };
 
@@ -92,12 +148,12 @@ E.to_obj = function(data, opt){
         return arr;
     var i, result = [], headers = arr[0];
     if ((i = headers.indexOf(''))!=-1)
-        throw new Error('Field '+i+' has unknown name');
+        throw make_csv_error('Headers row-Missing column name for field ' + i);
     for (i=1; i<arr.length; i++)
     {
         var obj = {};
         if (arr[i].length > headers.length)
-            throw new Error('Line '+i+' has more fields than header');
+            throw make_csv_error('Line '+i+' has more fields than header');
         for (var j=0; j<arr[i].length; j++)
             obj[headers[j]] = arr[i][j];
         result.push(obj);
@@ -117,10 +173,19 @@ E.escape_field = function(v, opt){
     if (is_complex(v))
         v = JSON.stringify(v);
     else
+    {
         v = ''+v;
-    if (!/["'\n,]/.test(v))
-        return v;
-    return '"'+v.replace(/"/g, '""')+'"';
+        if (opt && opt.escape_replace)
+        {
+            v = v
+                .replace(new RegExp(opt.field||',', 'g'), '.')
+                .replace(/"/g, "'")
+                .replace(/\s+/g, ' ');
+        }
+    }
+    var quote_needed = opt && opt.quote_needed || /["'\n,]/.test(v) ||
+        opt && opt.quote_spaces && v && v.includes(' ');
+    return quote_needed ? '"'+v.replace(/"/g, '""')+'"' : v;
 };
 
 function flatten(obj, opt, keys){

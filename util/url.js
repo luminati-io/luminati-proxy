@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports && module.children;
@@ -77,9 +77,29 @@ E.get_root_domain = function(domain){
     return root.join('.');
 };
 
+E.get_nth_level_domain = function(domain, level, strip_www){
+    if (E.is_ip(domain))
+        return domain;
+    var root = E.get_root_domain(domain);
+    var sub = domain.replace(root, '').split('.')
+        .filter(function(s){ return s; });
+    var www = '';
+    if (sub[0]=='www')
+        www = sub.shift()+'.';
+    sub = sub.length-level+1>0 ? sub.slice(sub.length-level+1) : sub;
+    sub = sub.join('.');
+    if (sub)
+        sub += '.';
+    if (!strip_www)
+        sub = www+sub;
+    return sub+root;
+};
+
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
-    var match = email.toLowerCase().match(/^[a-z0-9_.\-+*%]+@(.*)$/);
+    // XXX viktor: /^[\p{L}0-9_.\-+*%!]+@(.*)$/u works only in ES9
+    var match = String(email||'').toLowerCase()
+        .match(/^[a-z0-9_.\-+*%!ö]+@(.*)$/);
     return match && match[1];
 };
 
@@ -93,6 +113,13 @@ E.get_root_domain_email = function(email){
 E.get_path = function(url){
     var n = url.match(/^https?:\/\/[^\/]+(\/.*$)/);
     return n ? n[1] : '';
+};
+
+E.to_path = function(str){
+    var url = str;
+    if (url[0] != '/' && !str.startsWith('http'))
+        url = '/' + url;
+    return E.parse(url).pathname;
 };
 
 E.get_proto = function(url){
@@ -164,12 +191,22 @@ E.num2ip = function(num){
     return (num>>>24)+'.'+(num>>16 & 255)+'.'+(num>>8 & 255)+'.'+(num & 255);
 };
 
+E.get_subnet24 = function(ip){
+    return ip.substr(0, ip.lastIndexOf('.'))+'.0/24';
+};
+
 E.is_ip_subnet = function(host){
     var m = /(.+?)\/(\d+)$/.exec(host);
     return m && E.is_ip(m[1]) && +m[2]<=32;
 };
 
+E.cbl_key2sub = function(ip){
+    return ip.replace(/_/g, '.')+'/24';
+};
+
 E.is_ip_netmask = function(host){
+    if (!host || typeof host.split !== 'function')
+        return false;
     var ips = host.split('/');
     if (ips.length!=2 || !E.is_ip(ips[0]) || !E.is_ip_mask(ips[1]))
         return false;
@@ -177,6 +214,8 @@ E.is_ip_netmask = function(host){
 };
 
 E.is_ip_range = function(host){
+    if (typeof host.split !== 'function')
+        return false;
     var ips = host.split('-');
     if (ips.length!=2 || !E.is_ip(ips[0]) || !E.is_ip(ips[1]))
         return false;
@@ -197,9 +236,14 @@ E.is_valid_url = function(url){
 E.is_valid_domain = function(domain){
     return /^([a-z0-9]([a-z0-9-_]*[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain); };
 
-// XXX josh: move to email.js:is_valid
+E.is_http_url = function(url){
+    return /^https?:\/\//.test(url) && E.is_valid_url(url); };
+
+// XXX josh: migrate callers to email.js:is_valid and drop
+// XXX josh: is_signup is a nonsense flag for this fn, migrate callers to using
+// email.js:is_valid_signup_email()
 E.is_valid_email = function(email, is_signup){
-    if (!email)
+    if (!email || typeof email!='string')
         return false;
     var re = /^[a-z0-9_\-+*]+(?:\.[a-z0-9_\-+*]+)*@(.*)$/;
     var n = email.toLowerCase().match(re);
@@ -229,7 +273,7 @@ E.is_email_need_sanitize = function(email){
 // XXX vadimr: move to email.js:sanitize
 E.sanitize_email = function(email){
     var main = E.get_main_email(email);
-    if(!main)
+    if (!main)
         return;
     var sp = main.split('@');
     return sp[0].replace(/\.*/g, '')+'@'+sp[1];
@@ -261,11 +305,11 @@ E.is_ip_local = function(ip){
 };
 
 E.host_lookup = function(lookup, host){
-    var pos;
+    var pos, res;
     while (1)
     {
-        if (host in lookup)
-            return lookup[host];
+        if (res = lookup[host])
+            return res;
         if ((pos = host.indexOf('.'))<0)
             return;
         host = host.slice(pos+1);
@@ -297,7 +341,8 @@ E.parse = function(url, strict){
             m[i] = m[i]===undefined ? null : m[i];
         return m;
     }
-    url = url||location.href;
+    if (!(url = url || !is_node&&location.href))
+        return {};
     var uri = {orig: url};
     url = replace_slashes(url);
     var m, remaining = url;
@@ -478,12 +523,45 @@ E.qs_str = function(qs){
 
 E.qs_add = function(url, qs){
     var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {}, qs);
-    u.path = u.pathname+'?'+E.qs_str(q);
+    var query = E.qs_str(q);
+    u.path = u.pathname+(query ? '?'+query : '');
+    return E.uri_obj_href(u);
+};
+
+E.qs_remove = function(url, qs){
+    var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {});
+    qs.forEach(function(query){ delete q[query]; });
+    var query = E.qs_str(q);
+    u.path = u.pathname+(query ? '?'+query : '');
     return E.uri_obj_href(u);
 };
 
 E.qs_parse_url = function(url){
-    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, ''));
+    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, '').replace(/#.*$/,''));
+};
+
+var INVALID_PATH_REGEX = /[^\u0021-\u00ff]/;
+E.escape_path = function(path){
+    return INVALID_PATH_REGEX.test(path) ? encodeURI(path) : path;
+};
+
+E.remove_protocol = function(url){
+    var any_protocol_regex = /(^\w+:|^)\/\//;
+    return url.replace(any_protocol_regex, '');
+};
+
+E.remove_www = function(url){ return url.replace(/^www\./, ''); };
+
+E.is_same_domain = function(domain, urls){
+    var hostname = E.parse(domain).hostname;
+    var _domain = E.get_root_domain(hostname);
+    for (var i=0; i<urls.length; i++)
+    {
+        var d = E.get_root_domain(E.parse(urls[i]).hostname);
+        if (!(d==_domain || d.endsWith(_domain)))
+            return false;
+    }
+    return true;
 };
 
 return E; }); }());

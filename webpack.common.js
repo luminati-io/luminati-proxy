@@ -7,11 +7,11 @@ const mk_url_loader = mimetype=>[{
     options: {limit: '100000', fallback: 'file-loader', mimetype},
 }];
 module.exports = {
-    context: `${__dirname}/src/pub`,
+    context: `${__dirname}/src/`,
     entry: {
-        app: './app.js',
-        vendor: ['jquery', 'lodash', 'moment', 'bootstrap',
-            'bootstrap/dist/css/bootstrap.css', 'codemirror/lib/codemirror',
+        app: './pub/app.js',
+        vendor: ['jquery', 'lodash4', 'moment', 'bootstrap',
+        'bootstrap/dist/css/bootstrap.css', 'codemirror/lib/codemirror',
             'codemirror/lib/codemirror.css', 'react-bootstrap', 'react',
             'codemirror/mode/javascript/javascript', 'react-dom',
             'regenerator-runtime', 'es6-shim', 'animate.css'],
@@ -22,21 +22,33 @@ module.exports = {
         filename: '[chunkhash].[name].js',
     },
     plugins: [
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^\.\/locale$/,
+            contextRegExp: /moment$/
+        }),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
         }),
-        new html_webpack_plugin({inject: true, template: 'index.html'}),
+        new html_webpack_plugin({inject: true, template: './pub/index.html'}),
     ],
     optimization: {
         runtimeChunk: 'single',
         minimize: false,
     },
+    watchOptions: {
+        poll: true,
+        ignored: /node_modules/
+    },
     module: {
         rules: [
             {
                 test: /src[\\/]pub[\\/].+\.js$/,
+                exclude: /node_modules/,
+                use: ['babel-loader'],
+            },
+            {
+                test: /src[\\/]pub2[\\/].+\.js$/,
                 exclude: /node_modules/,
                 use: ['babel-loader'],
             },

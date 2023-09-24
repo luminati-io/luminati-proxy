@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node*/
+'use strict'; /*jslint node:true*/
 require('./config.js');
 const fs = require('fs');
 const string = require('./string.js');
@@ -15,11 +15,10 @@ const exec = require('./exec.js');
 const os = require('os');
 const E = exports;
 const env = process.env, qw = string.qw, KB = 1024, MB = KB*KB;
-var ffi_napi;
-try { ffi_napi = require('ffi-napi'); } catch(e){}
-const libc = ffi_napi && !file.is_darwin ? ffi_napi.Library('libc',
-    {fallocate: ['int', ['int', 'int', 'long', 'long']]}) : undefined;
+let fallocate;
+try { fallocate = require('fallocate-uint32'); } catch(e){}
 const BIN_IP = '/bin/ip';
+const PROC_DIR = env.PROC_DIR||'/proc';
 
 var distro_release;
 var procfs_fmt = {
@@ -71,6 +70,7 @@ E.meminfo_parse = function(info){
         case 'MemFree': mem.memfree = m[2]*KB; break;
         case 'Buffers': mem.buffers = m[2]*KB; break;
         case 'Cached': mem.cached = m[2]*KB; break;
+        case 'MemAvailable': mem.memfree_all = m[2]*KB; break;
         }
     }
     return mem;
@@ -80,11 +80,11 @@ E.meminfo_parse = function(info){
 E.meminfo = function(){
     if (file.is_darwin)
         return {memtotal: os.totalmem(), memfree_all: os.freemem()};
-    var info = cyg_read('/proc/meminfo');
+    var info = cyg_read(`${PROC_DIR}/meminfo`);
     var mem = E.meminfo_parse(info);
-    mem.buffers = mem.buffers||0; // openvz does not always have Buffers
+    mem.buffers = mem.buffers||0;
     mem.cached = mem.cached||0; // cygwin does not have Cached
-    mem.memfree_all = mem.memfree+mem.buffers+mem.cached;
+    mem.memfree_all = mem.memfree_all||mem.memfree+mem.buffers+mem.cached;
     return mem;
 };
 E.freemem = function(){ return E.meminfo().memfree_all; };
@@ -152,13 +152,13 @@ E.is_release = function(releases, no_cache){
 };
 
 E.fallocate = function(fd, len, offset, mode){
-    if (libc.fallocate(fd, mode||0, offset||0, len)!=0)
+    let ret = fallocate(fd, mode||0, offset||0, len);
+    if (ret)
     {
-        let errno = ffi_napi.errno();
-        if (errno==95) // EOPNOTSUPP
+        if (ret == -95) // EOPNOTSUPP
             fs.ftruncateSync(fd, len);
         else
-            throw new Error(`fallocate failed: ${errno}`);
+            throw new Error(`fallocate failed: ${ret}`);
     }
 };
 
@@ -172,14 +172,13 @@ E.swapon = function(){
             return;
         cli.exec_rt_e('mkswap '+swapfile);
     }
-    // XXX sergey: some openvz does not support swapon, ignore it
     cli.exec_rt('swapon '+swapfile);
 };
 E.swapoff = function(){ cli.exec_rt('swapoff '+swapfile); };
 E.swap_usage = function(){
     if (file.is_darwin)
         return {count: 0, usage: 0};
-    let swaps = cyg_read_lines('/proc/swaps').slice(1);
+    let swaps = cyg_read_lines(`${PROC_DIR}/swaps`).slice(1);
     let ret = {count: swaps.length, usage: 0};
     if (!swaps.length)
         return ret;
@@ -239,7 +238,7 @@ E.cpus = function(){
             cpus.all[item] = cpus.reduce((p, c)=>p+c[item], 0)/res.length;
         return cpus;
     }
-    var ll = cyg_read_lines('/proc/stat');
+    var ll = cyg_read_lines(`${PROC_DIR}/stat`);
     ll.forEach(l=>{
         if (!/^cpu\d* /.test(l))
             return;
@@ -264,8 +263,8 @@ E.cpu_threads = function(){
     };
     E.ps().forEach(pid=>{
         if (file.is_win)
-            return read_stat('/proc', pid);
-        let taskdir = `/proc/${pid}/task`;
+            return read_stat(PROC_DIR, pid);
+        let taskdir = `${PROC_DIR}/${pid}/task`;
         cyg_readdir(taskdir).forEach(tid=>read_stat(taskdir, tid));
     });
     return res;
@@ -282,7 +281,7 @@ E.cpu_threads_usage = function(){
 };
 
 E.cpus_prev = [null, null];
-E.cpu_usage = function(cpus_curr, cpus_prev){
+let calc_cpu_usage = function(cpus_curr, cpus_prev){
     var p = cpus_prev||E.cpus_prev;
     cpus_curr = cpus_curr||E.cpus();
     var zero = {all: 0, single: 0};
@@ -303,12 +302,23 @@ E.cpu_usage = function(cpus_curr, cpus_prev){
         p[1] = p[0];
         p[0] = cpus_curr;
     }
-    const total_per_cpu = d.all.total/d.length;
-    const threads = E.cpu_threads_usage();
-    return {all: d.all.busy_ratio,
+    return {
+        all: d.all.busy_ratio,
         single: Math.max.apply(null, d.map(e=>e.busy_ratio)),
-        thread_single: Math.max.apply(null, threads.map(x=>x/total_per_cpu)),
-        diff: d};
+        diff: d,
+    };
+};
+E.cpu_usage = function(cpus_curr, cpus_prev){
+    let ret = calc_cpu_usage(cpus_curr, cpus_prev);
+    if (!ret.diff)
+        return ret;
+    let threads = E.cpu_threads_usage();
+    let total_per_cpu = ret.diff.all.total/ret.diff.length;
+    let thread_single = Math.max.apply(null, threads.map(x=>x/total_per_cpu));
+    return Object.assign(ret, {thread_single});
+};
+E.cpu_usage_all = function(cpus_curr, cpus_prev){
+    return calc_cpu_usage(cpus_curr, cpus_prev).all;
 };
 if (!file.is_darwin)
     E.cpu_usage(); // init
@@ -405,7 +415,7 @@ function beancounter_value(value){
 
 E.beancounters = function(){
     try {
-        var info = file.read_lines_e('/proc/user_beancounters')
+        var info = file.read_lines_e(`${PROC_DIR}/user_beancounters`)
         .slice(2).map(line=>line.slice(12).split(/[^\w]+/g));
         var data = {total_failcnt: 0};
         info.forEach(line=>{
@@ -438,13 +448,13 @@ E.TCP = { // net/tcp_states.h
 E.sockets_count = proto=>etask(function*(){
     let line_idx = -1, v = {total: 0, lo: 0, ext: 0, err: 0};
     zutil.forEach(E.TCP, id=>v[id] = 0);
-    yield efile.read_line_cb_e('/proc/net/'+proto, conn=>{
+    yield efile.read_line_cb_e(`${PROC_DIR}/net/${proto}`, conn=>{
         line_idx++;
         if (!conn || !line_idx)
             return;
         let start;
         if ((start = conn.indexOf(':'))==-1)
-            return void(v.err++);
+            return void (v.err++);
         v.total++;
         if (conn.substr(start+2, 8)=='0100007F')
             v.lo++;
@@ -457,8 +467,28 @@ E.sockets_count = proto=>etask(function*(){
     return v;
 });
 
+E.netstat = ()=>{
+    const netstat_path = `${PROC_DIR}/net/netstat`;
+    const ll = file.read_lines_e(netstat_path), data = {};
+    for (let i = 0; i<ll.length; i += 2)
+    {
+        const counters = ll[i].split(' ');
+        const values = ll[i+1].split(' ');
+        if (counters[0]!=values[0])
+            throw new Error(`Can't parse ${netstat_path} lines ${i}, ${i+1}`);
+        const ext_name = string.to_snake_case(counters[0].slice(0, -1));
+        data[ext_name] = {};
+        for (let j = 1; j<values.length; j++)
+        {
+            data[ext_name][string.to_snake_case(counters[j])] =
+                parseInt(values[j], 10);
+        }
+    }
+    return data;
+};
+
 E.tcp_stats = ()=>{
-    let ll = file.read_lines_e('/proc/net/snmp'), i = 0;
+    let ll = file.read_lines_e(`${PROC_DIR}/net/snmp`), i = 0;
     for (; i<ll.length && !ll[i].startsWith('Tcp'); i++);
     if (i<ll.length-1)
     {
@@ -469,7 +499,7 @@ E.tcp_stats = ()=>{
 };
 
 E.udp_stats = ()=>{
-    let ll = file.read_lines_e('/proc/net/snmp'), i = 0;
+    let ll = file.read_lines_e(`${PROC_DIR}/net/snmp`), i = 0;
     for (; i<ll.length && !ll[i].startsWith('Udp'); i++);
     if (i<ll.length-1)
     {
@@ -481,7 +511,7 @@ E.udp_stats = ()=>{
 };
 
 E.vmstat = function(){
-    var vmstat = file.read_lines_e('/proc/vmstat');
+    var vmstat = file.read_lines_e(`${PROC_DIR}/vmstat`);
     var ret = {};
     for (var i=0; i<vmstat.length; i++)
     {
@@ -548,7 +578,7 @@ E.diskstats_sys = function(dev, inflight){
 E.diskstats = function(){
     // https://www.kernel.org/doc/Documentation/iostats.txt
     let diskstats;
-    if (!(diskstats = cyg_read_lines('/proc/diskstats')))
+    if (!(diskstats = cyg_read_lines(`${PROC_DIR}/diskstats`)))
         return;
     let ret = {};
     for (let i=0; i<diskstats.length; i++)
@@ -611,7 +641,7 @@ E.node = function(){
 };
 
 E.ps = function(){
-    return cyg_readdir('/proc').filter(p=>/^\d+$/.test(p)).map(p=>+p)
+    return cyg_readdir(PROC_DIR).filter(p=>/^\d+$/.test(p)).map(p=>+p)
     .sort((a, b)=>a-b);
 };
 
@@ -624,7 +654,7 @@ E.fd_use = opt=>etask(function*(){
     if (!pids.length)
         return res;
     let calc = (o, m)=>o<0 ? 0 : 100*o/m;
-    let ln = file.read_line('/proc/sys/fs/file-nr').split('\t');
+    let ln = file.read_line(`${PROC_DIR}/sys/fs/file-nr`).split('\t');
     if (ln.length==3)
     {
         res.glob.open = +ln[0];
@@ -634,10 +664,10 @@ E.fd_use = opt=>etask(function*(){
     for (let pid of pids)
     {
         pid = ''+pid;
-        let dir = `/proc/${pid}/fd`;
+        let dir = `${PROC_DIR}/${pid}/fd`;
         let open = yield efile.readdir(dir);
         let nopen = efile.error ? -1 : open.length;
-        let ln_re = cyg_read('/proc/'+pid+'/limits'), nmax = -1, m;
+        let ln_re = cyg_read(`${PROC_DIR}/${pid}/limits`), nmax = -1, m;
         if (m = /Max open files\s+([0-9]+)/g.exec(ln_re))
             nmax = +m[1];
         if (!nmax)
@@ -647,7 +677,7 @@ E.fd_use = opt=>etask(function*(){
         {
             res.use = use;
             res.pid = +pid;
-            let status = cyg_read(`/proc/${pid}/status`);
+            let status = cyg_read(`${PROC_DIR}/${pid}/status`);
             if (m = /^Name:\t(.*)/.exec(status))
                 res.name = m[1];
         }
@@ -686,6 +716,13 @@ const parse_pid_stat = stat=>{
     return {pid: +res[1], name: res[2], rss: +(fields[21]||0)*PAGESIZE};
 };
 
-const proc_mem = pid=>parse_pid_stat(cyg_read('/proc/'+pid+'/stat'));
+const proc_mem = pid=>parse_pid_stat(cyg_read(`${PROC_DIR}/${pid}/stat`));
 
 E.ps_mem = ()=>E.ps().map(p=>proc_mem(p));
+
+E.conntrack = function(){
+    const count = +cyg_read(
+        `${PROC_DIR}/sys/net/netfilter/nf_conntrack_count`);
+    const max = +cyg_read(`${PROC_DIR}/sys/net/netfilter/nf_conntrack_max`);
+    return {count, max, use: Math.round(count*100/max)};
+};

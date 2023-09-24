@@ -17,7 +17,7 @@ E.html = function(html){
     return html.replace(/[&<>"']/g, function(m){
         return html_escape_table[m[0]]; });
 };
-E.has_html = function(str) {
+E.has_html = function(str){
     return /[&<>"']/.test(str);
 };
 
@@ -26,7 +26,7 @@ E.sh = function(s_or_a){
         s = ''+s; // supports also numbers
         if (!s)
             return '""';
-        if (/^[a-z0-9_\-.\/:]+$/i.test(s))
+        if (/^[a-z0-9_\-./:]+$/i.test(s))
             return s;
         return '"'+s.replace(/([\\"`$])/g, '\\$1')+'"';
     }
@@ -118,13 +118,16 @@ E.un_sh = function(s, keep_esc){
         argv.push(a);
     }
     if (cur_state!=state.PARSE_STATE_INIT)
-        throw 'error parsing shell';
+        throw new Error('error parsing shell');
     return argv;
 };
 
-E.regex = function(s){ return s.replace(/[[\]{}()*+?.\\^$|\/]/g, '\\$&'); };
+E.regex = function(s){ return s.replace(/[[\]{}()*+?.\\^$|/]/g, '\\$&'); };
 
-E.uri_comp = function(s){ return encodeURIComponent(s).replace(/%20/g, '+'); };
+E.uri_comp = function(s){
+    try { return encodeURIComponent(s).replace(/%20/g, '+'); }
+    catch(e){ return ''; }
+};
 
 var http_escape_chars = [];
 (function(){
@@ -132,7 +135,7 @@ var http_escape_chars = [];
     for (i=0; i<256; i++)
     {
         var c = String.fromCharCode(i);
-        http_escape_chars[i] = /^[a-zA-Z0-9_.~,\-]$/.test(c) ? c :
+        http_escape_chars[i] = /^[a-zA-Z0-9_\-.~,]$/.test(c) ? c :
             '%'+('0'+i.toString(16)).slice(-2);
     }
 }());
@@ -143,8 +146,13 @@ E.encodeURIComponent_bin = function(s_or_b){
     var esc = '';
     // critical perf only for 0<=code<256: encodeURIComponent() will not be
     // called in these cases
+    var c;
     for (var i = 0; i < s.length; i++)
-        esc += http_escape_chars[s.charCodeAt(i)] || encodeURIComponent(s[i]);
+    {
+        c = s.charCodeAt(i);
+        try { esc += http_escape_chars[c]||encodeURIComponent(s[i]); }
+        catch(e){}
+    }
     return esc;
 };
 
@@ -154,8 +162,9 @@ E.qs = function(param, opt){
     var sep = qs || opt.amp ? '&' : '';
     if (!param)
         return qs;
-    var uri_comp = opt.space_plus===undefined || opt.space_plus ? E.uri_comp
-        : encodeURIComponent;
+    var uri_comp = opt.uri_comp ? opt.uri_comp :
+        opt.space_plus===undefined || opt.space_plus ? E.uri_comp :
+        encodeURIComponent;
     var uri_comp_val = opt.bin ? E.encodeURIComponent_bin : uri_comp;
     for (var i in param)
     {
@@ -170,7 +179,7 @@ E.qs = function(param, opt){
         {
             if (!val.length)
                 continue;
-            qs += val.map(function(val){ return key+'='+uri_comp_val(val); })
+            qs += val.map(function(v){ return key+'='+uri_comp_val(v); })
                 .join('&');
         }
         else
@@ -237,7 +246,7 @@ E.parse.http_words = function(val){
         {
             var v = match[1];
             // a quoted value
-            if (match = eat_token(o, /^\s*=\s*\"([^\"\\]*(?:\\.[^\"\\]*)*)\"/))
+            if (match = eat_token(o, /^\s*=\s*"([^"\\]*(?:\\.[^"\\]*)*)"/))
                 res.push([v, match[1].replace(/\\(.)/, '$1')]);
             // some unquoted value
             else if (match = eat_token(o, /^\s*=\s*([^;,\s]*)/))
@@ -247,8 +256,8 @@ E.parse.http_words = function(val){
                 res.push([v, null]);
         }
         else if (match = eat_token(o, /^\s*,/));
-        else if ((match = eat_token(o, /^\s*;/)) || (match = eat_token(o,
-            /^\s+/)));
+        else if (match = eat_token(o, /^\s*;/));
+        else if (match = eat_token(o, /^\s+/));
         else
             throw new Error('This should not happen: '+o.s);
     }
@@ -270,5 +279,35 @@ E.markdown2 = function(val, type){
     }
     return (''+val).replace(re, '\\$&');
 };
+
+E.restore_dates = function(data){
+    if (!data || typeof data!='object')
+        return;
+    var stack = new Array(100), len = 0;
+    stack[len++] = data;
+    while (len>0)
+    {
+        var obj = stack[--len];
+        for (var k in obj)
+        {
+            var v = obj[k];
+            if (typeof v=='string')
+            {
+                var strlen = v.length;
+                if (strlen>=20 && strlen<30 && date_rx.test(v))
+                    obj[k] = new Date(v);
+            }
+            else if (typeof v=='object' && v!=null)
+            {
+                if (!v.constructor || v.constructor==Object)
+                    stack[len++] = v;
+                else if (v.length && Array.isArray(v))
+                    stack[len++] = v;
+            }
+        }
+    }
+    return;
+};
+var date_rx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+([+-]\d{2}:\d{2}|Z)$/;
 
 return E; }); }());

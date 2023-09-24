@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, browser:true*//*global Map*/
+'use strict'; /*jslint node:true, browser:true*//*global Map, BigInt*/
 (function(){
 var define, hash, assert, zerr, vm;
 var is_node = typeof module=='object' && module.exports && module.children;
@@ -34,7 +34,7 @@ else
     vm = require('vm');
     define = require('./require_node.js').define(module, '../');
 }
-define(['/util/util.js'], function(zutil){
+define(['/util/util.js', '/util/date.js'], function(zutil, date){
 var E = {};
 
 var has_map = typeof Map=='function' && Map.prototype.get && Map.prototype.set;
@@ -73,10 +73,40 @@ E.cache_str_fn2 = function(fn){
 E.o = function(oct_str){ return parseInt(oct_str, 8); };
 
 // XXX vladimir: only nodejs
-E.md5 = function(buf, hash_len, encoding){
+E.hash = function(buf, hash_len, encoding, type){
+    type = type||'sha256';
     // update() ignores encoding if buf is a Buffer
-    return hash.createHash('md5').update(buf, encoding||'utf8')
+    return hash.createHash(type).update(buf, encoding||'utf8')
     .digest('hex').slice(0, hash_len);
+};
+
+E.encode_base64_shift = function(data, charset){
+    charset = charset||'ascii';
+    data = Buffer.from(data, charset).toString('base64');
+    if (!data.endsWith('='))
+        data = data.substr(3)+data.substr(0, 3);
+    else
+    {
+        var i = data.indexOf('=');
+        data = data.substring(3, i)+data.substr(0, 3)+data.substr(i);
+    }
+    return data;
+};
+
+E.decode_base64_shift = function(data, charset){
+    charset = charset||'ascii';
+    var i = data.indexOf('=');
+    var l = data.length;
+    if (i==-1)
+        data = data.substr(l-3)+data.substr(0, l-3);
+    else
+        data = data.substr(i-3, 3)+data.substr(0, i-3)+data.substr(i);
+    data = Buffer.from(data, 'base64').toString(charset);
+    return data;
+};
+
+E.md5 = function(buf, hash_len, encoding){
+    return E.hash(buf, hash_len, encoding, 'md5');
 };
 E.md5_zero = function(key, hash_len){
     assert(hash_len<=32, 'invalid hash len'+hash_len);
@@ -88,15 +118,15 @@ E.md5_etag = function(buf){ return E.md5(buf, 8); };
 
 E.inet_ntoa_t = function(ip){
     return ((ip & 0xff000000)>>>24)+'.'+((ip & 0xff0000)>>>16)+'.'
-    +((ip & 0xff00)>>>8)+'.'+(ip & 0xff);
+        +((ip & 0xff00)>>>8)+'.'+(ip & 0xff);
 };
 
 E.inet_addr = function(ip){
     var code, res = 0, shift = 24, num = undefined;
     ip = ''+ip;
-    for (var i = 0, l = ip.length; i < l; ++i)
+    for (var i = 0, l = ip.length; i<l; ++i)
     {
-            code = ip.charCodeAt(i);
+        code = ip.charCodeAt(i);
         if (code>47&&code<58)
         {
             num = (num||0)*10+code-48;
@@ -181,12 +211,37 @@ E.flags_from_str = function(s, conv){
 };
 
 E.scale_vals = {
-    1000: [{s: '', n: 1}, {s: 'K', n: 1e3}, {s: 'M', n: 1e6},
-        {s: 'G', n: 1e9}, {s: 'T', n: 1e12}, {s: 'P', n: 1e15}],
-    1024: [{s: '', n: 1}, {s: 'K', n: 1024}, {s: 'M', n: Math.pow(1024, 2)},
-        {s: 'G', n: Math.pow(1024, 3)}, {s: 'T', n: Math.pow(1024, 4)},
-        {s: 'P', n: Math.pow(1024, 5)}],
+    si: [
+        {s: '', n: 1},
+        {s: 'K', n: 1e3},
+        {s: 'M', n: 1e6},
+        {s: 'G', n: 1e9},
+        {s: 'T', n: 1e12},
+        {s: 'P', n: 1e15},
+    ],
+    ss: [
+        {s: '', n: 1},
+        {s: 'K', n: 1e3},
+        {s: 'M', n: 1e6},
+        {s: 'B', n: 1e9},
+        {s: 'T', n: 1e12},
+    ],
+    $: [
+        {s: '', n: 1},
+        {s: 'K', n: 1e3},
+        {s: 'M', n: 1e6},
+        {s: 'G', n: 1e9},
+    ],
+    1024: [
+        {s: '', n: 1},
+        {s: 'K', n: 1024},
+        {s: 'M', n: Math.pow(1024, 2)},
+        {s: 'G', n: Math.pow(1024, 3)},
+        {s: 'T', n: Math.pow(1024, 4)},
+        {s: 'P', n: Math.pow(1024, 5)},
+    ],
 };
+E.scale_vals['1000'] = E.scale_vals.si;
 
 E.scaled_number = function(num, opt){
     opt = opt||{};
@@ -234,18 +289,151 @@ E.scaled_bytes = function(num, opt){
     return E.scaled_number(num, Object.assign({base: 1000}, opt)); };
 
 E.fmt_currency = function(amount, digits, currency_sign){
-    if (amount===undefined)
-        return;
-    if (digits===undefined)
-        digits = 2;
-    if (currency_sign===undefined)
-        currency_sign = '$';
-    var sign = amount<0 ? '-' : '';
-    amount = Math.abs(amount);
-    amount = (+amount).toLocaleString('en-GB', {useGrouping: true,
-        maximumFractionDigits: digits})||amount;
-    return sign+currency_sign+amount;
+    return E.fmt_num(amount, {style: 'currency', max_digits: digits,
+        unit: currency_sign});
 };
+
+// opt:
+// - style:str (default: guessed based on unit, 'decimal' if unable to guess)
+// - unit:str (default: '')
+// - spaced_unit:bool (default: unit.length>3)
+// - scaling:bool (default: style-dependent)
+// - min_digits:int (default: null, or 2 for currencies)
+// - max_digits:int (default: null, or 2 for currencies)
+// - digits:int (default: null)
+// - delta:bool (default: false)
+//   => when true, show '+' sign for positive numbers
+// - rm_digits_all_zero:bool (default: false)
+//   => when true, removes digits that are all zeroes (e.g. 12.000)
+// - grouping:bool (default: true)
+// - nan:str (default:'NaN')
+//   => what to return for non-numbers
+// fmt_num(1234, '$')
+// fmt_num(1234, '$', {digits: 1})
+// fmt_num(1234, {unit: '$', digits: 1})
+E.fmt_num = function(num, unit_or_opt, opt){
+    opt = Object.assign({},
+        typeof unit_or_opt=='string' ? {unit: unit_or_opt} : unit_or_opt, opt);
+    if (num==null)
+        return num;
+    if (typeof num=='string' && num_regex.test(num))
+        num = +num;
+    if (!Number.isFinite(num))
+        return opt.nan||'NaN';
+    // resolve options
+    var style = opt.style;
+    if (style===undefined && opt.unit)
+    {
+        style = Object.keys(num_styles).find(function(s){
+            return num_styles[s].units.includes(opt.unit); });
+    }
+    if (!num_styles[style])
+        style = 'decimal';
+    var unit = opt.unit;
+    if (unit===undefined)
+        unit = num_styles[style].units[0];
+    if (typeof unit!='string')
+        unit = unit==null||unit==false ? '' : ''+unit;
+    var scaling = opt.scaling;
+    if (scaling===undefined)
+        scaling = num_styles[style].default_scaling;
+    if (scaling==true)
+        scaling = num_styles[style].vanilla_scaling;
+    var max_digits = opt.max_digits;
+    if (max_digits===undefined)
+    {
+        if (opt.digits!==undefined)
+            max_digits = opt.digits;
+        else if (style=='currency')
+            max_digits = scaling&&1 || 2;
+        else
+            max_digits = scaling&&2 || 3;
+    }
+    if (max_digits===null || max_digits===false || max_digits>12)
+        max_digits = 12;
+    var min_digits = opt.min_digits;
+    if (min_digits===undefined)
+    {
+        if (opt.digits!==undefined)
+            min_digits = opt.digits;
+        else if (style=='currency')
+            min_digits = max_digits>=2&&2 || undefined;
+    }
+    if (min_digits===null || min_digits===false)
+        min_digits = 0;
+    var rm_digits_all_zero = opt.rm_digits_all_zero;
+    if (rm_digits_all_zero===undefined)
+        rm_digits_all_zero = opt.digits==null && opt.min_digits==null;
+    var plural = opt.plural;
+    if (plural===undefined)
+        plural = num_styles[style].default_plural;
+    if (plural==true && unit.endsWith('s'))
+        unit = unit.slice(0, -1);
+    // apply scaling
+    var scale_str = '';
+    if (scaling=='%')
+        num *= 100;
+    else if (E.scale_vals[scaling])
+    {
+        var scale_vals = E.scale_vals[scaling], i;
+        var abs_num = Math.abs(num), mult = 1;
+        if (style=='bytes' && unit!='B' && unit!='Bs')
+        {
+            var needle = unit.replace(/s$/, '');
+            for (i=0; i<scale_vals.length; i++)
+            {
+                if (scale_vals[i].s+'B'==needle)
+                {
+                    mult *= scale_vals[i].n;
+                    break;
+                }
+            }
+            abs_num *= mult;
+            unit = 'B';
+        }
+        for (i=scale_vals.length-1; i>=0; i--)
+        {
+            if (abs_num>=scale_vals[i].n)
+            {
+                mult /= scale_vals[i].n;
+                scale_str = scale_vals[i].s;
+                break;
+            }
+        }
+        num *= mult;
+    }
+    // render
+    var sign = num<0&&'-' || opt.delta&&'+' || '';
+    var num_str = Math.abs(num).toLocaleString('en-GB', {
+        useGrouping: opt.grouping!=false,
+        maximumFractionDigits: max_digits,
+        minimumFractionDigits: min_digits,
+    });
+    if (rm_digits_all_zero && num_str.endsWith('0'))
+        num_str = num_str.replace(/\.0+$/, '');
+    var unit_sep = '';
+    if (opt.spaced_unit || opt.spaced_unit==null&&unit.length>3)
+        unit_sep = ' ';
+    if (plural && unit!=='' && !/^1(\.0+)?$/.test(num_str))
+        unit = typeof plural=='string' ? plural : unit+'s';
+    return style=='currency' ? sign+unit+num_str+scale_str
+        : sign+num_str+unit_sep+scale_str+unit;
+};
+
+var num_styles = {
+    decimal: {units: [''], vanilla_scaling: 'si'},
+    percent: {units: ['%'], vanilla_scaling: '%', default_scaling: 1},
+    currency: {units: ['$'], vanilla_scaling: '$'},
+    bytes: {
+        units: ['B', 'Bs', 'KB', 'KBs', 'MB', 'MBs', 'GB', 'GBs', 'TB', 'TBs',
+            'PB', 'PBs', 'byte', 'bytes'],
+        vanilla_scaling: 'si',
+        default_scaling: 1,
+        default_plural: 1,
+    },
+};
+
+var num_regex = /^\s*[+-]?((\d+(\.\d*)?)|(\.\d+))\s*$/;
 
 E.fmt_per = function(per){
     if (!per)
@@ -275,7 +463,9 @@ E.parse_function = function(f){
     };
 };
 
-function date_stringify(d){ return {__ISODate__: d.toISOString()}; }
+function date_stringify(d){
+    return !isNaN(d) ? {__ISODate__: d.toISOString()} : null;
+}
 
 var pos_inf = {__Infinity__: 1};
 var neg_inf = {__Infinity__: -1};
@@ -289,8 +479,8 @@ function replace_inf(k, v){
 }
 
 E.JSON_stringify = function(obj, opt){
-    var s, prev_date, _date, prev_func, prev_re;
-    var date_class, func_class, re_class;
+    var s, prev_date, _date, prev_func, prev_re, prev_bigint;
+    var date_class, func_class, re_class, bigint_class;
     opt = opt||{};
     if (opt.date)
         _date = typeof opt.date=='function' ? opt.date : date_stringify;
@@ -318,6 +508,16 @@ E.JSON_stringify = function(obj, opt){
         prev_re = re_class.prototype.toJSON;
         Object.defineProperty(re_class.prototype, 'toJSON', {
             value: function(){ return {__RegExp__: this.toString()}; },
+            writable: true,
+        });
+    }
+    if (opt.bigint)
+    {
+        bigint_class = opt.vm_context ?
+            vm.runInContext('BigInt', opt.vm_context) : BigInt;
+        prev_bigint = bigint_class.prototype.toJSON;
+        Object.defineProperty(bigint_class.prototype, 'toJSON', {
+            value: function(){ return {__BigInt__: this.toString()}; },
             writable: true,
         });
     }
@@ -351,38 +551,31 @@ E.JSON_stringify = function(obj, opt){
     if (opt.circular)
     {
         var ignore_circular = opt.circular=='ignore';
-        var orig_replacer = replacer, keys, objects, stack;
+        var orig_replacer = replacer, keys = [], stack = [];
         replacer = function(k, v){
-            if (!k)
+            if (stack.length)
             {
-                keys = [];
-                stack = [];
-                objects = [{keys: '', value: v}];
-                return orig_replacer ? orig_replacer.call(this, k, v) : v;
-            }
-            while (stack.length && this!==stack[0])
-            {
-                stack.shift();
-                keys.pop();
-            }
-            var found;
-            for (var i = 0; i<objects.length; i++)
-            {
-                if (objects[i].value===v)
+                var pos = stack.indexOf(this);
+                if (pos>=0)
                 {
-                    found = objects[i];
-                    break;
+                    stack.splice(pos+1);
+                    keys.splice(pos, keys.length, k);
+                }
+                else
+                {
+                    stack.push(this);
+                    keys.push(k);
+                }
+                pos = stack.indexOf(v);
+                if (pos>=0)
+                {
+                    v = ignore_circular ? undefined :
+                        {__Ref__: keys.slice(0, pos).join('.')};
                 }
             }
-            if (!found)
-            {
-                keys.push(k);
-                stack.unshift(v);
-                objects.push({keys: keys.join('.'), value: v});
-                return orig_replacer ? orig_replacer.call(this, k, v) : v;
-            }
-            if (!ignore_circular)
-                return {__Ref__: found.keys};
+            else
+                stack.push(v);
+            return orig_replacer ? orig_replacer.call(this, k, v) : v;
         };
     }
     try { s = JSON.stringify(obj, replacer, opt.spaces); }
@@ -393,6 +586,8 @@ E.JSON_stringify = function(obj, opt){
             func_class.prototype.toJSON = prev_func;
         if (opt.re)
             re_class.prototype.toJSON = prev_re;
+        if (opt.bigint)
+            bigint_class.prototype.toJSON = prev_bigint;
     }
     if (opt.mongo||opt.mongoku)
     {
@@ -402,30 +597,65 @@ E.JSON_stringify = function(obj, opt){
     return s;
 };
 
+var leaf_type = {
+    __ISODate__: [
+        function(opt){ return opt.date; },
+        function(v, opt){ return new Date(v.__ISODate__); },
+    ],
+    __Function__: [
+        function(opt){ return opt.func; },
+        function(v, opt){ return vm
+            ? vm.runInThisContext('"use strict";('+v.__Function__+')')
+            // fallback for browser environment
+            : new Function('', '"use strict";return ('+v.__Function__+');')();
+        },
+    ],
+    __RegExp__: [
+        function(opt){ return opt.re; },
+        function(v, opt){
+            var parsed = /^\/(.*)\/(\w*)$/.exec(v.__RegExp__);
+            if (!parsed)
+                throw new Error('failed parsing regexp');
+            return new RegExp(parsed[1], parsed[2]);
+        },
+    ],
+    __BigInt__: [
+        function(opt){ return opt.bigint; },
+        function(v, opt){ return BigInt(v.__BigInt__); },
+    ],
+    __Infinity__: [
+        function(opt){ return opt.inf; },
+        function(v, opt){
+            return v.__Infinity__ < 0 ? -Infinity : Infinity;
+        },
+    ],
+    __ObjectId__: [
+        function(opt){ return typeof opt.object_id=='function'; },
+        function(v, opt){ return opt.object_id(v.__ObjectId__); },
+    ],
+};
+
+function get_single_key(o){
+    var key = '';
+    var i = 0;
+    for (var k in o)
+    {
+        if (i)
+            return '';
+        if (!o.hasOwnProperty(k))
+            continue;
+        key = k;
+        ++i;
+    }
+    return key;
+}
+
 function parse_leaf(v, opt){
-    if (!v || typeof v!='object' || Object.keys(v).length!=1)
+    var key;
+    if (!v || typeof v!='object' || !(key = get_single_key(v)))
         return v;
-    if (v.__ISODate__ && opt.date)
-        return new Date(v.__ISODate__);
-    if (v.__Function__ && opt.func)
-    {
-        if (vm)
-            return vm.runInThisContext('"use strict";('+v.__Function__+')');
-        // fallback for browser environment
-        return new Function('', '"use strict";return ('+v.__Function__+');')();
-    }
-    if (v.__RegExp__ && opt.re)
-    {
-        var parsed = /^\/(.*)\/(\w*)$/.exec(v.__RegExp__);
-        if (!parsed)
-            throw new Error('failed parsing regexp');
-        return new RegExp(parsed[1], parsed[2]);
-    }
-    if (v.__Infinity__ && opt.inf)
-        return v.__Infinity__ < 0 ? -Infinity : Infinity;
-    if (v.__ObjectId__ && typeof opt.object_id=='function')
-        return opt.object_id(v.__ObjectId__);
-    return v;
+    return leaf_type.hasOwnProperty(key) && leaf_type[key][0](opt)
+        ? leaf_type[key][1](v, opt) : v;
 }
 
 function parse_obj(v, opt){
@@ -461,23 +691,43 @@ function deref_obj(obj){
 }
 
 E.JSON_parse = function(s, opt){
-    opt = Object.assign({date: true, re: true, func: true, inf: true,
-        circular: true}, opt);
-    var has_circular;
-    var ret = JSON.parse(s, function(k, v){
+    opt = Object.assign({date: true, re: true, bigint: true, func: true,
+        inf: true, circular: true}, opt);
+    var has_circular, ret = {};
+    var reviver = function(k, v){
         v = parse_leaf(v, opt);
         if (v && typeof v.__Ref__=='string')
             has_circular = true;
         return v;
-    });
+    };
+    try {
+        ret = JSON.parse(s, reviver);
+    } catch(e){
+        if (!opt.date)
+            throw e;
+        ret = JSON.parse(JSON.stringify(s), reviver);
+    }
     if (has_circular && opt.circular)
         deref_obj(ret);
     return ret;
 };
 
 E.JSON_parse_obj = function(v, opt){
-    opt = Object.assign({date: true, re: true, func: true, inf: true}, opt);
+    opt = Object.assign({date: true, re: true, bigint: true, func: true,
+        inf: true}, opt);
     return parse_obj(v, opt);
+};
+
+E.mongo_funcs_to_conv_json = function(str){
+    str = str.replace(/ISODate\(['"]([^'"]+)['"]\)/g, function(x, v){
+        if (!date.is_date_like(v))
+            return x;
+        return '{__ISODate__:"'+date(v).toISOString()+'"}';
+    });
+    str = str.replace(/ObjectId\(['"]([^'"]+)['"]\)/g, function(x, v){
+        return '{__ObjectId__:"'+v+'"}';
+    });
+    return str;
 };
 
 E.hex2bin = function(hex, opt){
@@ -610,6 +860,10 @@ E.utf8bin2str = function(arr, offset, len){
         }
     }
     return out;
+};
+
+E.mask_uuid = function(s){
+    return s.substring(0, s.length-32)+s.substring(s.length-8);
 };
 
 return E; }); }());

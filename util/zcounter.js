@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON
-'use strict'; /*zlint node*/
+'use strict'; /*jslint node:true*/
 require('./config.js');
 const cluster = require('cluster');
 const cluster_ipc = require('./cluster_ipc.js');
@@ -7,6 +7,7 @@ const conf = require('./conf.js');
 const date = require('./date.js');
 const etask = require('./etask.js');
 const file = require('./file.js');
+const zurl = require('./url.js');
 const queue = require('./queue.js');
 const zerr = require('./zerr.js');
 const zutil = require('./util.js');
@@ -14,19 +15,15 @@ const env = process.env, ef = etask.ef, ms = date.ms;
 const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
-
-let hosts = ['zs-graphite.luminati.io'];
-
-if (!+env.LXC)
-    hosts.push('zs-graphite-log.luminati.io', 'zs-graphite2.luminati.io');
+const global_only_worlds = new Set();
 
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
-        if (process.env.IS_MOCHA)
+        if (env.IS_MOCHA)
             return;
         zerr.warn('zcounter.enable_submit() was already called: ignoring.');
     };
-    if (+process.env.ZCOUNTER_DROP)
+    if (+env.ZCOUNTER_DROP)
         when = false;
     switch (when)
     {
@@ -42,9 +39,13 @@ E.enable_submit = when=>{
     zerr.warn(`zcounter is disabled`);
 };
 
-let to_valid_ids = {};
-E.to_valid_id = id=>to_valid_ids[id]||
-    (to_valid_ids[id]=id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
+const to_valid_ids = new Map();
+E.to_valid_id = id=>{
+    let v = to_valid_ids.get(id);
+    if (!v)
+        to_valid_ids.set(id, v = id.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
+    return v;
+};
 
 // XXX vladislavl: convert to Map all structure
 let type = {sum: new Map(), avg: {}, sum_mono: {}, avg_level: {},
@@ -62,12 +63,12 @@ function report_invalid_val(name, value){
 }
 
 // monotonic counters: http req/sec, bytes/sec
-E.inc = (name, inc=1, agg_srv='sum')=>{
+E.inc = (name, inc=1, agg_srv='sum', agg_tm='avg0')=>{
     if (!Number.isFinite(inc))
         return void report_invalid_val(name, inc);
     let _type = type.sum, entry = _type.get(name);
     if (!entry)
-        _type.set(name, entry = {v: 0, agg_srv, agg_tm: 'avg0'});
+        _type.set(name, entry = {v: 0, agg_srv, agg_tm});
     entry.v += inc;
 };
 
@@ -119,12 +120,12 @@ E.inc_level_eco = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
 
 // current in-progress counter read from elsewhere, or absolute value such
 // as %cpu or %disk usage
-E.set_level = (name, value, agg_mas='avg', agg_srv='avg')=>{
+E.set_level = (name, value, agg_mas='avg', agg_srv='avg', agg_tm='avg')=>{
     if (!Number.isFinite(value))
         return void report_invalid_val(name, value);
     let _type = type[agg_mas+'_level'], entry = _type[name];
     if (!entry)
-        entry = _type[name] = {v: 0, agg_srv};
+        entry = _type[name] = {v: 0, agg_srv, agg_tm};
     entry.v = value;
 };
 
@@ -192,8 +193,8 @@ E.ext_minc = (server, name, value, agg_srv)=>
     E.minc(server+'/'+name, value, agg_srv);
 E.ext_inc_level = (server, name, inc, agg_mas, agg_srv)=>
     E.inc_level(server+'/'+name, inc, agg_mas, agg_srv);
-E.ext_set_level = (server, name, value, agg_mas, agg_srv)=>
-    E.set_level(server+'/'+name, value, agg_mas, agg_srv);
+E.ext_set_level = (server, name, value, agg_mas, agg_srv, agg_tm)=>
+    E.set_level(server+'/'+name, value, agg_mas, agg_srv, agg_tm);
 E.ext_avg = (server, name, value, agg_srv)=>
     E.avg(server+'/'+name, value, agg_srv);
 E.ext_avgw = (server, name, value, weight, agg_srv)=>
@@ -212,7 +213,9 @@ E.group_max = (name, value, agg_srv)=>E.max(name, value, agg_srv, 'avg');
 E.group_set_level = E.set_level;
 if (env.ZCOUNTER_GROUP!==undefined)
 {
-    let groups = ['', '_g_'+env.ZCOUNTER_GROUP];
+    let groups = [''];
+    if (env.ZCOUNTER_GROUP!='')
+        groups.push('_g_'+env.ZCOUNTER_GROUP);
     if (env.AGENT_DC)
         groups.push('_g_'+env.AGENT_COUNTRY+'_'+env.AGENT_DC);
     E.group_inc = (name, inc, agg_srv)=>groups.forEach(g=>
@@ -226,9 +229,13 @@ if (env.ZCOUNTER_GROUP!==undefined)
 }
 
 E.glob_inc = (name, inc, agg_srv)=>E.inc('glob/'+name, inc, agg_srv);
+E.glob_inc_level = (name, inc, agg_mas, agg_srv)=>
+    E.inc_level('glob/'+name, inc, agg_mas, agg_srv);
 E.glob_avg = (name, value, agg_srv)=>E.avg('glob/'+name, value, agg_srv);
 E.glob_max = (name, value, agg_srv)=>E.max('glob/'+name, value, agg_srv);
 E.glob_min = (name, value, agg_srv)=>E.min('glob/'+name, value, agg_srv);
+E.glob_set_level = (name, value, agg_mas, agg_srv)=>
+    E.set_level('glob/'+name, value, agg_mas, agg_srv);
 
 E.del = name=>{
     if (reported_names[name])
@@ -296,7 +303,7 @@ let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
     if (update_prev)
     {
         for (let fn of E.on_send)
-            try { yield fn(); } catch(e){ ef(e); }
+            try { yield fn(); } catch(e){ ef(e, this); }
         // base gauge for 'sum_mono' kind should be reset so that next
         // measurement will be relative to the current value
         let mono = {sum_mono: {}, sum_mono_eco: {}};
@@ -407,17 +414,22 @@ let prepare = ()=>etask(function*zcounter_prepare(){
         ? mas_get_counters : loc_get_counters;
     let counters = yield get_counters_fn(true);
     let prefix = `stats.${conf.hostname}.${conf.app}.`;
-    let metrics = [];
+    let res = {lum: [], stats: []};
     for (let t in agg_mas_fn)
     {
         let _type = counters[t];
         let agg_fn = agg_mas_fn[t];
         for (let key in _type)
         {
+            let world = 'stats';
             let c = _type[key], agg = agg_fn(key, c);
             let path;
             if (key[0]=='.')
+            {
                 path = key.slice(1).replace(/\//g, '.');
+                if (path.startsWith('lum.'))
+                    world = 'lum';
+            }
             else
             {
                 let parts = key.split('/');
@@ -426,11 +438,14 @@ let prepare = ()=>etask(function*zcounter_prepare(){
                 else
                     path = `stats.${parts[0]}.${conf.app}.${parts[1]}`;
             }
-            metrics.push({path, v: agg.v, w: agg.w,
-                agg_srv: c.agg_srv, agg_tm: c.agg_tm});
+            if (!global_only_worlds.has(world) || path.includes('.glob.'))
+            {
+                res[world].push({path, v: agg.v, w: agg.w,
+                    agg_srv: c.agg_srv, agg_tm: c.agg_tm});
+            }
         }
     }
-    return metrics;
+    return res;
 });
 
 let get_agg_counters = ()=>etask(function*zcounter_get_agg_counters(){
@@ -458,39 +473,79 @@ function init(){
         cluster_ipc.worker_on('get_zcounters', loc_get_counters);
 }
 
-let ws_queue = new queue('zcounter');
-const ws_conn = new Map();
-let send_loop = ()=>etask(function*(){
-    if (send_loop.et)
+let ws_queue = {lum: new queue('lum zc'), stats: new queue('stats zc')};
+const ws_conn = {lum: new Map(), stats: new Map()};
+let send_loop = world=>etask(function*(){
+    if (send_loop[world])
         zerr.perr('zcounter_double_conn');
-    this.finally(()=>send_loop.et = null);
-    send_loop.et = this;
+    this.finally(()=>send_loop[world] = null);
+    send_loop[world] = this;
     for (;;)
     {
-        const data = ws_format(yield ws_queue.wait());
-        if (!ws_conn.size)
-            return void (send_loop.et = null);
-        ws_conn.forEach(ws=>ws.json(data));
+        const data = ws_format(yield ws_queue[world].wait());
+        let conns = ws_conn[world];
+        if (!conns.size)
+            return void (send_loop[world] = null);
+        conns.forEach(ws=>ws.json(data));
     }
 });
 
-function ws_client(url){
+let all_conns = new Map();
+function ws_client(world, url){
     if (!url.startsWith('ws'))
         url = `ws://${url}`;
-    if (ws_conn.has(url))
-        return ws_conn.get(url);
-    zerr.notice(`Opening zcounter conn to ${url}`);
-    let zws = require('./ws.js');
-    const label = url.split(':')[1].replace(/^\/\//, '');
-    const ws = new zws.Client(url, {label: `zcounter-${label}`,
-        retry_interval: ms.SEC});
+    let ws, conn_info;
+    if (conn_info = all_conns.get(url))
+    {
+        if (conn_info.worlds.includes(world))
+            return conn_info.ws;
+        ws = conn_info.ws;
+        conn_info.worlds.push(world);
+    }
+    else
+    {
+        zerr.notice(`Opening zcounter conn to ${url}`);
+        let zws = require('./ws.js');
+        const label = url.split(':')[1].replace(/^\/\//, '');
+        ws = new zws.Client(url, {label: `zcounter-${label}`,
+            retry_interval: +process.env.LXC ? 5*ms.MIN : 3*ms.SEC});
+        all_conns.set(url, {ws, worlds: [world]});
+    }
+    let conns = ws_conn[world];
+    if (ws.connected && !conns.has(url))
+    {
+        conns.set(url, ws);
+        if (!send_loop[world])
+            send_loop(world);
+    }
     ws.on('connected', ()=>{
-        ws_conn.set(url, ws);
-        if (!send_loop.et)
-            send_loop();
+        conns.set(url, ws);
+        if (!send_loop[world])
+            send_loop(world);
     });
-    ws.on('disconnected', ()=>ws_conn.delete(url));
+    ws.on('disconnected', ()=>conns.delete(url));
     return ws;
+}
+
+const lazy_conns = {lum: [], stats: []};
+class Lazy_ws_client {
+    constructor(world, url){
+        zerr.notice(`Opening lazy zcounter conn to ${url}`);
+        this.world = world;
+        this.url = url;
+    }
+    connect(){
+        let _this = this;
+        return etask(function*(){
+            _this.ws = ws_client(_this.world, _this.url);
+            if (_this.ws.connected)
+                return _this.ws;
+            let task = etask.sleep(10*ms.SEC);
+            _this.ws.on('connected', task.continue_fn());
+            yield task;
+            return _this.ws;
+        });
+    }
 }
 
 function run(){
@@ -498,43 +553,104 @@ function run(){
     if (cluster.isWorker)
         return;
     let port = env.ZCOUNTER_PORT||3374;
+    let create_client = env.ZCOUNTER_LAZY_CONNECT
+        ? (world, url)=>{
+            let client = new Lazy_ws_client(world, url);
+            lazy_conns[world].push(client);
+        } : ws_client;
     if (env.NODE_ENV!='production')
-        ws_client(`ws://localhost:${port}`);
-    else if (env.ZCOUNTER_URL)
-        env.ZCOUNTER_URL.split(';').forEach(ws_client);
+    {
+        create_client('lum', `ws://localhost:${port}`);
+        create_client('stats', `ws://localhost:${port}`);
+    }
+    else if (env.ZCOUNTER_STATS_URL && env.ZCOUNTER_LUM_URL)
+    {
+        let [stats, lum] = [env.ZCOUNTER_STATS_URL, env.ZCOUNTER_LUM_URL]
+            .map(x=>x.split(';').filter(url=>{
+                let host = zurl.parse(url).hostname;
+                return host=='zs-graphite-log.luminati.io' ? !+env.LXC : url;
+            }));
+        stats.forEach(u=>create_client('stats', u));
+        lum.forEach(u=>create_client('lum', u));
+    }
     else
-        hosts.forEach(h=>ws_client(`ws://${h}:${port}`));
-    etask.interval({ms: interval, mode: 'smart'}, function*zcounter_run(){
-        let metrics = yield prepare();
-        if (metrics.length)
-            ws_queue.put(metrics, max_age);
+    {
+        let lum = ['zs-graphite.luminati.io', 'zs-graphite-log.luminati.io'];
+        let stats = ['zs-graphite-stats.luminati.io',
+            'zs-graphite-log.luminati.io'];
+        if (+env.LXC)
+        {
+            lum = ['zs-graphite.luminati.io'];
+            stats = ['zs-graphite-stats.luminati.io'];
+        }
+        lum.forEach(h=>create_client('lum', `ws://${h}:${port}`));
+        stats.forEach(h=>create_client('stats', `ws://${h}:${port}`));
+    }
+    if (env.ZCOUNTER_LUM_GLOB_ONLY)
+        global_only_worlds.add('lum');
+    if (env.ZCOUNTER_STATS_GLOB_ONLY)
+        global_only_worlds.add('stats');
+    etask.interval(interval, function*zcounter_run(){
+        this.on('uncaught', e=>zerr.e2s(e));
+        let data = yield prepare();
+        for (let world of ['lum', 'stats'])
+        {
+            if (!data[world].length)
+                continue;
+            if (lazy_conns[world].length)
+            {
+                let tasks = lazy_conns[world].map(x=>x.connect());
+                lazy_conns[world] = [];
+                yield etask.all(tasks);
+            }
+            ws_queue[world].put(data[world], max_age);
+        }
     });
 }
 
-E.submit_raw = (metrics, ttl)=>ws_queue.put(metrics, ttl);
+E.submit_raw = (data, ttl)=>{
+    if (data.world)
+        return void ws_queue[data.world].put(data.metrics, ttl);
+    let lum = [], stats = [];
+    for (let metric of data)
+    {
+        if (!metric.path)
+            continue;
+        let world = metric.path.startsWith('lum.') && lum || stats;
+        world.push(metric);
+    }
+    if (lum.length)
+        ws_queue.lum.put(lum, ttl);
+    if (stats.length)
+        ws_queue.stats.put(stats, ttl);
+};
 
 E.flush = ()=>etask(function*zcounter_flush(){
     if (cluster.isWorker)
         zerr.zexit('zcounter.flush must be called from the master');
-    let metrics = yield prepare();
-    if (metrics.length)
-        ws_queue.put(metrics, max_age);
-    if (ws_conn.size)
-        return;
-    const dir = env.ZCOUNTER_DIR||'/run/shm/zcounter';
-    for (;;)
+    const dir = env.ZCOUNTER_DIR||(env.SHM_PATH||'/run/shm')+'/zcounter';
+    let data = yield prepare();
+    for (let world of ['lum', 'stats'])
     {
-        let entry = ws_queue.get_ex();
-        if (!entry)
-            break;
-        let r = Math.random()*1e8|0;
-        file.mkdirp(dir);
-        file.write_atomic(`${dir}/${entry.expires}.${conf.app}.${r}.json`,
-            JSON.stringify(entry.item));
+        let metrics = data[world];
+        if (metrics.length)
+            ws_queue[world].put(metrics, max_age);
+        if (ws_conn[world].size)
+            continue;
+        for (;;)
+        {
+            let entry = ws_queue[world].get_ex();
+            if (!entry)
+                break;
+            let r = Math.random()*1e8|0;
+            file.mkdirp(dir);
+            file.write_atomic(`${dir}/${entry.expires}.${conf.app}.${r}.json`,
+                JSON.stringify({world, metrics: entry.item}));
+        }
     }
 });
 
-let agent_conf;
+let agent_conf, agent_num;
 E.is_debug = title=>{
     if (!agent_conf)
     {
@@ -544,7 +660,7 @@ E.is_debug = title=>{
     let debug = agent_conf.debug_zcounter;
     let v = debug && debug[title];
     if (typeof v=='object')
-        return v.includes(+env.AGENT_NUM);
+        return v.includes(agent_num || (agent_num = +env.AGENT_NUM));
     return !!v;
 };
 
@@ -555,4 +671,4 @@ function test_reset(){
 }
 
 E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client,
-    test_reset};
+    test_reset, all_conns, ws_conn};

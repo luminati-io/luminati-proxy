@@ -5,10 +5,12 @@ const fs = require('fs');
 const sinon = require('sinon');
 const {qw} = require('../util/string.js');
 const file = require('../util/file.js');
+const etask = require('../util/etask.js');
 const Manager = require('../lib/manager.js');
 const Config = require('../lib/config.js');
 const logger = require('../lib/logger.js');
 const consts = require('../lib/consts.js');
+const {assert_has} = require('./common.js');
 
 describe('config', ()=>{
     it('proxies should not include unwanted fields', ()=>{
@@ -24,13 +26,19 @@ describe('config', ()=>{
             customer: 'wrong_cust',
             banlist: {cache: {}},
             error: 'my_error',
+            mobile: true,
+            unblock: true,
+            static: true,
+            gb_cost: 3,
         }];
-        const conf_mgr = new Config(new Manager({}), Manager.default);
+        const mgr = new Manager({});
+        const conf_mgr = new Config(mgr, Manager.default);
         const s = conf_mgr._serialize(proxies, {});
         const config = JSON.parse(s);
         const proxy = config.proxies[0];
         qw`stats proxy_type zones www_whitelist_ips request_stats logs conflict
-        version customer banlist error`.forEach(field=>
+        version customer banlist error static mobile unblock
+        gb_cost`.forEach(field=>
             assert.equal(proxy[field], undefined));
         assert.equal(proxy.port, 24000);
     });
@@ -72,30 +80,76 @@ describe('config', ()=>{
             conf_mgr = null;
         });
         it('should remove rules and warn if it exists and not an array', ()=>{
-            const res = conf_mgr._prepare_proxy({rules: {}});
+            const proxy = conf_mgr._prepare_proxy({rules: {}});
             sinon.assert.called(logger.warn);
-            assert.ok(!res.rules);
+            assert.ok(!proxy.rules);
         });
         it('should not warn if rules do not exist', ()=>{
             conf_mgr._prepare_proxy({});
             sinon.assert.notCalled(logger.warn);
         });
         it('should leave rules without warning if an array', ()=>{
-            const res = conf_mgr._prepare_proxy({rules: [1, 2]});
+            const proxy = conf_mgr._prepare_proxy({rules: [1, 2]});
             sinon.assert.notCalled(logger.warn);
-            assert.deepEqual(res.rules, [1, 2]);
+            assert.deepEqual(proxy.rules, [1, 2]);
         });
-        it('should remove ext proxies when exceeding the limit', ()=>{
+        it('should remove ext proxies when exceeding the limit in cloud', ()=>{
             const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
                 .map((_, i)=>`${++i}`);
-            const res = conf_mgr._prepare_proxy({ext_proxies});
+            conf_mgr = new Config(new Manager({zagent: true}),
+                Manager.default);
+            const proxy = conf_mgr._prepare_proxy({ext_proxies});
             sinon.assert.called(logger.warn);
-            assert.ok(!res.ext_proxies);
+            assert.ok(!proxy.ext_proxies);
+        });
+        it('should not touch ext proxies if exceeding the limit in pmgr', ()=>{
+            const ext_proxies = Array(consts.MAX_EXT_PROXIES+1).fill()
+                .map((_, i)=>`${++i}`);
+            const proxy = conf_mgr._prepare_proxy({ext_proxies});
+            sinon.assert.notCalled(logger.warn);
+            assert.deepEqual(proxy.ext_proxies, ext_proxies);
         });
         it('should not touch ext proxies if within the limit', ()=>{
-            const res = conf_mgr._prepare_proxy({ext_proxies: ['1.2.3.4']});
+            const proxy = conf_mgr._prepare_proxy({ext_proxies: ['1.2.3.4']});
             sinon.assert.notCalled(logger.warn);
-            assert.deepEqual(res.ext_proxies, ['1.2.3.4']);
+            assert.deepEqual(proxy.ext_proxies, ['1.2.3.4']);
         });
+        describe('session', ()=>{
+            const t = (name, session, eq)=>it(name, ()=>{
+                const proxy = conf_mgr._prepare_proxy({session});
+                assert.strictEqual(proxy.session, eq);
+            });
+            t('non-empty session string is untouched', 'sess_123', 'sess_123');
+            t('empty session string is removed', '', undefined);
+        });
+    });
+    describe('limit specific proxy opts in zagents', ()=>{
+        const t = (name, proxy_opt, eq_has)=>it(name, ()=>{
+            const proxy = Object.assign({port: 24000}, proxy_opt);
+            const conf = new Config(new Manager({zagent: true}),
+                Manager.default, {cloud_config: {proxies: [proxy]}});
+            const {proxies: [proxy_conf]} = conf.get_proxy_configs();
+            assert_has(proxy_conf, eq_has);
+        });
+        t('proxy_connection_type is "http"', {proxy_connection_type: 'https'},
+            {proxy_connection_type: 'http'});
+    });
+    describe('upload', ()=>{
+        it('doesnt throw on "not_authorized" err from update_conf', etask.fn(
+        function*(){
+            const conf = new Config(new Manager({}), Manager.default,
+                {cloud_config: {_defaults: {}}});
+            const serialized_conf = conf._serialize([], {});
+            sinon.stub(conf.mgr, 'skip_config_sync').returns(false);
+            let update_conf_stub = sinon.stub(conf.mgr.lpm_f, 'update_conf')
+                .throws(new Error('not_authorized'));
+            try { yield conf.upload(serialized_conf); }
+            catch(e){ assert.fail('"not_authorized" Should not be thrown'); }
+            update_conf_stub.restore();
+            update_conf_stub = sinon.stub(conf.mgr.lpm_f, 'update_conf')
+                .throws(new Error('should_be_thrown'));
+            yield assert.rejects(()=>conf.upload(serialized_conf),
+                /should_be_thrown/);
+        }));
     });
 });

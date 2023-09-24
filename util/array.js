@@ -79,6 +79,12 @@ E.flatten = function(a){
     }
     return _a;
 };
+E.flat_map = function(a, cb){
+    if (a.flatMap)
+        return a.flatMap(cb);
+    return Array.prototype.concat.apply([], a.map(cb));
+};
+
 E.unique = function(a){
     var _a = [];
     for (var i=0; i<a.length; i++)
@@ -177,6 +183,20 @@ E.move = function(a, from, to, n){
 };
 
 E.to_array = function(v){ return Array.isArray(v) ? v : v==null ? [] : [v]; };
+
+E.enumerate = function(arr){
+    return Array.from(arr).map(function(e, i){ return [i, e]; });
+};
+
+E.range = function(start_or_length, stop){
+    if (stop===undefined)
+    {
+        return Array.from({length: start_or_length})
+            .map(function(_, i){ return i; });
+    }
+    return Array.from({length: stop-start_or_length})
+        .map(function(_, i){ return i+start_or_length; });
+};
 
 var proto = {};
 proto.sed = function(regex, replace){

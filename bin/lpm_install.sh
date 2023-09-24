@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.212.374"
+VERSION="1.410.597"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -21,8 +21,8 @@ INSTALL_NPM=0
 INSTALL_CURL=0
 INSTALL_BREW=0
 USE_NVM=0
-NODE_VER='12.18.3'
-NPM_VER='6.14.6'
+NODE_VER='14.19.0'
+NPM_VER='6.14.16'
 NETWORK_RETRY=3
 NETWORK_ERROR=0
 UPDATE_NODE=0
@@ -105,9 +105,9 @@ usage()
     echo "  --no-perr     - don't send perrs to server"
     echo "  --print-perr  - print perrs to console"
     echo "ACTION:"
-    echo "  setup         - setup lpm (DEFAULT)"
-    echo "  clean         - clean cache and lpm related files"
-    echo "  dev-setup     - attempt to clean any traces of lpm and it's"
+    echo "  setup         - setup pmgr (DEFAULT)"
+    echo "  clean         - clean cache and pmgr related files"
+    echo "  dev-setup     - attempt to clean any traces of pmgr and it's"
     echo "                  dependencies"
     echo "                  WARNING: be careful, attempts to delete"
     echo "                           - several system packages"
@@ -435,7 +435,7 @@ install_nave()
     perr "install_nave"
     run_cmd "mkdir -p ~/.nave"
     local nave_path="$HOME/.nave/nave.sh"
-    download_script "http://github.com/isaacs/nave/raw/master/nave.sh" \
+    download_script "http://github.com/isaacs/nave/raw/main/nave.sh" \
         "$nave_path"
     run_cmd "chmod +x $nave_path"
     sudo_cmd "ln -s $nave_path /usr/local/bin/nave"
@@ -589,7 +589,7 @@ deps_install()
 
 lpm_clean()
 {
-    echo "cleaning lpm related node packages and npm cache..."
+    echo "cleaning pmgr related node packages and npm cache..."
     local clean_cmd=(
         "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
         "rm -rf $(npm root -g)/{@luminati-io,luminati-proxy}"
@@ -608,15 +608,15 @@ lpm_clean()
     done
     if ((!USE_NVM)); then
         sudo_cmd "rm -rf /root/.npm"
-        echo "removing luminati links..."
-        sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}"
+        echo "removing proxy-manager links..."
+        sudo_cmd "rm -rf /usr/{local/bin,bin}/{proxy-manager,pmgr,luminati,luminati-proxy}"
     fi
 }
 
 lpm_install()
 {
     perr "install" "lpm"
-    echo "installing Luminati proxy manager..."
+    echo "installing Proxy Manager..."
     local cmd="npm install -g --unsafe-perm --loglevel error @luminati-io/luminati-proxy"
     if ((USE_NVM)); then
         retry_cmd "$cmd" 0 1
@@ -624,23 +624,23 @@ lpm_install()
         retry_sudo_cmd "$cmd" 0 1
     fi
     if (($?)); then
-        echo "Luminati failed to install from npm"
+        echo "Proxy Manager failed to install from npm"
         perr "install_error_lpm"
         exit 1
     fi
     if ((!USE_NVM)); then
         if ((LUM)); then
-            # fix luminati binary not found on luminati ubuntu
+            # fix proxy-manager binary not found on ubuntu
             echo "running nave relink..."
             sudo_cmd "nave relink"
         fi
         # create symlink to /usr/local/bin if necessary
         if ! [ $(npm bin -g) -ef /usr/local/bin ]; then
-            if [ -f "/usr/local/bin/luminati" ]; then
-                sudo_cmd "rm /usr/local/bin/luminati"
+            if [ -f "/usr/local/bin/proxy-manager" ]; then
+                sudo_cmd "rm /usr/local/bin/proxy-manager"
             fi
-            sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati"
-            sudo_cmd "chmod a+x /usr/local/bin/luminati"
+            sudo_cmd "ln -s $(npm bin -g)/proxy-manager /usr/local/bin/proxy-manager"
+            sudo_cmd "chmod a+x /usr/local/bin/proxy-manager"
         fi
     fi
     perr "install_success_lpm"
@@ -649,18 +649,18 @@ lpm_install()
 check_install()
 {
     echo "check install"
-    if ! $(npm bin -g)/luminati -v > /dev/null; then
-        echo "there was an error installing Luminati"
+    if ! $(npm bin -g)/proxy-manager -v > /dev/null; then
+        echo "there was an error installing Proxy Manager"
         perr "install_error_lpm_check"
         exit 1
     fi
-    echo "Luminati installed successfully!"
+    echo "Proxy Manager installed successfully!"
     perr "install_success_lpm_check"
 }
 
 dev_setup()
 {
-    echo "removing LPM dependencies..."
+    echo "removing Proxy Manager dependencies..."
     local lib_path="$(npm prefix -g)/lib"
     if prompt "Remove curl, wget, nodejs and npm" n; then
         sys_rm "curl wget nodejs npm"
@@ -682,9 +682,9 @@ dev_setup()
     if prompt "Remove npm and nave cache dirs" n; then
         sudo_cmd "rm -rf $lib_path/node $lib_path/node_modules ~/.npm ~/.nave"
     fi
-    if prompt "Remove luminati, npm, nave, node links from /usr/local/bin"\
+    if prompt "Remove proxy-manager, npm, nave, node links from /usr/local/bin"\
         n; then
-        sudo_cmd "rm -rf /usr/local/bin/{luminati,liminati-proxy,npm,nave,node}"
+        sudo_cmd "rm -rf /usr/local/bin/{pmgr,proxy-manager,luminati,liminati-proxy,npm,nave,node}"
     fi
     setup
 }
@@ -692,9 +692,9 @@ dev_setup()
 setup()
 {
     perr "start"
-    echo "Luminati install script. Install id: $RID"
+    echo "Proxy Manager install script. Install id: $RID"
     check_env
-    if ! prompt 'Install Luminati?' y; then
+    if ! prompt 'Install Proxy Manager?' y; then
         perr "user_cancel"
         exit 0
     fi
@@ -704,8 +704,8 @@ setup()
     lpm_install
     check_install
     perr "complete"
-    echo "Luminati install script complete. Install id: $RID"
-    echo "To run the process enter 'luminati'"
+    echo "Proxy Manager install script complete. Install id: $RID"
+    echo "To run the process enter 'proxy-manager'"
 }
 
 on_exit()
@@ -749,12 +749,12 @@ main()
         setup
         ;;
     clean)
-        if prompt "Clean lpm related files and packages?" n; then
+        if prompt "Clean pmgr related files and packages?" n; then
             lpm_clean
         fi
         ;;
     dev-setup)
-        if prompt "Clean machine from lpm install and setup again?" n; then
+        if prompt "Clean machine from pmgr install and setup again?" n; then
            dev_setup
         fi
         ;;

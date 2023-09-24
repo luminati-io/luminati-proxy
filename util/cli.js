@@ -15,16 +15,18 @@ const assign = Object.assign, ef = etask.ef;
 const E = exports;
 E.dry_run = false;
 E.opt = {};
+E.ext_opt = {verbose: true};
 const L = E.L = {
     require: function(name, lib){
         this.__defineGetter__(name, function(){
             delete this[name];
-            return this[name] = require(lib);
+            return this[name] = require(/* brd-build-deps ignore */lib);
         });
     }
 };
 L.require('readline', 'readline-sync');
 L.require('getopt', 'node-getopt');
+const TERM = {OSC: '\x1b]', ST: '\x1b\\'};
 
 function find_opt(arg, argv){
     for (let a=0; a<argv.length; a++)
@@ -59,10 +61,12 @@ function guess_dryrun(args){
         args.push(['', 'real-run', 'actually run commands']);
 }
 
-E.getopt = function(args, usage, commands){
+E.getopt = function(args, usage, commands, lock_key){
+    if (global.zcli_getopt_lock_key && global.zcli_getopt_lock_key!=lock_key)
+        return;
     if (find_opt('h', args)<0)
         args.push(['h', 'help', 'show usage']);
-    if (find_opt('v', args)<0)
+    if (E.ext_opt.verbose && find_opt('v', args)<0)
         args.push(['v', 'verbose+', 'verbose output (-vv* to control level)']);
     guess_dryrun(args);
     if (commands)
@@ -106,8 +110,8 @@ let get_exec_opt = opt=>
     assign({verbose: E.opt.verbose, dry_run: E.dry_run}, opt);
 E.exec_sys = (cmd, opt)=>exec.sys(cmd, get_exec_opt(opt));
 E.exec = (cmd, opt)=>exec.get(cmd, get_exec_opt(opt));
-E.exec_get_lines = cmd=>exec.get_lines(cmd, get_exec_opt());
-E.exec_get_line = cmd=>exec.get_line(cmd, get_exec_opt());
+E.exec_get_lines = (cmd, opt)=>exec.get_lines(cmd, get_exec_opt(opt));
+E.exec_get_line = (cmd, opt)=>exec.get_line(cmd, get_exec_opt(opt));
 E.exec_e = function(cmd, opt){
     let ret;
     if (ret = E.exec(cmd, opt))
@@ -229,7 +233,7 @@ E.script_error = name=>{
         this.opt = opt||{};
         this.name = name;
         this.message = msg.message||msg;
-        this.stack = msg.stack||(new Error(this)).stack;
+        this.stack = msg.stack||new Error(this).stack;
         this.output = this.opt.output||'';
     }
     err.prototype = Object.create(Error.prototype);
@@ -258,7 +262,7 @@ E.process_exit = (promise, opt)=>etask(function*process_main(){
                 yield this.wait_ext(et);
             }
         }
-    } catch(e){ ef(e);
+    } catch(e){ ef(e, this);
         console.error(opt.skip_stack ? e.message : e.stack||e);
         return exit_with_code(opt, 1);
     }
@@ -267,13 +271,19 @@ E.process_exit = (promise, opt)=>etask(function*process_main(){
 });
 
 // get input from user that works also in cygwin
-E.get_input = (prompt, hide)=>{
-    let res, hide_cmd = hide ? '-s' : '';
-    process.stdout.write(prompt+' ');
-    res = E.exec('read '+hide_cmd+' param && echo $param',
+E.get_input = (prompt, opt)=>{
+    if (opt!=null && opt.constructor!=Object)
+        opt = {hide: opt};
+    opt = opt||{};
+    let fd = opt.stderr&&'stderr' || 'stdout';
+    let hide_cmd = opt.hide ? '-s' : '';
+    if (zerr.log_buffer)
+        zerr.flush();
+    process[fd].write(prompt+' ', ()=>{});
+    let res = E.exec('read '+hide_cmd+' param && echo $param',
         {out: 'stdout', stdio: [0, 'pipe'], dry_run: false});
-    if (hide)
-        process.stdout.write('\n');
+    if (opt.hide)
+        process[fd].write('\n');
     return string.chomp(res);
 };
 
@@ -286,7 +296,7 @@ E.ask_approval = (prompt, opt)=>{
         return true;
     while (!opt.limit.test(res))
     {
-        if (!(res = E.get_input(prompt)) && opt.default_input)
+        if (!(res = E.get_input(prompt, opt)) && opt.default_input)
         {
             res = opt.default_input;
             break;
@@ -322,3 +332,44 @@ E.spinner.stop = ()=>{
     process.stderr.clearLine();
     process.stderr.write('\r');
 };
+
+// process bash pipe input line by line
+// cb(lines) - a callback (can be async) to call on each portion of lines
+E.pipe_lines = cb=>etask(function*(){
+    if (process.stdin.isTTY)
+        E.exit('pipe input expected');
+    let stdin = process.openStdin();
+    let data = [], finished, _this = this;
+    let process_lines = ()=>etask(function*(){
+        let lines = Buffer.concat(data).toString().split('\n');
+        try { yield cb(lines); }
+        catch(e){ _this.throw(e); }
+    });
+    let finalize = ()=>etask(function*(){
+        yield process_lines();
+        _this.continue();
+    });
+    stdin.on('data', chunk=>etask(function*(){
+        let idx = chunk.lastIndexOf('\n');
+        if (idx<0)
+            return void data.push(chunk);
+        data.push(chunk.subarray(0, idx));
+        stdin.pause();
+        yield process_lines();
+        data = [chunk.subarray(idx+1)];
+        stdin.resume();
+        if (finished)
+            finalize();
+    }));
+    stdin.on('end', ()=>{
+        finished = true;
+        if (!stdin.isPaused())
+            finalize();
+    });
+    yield this.wait();
+});
+
+// encode url with anchor text to be parsed by terminal
+// see https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+E.term_url = (url, text)=>process.stdout.isTTY ?
+    TERM.OSC+'8;;'+url+TERM.ST+(text||url)+TERM.OSC+'8;;'+TERM.ST : text;

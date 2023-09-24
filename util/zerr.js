@@ -1,16 +1,16 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
-var define, process;
+var define, process, cluster, worker_threads, version;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
-        require('/util/array.js'), require('/util/date.js'),
-        require('/util/util.js'), require('/util/sprintf.js'),
-        require('/util/rate_limit.js'), require('/util/escape.js'));
+        require('/util/date.js'), require('/util/util.js'),
+        require('/util/sprintf.js'), require('/util/rate_limit.js'),
+        require('/util/escape.js'));
     process = {
         nextTick: function(fn){ setTimeout(fn, 0); },
         env: {},
@@ -28,18 +28,18 @@ else
     {
         process = global.process||require('_process');
         require('./config.js');
-        var cluster = require('cluster');
+        cluster = require('cluster');
         // XXX stanislav/sergeyp: remove try/catch wrap after node on
         // app_win64_jse is updated
-        var worker_threads = {isMainThread: true};
+        worker_threads = {isMainThread: true};
         try { worker_threads = require('worker_threads'); }
         catch(e){}
-        var version = require('./version.js').version;
+        version = require('./version.js').version;
     }
 }
-define(['/util/array.js', '/util/date.js', '/util/util.js',
-    '/util/sprintf.js', '/util/rate_limit.js', '/util/escape.js'],
-    function(array, date, zutil, sprintf, rate_limit, zescape){
+define(['/util/date.js', '/util/util.js', '/util/sprintf.js',
+    '/util/rate_limit.js', '/util/escape.js'],
+    function(date, zutil, sprintf, rate_limit, zescape){
 var E, _zerr;
 var env = process.env;
 var zerr = function(msg){ _zerr(L.ERR, arguments); };
@@ -101,10 +101,24 @@ function wrap_perr(perr_fn){
         send = perr_fn.send;
         pre_send = perr_fn.pre_send;
     }
-    return function(id, info, opt){
+    return function new_perr(id, info, opt){
         opt = opt||{};
+        if (!/^[a-zA-Z0-9_.]+$/.test(id))
+        {
+            var perr_id = 'invalid_zerr_perr_id';
+            var perr_info = {arguments: arguments, trace: E.get_stack_trace()};
+            if (env.NODE_ENV=='production')
+            {
+                var zcounter_file = require('./zcounter_file.js');
+                zcounter_file.inc(perr_id);
+                perr_info.server = env.SERVER_ID;
+            }
+            return new_perr(perr_id, perr_info, {rate_limit: false});
+        }
         var _rate_limit = opt.rate_limit||{};
-        var ms = _rate_limit.ms||date.ms.HOUR, count = _rate_limit.count||10;
+        var default_rate_limit = zutil.is_mocha() ? 100 : 10;
+        var ms = _rate_limit.ms||date.ms.HOUR;
+        var count = _rate_limit.count||default_rate_limit;
         var disable_drop_count = _rate_limit.disable_drop_count;
         var rl_hash = perr_orig.rl_hash = perr_orig.rl_hash||{};
         var rl = rl_hash[id] = rl_hash[id]||{};
@@ -134,15 +148,69 @@ E.perr_install = function(install_fn){
     perr_pending = null;
 };
 
+E.make_nodejs_perr_install_fn = function(prefix){
+    var zos = require('os');
+    var wget = require('./wget.js');
+    var zversion = require('./version.js');
+    var perr_send = function(id, info, opt){
+        opt = opt||{};
+        var full_id = prefix+'_'+id;
+        return wget({url: env.PERR_URL+'perr?id='+full_id,
+            method: 'POST', timeout: 10000,
+            json: {
+                timestamp: date.to_sql(),
+                info: info,
+                filehead: opt.filehead,
+                bt: opt.backtrace,
+                host: zos.hostname(),
+                ver: zversion.version,
+                cluster: env.CLUSTER_NAME,
+            },
+        });
+    };
+    return function(_perr_orig, pending){
+        while (pending.length)
+            perr_send.apply(null, pending.shift());
+        return function(id, info, opt){
+            _perr_orig.apply(null, arguments); // keep stub's print
+            return perr_send(id, info, opt);
+        };
+    };
+};
+
 function err_has_stack(err){ return err instanceof Error && err.stack; }
 
 E.e2s = function(err){
+    var str;
     if (!is_node && err_has_stack(err))
     {
         var e_str = ''+err, e_stack = ''+err.stack;
-        return e_stack.startsWith(e_str) ? e_stack : e_str+' '+e_stack;
+        str = e_stack.startsWith(e_str) ? e_stack : e_str+' '+e_stack;
     }
-    return err_has_stack(err) ? ''+err.stack : ''+err;
+    else
+        str = err_has_stack(err) ? ''+err.stack : ''+err;
+    if (err && err.code)
+        str = '[code='+err.code+'] '+str;
+    return str;
+};
+
+E.s2e = function(str){
+    if (!str)
+        return;
+    var code_match = /^\[code=([^\]]*)\] /.exec(str);
+    if (code_match)
+        str = str.substr(code_match.index+code_match[0].length);
+    if (!str.startsWith('Error:'))
+        str = 'Error: '+str;
+    var message = (/^Error: (.*)/.exec(str)||[])[1]||'';
+    var err = new Error();
+    err.message = message;
+    err.stack = str;
+    if (code_match)
+        err.code = code_match[1];
+    if (/^\d+$/.test(err.code))
+        err.code = +err.code;
+    return err;
 };
 
 E.on_exception = undefined;
@@ -217,28 +285,64 @@ function log_tail_push(msg){
         E.log.splice(0, E.log.length - E.log.max_size/2);
 }
 
+var zerr_format = function(args){
+    return args.length<=1 ? args[0] : sprintf.apply(null, args); };
+
 if (is_node)
 { // zerr-node
 E.ZEXIT_LOG_DIR = env.ZEXIT_LOG_DIR||'/tmp/zexit_logs';
 E.prefix = '';
 
 E.level = L.NOTICE;
+
+var flush_timer;
 E.flush = function(){};
 E.set_log_buffer = function(on){
     if (!on)
     {
-        if (E.log_buffer)
-        {
-            E.flush();
-            E.log_buffer(0);
-        }
+        if (!E.log_buffer)
+            return;
+        E.flush();
+        write_log = E.log_buffer.destroy();
+        E.flush = function(){};
+        clearInterval(flush_timer);
         return;
     }
-    E.log_buffer = require('log-buffer');
-    E.log_buffer(32*1024);
-    E.flush = function(){ E.log_buffer.flush(); };
-    setInterval(E.flush, 1000).unref();
+    E.log_buffer = Log_buffer();
+    write_log = E.log_buffer(write_log, 32*1024);
+    E.flush = function log_buffer_flush(){ E.log_buffer.flush(); };
+    flush_timer = setInterval(E.flush, 1000).unref();
 };
+
+var Log_buffer = function(){
+    var orig_func;
+    var size = 0;
+    var buf = [];
+    var instance = function log_patch(func, limit){
+        orig_func = func;
+        process.on('exit', instance.flush);
+        return function log_write(string){
+            size += Buffer.byteLength(string);
+            buf.push(string);
+            if (size > limit)
+                instance.flush();
+        };
+    };
+    instance.flush = function log_flush(){
+        if (size)
+            orig_func(buf.join('\n'));
+        buf.length = 0;
+        size = 0;
+    };
+    instance.destroy = function log_destroy(){
+        process.off('exit', instance.flush);
+        buf.length = 0;
+        size = 0;
+        return orig_func;
+    };
+    return instance;
+};
+
 var node_init = function(){
     if (zutil.is_mocha())
     {
@@ -256,18 +360,81 @@ var init = function(){
 };
 init();
 
-var zerr_format = function(args){
-    return args.length<=1 ? args[0] : sprintf.apply(null, args); };
+var systemd_level_dict = [];
+for (var slk in L)
+    systemd_level_dict[L[slk]] = '<'+L[slk]+'>';
+var systemd_level = env.CURRENT_SYSTEMD_UNIT_NAME
+    ? function(level){ return systemd_level_dict[level]; }
+    : function(level){ return ''; };
+
+var level_prefix = [];
+for (var lpk in L)
+    level_prefix[L[lpk]] = lpk+': ';
+
 var __zerr = function(level, args){
     var msg = zerr_format(args);
-    var k = Object.keys(L);
-    var prefix = E.hide_timestamp ? '' : E.prefix+date.to_sql_ms()+' ';
-    if (env.CURRENT_SYSTEMD_UNIT_NAME)
-        prefix = '<'+level+'>'+prefix;
-    var res = prefix+k[level]+': '+msg;
-    console.error(res);
+    var ts = E.hide_timestamp ? '' : date.to_sql_ms()+' ';
+    var res = systemd_level(level)+E.prefix+ts+level_prefix[level]+msg;
+    write_log(res);
     log_tail_push(res);
 };
+
+// simplified nodejs console.error
+// https://github.com/nodejs/node/blob/5fad0b93667ffc6e4def52996b9529ac99b26319/lib/internal/console/constructor.js#L381
+var write_log = function(string){
+    // There may be an error occurring synchronously (e.g. for files or TTYs
+    // on POSIX systems) or asynchronously (e.g. pipes on POSIX systems), so
+    // handle both situations.
+    try {
+        // Add and later remove a noop error handler to catch synchronous
+        // errors.
+        if (process.stderr.listenerCount('error') === 0)
+            process.stderr.once('error', noop);
+        process.stderr.write(string+'\n', stderr_error_handler);
+    } catch(e){
+        // Console is a debugging utility, so it swallowing errors is not
+        // desirable even in edge cases such as low stack space.
+        if (is_stack_overflow_error(e))
+            throw e;
+        // Sorry, there's no proper way to pass along the error here.
+    } finally {
+        process.stderr.removeListener('error', noop);
+    }
+};
+// Make a function that can serve as the callback passed to `stream.write()`.
+var stderr_error_handler = function(err){
+    // This conditional evaluates to true if and only if there was an error
+    // that was not already emitted (which happens when the _write callback
+    // is invoked asynchronously).
+    if (err !== null && !process.stderr._writableState.errorEmitted)
+    {
+        // If there was an error, it will be emitted on `stream` as
+        // an `error` event. Adding a `once` listener will keep that error
+        // from becoming an uncaught exception, but since the handler is
+        // removed after the event, non-console.* writes won't be affected.
+        // we are only adding noop if there is no one else listening for
+        // 'error'
+        if (process.stderr.listenerCount('error') === 0)
+            process.stderr.once('error', noop);
+    }
+};
+var max_stack_error_name;
+var max_stack_error_message;
+try {
+    var overflow_stack = function(){ overflow_stack(); };
+    overflow_stack();
+} catch(e){
+    max_stack_error_name = e.name;
+    max_stack_error_message = e.message;
+}
+// Returns true if `err.name` and `err.message` are equal to engine-specific
+// values indicating max call stack size has been exceeded.
+// "Maximum call stack size exceeded" in V8.
+var is_stack_overflow_error = function(err){
+    return err && err.name === max_stack_error_name &&
+        err.message === max_stack_error_message;
+};
+var noop = function(){};
 
 E.set_logger = function(logger){
     __zerr = function(level, args){
@@ -286,6 +453,13 @@ E._zerr = _zerr;
 
 E.zexit = function(args){
     var stack;
+    // this prevents logs from being truncated when the process exits, which
+    // might cause us to lose crash stack traces
+    // https://github.com/nodejs/node/issues/6379
+    [process.stdout, process.stderr].forEach(function(s){
+        if (s && s._handle && s._handle.setBlocking)
+            s._handle.setBlocking(true);
+    });
     if (err_has_stack(args))
     {
         stack = args.stack;
@@ -298,7 +472,7 @@ E.zexit = function(args){
         __zerr(L.CRIT, arguments);
     }
     if ((args&&args.code)!='ERR_ASSERTION')
-        console.error('zerr.zexit was called', new Error().stack);
+        __zerr(L.CRIT, ['zerr.zexit was called: '+new Error().stack]);
     E.flush();
     // workaround for process.zon override issue
     if (process.zon && process.zon.main)
@@ -312,8 +486,8 @@ E.zexit = function(args){
     }
     if (env.NODE_ENV=='production')
     {
-        var conf = require('./conf.js');
         var zcounter_file = require('./zcounter_file.js');
+        var conf = require('./conf.js');
         zcounter_file.inc('server_zexit');
         args = zerr_format(arguments);
         write_zexit_log({id: 'lerr_server_zexit', info: ''+args,
@@ -366,6 +540,8 @@ var console_method = function(l){
         l<=L.INFO ? 'info' : 'debug';
 };
 
+var logger_fn;
+
 _zerr = function(l, args){
     var s;
     try {
@@ -381,6 +557,8 @@ _zerr = function(l, args){
         {
             Function.prototype.apply.bind(console[console_method(l)],
                 console)([prefix+fmt].concat(fmt_args));
+            if (logger_fn)
+                logger_fn(l, zerr_format(args));
         }
         log_tail_push(prefix+s);
     } catch(err){
@@ -391,6 +569,10 @@ _zerr = function(l, args){
         throw new Error(s);
 };
 E._zerr = _zerr;
+
+E.set_logger = function(logger){
+    logger_fn = logger;
+};
 
 var post = function(url, data){
     var use_xdr = typeof XDomainRequest=='function' &&
@@ -423,7 +605,7 @@ var perr_transport = function(id, info, opt){
     return post(zescape.uri(E.conf.url_perr+'/perr', qs), data);
 };
 
-var perr = function(perr_orig, pending){
+var perr = function(_perr_orig, pending){
     while (pending.length)
         perr_transport.apply(null, pending.shift());
     // set the zerr.perr stub to send to the clog server

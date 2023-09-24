@@ -35,7 +35,7 @@ E.close_e = fd=>etask.nfn_apply(fs.close, [fd]);
 E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
     let ret, fd = yield E.open_e(path, flags, mode);
     try { ret = yield cb(fd); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         yield E.close_e(fd);
         throw e;
     }
@@ -43,15 +43,19 @@ E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
     return ret;
 });
 E.write_e = (path, data, opt)=>etask(function*write_e(){
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     yield check_file(path, opt);
-    yield etask.nfn_apply(fs.writeFile, [path, data]);
+    yield etask.nfn_apply(fs.writeFile, [path, data, opt]);
 });
 E.tmp_path = file=>{
     let name = path.basename(file), dir = path.dirname(file);
     return dir+'/.'+name+'.'+(1000000*Math.random()|0)+'.tmp';
 };
 E.write_atomic_e = (file, data, opt)=>etask(function*write_atomic_e(){
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     yield check_file(file, opt);
     let tmpfile = E.tmp_path(file);
@@ -68,17 +72,21 @@ E.rename_e = (old_path, new_path)=>
     etask.nfn_apply(fs.rename, [old_path, new_path]);
 E.unlink_e = path=>etask.nfn_apply(fs.unlink, [path]);
 E.mkdir_e = (path, mode)=>etask.nfn_apply(fs.mkdir, [path, mode]);
-E.mkdirp_e = p=>etask(function*mkdirp_e(){
-    let mode = 0o777 & ~(process.umask&&process.umask());
+E.mkdirp_e = (p, mode)=>etask(function*mkdirp_e(){
+    if (mode!==undefined && process.umask)
+    {
+        let oldmask = process.umask(0);
+        this.finally(()=>process.umask(oldmask));
+    }
     try { yield E.mkdir_e(p, mode); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         if (e.code=='EEXIST')
             return;
         if (e.code!='ENOENT')
             throw e;
-        yield E.mkdirp_e(path.dirname(p));
+        yield E.mkdirp_e(path.dirname(p), mode);
         try { yield E.mkdir_e(p, mode); }
-        catch(e){ ef(e);
+        catch(e){ ef(e, this);
             if (e.code=='EEXIST')
                 return;
             throw e;
@@ -88,6 +96,8 @@ E.mkdirp_e = p=>etask(function*mkdirp_e(){
 E.mkdirp_file_e = f=>E.mkdirp_e(path.dirname(f));
 E.readdir_e = path=>etask.nfn_apply(fs.readdir, [path]);
 E.rmdir_e = path=>etask.nfn_apply(fs.rmdir, [path]);
+E.rmdir_r_e = (p, opt)=>
+    etask.nfn_apply(fs.rmdir, [p, assign({recursive: true}, opt)]);
 E.rmdirs_empty_e = (dir, base)=>etask(function*(){
     dir = path.resolve(dir);
     if (base)
@@ -166,7 +176,7 @@ E.copy_e = (old_path, new_path, opt)=>etask(function*copy_e(){
     r_stream.on('close', this.continue_fn());
     r_stream.pipe(w_stream);
     try { yield this.wait(); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         log('copy error: '+e);
         close();
         yield E.unlink_e(new_path);
@@ -311,6 +321,8 @@ E.write_lines_e = (file, data, opt)=>etask(function*write_lines_e(){
     return yield E.write_e(file, data, opt);
 });
 E.append_e = (file, data, opt)=>etask(function*append_e(){
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     yield check_file(file, opt);
     yield etask.nfn_apply(fs.appendFile, [file, data, opt]);
@@ -328,7 +340,7 @@ E.link_e = (src, dst, opt)=>etask(function*line_e(){
     dst = file.normalize(dst);
     yield check_file(dst, opt);
     try { yield etask.nfn_apply(fs.link, [src, dst]); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         if (opt.no_copy)
             throw e;
         return yield E.copy_e(src, dst, opt);
@@ -370,12 +382,12 @@ E.mtime_e = path=>etask(function*mtime_e(){
     return +(yield E.stat_e(path)).mtime; });
 E.exists = path=>etask(function*exists(){
     try { yield etask.nfn_apply(fs.access, [path]); }
-    catch(e){ ef(e); return false; }
+    catch(e){ ef(e, this); return false; }
     return true;
 });
 E.is_exec = path=>etask(function*is_exec(){
     try { yield etask.nfn_apply(fs.access, [path, fs.X_OK]); }
-    catch(e){ ef(e); return false; }
+    catch(e){ ef(e, this); return false; }
     return true;
 });
 let false_stat = {isSymbolicLink: ()=>false, isCharacterDevice: ()=>false,
@@ -454,7 +466,7 @@ let call_safe = (method, func, ret, args)=>etask(method, function*(){
     E.errno = 0;
     E.error = null;
     try { return yield func.apply(null, args); }
-    catch(e){ ef(e);
+    catch(e){ ef(e, this);
         E.errno = e.code||e;
         E.error = e;
         log(`${method} failed: ${e}`);
@@ -475,3 +487,33 @@ for (let m in err_retval)
     E[m] = function(){
         return call_safe(m, E[m+'_e'], err_retval[m], arguments); };
 }
+
+E.Concurrent_file_writer = etask._class(class Concurrent_file_writer {
+    constructor(file, append_opt){
+        this.file = file;
+        this.append_opt = append_opt;
+        this.buffer = [];
+    }
+    *write(_this, data){
+        let et = etask.wait();
+        _this.buffer.push({et, data});
+        if (!_this.write_et)
+            _this._write();
+        return yield et;
+    }
+    *_write(_this){
+        _this.write_et = this;
+        this.finally(()=>{
+            delete _this.write_et;
+            if (_this.buffer.length)
+                _this._write();
+        });
+        let curr = _this.buffer;
+        _this.buffer = [];
+        try {
+            yield E.append_e(_this.file, curr.map(el=>el.data).join(''),
+                _this.append_opt);
+            curr.forEach(el=>el.et.return());
+        } catch(e){ curr.forEach(el=>el.et.throw(e)); }
+    }
+});

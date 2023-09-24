@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports && module.children;
@@ -7,7 +7,7 @@ if (!is_node)
     define = self.define;
 else
     define = require('./require_node.js').define(module, '../');
-define(['/util/array.js'], function(array){
+define(['/util/array.js', '/util/date.js'], function(array, date){
 var E = {};
 
 var is_jtest = false;
@@ -38,11 +38,12 @@ E.rand_int32 = function(s){
     return Math.floor(Math.random()*(MAX_INT-MIN_INT+1))-MAX_INT;
 };
 
-E.rand_range = function(from, to, s){
+// return a rand number from "min" to "max-1"
+E.rand_range = function(min, max, s){
     var ret;
     if (is_jtest && (ret = jtest_pop(s))!==null)
         return ret;
-    return Math.floor(Math.random()*(to-from))+from;
+    return Math.floor(Math.random()*(max-min))+min;
 };
 
 E.rand_element = function(a, s){
@@ -73,14 +74,34 @@ E.jtest_push = function(s, arr){
 };
 
 E.jtest_init = function(){
+    var i;
     is_jtest = true;
     jtest_vals = {};
+    for (i=0; i<arguments.length; i++)
+        E.jtest_push.apply(E, array.to_array(arguments[i]));
+    return E.jtest_uninit.bind(E);
 };
 
 E.jtest_uninit = function(){
-    is_jtest = false; };
+    is_jtest = false;
+    jtest_vals = {};
+};
 
-E.basic_u32 = function(v){ return (1103515245*v+12345) >>> 0; };
-E.basic_u31 = function(v){ return (1103515245*v+12345) & 0x7fffffff; };
+E.basic_u32 = function(v){ return 1103515245*v+12345 >>> 0; };
+E.basic_u31 = function(v){ return 1103515245*v+12345 & 0x7fffffff; };
+
+var backoff_jitter_strategies = {
+    full_jitter: function(base, cap, attempt){
+        // using rand instead of rand_range to be able correctly use jtest
+        return Math.round(
+            E.rand('jitter')*Math.min(cap, base*Math.pow(2, attempt)));
+    },
+};
+E.calc_exp_delay_with_jitter = function(attempt, opt){
+    opt = opt||{};
+    var base = opt.base||3*date.ms.SEC, cap = opt.cap||15*date.ms.SEC;
+    var strategy = opt.strategy||'full_jitter';
+    return backoff_jitter_strategies[strategy](base, cap, attempt);
+};
 
 return E; }); }());

@@ -14,7 +14,7 @@ function local_jdir_one(top){
     let root, inbin, rel = '', _rel, ret = {};
     top = file.normalize(top||process.cwd());
     let t = file.cyg2unix('/');
-    let re = new RegExp(`^(${t}.*)\/([^\/]*)$`);
+    let re = new RegExp(`^(${t}.*)/([^/]*)$`);
     for (let i=0; i<24 && top!==t; i++)
     {
         let up_top = top;
@@ -116,6 +116,8 @@ E.exec_in_zon_tree = (filename, exe_in_tree, args, opt)=>{
         }
     }
     let exe = `${root}/${exe_in_tree}`;
+    if (!file.exists(exe))
+        return;
     let cmd = [exe, ...args];
     // XXX pavelp: don't try to execute .js files directly (windows only)
     if (file.is_win && /.js$/.test(exe))
@@ -155,7 +157,8 @@ E.zon_root = product=>{
     if (!file.exists(zon_dir))
     {
         console.error(`checking out zon to ${zon_dir}`);
-        let _env = {CVSROOT: `:pserver:${env.USER}@cvs.luminati.io:/arch/cvs`};
+        let _env = {CVSROOT: `:pserver:${env.USER}@cvs.brightdata.com`
+            +':/arch/cvs'};
         const res = exec.sys_sync(
             ['cvs', '-q', 'co', '-d', path.basename(zon_dir), 'zon'],
             {opt: {cwd: path.dirname(zon_dir), env: _env}});
@@ -185,14 +188,6 @@ E.split_debug_flags = opt=>{
             args.push(opt[f]);
         switch (f)
         {
-        case '-d':
-            node_args.push('--debug');
-            break;
-        case 'debug':
-        case '--debug':
-        case '--debug-brk':
-            node_args.push(a);
-            break;
         case '--gc':
         case '--expose-gc':
             node_args.push('--expose-gc');
@@ -210,6 +205,7 @@ E.split_debug_flags = opt=>{
         case '--tls-min-v1.0':
         case '--insecure-http-parser':
         case '--expose-internals':
+        case 'inspect':
         case '--inspect':
         case '--inspect-brk':
             node_args.push(a);

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
+require('../util/conf.js');
 const lpm_util = require('../util/lpm_util.js');
 const lpm_config = require('../util/lpm_config.js');
 const Lum_node_index = require('./lum_node_index.js');

@@ -21,7 +21,7 @@ function parse(conf){
 }
 
 function _hostname(){
-    let hostname = env.CONFIG_HOSTNAME || os.hostname();
+    let hostname = (env.CONFIG_HOSTNAME || os.hostname()).toLowerCase();
     return hostname.replace(/\.hola\.org$/, '').replace(/\.localdomain$/, '')
         .replace(/\.local$/, '').replace(/\.home$/, '');
 }
@@ -44,6 +44,6 @@ init();
 
 module.exports = {
     hostname: _hostname(),
-    app: script_path && path.basename(script_path, '.js'),
+    app: env.CONFIG_APP || script_path&&path.basename(script_path, '.js'),
     t: {parse},
 };

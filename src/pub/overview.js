@@ -3,19 +3,20 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
 import classNames from 'classnames';
-import Proxies from './proxies.js';
-import {Logs_context, Stats} from './stats.js';
-import {Har_viewer} from './har/viewer.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {T} from './common/i18n.js';
-import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
+import zurl from '../../util/url.js';
+import setdb from '../../util/setdb.js';
 import {perr, get_last_versions, get_changes_tooltip} from './util.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
-import zurl from '../../util/url.js';
-import setdb from '../../util/setdb.js';
-import ajax from '../../util/ajax.js';
+import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
+import {T} from './common/i18n.js';
+import Har_viewer from './har_viewer.js';
+import {Logs_context, Stats} from './stats.js';
+import Proxies from './proxies.js';
+import ws from './ws.js';
+import {main as Api} from './api.js';
 import './css/overview.less';
 
 class Overview extends Pure_component {
@@ -25,6 +26,8 @@ class Overview extends Pure_component {
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
         this.state = {
             show_logs: null,
+            remote_logs_enabled: null,
+            request_stats: null,
             tls_warning: false,
             embedded: qs_o.embedded=='true' || window.self!=window.top,
         };
@@ -33,20 +36,40 @@ class Overview extends Pure_component {
         this.setdb_on('head.settings', settings=>{
             if (!settings)
                 return;
+            let remote_settings = settings.logs_settings||{};
             this.setState({show_logs: settings.logs>0,
-                zagent: settings.zagent});
+                remote_logs_enabled: !!remote_settings.type,
+                zagent: settings.zagent, reseller: settings.reseller,
+                request_stats: settings.request_stats});
             if (settings.ask_sync_config&&!settings.zagent)
                 $('#sync_config_modal').modal();
         });
         this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&
             this.setState({tls_warning}));
-        this.setdb_on('head.save_settings', save_settings=>
-            this.save_settings = save_settings);
+        this.setdb_on('head.save_settings', save_settings=>{
+            this.save_settings = save_settings;
+            if (typeof this.saved_stats=='boolean')
+            {
+                this.toggle_stats(this.saved_stats);
+                delete this.saved_stats;
+            }
+        });
     }
     toggle_logs = val=>{
         const _this = this;
         this.setState({show_logs: null});
         this.etask(function*(){ yield _this.save_settings({logs: val}); });
+    };
+    toggle_stats = val=>{
+        if (!this.save_settings)
+        {
+            this.saved_stats = val;
+            return;
+        }
+        const _this = this;
+        this.etask(function*(){
+            yield _this.save_settings({request_stats: val});
+        });
     };
     set_sync_config = val=>{
         const _this = this;
@@ -57,103 +80,128 @@ class Overview extends Pure_component {
             yield _this.save_settings({sync_config: val});
             if (!val)
                 return;
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            const proxies = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies);
         });
     };
     render(){
-        const {show_logs, zagent} = this.state;
+        const {show_logs, zagent, request_stats, reseller,
+            remote_logs_enabled} = this.state;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
-        const title = <T>Overview</T>;
+        const title = zagent ? <span></span> : <T>Proxy Manager Dashboard</T>;
         return <div className="overview_page">
-              <div className="warnings">
-                {!this.state.embedded &&
-                  <React.Fragment>
-                    <Upgrade/>
-                    <Upgrade_warning/>
-                  </React.Fragment>
-                }
-                <Tls_warning show={this.state.tls_warning}/>
-                <Whitelist_warning/>
-                <Warnings warnings={this.state.warnings}/>
-              </div>
-              <div className="proxies nav_header">
-                <h3>{title}</h3>
-                <Toolbar/>
-              </div>
-              <div className="panels" style={panels_style}>
-                <div className="proxies proxies_wrapper">
-                  <Proxies/>
-                </div>
-                {!zagent &&
-                  <Logs_context.Provider value={!!show_logs}>
-                    <Stats/>
-                  </Logs_context.Provider>
-                }
-              </div>
-              {show_logs===null &&
-                <Loader_small show loading_msg="Loading..."/>}
-              {show_logs &&
-                <div className="logs_wrapper">
-                  <Har_viewer/>
-                </div>}
-              {show_logs===false &&
-                <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>}
-              <Modal id="sync_config_modal" ok_btn_title="Yes"
-                click_ok={()=>this.set_sync_config(true)}
-                cancel_clicked={()=>this.set_sync_config(false)}
-                title={<T>Do you want to enable configuration
-                    synchronization?</T>}>
-                <p>
-                  <T>
-                    Synchronizing your LPM configuration gives you reliable
-                    backup, single configuration across all instances which
-                    propagates automatically and central control via control
-                    panel.
-                  </T>
-                </p>
-                <p><T>You can always change it later in settings.</T></p>
-              </Modal>
-            </div>;
+          <div className="warnings">
+            {!this.state.embedded &&
+              <React.Fragment>
+                <Upgrade/>
+                <Upgrade_warning/>
+              </React.Fragment>
+            }
+            <Tls_warning show={this.state.tls_warning}/>
+            <Whitelist_warning/>
+            <Warnings warnings={this.state.warnings}/>
+          </div>
+          <div className="proxies nav_header">
+            <h3>{title}</h3>
+            <Toolbar
+              request_stats={request_stats}
+              toggle_stats={this.toggle_stats}
+              zagent={zagent}
+            />
+          </div>
+          <div className="panels" style={panels_style}>
+            <div className="proxies proxies_wrapper">
+              <Proxies/>
+            </div>
+            {!zagent &&
+              <Logs_context.Provider value={!!show_logs}>
+                <Stats/>
+              </Logs_context.Provider>
+            }
+          </div>
+          {show_logs===null &&
+            <Loader_small show loading_msg="Loading..."/>
+          }
+          {show_logs &&
+            <div className="logs_wrapper">
+              <Har_viewer/>
+            </div>}
+          {show_logs===false && !reseller && !remote_logs_enabled &&
+            <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>
+          }
+          <Modal id="sync_config_modal" ok_btn_title="Yes"
+            click_ok={()=>this.set_sync_config(true)}
+            cancel_clicked={()=>this.set_sync_config(false)}
+            title={<T>Do you want to enable configuration
+                synchronization?</T>}>
+            <p>
+              <T>
+                Synchronizing your Proxy Manager configuration gives you
+                reliable backup, single configuration across all instances
+                which propagates automatically and central control via
+                control panel.
+              </T>
+            </p>
+            <p><T>You can always change it later in settings.</T></p>
+          </Modal>
+        </div>;
     }
 }
 
-const Toolbar = ()=>
-  <div className="toolbar">
-    <Nav_icon id='how_to' link_to='/howto'
-      tooltip='How to use the Proxy Manager'/>
-    <Nav_icon id='general_settings' link_to='/settings'
-      tooltip='General settings'/>
+const Toolbar = ({request_stats, toggle_stats, zagent})=>{
+  const howto_click = ()=>ws.post_event('Howto Nav Top Click');
+  return <div className="toolbar">
+    {!zagent &&
+      <React.Fragment>
+        <Nav_icon id='how_to' link_to='/howto' on_click={howto_click}
+          tooltip='How to use the Proxy Manager'/>
+        <Nav_icon id='general_settings' link_to='/settings'
+          tooltip='General settings'/>
+      </React.Fragment>
+    }
+    <Nav_icon id='stats' filled={request_stats}
+      tooltip={`Recent stats are ${request_stats ? 'enabled' : 'disabled'}`}
+      onClick={()=>toggle_stats(!request_stats)}/>
     <Add_proxy_btn/>
   </div>;
+};
 
 const Add_proxy_btn = ()=>{
-  const open_modal = ()=>$('#add_new_proxy_modal').modal('show');
+  const open_modal = ()=>{
+      ws.post_event('Add New Port Click');
+      return $('#add_new_proxy_modal').modal('show');
+  };
   return <T>{t=>
-      <Tooltip title={t('Add new port')}>
-        <button onClick={open_modal}
-          className="btn btn_lpm btn_lpm_primary toolbar_item">
-          Add new port
-        </button>
-      </Tooltip>
-    }</T>;
+    <Tooltip title={t('Add new port')}>
+      <button onClick={open_modal}
+        className="btn btn_lpm btn_lpm_primary toolbar_item">
+        <T>Add new port</T>
+      </button>
+    </Tooltip>
+  }</T>;
 };
 
 const Nav_icon = withRouter(props=>{
-  const classes = classNames('toolbar_icon', 'cp_icon ', props.id);
+  const icon_classes = classNames('toolbar_icon', 'cp_icon ', props.id,
+      props.filled ? 'filled' : '');
+  const bg_classes = classNames('toolbar_icon_bg',
+      props.filled ? 'btn_lpm_primary' : '');
   const navigate_to = path=>{
+      if (props.on_click)
+          props.on_click();
       props.history.push({pathname: path});
   };
+  const on_click_navigate = {onClick: ()=>navigate_to(props.link_to)};
   return <T>{t=>
-      <Tooltip title={t(props.tooltip)}>
-          <div className="toolbar_item">
-            <div className='toolbar_icon_bg'>
-            <div className={classes}
-              onClick={()=>navigate_to(props.link_to)}/>
-            </div>
+    <Tooltip title={t(props.tooltip)}>
+        <div className="toolbar_item">
+          <div className={bg_classes} onClick={props.onClick}
+            {...(props.link_to && on_click_navigate)}>
+            <div className={icon_classes}/>
           </div>
-      </Tooltip>
-    }</T>;
+        </div>
+    </Tooltip>
+  }</T>;
 });
 
 const Logs_off_btn = props=>
@@ -164,20 +212,20 @@ const Logs_off_btn = props=>
   </Tooltip>;
 
 const Tls_warning = with_www_api(props=>{
-    const faq_url = props.www_api+'/faq#proxy-certificate';
+    const faq_url = props.www_api+'/faq#pmgr-cert-installation';
     if (!props.show)
         return null;
     return <Warning id="tls_warning">
-          <span>
-            <strong>TLS errors have been detected. </strong>
-            <span>
-              Your browser or crawler has to install the certificate. </span>
-            <a target="_blank" rel="noopener noreferrer" className="link"
-              onClick={()=>perr('tls.check_instructions')} href={faq_url}>
-              Check the instructions.
-            </a>
-          </span>
-        </Warning>;
+      <span>
+        <strong>TLS errors have been detected. </strong>
+        <span>
+          Your browser or crawler has to install the certificate. </span>
+        <a target="_blank" rel="noopener noreferrer" className="link"
+          onClick={()=>perr('tls.check_instructions')} href={faq_url}>
+          Check the instructions.
+        </a>
+      </span>
+    </Warning>;
 });
 
 class Upgrade extends Pure_component {
@@ -208,28 +256,31 @@ class Upgrade extends Pure_component {
         const major = versions.some(v=>v.type=='dev');
         const upgrade_type = major ? 'major' : 'minor';
         return <Warning tooltip={tooltip} id={this.state.ver_last.version}>
+          <div>
+            <T>A new</T>{' '}
+            <strong><T>{upgrade_type}</T></strong>{' '}
+            <T>version</T>{' '}
+            <strong>{this.state.ver_last.version}</strong>{' '}
+            <T>is available. You are</T>{' '}
+            <strong>{versions.length}</strong>{' '}
+            <T>releases behind the newest version.</T>
+          </div>
+          <div className="buttons buttons_upgrade">
+            <button className="btn btn_lpm btn_upgrade"
+              onClick={this.upgrade} disabled={disabled}>
+              <T>
+                {upgrading ? 'Upgrading...' :
+                  upgrade_error ? 'Error' : 'Upgrade'
+                }
+              </T>
+            </button>
+          </div>
+          {ver_node && !ver_node.satisfied && !electron &&
             <div>
-              <T>lpm_new_ver</T>{' '}
-              <strong><T>{'lpm_new_ver_'+upgrade_type}</T></strong>{' '}
-              <T>lpm_new_ver_version</T>{' '}
-              <strong>{this.state.ver_last.version}</strong>{' '}
-              <T>is available. You are</T>{' '}
-              <strong>{versions.length}</strong>{' '}
-              <T>releases behind the newest version.</T>
+              To upgrade Proxy Manager, you need to update Node.js
+              to version {this.state.ver_node.recommended}.
             </div>
-            <div className="buttons buttons_upgrade">
-              <button className="btn btn_lpm btn_upgrade"
-                onClick={this.upgrade} disabled={disabled}>
-                <T>{upgrading ? 'Upgrading...' :
-                    upgrade_error ? 'Error' : 'Upgrade'}</T>
-              </button>
-            </div>
-            {ver_node && !ver_node.satisfied && !electron &&
-              <div>
-                To upgrade Luminati Proxy Manager, you need to update Node.js
-                to version {this.state.ver_node.recommended}.
-              </div>
-            }
+          }
         </Warning>;
     }
 }
@@ -249,13 +300,14 @@ class Upgrade_warning extends Pure_component {
         if (!is_upgraded||!ver)
             return null;
         return <Warning id={'upgrade_alert'+ver}>
-              <span>
-                <strong><T>LPM was upgraded in the background. </T></strong>
-                <T>Click here to </T>
-                <a className="link"
-                  onClick={this.on_click.bind(this)}><T>downgrade.</T></a>
-              </span>
-            </Warning>;
+          <span>
+            <strong><T>Proxy Manager was upgraded in the background. </T>
+            </strong>
+            <T>Click here to </T>
+            <a className="link"
+              onClick={this.on_click.bind(this)}><T>downgrade.</T></a>
+          </span>
+        </Warning>;
     }
 }
 
@@ -276,14 +328,14 @@ class Whitelist_warning extends Pure_component {
         if (!not_whitelisted)
             return null;
         return <Warning id="not_whitelisted_warning">
-              <span>
-                <strong><T>Security issues found. Proxy Manager accepts
-                connections from all the IPs</T></strong>{' '}
-                <T>Click here to</T>{' '}
-                <a className="link" onClick={this.on_click.bind(this)}><T>see
-                  whitelisted IPs.</T></a>
-              </span>
-            </Warning>;
+          <span>
+            <strong><T>Security issues found. Proxy Manager accepts
+            connections from all the IPs</T></strong>{' '}
+            <T>Click here to</T>{' '}
+            <a className="link" onClick={this.on_click.bind(this)}><T>see
+              whitelisted IPs.</T></a>
+          </span>
+        </Warning>;
     }
 });
 

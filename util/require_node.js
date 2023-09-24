@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, node_ios, be_ff*/
+'use strict'; /*jslint node:true, browser:true*/
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
     (typeof navigator=='object' && navigator.product=='ReactNative');
@@ -39,12 +39,12 @@ else
                     return ex;
                 // XXX odin: react native bundler syntax error when require()
                 // not string literal -> workaround.
-                var node_req = require;
+                var _require = require;
                 if (!dep||/https?:\/\//.test(dep))
                     return null;
                 if (/^\.?\.?\//.test(dep)) // './' '../' '/'
-                    return node_req(rel_root+dep);
-                return node_req(dep);
+                    return _require(/* brd-build-deps ignore */rel_root+dep);
+                return _require(/* brd-build-deps ignore */dep);
             }));
         };
     };

@@ -736,6 +736,35 @@ describe('migration', ()=>{
             assert.equal(tests_run[v], true);
         }
     });
+    describe_version('1.222.563', v=>{
+        it('does not change if no proxy_count', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [{port: 24000, pool: 15}, {port: 24001}],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, conf);
+        });
+        it('removes legacy proxy_count attribute', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [{port: 24000, proxy_count: 20}, {port: 24001}],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [{port: 24000}, {port: 24001}],
+            });
+        });
+    });
+    it('ensures that each production migration has a test', ()=>{
+        for (let v in migrations)
+        {
+            if (v.startsWith('x'))
+                continue;
+            assert.equal(tests_run[v], true);
+        }
+    });
 });
 
 describe('manager', ()=>{

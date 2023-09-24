@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
@@ -21,7 +21,7 @@ E.glob_to_regex = function(glob){
     return new RegExp(E.glob_to_regex_str(glob)); };
 E.glob_fn = function(glob){
     var re = E.glob_to_regex(glob);
-    return function(s){ return re.test(s); };
+    return function glob_fn_test(s){ return re.test(s); };
 };
 E.glob = function(glob, value){ return E.glob_fn(glob)(value); };
 
@@ -189,7 +189,7 @@ E.match_fn = function(filter, opt){
         }
         cmp[i] = c;
         if (typeof c=='function')
-            func += 'cmp['+i+'](s, extra) ';
+            func += 'cmp['+i+'](s, extra, extra2) ';
         else if (c instanceof Object)
             func += c.fn ? c.fn+' ' : '';
         else
@@ -198,7 +198,7 @@ E.match_fn = function(filter, opt){
     if (!cmp.length)
         func += 'false ';
     func += ';';
-    return new Function(['cmp', 's', 'extra'], func).bind(null, cmp);
+    return new Function(['cmp', 's', 'extra', 'extra2'], func).bind(null, cmp);
 };
 E.match = function(filter, value, opt){
     return E.match_fn(filter, opt)(value, opt && opt.extra); };

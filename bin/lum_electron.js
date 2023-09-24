@@ -12,14 +12,17 @@ console.info = function(){};
 const auto_updater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
 const config = require('../util/lpm_config.js');
+const lpm_config_static = require('../util/lpm_config_static');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
-require('../lib/perr.js').run({});
+const perr = require('../lib/perr.js');
 const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
 const pkg = require('../package.json');
 const logger = require('../lib/logger.js');
+const get_cache = require('../lib/cache.js');
+const cluster_ipc = require('../util/cluster_ipc.js');
 const E = module.exports;
 
 let manager, upgrade_available, can_upgrade, is_upgrading, upgrade_cb;
@@ -46,8 +49,10 @@ const restart = ()=>{
 let upgrade = ver=>etask(function*(){
     if (!can_upgrade)
     {
-        let res = yield show_message({type: 'info', title: 'Luminati update',
-            message: (ver ? `Luminati version ${ver}` : 'Luminati update')
+        let res = yield show_message({type: 'info',
+            title: 'Proxy manager update',
+            message: (ver ? `Proxy Manager version ${ver}` :
+                'Proxy Manager update')
             +' will be installed on exit',
             buttons: ['Install on exit', 'Install now']});
         if (!res)
@@ -86,16 +91,16 @@ auto_updater.on('update-available', e=>etask(function*(){
         }
         return;
     }
-    const changelog_url = 'https://github.com/luminati-io/luminati-proxy/blob/'
-    +'master/CHANGELOG.md';
+    const changelog_url = 'https://github.com/'+lpm_config_static.github_repo
+    +'/blob/master/CHANGELOG.md';
     const update_msg = `Update version ${e.version} is available. Full list of`
     +` changes is available here: ${changelog_url}`;
     logger.notice(update_msg);
     if (!can_upgrade)
     {
         let res = yield show_message({type: 'info',
-            title: `Luminati update ${e.version} is available`,
-            message: 'Luminati version '+e.version
+            title: `Proxy Manager update ${e.version} is available`,
+            message: 'Proxy Manager version '+e.version
             +' is available. Would you like to download it?',
             buttons: ['No', 'Yes']});
         if (!res)
@@ -121,16 +126,16 @@ const check_conflicts = ()=>etask(function*(){
     let tasks;
     try { tasks = yield tasklist(); }
     catch(e){ process.exit(); }
-    tasks = tasks.filter(t=>t.imageName.includes('Luminati Proxy Manager') &&
+    tasks = tasks.filter(t=>t.imageName.includes('Proxy Manager') &&
         t.pid!=process.pid);
     if (tasks.length<=2)
         return;
     const res = yield show_message({
         type: 'warning',
         title: 'Address in use',
-        message: `LPM is already running (${tasks[0].pid})\n`
+        message: `Proxy Manager is already running (${tasks[0].pid})\n`
             +'Click OK to stop the '
-            +'offending processes or Cancel to close LPM.\n\n'
+            +'offending processes or Cancel to close Proxy Manager.\n\n'
             +'Suspected processes:\n'
             +'PID\t Image Name\t Session Name\t Mem Usage\n'
             +tasks.map(t=>`${t.pid}\t ${t.imageName}\t ${t.sessionName}\t `
@@ -145,7 +150,7 @@ const check_conflicts = ()=>etask(function*(){
         yield show_message({
             type: 'warning',
             title: 'Failed stopping processes',
-            message: 'Failed stopping processes. Restart Luminati Proxy '
+            message: 'Failed stopping processes. Restart Proxy '
                 +'Manager as administrator or stop the processes manually '
                 +'and then restart.\n\n'+e,
             buttons: ['Ok'],
@@ -155,6 +160,24 @@ const check_conflicts = ()=>etask(function*(){
     restart();
 });
 
+const init_shared_cache = ()=>{
+    try {
+        const cache = get_cache();
+        cluster_ipc.master_on('cache_set', msg=>
+            cache.set(msg.url, msg.res_data, msg.headers));
+        cluster_ipc.master_on('cache_get', msg=>cache.get(msg.url));
+        cluster_ipc.master_on('cache_has', msg=>cache.has(msg.url));
+    } catch(e){ console.log('SETTING CACHE ERROR: '+e.message); }
+};
+
+const check_for_updates = ()=>{
+    try {
+        auto_updater.checkForUpdates();
+    } catch(e){
+        logger.error('Version update check fail: '+zerr.e2s(e));
+    }
+};
+
 const _run = argv=>etask(function*(){
     if (process.send)
     {
@@ -163,11 +186,16 @@ const _run = argv=>etask(function*(){
         yield etask.sleep(2000);
     }
     yield check_conflicts();
+    init_shared_cache();
     manager = new Manager(argv);
     auto_updater.logger = manager.log;
-    setTimeout(()=>auto_updater.checkForUpdates(), 15000);
+    setTimeout(()=>check_for_updates(), 15000);
     manager.on('www_ready', url=>{
-        open(url, {url: true});
+        try {
+            open(url, {url: true});
+        } catch(e){
+            logger.error('Failed to auto open UI: '+zerr.e2s(e));
+        }
     })
     .on('upgrade', cb=>{
         upgrade_cb = cb;
@@ -175,7 +203,7 @@ const _run = argv=>etask(function*(){
         if (upgrade_available)
             upgrade();
         else
-            auto_updater.checkForUpdates();
+            check_for_updates();
     })
     .on('stop', ()=>{
         process.exit();
@@ -209,6 +237,7 @@ let quit = err=>{
 };
 
 E.run = argv=>{
+    perr.run({enabled: !argv.no_usage_stats, zagent: argv.zagent});
     app.on('ready', ()=>_run(argv));
     process.on('SIGINT', quit);
     process.on('SIGTERM', quit);

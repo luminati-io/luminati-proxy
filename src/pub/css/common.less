@@ -1,5 +1,22 @@
-@first_color: #004d74;
-@first_odd: #4a8398;
+@first_color: var(--first-color);
+@first_odd: var(--first-odd);
+@cp_border: var(--cp-border);
+@cp_border_dark: var(--cp-border-dark);
+@cp_dark: var(--cp-dark);
+@cp_white: var(--cp-white);
+@cp_second: var(--cp-second);
+@cp_third: var(--cp-third);
+
+@login_logo: var(--login-logo);
+@login_logo_width: var(--login-logo-width);
+@login_logo_version_top: var(--login-logo-version-top);
+@login_logo_version_left: var(--login-logo-version-left);
+@logo_icon: var(--logo-icon);
+@logo_bg_size: var(--logo-bg-size);
+@btn_lpm_border_radius: var(--btn-lpm-border-radius);
+@border_radius_round: var(--border-radius-round);
+@btn_lpm_font_weight: var(--btn-lpm-font-weight);
+
 @grey: #ccdbe3;
 @grey_border: #e0e9ee;
 @light_grey: #e2e2e2;
@@ -17,29 +34,11 @@
 @link: #428bca;
 @tooltip: #154055;
 @chrome_border: #d0d0d0;
-@cp_border: rgba(0,77,116,0.1);
-@cp_border_dark: rgba(0,77,116,0.2);
-@cp_dark: #E5EDF1;
-@cp_second: rgba(0,77,116,0.5);
-@cp_third: rgba(0,77,116,0.7);
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Lato Regular'), local('Lato-Regular'),
-      url(/font/lato_regular.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
-      U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-}
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Lato Bold'), local('Lato-Bold'),
-      url(/font/lato_bold.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
-      U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-}
+@color-success: #0BE597;
+@color-white: #ffffff;
+@color-alert-danger: #E22541;
+@color-alert-success: #0BE597;
+
 @keyframes field_highlight {
     0% {
         border: 1px solid white;
@@ -97,15 +96,15 @@ h4 { margin: 0; }
     width: auto;
     min-width: 140px;
     height: 32px;
-    border-radius: 2px;
+    border-radius: @border_radius_round;
     background-color: white;
     border: solid 1px @grey;
     color: @first_color;
     font-size: 16px;
-    font-weight: 300;
     padding-top: 3px;
     margin: 0 2px;
     box-shadow: none;
+    font-weight: @btn_lpm_font_weight;
     &:hover, &.active {
         background-color: @first_color;
         border-color: @first_color;
@@ -135,7 +134,7 @@ h4 { margin: 0; }
     line-height: 0;
     font-size: 32px;
     padding-bottom: 9px;
-    border-radius: 4px;
+    border-radius: @border_radius_round;
     font-weight: 700;
     width: 280px;
     height: 60px;
@@ -168,7 +167,7 @@ h4 { margin: 0; }
 .flex {
     flex: 1;
 }
-.flag-icon {
+.fi {
     border-radius: 2px;
     margin-right: 2px;
 }
@@ -179,26 +178,6 @@ h4 { margin: 0; }
         min-width: 550px;
     }
     .nav_tabs { margin-bottom: 15px; }
-    .gifs_inner {
-        flex: 1;
-        .gif {
-            flex: 1;
-            margin-left: 20px;
-            max-width: 720px;
-            min-width: 400px;
-            background-repeat: no-repeat;
-            background-size: contain;
-            &.chrome_mac {
-                background-image: url(https://lum.fleeq.io/l/lgqwdg3m1l-f1kbxvu0lx);
-            }
-            &.chrome_win {
-                background-image: url(https://lum.fleeq.io/l/ixla2i9nr2-2ld5aufqf1);
-            }
-            &.ie { background-image: url(https://lum.fleeq.io/l/om9yter7qd-t5032zwo3g); }
-            &.firefox { background-image: url(https://lum.fleeq.io/l/5rzxcrg8zp-q6r2lmkiv8); }
-            &.safari { background-image: url(https://lum.fleeq.io/l/jij8ogkbry-boq8hoou0v); }
-        }
-    }
     .well {
         box-shadow: none;
         border-radius: 3px;
@@ -255,13 +234,14 @@ h4 { margin: 0; }
     width: 100%;
     z-index: 20;
     .logo {
+        pointer-events: none;
         height: 60px;
         width: 50px;
         display: inline-block;
-        background-image: url('img/lum_logo_short.svg');
+        background-image: @logo_icon;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: 40px;
+        background-size: @logo_bg_size;
         cursor: pointer;
         &.lock {
             pointer-events: none;
@@ -329,7 +309,7 @@ h4 { margin: 0; }
         color: @first_color;
         text-decoration: none;
         cursor: pointer;
-        .flag-icon { margin-right: 5px; }
+        .fi { margin-right: 5px; }
     }
     .schema {
         width: 100%;
@@ -358,7 +338,8 @@ h4 { margin: 0; }
                 }
                 .layer_btn {
                     text-align: center;
-                    border-radius: 4px;
+                    border-radius: @border_radius_round;
+                    font-weight: @btn_lpm_font_weight;
                     border: solid 1px @cp_border;
                     padding: 4px 18px;
                     margin: 3px 0;
@@ -384,7 +365,7 @@ h4 { margin: 0; }
                     position: relative;
                     top: -1px;
                 }
-                .flag-icon {
+                .fi {
                     font-size: 15px;
                     top: 1px;
                 }
@@ -425,6 +406,15 @@ h4 { margin: 0; }
                     .layer_btn { padding: 4px 4px; }
                 }
             }
+        }
+    }
+    .cert {
+        width: 18px;
+        height: 18px;
+        margin: 0 3px;
+        color: @blue_grey;
+        &.custom {
+            color: @color-success;
         }
     }
 }
@@ -552,7 +542,7 @@ input[type=url].error { border-color: @error_dark; }
     min-width: 113px;
     input { min-width: 0; }
     &.status { min-width: 130px; }
-    &.ban_action { min-width: 165px; }
+    &.duration { min-width: 175px; }
 }
 ul.bullets {
     padding-left: 0;
@@ -745,7 +735,7 @@ span.icon_link {
     display: flex;
     align-items: center;
     border-radius: 2px;
-    padding: 10px 20px;
+    padding: 10px 35px 10px 20px;
     position: relative;
     .warning_icon {
         background: url(/img/warning.svg);
@@ -756,8 +746,9 @@ span.icon_link {
      }
     .close_btn {
         position: absolute;
-        right: 6px;
-        top: 14px;
+        right: 10px;
+        top: 13px;
+        cursor: pointer;
     }
 }
 .cp_icon {
@@ -927,7 +918,7 @@ span.icon_link {
         padding: 15px 40px 15px 15px;
         border: 0;
         h4.modal-title, h4 {
-            font-size: 24px;
+            font-size: 23px;
             font-weight: bold;
             text-align: center;
             padding-top: 15px;
@@ -1055,10 +1046,6 @@ span.icon_link {
         background-image: url(/img/logo_80legs.svg);
         width: 56px;
     }
-}
-.select_zone {
-    display: flex;
-    align-items: center;
 }
 .hbox {
     white-space: pre-wrap;
@@ -1237,7 +1224,7 @@ span.icon_link {
         }
         &_on {
             left: 7px;
-            color: #ffffff;
+            color: @color-white;
             transform: translateX(-24px);
         }
         &_active {
@@ -1250,7 +1237,7 @@ span.icon_link {
         width: 14px;
         height: 14px;
         border-radius: 7px;
-        background-color: #ffffff;
+        background-color: @color-white;
         transition: transform 350ms ease;
         left: 0;
         top: 2px;
@@ -1297,4 +1284,60 @@ span.icon_link {
         -webkit-mask-position: 0 0;
     }
     &.open:before { -webkit-mask-position: -16px 0; }
+}
+.faq_link {
+    margin: 0 3px;
+    cursor: pointer;
+}
+.alert_wrapper {
+    bottom: 0;
+    left: 44px;
+    position: fixed;
+    z-index: 9000;
+    min-width: 20%;
+    .alert {
+        white-space: pre-line;
+        border: 0;
+        border-radius: 5px;
+        color: @color-white;
+        min-height: 48px;
+        position: relative;
+        font-weight: normal;
+        line-height: 22px;
+        font-size: 14px;
+    }
+    .alert-danger {
+        background-color: @color-alert-danger;
+    }
+    .alert-success {
+        background-color: @color-alert-success;
+    }
+    .alert-warning {
+        background-color: #ffdb7b;
+        color: #5f5233;
+    }
+    .alert-dismissable, .alert-dismissible {
+        padding-right: 0;
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        align-items: center;
+        .close {
+            color: inherit;
+            opacity: 1;
+            text-shadow: none;
+            outline: 0;
+            right: 10px;
+            top: 0px;
+            &:hover {
+                color: fade(@dark, 70%);
+            }
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+}
+.zagent .alert_wrapper {
+    left: 10px;
 }

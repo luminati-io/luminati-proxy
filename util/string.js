@@ -1,10 +1,10 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true*//*global Map*/
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -36,13 +36,9 @@ E.split_crlf = function(s){
 E.split_nl = function(s){
     return E.rm_empty_last(s.split('\n')); };
 E.to_array_buffer = function(s){
-    var buf = new ArrayBuffer(s.length), buf_view = new Uint8Array(buf), i;
-    for (i=0; i<s.length; i++)
-        buf_view[i] = s.charCodeAt(i);
-    return buf;
-};
-E.from_array_buffer = function(buf){
-    return String.fromCharCode.apply(null, new Uint8Array(buf)); };
+    return new TextEncoder().encode(s).buffer; };
+E.from_array_buffer = function(buf, enc){
+    return new TextDecoder(enc||'utf8').decode(buf); };
 E.capitalize = function(s){
     s = ''+s;
     return (s[0]||'').toUpperCase()+s.slice(1);
@@ -116,9 +112,10 @@ E.hash = function(s){
     return hash;
 };
 
-var alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
-E.generate = function(len){
+var def_alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
+E.generate = function(len, alphabet){
     len = len||12;
+    alphabet = alphabet||def_alphabet;
     var ret = '';
     for (var i=0; i<len; i++)
         ret += alphabet[Math.random()*alphabet.length|0];
@@ -137,6 +134,74 @@ E.longest = function(){
 E.trim = function(s){
     return (''+s).replace(/^[\s\u00a0\u200c]*/g, '')
         .replace(/[\s\u00a0\u200c]*$/g, '');
+};
+
+E.object_to_str = function(obj){
+    return Object.entries(obj)
+    .map(function(entry){
+        if (entry[1]!=null)
+            return entry[0]+'='+entry[1];
+    })
+    .filter(Boolean)
+    .join(' ');
+};
+
+var snake_case_regex = /(([A-Z](?![^A-Z]))+|[A-Z])[^A-Z]*|[^A-Z]+/g;
+E.to_snake_case = function(str){
+    return Array.from((str||'').matchAll(snake_case_regex))
+        .map(function(m){ return m[0].toLowerCase(); }).join('_');
+};
+
+/* eslint-disable-next-line no-control-regex*/
+E.str_rm_null = function(s){ return (s||'').replace(/\u0000/g, ''); };
+
+E.count = function(s, p){
+    if (!p || !p.toString || (p=p.toString()).length<1 || p.length>s.length)
+        return 0;
+    var c, i;
+    for (c=-1, i=-1-p.length; i!=-1; ++c, i=s.indexOf(p, i+p.length));
+    return c;
+};
+
+E.internalize_pool = typeof Map=='function' ? function(){
+    var pool = new Map();
+    return function internalize_string(str){
+        var v = pool.get(str);
+        if (v===undefined)
+            pool.set(str, v = str);
+        return v;
+    };
+} : function(v){ return v; };
+
+E.wrap = function wrap(str, width, nbsp_to_space){
+    nbsp_to_space = nbsp_to_space!==false;
+    var lines = str.split('\n');
+    if (lines.length>1)
+    {
+        return lines.map(function(line){
+            return wrap(line, width);
+        }).join('\n');
+    }
+    var words = str.split(' ');
+    var output = '';
+    var cur_line = '';
+    for (var i = 0; i < words.length; i++)
+    {
+        var word = words[i];
+        var possible_line = cur_line ? cur_line+' '+word : word;
+        if (possible_line[width])
+        {
+            output += cur_line+'\n';
+            cur_line = word;
+        }
+        else
+            cur_line = possible_line;
+    }
+    output += cur_line;
+    return nbsp_to_space ? output.replace(/\u00A0/g, ' ') : output;
+};
+E.sp2nbsp = function(){
+    return E.es6_str(arguments).replace(/ /g, '\u00A0');
 };
 
 return E; }); }());

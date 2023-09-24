@@ -35,7 +35,7 @@ E.get_cmd = (cmd, opt)=>{
     let args = array.copy(array.to_array(cmd));
     // XXX vladimir: rm process.zon from hutil
     if (opt.node && process.zon && process.zon.main)
-        throw 'Unable to spawn node process from embedded Node';
+        throw new Error('Unable to spawn node process from embedded Node');
     let command = opt.cmd_shell ? `"${args.shift()}"` :
         opt.shell ? '/bin/bash' : opt.node ? process.argv[0] : args.shift();
     command = file.normalize(command);
@@ -51,7 +51,17 @@ E.get_cmd = (cmd, opt)=>{
 };
 E.get_env = opt=>{
     if (!opt.opt||!opt.opt.env)
-        return process.env;
+    {
+        if (!opt.opt||!opt.opt.remove_env)
+            return process.env;
+        let cur_env = {};
+        for (let k of Object.keys(process.env)
+            .filter(r=>!opt.opt.remove_env.includes(r)))
+        {
+            cur_env[k] = process.env[k];
+        }
+        return cur_env;
+    }
     if (!opt.node)
         return opt.opt.env;
     let nave_env = {};
@@ -86,9 +96,7 @@ E.get_redir = (input, piped, ipc)=>{
             if (/^\/dev\/pipe$/.test(dst))
                 dst += src; // remember src fd
             if (!/^\/dev\/(null|pipe)/.test(dst)) // real file
-            {
                 fds.push(dst = fs.openSync(dst, redir_modes[match[2]]));
-            }
         }
         outputs[src] = dst;
     }
@@ -122,6 +130,8 @@ function unshift_pipe(stdio, data){
 }
 function handle_stdio(child, redir, logger){
     let io_names = ['stdin', 'stdout', 'stderr'];
+    if (!child || !child.stdio)
+        return;
     child.stdio.forEach((stdio, i)=>{
         if (i<1||!stdio)
            return;
@@ -132,12 +142,9 @@ function handle_stdio(child, redir, logger){
 }
 function close_fds(child, fds){
     fds.forEach(fs.closeSync);
-    if (!child)
+    if (!child || !child.stdio)
         return;
-    child.stdio.forEach(stdio=>{
-        if (stdio)
-            stdio.destroy();
-    });
+    child.stdio.forEach(stdio=>stdio && stdio.destroy());
 }
 
 // XXX vladimir: check about platforms other than x86/arm from signal(7)
@@ -185,7 +192,7 @@ E.sys = (cmd, opt)=>etask(function*exec(){
     opt = E.process_opt(opt||{});
     // XXX vladimir: rm process.zon from hutil
     if (opt.fork && process.zon && process.zon.main)
-        throw 'Unable to spawn node process from embedded Node';
+        throw new Error('Unable to spawn node process from embedded Node');
     cmd = E.get_cmd(cmd, opt);
     let status = {signal: 0, code: 0};
     let log = {stdout: '', stderr: '', stdall: ''};
@@ -229,12 +236,16 @@ E.sys = (cmd, opt)=>etask(function*exec(){
         this.child_process = child;
     // Process stdio redirection
     let logger = (name, data)=>{
+        if (opt.log)
+        {
+            opt.log(data, name);
+            if (opt.no_buf)
+                return;
+        }
         if (opt[name])
             log[name] += data;
         if (opt.stdall)
             log.stdall += data;
-        if (opt.log)
-            opt.log(data, name);
     };
     handle_stdio(child, redir.pipes, logger);
     if (opt.stdin&&child.stdio[0])

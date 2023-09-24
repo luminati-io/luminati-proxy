@@ -1,15 +1,15 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.212.374",
-        "title": "Luminati Proxy Manager",
+        "version": "1.410.597",
+        "title": "Proxy Manager",
         "license": {
             "name": "MIT",
             "url": "http://opensource.org/licenses/MIT"
         }
     },
     "host": "127.0.0.1:22999",
-    "basePath": "/api",
+    "basePath": "/api/v2",
     "schemes": ["http"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
@@ -29,7 +29,7 @@
         },
         "/version": {
             "get": {
-                "description": "Returns the version of the running Luminati Proxy Manager\n",
+                "description": "Returns the version of the running Proxy Manager\n",
                 "tags": [
                     "Manager"
                 ],
@@ -40,11 +40,11 @@
                             "type": "object",
                             "properties": {
                                 "version": {
-                                    "description": "LPM version",
+                                    "description": "Proxy Manager version",
                                     "type": "string"
                                 },
                                 "argv": {
-                                    "description": "Command line arguments passed to LPM",
+                                    "description": "Command line arguments passed to Proxy Manager",
                                     "type": "string"
                                 }
                             }
@@ -66,15 +66,15 @@
                             "type": "object",
                             "properties": {
                                 "version": {
-                                    "description": "Latest LPM version",
+                                    "description": "Latest Proxy Manager version",
                                     "type": "string"
                                 },
                                 "newer": {
-                                    "description": "Whether or not latest version is newer than current LPM version",
+                                    "description": "Whether or not latest version is newer than current Proxy Manager version",
                                     "type": "boolean"
                                 },
                                 "versions": {
-                                    "description": "LPM versions changelog",
+                                    "description": "Proxy Manager versions changelog",
                                     "type": "array",
                                     "items": {
                                         "type": "object",
@@ -168,6 +168,7 @@
         },
         "/add_wip": {
             "post": {
+                "deprecated": true,
                 "description": "An alternative to adding IPs to whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
                 "tags": ["Manager"],
                 "parameters": [
@@ -210,8 +211,98 @@
                 }
             }
         },
+        "/wip": {
+            "put": {
+                "description": "An alternative to adding IPs to whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "type": "string"
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to whitelist",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "403": {
+                        "description": "Forbidden. No authentication provided"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            },
+            "delete": {
+                "description": "An alternative to removing IP from whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "type": "string"
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to remove",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "403": {
+                        "description": "Forbidden. No authentication provided"
+                    },
+                    "404": {
+                        "description": "Not Found. IP is not whitelisted"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            }
+        },
         "/add_whitelist_ip": {
             "post": {
+                "deprecated": true,
                 "description": "Grants access to an IP to browse admin UI",
                 "tags": ["Manager"],
                 "parameters": [
@@ -238,6 +329,77 @@
                     },
                     "400": {
                         "description": "Bad request. No IP was passed"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            }
+        },
+        "/whitelist_ip": {
+            "put": {
+                "description": "Grants access to an IP to browse admin UI",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to whitelist",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Invalid IP was passed"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove access to browse admin UI for IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "IP to remove",
+                                    "example": "10.0.0.0"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request. No IP was passed"
+                    },
+                    "404": {
+                        "description": "Not Found. IP is not whitelisted"
                     },
                     "422": {
                         "description": "Unprocessable entity. Invalid IP was passed"
@@ -441,7 +603,7 @@
         },
         "/shutdown": {
             "post": {
-                "description": "Shutdown LPM",
+                "description": "Shutdown Proxy Manager",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -452,7 +614,7 @@
         },
         "/upgrade": {
             "post": {
-                "description": "Upgrade LPM",
+                "description": "Upgrade Proxy Manager",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -463,7 +625,7 @@
         },
         "/restart": {
             "post": {
-                "description": "Restart LPM",
+                "description": "Restart Proxy Manager",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -803,6 +965,7 @@
         },
         "/refresh_sessions/{port}": {
             "get": {
+                "deprecated": true,
                 "description": "Switch luminati sessions to new sessions (get new IPs)",
                 "tags": ["Proxy"],
                 "parameters": [
@@ -873,19 +1036,19 @@
         },
         "/settings": {
             "get": {
-                "description": "Return current LPM general settings",
+                "description": "Return current general settings",
                 "tags": ["Proxy"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/settings"  
+                            "$ref": "#/definitions/settings"
                         }
                     }
                 }
             },
             "put": {
-                "description": "Update LPM general settings",
+                "description": "Update general settings",
                 "tags": ["Proxy"],
                 "parameters": [
                     {
@@ -894,7 +1057,7 @@
                         "description": "New settings",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/updatable_settings"  
+                            "$ref": "#/definitions/updatable_settings"
                         }
                     }
                 ],
@@ -902,7 +1065,7 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/settings"  
+                            "$ref": "#/definitions/settings"
                         }
                     }
                 }
@@ -971,13 +1134,57 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "ips": {
+                                "vips": {
                                     "type": "array",
                                     "items": {"type": "string"},
                                     "example": ["gip1", "gip2"]
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/refresh_ip/{port}": {
+            "post": {
+                "description": "Refresh allocated IP or gIP in determined port",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Proxy port",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "description": "Refresh IP options (specify either IP or gIP)",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ip": {
+                                    "description": "IP to be refreshed",
+                                    "type": "string",
+                                    "example": "10.0.0.0"
+                                },
+                                "vip": {
+                                    "description": "gIP to be refreshed",
+                                    "type": "string",
+                                    "example": "gIP_1"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Error response"
                     }
                 }
             }
@@ -1035,7 +1242,7 @@
         },
         "/lpm_users": {
             "get": {
-                "description": "List of all the available LPM users for the account",
+                "description": "List of all the available pmgr users for the account",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -1057,7 +1264,7 @@
         },
         "/lpm_user": {
             "post": {
-                "description": "Creates a new LPM user",
+                "description": "Creates a new pmgr user",
                 "tags": ["Manager"],
                 "responses": {
                     "200": {
@@ -1244,10 +1451,6 @@
                     "type": "string",
                     "description": "Alternative domain url to luminati API"
                 },
-                "mail_domain": {
-                    "type": "string",
-                    "description": "Luminati support email domain (used in the UI)"
-                },
                 "logs": {
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
@@ -1263,7 +1466,7 @@
                 "pending_www_ips": {
                     "type": "array",
                     "items": {"type": "string"},
-                    "description": "List of IPs not whitelisted that recently tried to access LPM"
+                    "description": "List of IPs not whitelisted that recently tried to access Proxy Manager"
                 }
             }
         },
@@ -1315,10 +1518,6 @@
                     "type": "string",
                     "description": "Config file containing proxy definitions"
                 },
-                "cookie": {
-                    "type": "string",
-                    "description": "Cookie Jar file"
-                },
                 "mode": {
                     "type": "string",
                     "pattern": "^root|normal|guest$",
@@ -1341,12 +1540,6 @@
                     "description": "An authorization token"
                 },
                 "high_perf": {
-                    "type": "boolean"
-                },
-                "cloud": {
-                    "type": "boolean"
-                },
-                "flex_tls": {
                     "type": "boolean"
                 },
                 "zagent": {
@@ -1386,9 +1579,13 @@
                     "type": "integer",
                     "description": "Limit the numer of open proxy ports at the same time"
                 },
+                "ui_ws": {
+                    "type": "boolean",
+                    "description": "Enable live logs preview and other live data communication on the UI"
+                },
                 "force": {
                     "type": "boolean",
-                    "description": "Kill other instances of LPM if there are any"
+                    "description": "Kill other instances of Proxy Manager if there are any"
                 },
                 "session_termination": {
                     "type": "boolean",
@@ -1404,7 +1601,7 @@
                 },
                 "local_login": {
                     "type": "boolean",
-                    "description": "Requires each browser to authenticate against LPM"
+                    "description": "Requires each browser to authenticate against Proxy Manager"
                 },
                 "read_only": {
                     "type": "boolean",
@@ -1412,7 +1609,7 @@
                 },
                 "sync_config": {
                     "type": "boolean",
-                    "description": "Synchronize LPM configuration with the cloud"
+                    "description": "Synchronize Proxy Manager configuration with the cloud"
                 },
                 "extra_ssl_ips": {
                     "type": "array",
@@ -1448,13 +1645,18 @@
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
                 },
+                "tls_lib": {
+                    "type": "string",
+                    "pattern": "^(open_ssl|flex_tls)?$",
+                    "description": "SSL library"
+                },
                 "iface": {
                     "type": "string",
                     "description": "Interface or IP to listen on"
                 },
                 "customer": {
                     "type": "string",
-                    "description": "Luminati customer"
+                    "description": "Customer name"
                 },
                 "zone": {
                     "type": "string",
@@ -1475,7 +1677,7 @@
                 "proxy_connection_type": {
                     "type": "string",
                     "pattern": "^(http|https|socks)?$",
-                    "description": "Determines what kind of connection will be used between LPM and Super Proxy"
+                    "description": "Determines what kind of connection will be used between Proxy Manager and Super Proxy"
                 },
                 "proxy_retry": {
                     "type": "integer",
@@ -1500,7 +1702,7 @@
                 "ip": {
                     "type": "string",
                     "pattern": "^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$",
-                    "description": "Data center IP"
+                    "description": "Data Center IP"
                 },
                 "vip": {
                     "type": "integer",
@@ -1544,7 +1746,7 @@
                 "session": {
                     "type": "string",
                     "pattern": "^[^\\.\\-]*$",
-                    "description": "Luminati session for all proxy requests"
+                    "description": "Session for all proxy requests"
                 },
                 "sticky_ip": {
                     "type": "boolean",
@@ -1609,7 +1811,7 @@
                 "debug": {
                     "type": "string",
                     "pattern": "^(full|none)?$",
-                    "description": "Luminati request debug info"
+                    "description": "Request debug info"
                 }
             }
         }

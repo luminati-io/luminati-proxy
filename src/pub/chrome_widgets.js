@@ -24,13 +24,14 @@ export class Infinite_chrome_table extends Pure_component {
     cell_renderer = function Cell_renderer(props){
         if (props.rowData=='filler')
             return <div className="chrome_td"></div>;
-        return <span key={props.rowData}>{props.rowData}</span>;
+        return <span key={props.rowData.ip}>{props.cellData}</span>;
     };
     select_renderer = function Select_renderer(props){
         if (props.rowData=='filler')
             return <div className="chrome_td"></div>;
         return <Checkbox
-          checked={this.props.selected_list.includes(props.rowData)}
+          className="checkbox_single"
+          checked={this.props.selected_list.includes(props.rowData.ip)}
           on_change={()=>null}
         />;
     };
@@ -39,6 +40,15 @@ export class Infinite_chrome_table extends Pure_component {
             this.props.unselect_all();
         else
             this.props.select_all();
+    };
+    cell_data_getter = ({rowData, dataKey})=>rowData[dataKey];
+    header_row_renderer = function Header_renderer(props){
+        let {className} = props;
+        if (props.style.paddingRight)
+            className += ' chrome_tr_with_padding';
+        return <div role="row" className={className} style={props.style}>
+          {props.columns}
+        </div>;
     };
     render(){
         const rows = this.props.rows||[];
@@ -57,7 +67,8 @@ export class Infinite_chrome_table extends Pure_component {
                   <div className="chrome_table">
                     <AutoSizer>
                       {({height, width})=>
-                        <Table width={width}
+                        <Table
+                          width={width}
                           height={height}
                           onRowClick={this.props.toggle}
                           onHeaderClick={({dataKey})=>dataKey=='select' &&
@@ -65,14 +76,18 @@ export class Infinite_chrome_table extends Pure_component {
                           gridClassName="chrome_grid"
                           headerHeight={27}
                           headerClassName="chrome_th"
+                          headerRowRenderer={this.header_row_renderer}
                           rowClassName="chrome_tr"
                           rowHeight={22}
                           rowCount={rows.length+1}
-                          rowGetter={({index})=>rows[index]||'filler'}>
+                          rowGetter={({index})=>rows[index]||'filler'}
+                        >
                           <Column key="select"
                             cellRenderer={this.select_renderer.bind(this)}
                             label={
-                              <Checkbox checked={this.props.selected_all}
+                              <Checkbox
+                                className="checkbox_single"
+                                checked={this.props.selected_all}
                                 on_change={()=>null}
                               />
                             }
@@ -80,10 +95,12 @@ export class Infinite_chrome_table extends Pure_component {
                             className="chrome_td"
                             flexGrow={0}
                             flexShrink={1}
-                            width={20}
+                            width={40}
                           />
                           {this.props.cols.map(col=>
-                            <Column key={col.id}
+                            <Column
+                              key={col.id}
+                              cellDataGetter={this.cell_data_getter}
                               cellRenderer={this.cell_renderer}
                               label={col.title}
                               className="chrome_td"

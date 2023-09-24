@@ -3,22 +3,28 @@
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
-const http_shutdown = require('http-shutdown');
 const net = require('net');
 const url = require('url');
 const zlib = require('zlib');
 const request = require('request');
+const http_shutdown = require('http-shutdown');
 const {Netmask} = require('netmask');
+const forge = require('node-forge');
 const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
+const {SSL_OP_NO_TLSv1_1} = require('../lib/consts.js');
 const etask = require('../util/etask.js');
 const date = require('../util/date.js');
 const zutil = require('../util/util.js');
-const restore_case = require('../util/http_hdr.js').restore_case;
+const restore_case = require('../util/takeup_util.js').restore_case;
 const customer = 'abc';
 const password = 'xyz';
 
 const E = module.exports = {};
+
+E.keys = forge.pki.rsa.generateKeyPair(2048);
+E.keys.privateKeyPem = forge.pki.privateKeyToPem(E.keys.privateKey);
+E.keys.publicKeyPem = forge.pki.publicKeyToPem(E.keys.publicKey);
 
 E.assert_has = (value, has, prefix)=>{
     prefix = prefix||'';
@@ -92,6 +98,7 @@ E.http_proxy = port=>etask(function*(){
     });
     http_shutdown(proxy.http);
     const headers = {};
+    ssl.load_ca();
     proxy.http.on('connect', (req, res, head)=>etask(function*(){
         let _url = req.url;
         if (proxy.fake)
@@ -99,7 +106,8 @@ E.http_proxy = port=>etask(function*(){
             if (!proxy.https)
             {
                 proxy.https = https.createServer(
-                    Object.assign({requestCert: false}, ssl()),
+                    Object.assign({requestCert: false}, ssl(E.keys),
+                    {secureOptions: SSL_OP_NO_TLSv1_1}),
                     (_req, _res, _head)=>{
                         zutil.defaults(_req.headers,
                             headers[_req.socket.remotePort]||{});
@@ -222,7 +230,7 @@ E.http_ping = ()=>etask(function*(){
         port: _http.address().port,
         url: `http://127.0.0.1:${_http.address().port}/`,
     };
-    const _https = https.createServer(ssl(), handler);
+    const _https = https.createServer(ssl(E.keys), handler);
     yield etask.nfn_apply(_https, '.listen', [0]);
     _https.on('error', this.throw_fn());
     ping.https = {

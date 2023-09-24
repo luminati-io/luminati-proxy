@@ -1,10 +1,11 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
+'use strict'; /*jslint node:true, browser:true, es6:true*/
 (function(){
 var define, node_util;
-var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = typeof global=='object' && !!global.nativeRequire
-    || typeof navigator=='object' && navigator.product=='ReactNative';
+var is_node = typeof module=='object' && module.exports && module.children &&
+    typeof __webpack_require__!='function';
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -30,6 +31,14 @@ E.is_mocha = function(){
 };
 
 E.is_lxc = function(){ return is_node && +process.env.LXC; };
+
+// refresh() was added in node 10, we need to support node 8 for webOS TV 5.0
+// https://webostv.developer.lge.com/develop/guides/js-service-basics
+E.is_timer_refresh = (()=>{
+    let t = setTimeout(()=>{});
+    clearTimeout(t);
+    return !!t.refresh;
+})();
 
 E.f_mset = function(flags, mask, bits){ return flags&~mask | bits; };
 E.f_lset = function(flags, bits, logic){
@@ -92,6 +101,8 @@ function _clone_deep(obj){
         return new Date(obj);
     else if (obj instanceof RegExp)
         return new RegExp(obj);
+    else if (obj instanceof URL)
+        return new URL(obj);
     else if (obj instanceof Function)
         return obj;
     ret = {};
@@ -104,6 +115,41 @@ E.clone_deep = function(obj){
     if (!(obj instanceof Object))
         return obj;
     return _clone_deep(obj);
+};
+
+// assumptions & shortcuts:
+// - only arrays & pojos will be deeply cloned
+// - we accept the risk of having shallow copy of Date/RegExp/ObjectId/etc
+// - we accept the risk of skipping hasOwnProperty checks
+// - we accept the risk of skipping xxx.constructor edge cases (e.g. iframes)
+// => result is about 10-100x faster than _.cloneDeep for large objects
+E.fast_unsafe_clone_deep = function(orig){
+    if (orig==null)
+        return orig;
+    var res = orig.constructor==Object ? Object.assign({}, orig)
+        : orig.constructor==Array ? orig.slice()
+        : orig;
+    if (res!==orig)
+    {
+        var stack = new Array(2500), len = 0, obj, k, v;
+        stack[len++] = res;
+        while (len>0)
+        {
+            obj = stack[--len];
+            for (k in obj)
+            {
+                v = obj[k];
+                if (typeof v==='object' && v!==null)
+                {
+                    if (v.constructor===Object)
+                        obj[k] = stack[len++] = Object.assign({}, v);
+                    else if (v.constructor===Array)
+                        obj[k] = stack[len++] = v.slice();
+                }
+            }
+        }
+    }
+    return res;
 };
 
 // prefer to normally Object.assign() instead of extend()
@@ -373,6 +419,7 @@ E.unset = function(o, path){
 };
 var has_unique = {};
 E.has = function(o, path){ return E.get(o, path, has_unique)!==has_unique; };
+
 E.own = function(o, prop){
     return o!=null && Object.prototype.hasOwnProperty.call(o, prop); };
 
@@ -395,15 +442,9 @@ E.clone_inplace = function(dst, src){
         dst.splice(src.length);
     }
     else if (typeof dst=='object')
-    {
-        var k;
-        for (k in src)
-            dst[k] = src[k];
-        for (k in dst)
-        {
-            if (!src.hasOwnProperty(k))
-                delete dst[k];
-        }
+    { /* saving strict items order */
+        Object.keys(dst).forEach(x=>delete dst[x]);
+        Object.entries(src).forEach(([k, v])=>dst[k] = v);
     }
     return dst;
 };
@@ -445,6 +486,19 @@ E.pick = function(obj){
     return o;
 };
 
+// like _.pickBy
+E.pick_by = function(obj, cb){
+    var k, o = {};
+    for (k in obj)
+    {
+        if (typeof obj[k] == 'object' && !Array.isArray(obj[k]))
+            o[k] = E.pick_by(obj[k], cb);
+        else if (cb(obj[k], k))
+            o[k] = obj[k];
+    }
+    return o;
+};
+
 // subset of _.omit
 E.omit = function(obj, omit){
     var i, o = {};
@@ -455,11 +509,6 @@ E.omit = function(obj, omit){
             o[i] = obj[i];
     }
     return o;
-};
-
-E.if_set = function(val, o, name){
-    if (val!==undefined)
-        o[name] = val;
 };
 
 E.escape_dotted_keys = function(obj, repl){
@@ -496,41 +545,48 @@ E.ensure_array = function(v, split){
     return [v];
 };
 
-E.reduce_obj = function(coll, key_cb, val_cb){
+E.reduce_obj = function(coll, key_cb, val_cb, merge_cb){
     if (coll==null)
         return {};
-    if (key_cb==null)
-        key_cb = function(it){ return it; };
-    else if (typeof key_cb=='string')
+    if (val_cb===undefined && key_cb!=null && (key_cb.key||key_cb.value))
     {
-        var kpath = E.path(key_cb);
-        key_cb = function(it){ return E.get(it, kpath); };
+        merge_cb = key_cb.merge;
+        val_cb = key_cb.value;
+        key_cb = key_cb.key;
     }
-    if (val_cb==null)
-        val_cb = function(it){ return it; };
-    else if (typeof val_cb=='string')
-    {
-        var vpath = E.path(val_cb);
-        val_cb = function(it){ return E.get(it, vpath); };
-    }
+    key_cb = get_map_fn(key_cb);
+    val_cb = get_map_fn(val_cb);
     var obj = {};
     if (Array.isArray(coll))
     {
         coll.forEach(function(item, i){
             var k = key_cb(item, i), v = val_cb(item, i);
-            if (k!==undefined && v!==undefined)
-                obj[k] = v;
+            if (k===undefined || v===undefined)
+                return;
+            if (obj[k]!==undefined && merge_cb)
+                v = merge_cb(obj[k], v);
+            obj[k] = v;
         });
     }
     else if (typeof coll=='object')
     {
         Object.keys(coll).forEach(function(i){
             var k = key_cb(coll[i], i), v = val_cb(coll[i], i);
-            if (k!==undefined && v!==undefined)
-                obj[k] = v;
+            if (k===undefined || v===undefined)
+                return;
+            if (obj[k]!==undefined && merge_cb)
+                v = merge_cb(obj[k], v);
+            obj[k] = v;
         });
     }
     return obj;
+};
+
+E.group_by = function(coll, key_cb, val_cb){
+    var inner_val_cb = get_map_fn(val_cb);
+    val_cb = function(it){ return [inner_val_cb(it)]; };
+    var merge_cb = function(a, b){ return a.concat(b); };
+    return E.reduce_obj(coll, key_cb, val_cb, merge_cb);
 };
 
 E.flatten_obj = function(obj){
@@ -544,12 +600,72 @@ E.flatten_obj = function(obj){
             res[k] = obj[k];
         else
         {
-            var o = E.flatten_obj(obj[keys[i]]), _keys = Object.keys(o);
+            var o = E.flatten_obj(obj[k]), _keys = Object.keys(o);
             for (var j = 0; j < _keys.length; j++)
                 res[k+'_'+_keys[j]] = o[_keys[j]];
         }
     }
     return res;
 };
+
+E.pairwise = function(coll, opt){
+    if (!Array.isArray(coll) || coll.length<2)
+        return;
+    opt = opt||{};
+    var res = [];
+    for (var i = 0; i < coll.length; i++)
+    {
+        for (var j = i+1; j < coll.length; j++)
+        {
+            if (opt.balanced)
+                res.push((i+j)%2 ? [coll[i], coll[j]] : [coll[j], coll[i]]);
+            else
+                res.push([coll[i], coll[j]]);
+        }
+    }
+    return res;
+};
+
+E.stackless_error = function(msg, extra, Err_f){
+    if (!Err_f && typeof extra=='function')
+    {
+        Err_f = extra;
+        extra = undefined;
+    }
+    Err_f = Err_f || Error;
+    const old_lmt = Error.stackTraceLimit;
+    Error.stackTraceLimit = 0;
+    const err = Object.assign(new Err_f(msg), extra);
+    Error.stackTraceLimit = old_lmt;
+    return err;
+};
+
+E.omit_falsy_props = function(o){
+    return Object.fromEntries(Object.entries(o).filter(function(arg){
+        return ![null, undefined, ''].includes(arg[1]);
+    }));
+};
+
+// XXX: drop once jshint version supports BigInt (esversion >= 11)
+/* jshint -W119 */
+E.object_sizeof = obj=>Buffer.byteLength(
+    JSON.stringify(obj, (_k, v)=>typeof v=='bigint' ? Number(v) : v));
+/* jshint +W119 */
+
+function get_map_fn(v){
+    if (v==null)
+        return function(it){ return it; };
+    if (typeof v=='function')
+        return v;
+    var path = E.path(v);
+    if (!path.length)
+        return function(it){ return it; };
+    if (path.length==1)
+        return function(it){ return it==null ? it : it[path[0]]; };
+    return function(it){ return E.get(it, path); };
+}
+
+E.make_error = (message, code, extra)=>
+    Object.assign(new Error(message), code&&{code}, extra&&{extra});
 
 return E; }); }());

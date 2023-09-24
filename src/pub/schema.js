@@ -8,8 +8,9 @@ import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
 
 const tooltips = t=>({
-    crawler: t('Your crawler or bot that systematically browses the web. '
-        +'Connect any type of crawler to the Luminati Proxy Manager:')
+    crawler: t('Your proxy journey begins with your crawler, which '
+        +'systematically browses the Web. Proxy Manager works with any type '
+        +'of crawler.')
         +`<ul>
           <li>
             <div>${t('Browser and extension based crawlers')}</div>
@@ -25,30 +26,29 @@ const tooltips = t=>({
             <div class="logo_icon import"></div>
           </li>
         </ul>`,
-    port_numbers: t('Defined proxy ports in Luminati Proxy Manager'),
-    lpm: t('Luminati Proxy Manager - open-source proxy service that holds '
-        +'valuable features, such as:')
+    port_numbers: t('Defined proxy ports in Proxy Manager'),
+    lpm: t('Your request next travels through the Proxy Manger, your control '
+        +'center, where you manage:')
         +`<ul>
-          <li>${t('IP rotation control')}</li>
-          <li>${t('auto retry')}</li>
-          <li>${t('speed optimization')}</li>
-          <li>${t('auto blacklist of bad IPs')}</li>
-          <li>${t('powerful debugging options')}</li>
+          <li>${t('IP rotations')}</li>
+          <li>${t('Auto-retries')}</li>
+          <li>${t('Speed optimization')}</li>
+          <li>${t('Automatic blacklisting of bad IPs')}</li>
+          <li>${t('Debugging')}</li>
         </ul>`
-        +t('and more. View full list of features by clicking any proxy port '
-            +'in the')
-        +`<strong> ${t('Proxies')}</strong> ${t('table')}`,
-    super_proxy: t('Load balancing servers that manage the traffic between '
-        +'the Luminati Proxy Manager and the peer'),
-    peer: `${t('Exit node (IP) - This might be:')}
+        +t('See the complete list of features by selecting any of your proxy '
+        +'ports.'),
+    super_proxy: t('Super Proxies are load-balancing servers that manage the '
+        +'traffic between the Proxy Manager and the peer.'),
+    peer: `${t('Before arriving at your target site, your request travels '
+        +'through a peer, which is an exit node. 3 types of peers are:')}
         <ul>
-          <li>${t('Residential IP - provided through cable modem, DSL or '
-              +'wireless router')}</li>
-          <li>${t('Datacenter IP (static)')}</li>
-          <li>${t('Mobile IP - based on a 3G or 4G cellular network')}</li>
+          <li>${t('Residential')}</li>
+          <li>${t('Data Center')}</li>
+          <li>${t('Mobile')}</li>
         </ul>`,
-    destination: t('The target website that the crawler is collecting data '
-        +'from'),
+    destination: t('The target website that your crawler is collecting data '
+        +'from.'),
 });
 
 class Schema extends Pure_component {
@@ -76,6 +76,9 @@ class Schema extends Pure_component {
             if (zones)
                 this.setState({zones});
         });
+        this.setdb_on('head.settings', settings=>{
+            this.setState({proxy_port: settings.proxy_port});
+        });
         this.setdb_on('head.proxy_edit.form.proxy', proxy=>{
             const country_prefix = 'servercountry-';
             if (proxy && proxy.includes(country_prefix))
@@ -98,11 +101,12 @@ class Schema extends Pure_component {
               <Proxy_port_layer proxies={this.state.proxies}
                 form={this.state.form}/>
               <Layer id="lpm" class_names="port active">
-                <T>LPM</T>
+                <T>Proxy Manager</T>
               </Layer>
-              <Layer no_btn id="port_numbers"><T>Port</T> 22225</Layer>
+              <Layer no_btn id="port_numbers"><T>Port</T>{' '
+                  +this.state.proxy_port}</Layer>
               <Layer id="super_proxy">
-                <span className={'flag-icon flag-icon-'+this.state.spcountry}/>
+                <span className={'fi fi-'+this.state.spcountry}/>
                 <T>Super Proxy</T>
               </Layer>
               <Layer no_btn id="port_numbers"><T>Port</T> 80, 443</Layer>
@@ -167,7 +171,7 @@ const Flag = ({proxy={}, zones})=>{
     if (!country||country=='any'||country=='*')
         country = proxy.country;
     if (country&&country!='any'&&country!='*')
-        return <span className={'flag-icon flag-icon-'+country}/>;
+        return <span className={'fi fi-'+country}/>;
     return <img className="globe" src="/img/flag_any_country.svg"/>;
 };
 

@@ -24,14 +24,17 @@ E.proxy_fields = {
     users: {type: 'array', desc: 'List of users. This option has to be used '
         +'along with "multiply_users"', params: {user: {type: 'string'}}},
     ssl: {type: 'boolean', desc: 'Enable SSL analyzing'},
+    tls_lib: {type: 'string', desc: 'SSL library',
+        values: 'open_ssl|flex_tls'},
+    av_check: {type: 'boolean', desc: 'Enable antivirus check'},
     iface: {type: 'string', desc: 'Interface or IP to listen on'},
-    customer: {type: 'string', desc: 'Luminati customer'},
-    zone: {type: 'string', desc: 'Luminati zone'},
+    customer: {type: 'string', desc: 'Customer name'},
+    zone: {type: 'string', desc: 'Zone name'},
     password: {type: 'string', desc: 'Zone password'},
     proxy: {type: 'string', desc: 'Hostname or IP of super proxy'},
     proxy_port: {type: 'integer', desc: 'Super proxy port'},
     proxy_connection_type: {type: 'string', desc: 'Determines what kind of '
-        +'connection will be used between LPM and Super Proxy',
+        +'connection will be used between Proxy Manager and Super Proxy',
         values: 'http|https|socks'},
     proxy_retry: {type: 'integer', desc: 'Automatically retry on super '
         +'proxy failure'},
@@ -40,8 +43,9 @@ E.proxy_fields = {
     country: {type: 'string', desc: 'Country'},
     state: {type: 'string', desc: 'State'},
     city: {type: 'string', desc: 'City'},
+    zip: {type: 'string', desc: 'Zip code'},
     asn: {type: 'string', desc: 'ASN'},
-    ip: {type: 'string', desc: 'Data center IP'},
+    ip: {type: 'string', desc: 'Data Center IP'},
     vip: {type: 'integer', desc: 'gIP'},
     ext_proxies: {type: 'array', desc: 'A list of proxies from external '
         +'vendors. Format: [username:password@]ip[:port]',
@@ -59,7 +63,7 @@ E.proxy_fields = {
         +'via file'},
     reverse_lookup_values: {type: 'array', desc: 'Process reverse lookup '
         +'via value'},
-    session: {type: 'string', desc: 'Luminati session for all proxy requests',
+    session: {type: 'string', desc: 'Session for all proxy requests',
         values: '^[^\\.\\-]*$'},
     sticky_ip: {type: 'boolean', desc: 'Use session per requesting host to '
         +'maintain IP per host'},
@@ -74,8 +78,10 @@ E.proxy_fields = {
     os: {type: 'string', desc: 'Operating System of the Peer IP'},
     headers: {type: 'array', desc: 'Request headers',
         params: {name: {type: 'string'}, value: {type: 'string'}}},
-    debug: {type: 'string', desc: 'Luminati request debug info',
+    debug: {type: 'string', desc: 'Request debug info',
         values: 'full|none'},
+    lpm_auth: {type: 'string', desc: 'x-lpm-authorization header'},
+    const: {type: 'boolean'},
     socket_inactivity_timeout: {type: 'integer'},
     multiply_ips: {type: 'boolean'},
     multiply_vips: {type: 'boolean'},
@@ -85,6 +91,16 @@ E.proxy_fields = {
     timezone: {type: 'string', desc: 'Timezone ID to be used by the browser'},
     resolution: {type: 'string', desc: 'Browser screen size'},
     webrtc: {type: 'string', desc: 'WebRTC plugin behavior in the browser'},
+    bw_limit: {type: 'object', desc: 'BW limit params',
+        params: {
+            days: {type: 'integer'},
+            bytes: {type: 'integer'},
+            renewable: {type: 'boolean', desc: 'Renew limit of bytes each '
+                +'period or use single period and stop usage once last day '
+                +'of period is reached. Default is true'}
+        }
+    },
+    follow_redirect: {type: 'boolean', desc: 'Auto redirect requests'},
 };
 
 E.manager_fields = {
@@ -95,7 +111,6 @@ E.manager_fields = {
     www: {type: 'integer', desc: 'HTTP and WebSocket port used for browser '
         +'admin UI and request logs'},
     config: {type: 'string', desc: 'Config file containing proxy definitions'},
-    cookie: {type: 'string', desc: 'Cookie Jar file'},
     mode: {type: 'string', desc: 'Defines a set of permissible operations '
         +'within the UI/API'},
     dropin: {type: 'boolean', desc: 'Create dropin mode proxy port (default: '
@@ -105,33 +120,45 @@ E.manager_fields = {
         +'statistics'},
     lpm_token: {type: 'string', desc: 'An authorization token'},
     high_perf: {type: 'boolean'},
-    cloud: {type: 'boolean'},
     zagent: {type: 'boolean'},
+    reseller: {type: 'boolean'},
     cluster: {type: 'string'},
-    sync_config: {type: 'boolean', desc: 'Synchronize LPM configuration with '
-        +'the cloud'},
+    sync_config: {type: 'boolean', desc: 'Synchronize Proxy Manager '
+        +'configuration with the cloud'},
     sync_zones: {type: 'boolean'},
     sync_stats: {type: 'boolean'},
     request_stats: {type: 'boolean', desc: 'Enable requests statistics'},
     test_url: {type: 'string', desc: 'Url for testing proxy'},
     log: {type: 'string', desc: 'Log level'},
     logs: {type: 'number', desc: 'Number of request logs to store'},
+    logs_settings: {type: 'object', desc: 'Settings for logs remote delivery'},
     har_limit: {type: 'number', desc: 'Number of bytes to store'},
+    debug: {type: 'string', desc: 'Request debug info default value'},
+    lpm_auth: {type: 'string', desc: 'x-lpm-authorization header'},
     ports_limit: {type: 'integer', desc: 'Limit the numer of open proxy ports '
         +'at the same time'},
-    force: {type: 'boolean', desc: 'Kill other instances of LPM if there are '
-        +'any'},
+    ui_ws: {type: 'boolean', desc: 'Enable live logs preview and other live '
+        +'data communication on the UI'},
+    force: {type: 'boolean', desc: 'Kill other instances of Proxy Manager if '
+        +'there are any'},
     session_termination: {type: 'boolean', desc: 'Stop sending new requests '
         +'when the peer IP becomes unavailable and redirect to confimration '
         +'page before new IP is taken'},
     api: {type: 'string', desc: 'Alternative url to luminati API'},
     api_domain: {type: 'string', desc: 'Alternative domain url to luminati '
         +'API'},
+    pmgr_domain: {type: 'string', desc: 'Alternative domain url to Proxy '
+        +'Manager'},
     local_login: {type: 'boolean', desc: 'Requires each browser to '
-        +'authenticate against LPM'},
+        +'authenticate against Proxy Manager'},
     read_only: {type: 'boolean', desc: 'Avoid saving current config in the '
         +'config file'},
     extra_ssl_ips: {type: 'array', desc: 'List of IPs to add to SSL '
         +'certificate'},
+    bw_limit_webhook_url: {type: 'string', desc: 'URL to send webhook '
+        +'messages to when BW limit is reached'},
+    bw_th_webhook_url: {type: 'string', desc: 'URL to send webhook messages '
+        +'to when BW limit threshold is reached'},
+    new_ui: {type: 'boolean', desc: 'Enable UiKit UI'},
 };
 return E; }); // eslint-disable-line

@@ -9,15 +9,15 @@ const LONG_CB_MS = 100;
 class Pure_component extends React.PureComponent {
     constructor(props){
         super(props);
-        this.listeners = {};
         this.comp_name = this.constructor.name;
+        this.listeners = {};
     }
     componentWillUnmount(){
-        let t0 = Date.now();
-        if (this.sp)
+        let t0 = this.unmount_time = Date.now();
+        if (this.root_et)
         {
-            this.sp.return();
-            delete this.sp;
+            this.root_et.return();
+            delete this.root_et;
         }
         // XXX michaelg: 'let of' requires shim with babel+react+ie11
         // requires further investigation, leave as is till 01-Feb-2018
@@ -37,13 +37,22 @@ class Pure_component extends React.PureComponent {
     setdb_off(path){ this.listeners[path] && setdb.off(this.listeners[path]); }
     setdb_get(path){ return setdb.get(path); }
     setdb_set(path, curr, opt){ return setdb.set(path, curr, opt); }
-    etask(sp){
-        if (!this.sp)
-            this.sp = etask('Component', function*(){ yield this.wait(); });
-        if (sp.constructor.name!='Etask')
-            sp = etask(sp);
-        this.sp.spawn(sp);
-        return sp;
+    etask(et){
+        if (et.constructor.name!='Etask')
+            et = etask(et);
+        // note: in some cases etask(sp) ends up calling componentWillUnmount
+        // synchronously, so this.root_et can be null after initialization
+        let root_et;
+        if (!(root_et = this.root_et))
+        {
+            root_et = etask('Component', function*(){ yield this.wait(); });
+            if (this.unmount_time)
+                root_et.return();
+            else
+                this.root_et = root_et;
+        }
+        root_et.spawn(et);
+        return et;
     }
     setState(updater, cb){
         let t0, t1, t2, t3;

@@ -2,39 +2,52 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
+import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
+import {AutoSizer, Table, Column} from 'react-virtualized';
 import ReactDOM from 'react-dom';
 import {withRouter} from 'react-router-dom';
+import classnames from 'classnames';
+import filesaver from 'file-saver';
+import $ from 'jquery';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
-import zescape from '../../util/escape.js';
 import csv from '../../util/csv.js';
 import etask from '../../util/etask.js';
 import zutil from '../../util/util.js';
-import classnames from 'classnames';
-import filesaver from 'file-saver';
 import {get_static_country, report_exception, is_local} from './util.js';
-import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title, No_zones,
-    Tooltip_bytes, Loader_small, Toolbar_button} from './common.js';
+    Tooltip_bytes, Loader_small, Toolbar_button, Warnings} from './common.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
-import {T} from './common/i18n.js';
+import {T, t} from './common/i18n.js';
 import {Search_box} from './chrome_widgets.js';
-import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
-import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
+import ws from './ws.js';
+import {main as Api} from './api.js';
 import './css/proxies.less';
 
-const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog})=>{
+const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog,
+    show_error_ntf})=>{
     return <Actions proxy={proxy} get_status={mgr.get_status}
           update_proxies={mgr.update} scrolling={scrolling}
-          open_delete_dialog={open_delete_dialog}/>;
+          open_delete_dialog={open_delete_dialog}
+          show_error_ntf={show_error_ntf}/>;
 };
 
 class Targeting_cell extends Pure_component {
     render(){
+        const title = (t_country, t_state, t_city, t_zip)=>{
+            let _val = t_country;
+            if (t_state)
+                _val += ` (${t_state})`;
+            if (t_state && t_city)
+                _val += `, ${t_city}`;
+            if (t_zip)
+                _val += ` (${t_zip})`;
+            return _val;
+        };
         const {proxy, mgr} = this.props;
         const zones = mgr.state.zones;
         const static_country = get_static_country(proxy, zones);
@@ -45,15 +58,9 @@ class Targeting_cell extends Pure_component {
         }
         let val = proxy.country;
         if (!val||val=='any'||val=='*')
-            return any_flag;
-        val = val.toUpperCase();
-        const state = proxy.state&&proxy.state.toUpperCase();
-        if (!state)
-            return flag_with_title(proxy.country, val);
-        if (!proxy.city)
-            return flag_with_title(proxy.country, `${val} (${state})`);
-        return flag_with_title(proxy.country,
-            `${val} (${state}), ${proxy.city}`);
+            return any_flag();
+        return flag_with_title(proxy.country, title(val.toUpperCase(),
+            proxy.state && proxy.state.toUpperCase(), proxy.city, proxy.zip));
     }
 }
 
@@ -102,7 +109,7 @@ const Static_ip_cell = ({proxy, mgr})=>{
 class Type_cell extends React.Component {
     render(){
         if (this.props.scrolling)
-            return 'Luminati';
+            return 'Bright Data';
         const proxy = this.props.proxy;
         let val, tip;
         if (proxy.ext_proxies)
@@ -112,10 +119,10 @@ class Type_cell extends React.Component {
         }
         else
         {
-            val = 'Luminati';
-            tip = 'Proxy port using your Luminati account';
+            val = 'Bright Data';
+            tip = 'Proxy port using your Bright Data account';
         }
-        return <T>{t=><Tooltip title={t(tip)}>{t(val)}</Tooltip>}</T>;
+        return <Tooltip title={t(tip)}>{t(val)}</Tooltip>;
     }
 }
 
@@ -123,20 +130,20 @@ class Browser_cell extends Pure_component {
     open_browser = e=>{
         e.stopPropagation();
         const _this = this;
+        ws.post_event('Browser Click');
         this.etask(function*(){
-            const url = `/api/browser/${_this.props.proxy.port}`;
-            const res = yield window.fetch(url);
-            if (res.status==206)
+            const res = yield Api.get(`browser/${_this.props.proxy.port}`);
+            if ((res||'').includes('Fetching'))
                 $('#fetching_chrome_modal').modal();
         });
     };
     render(){
         const class_names = 'btn btn_lpm btn_lpm_small';
         const tooltip = 'Open browser configured with this port';
-        return is_local() && <T>{t=><Tooltip title={t(tooltip)}>
+        return is_local() && <Tooltip title={t(tooltip)}>
               <button className={class_names}
-                onClick={this.open_browser}>Browser</button>
-            </Tooltip>}</T>;
+                onClick={this.open_browser}><T>Browser</T></button>
+            </Tooltip>;
     }
 }
 
@@ -187,10 +194,8 @@ class Port_cell extends Pure_component {
 const Success_rate_cell = ({proxy})=>{
     const val = !proxy.reqs ? '—' :
         (proxy.success/proxy.reqs*100).toFixed(2)+'%';
-    return <T>{t=>
-          <Tooltip title={`${t('Total')}: ${proxy.reqs||0}, ${
-            t('Success')}: ${proxy.success||0}`}>{val}</Tooltip>
-        }</T>;
+    return <Tooltip title={`${t('Total')}: ${proxy.reqs||0}, ${
+            t('Success')}: ${proxy.success||0}`}>{val}</Tooltip>;
 };
 
 const Reqs_cell = ({proxy})=>{
@@ -222,13 +227,13 @@ const Zone_cell = ({proxy, mgr, scrolling})=>{
 const Rules_cell = ({proxy: {rules=[]}})=>{
     const tip = 'Number of defined rules for this proxy port';
     const val = rules.length;
-    return !!val && <T>{t=><Tooltip title={t(tip)}>{t(val)}</Tooltip>}</T>;
+    return !!val && <Tooltip title={t(tip)}>{t(val)}</Tooltip>;
 };
 
 const columns = [
     {
         key: 'actions',
-        title: 'lpm_ports_actions',
+        title: 'Actions',
         tooltip: `Delete/duplicate/refresh sessions/open browser`,
         ext: true,
         sticky: true,
@@ -263,8 +268,8 @@ const columns = [
         key: 'proxy_type',
         title: 'Type',
         render: Type_cell,
-        tooltip: 'Type of connected proxy - Luminati proxy or external proxy '
-            +'(non-Luminati)',
+        tooltip: 'Type of connected proxy - Bright Data proxy or external'
+            +' proxy (non Bright Data)',
         ext: true,
         width: 70,
     },
@@ -306,7 +311,7 @@ const columns = [
     {
         key: 'proxy_connection_type',
         title: 'Proxy connection type',
-        tooltip: 'Connection type between LPM and Super Proxy',
+        tooltip: 'Connection type between Proxy Manager and Super Proxy',
         ext: true,
     },
     {
@@ -314,7 +319,7 @@ const columns = [
         title: 'Zone',
         type: 'options',
         default: true,
-        tooltip: 'Specific Luminati zone configured for this proxy. Switch '
+        tooltip: 'Specific Bright Data zone configured for this proxy. Switch '
             +'zones in proxy configuration page.',
         render: Zone_cell,
     },
@@ -470,6 +475,11 @@ const columns_obj = Object.keys(columns)
 class Columns_modal extends Pure_component {
     state = {selected_cols: []};
     componentDidMount(){
+        this.setdb_on('head.settings', settings=>{
+            if (!settings)
+                return;
+            this.setState({settings});
+        });
         const selected_cols = this.props.selected_cols.reduce((acc, e)=>
             Object.assign(acc, {[e]: true}), {});
         this.setState({selected_cols, saved_cols: selected_cols});
@@ -499,27 +509,28 @@ class Columns_modal extends Pure_component {
     };
     render(){
         const header = <div className="header_buttons">
-              <button onClick={this.select_all} className="btn btn_lpm">
-                <T>Check all</T></button>
-              <button onClick={this.select_none} className="btn btn_lpm">
-                <T>Uncheck all</T></button>
-              <button onClick={this.select_default} className="btn btn_lpm">
-                <T>Default</T></button>
-            </div>;
+          <button onClick={this.select_all} className="btn btn_lpm">
+            <T>Check all</T></button>
+          <button onClick={this.select_none} className="btn btn_lpm">
+            <T>Uncheck all</T></button>
+          <button onClick={this.select_default} className="btn btn_lpm">
+            <T>Default</T></button>
+        </div>;
         return <Modal id="edit_columns" custom_header={header}
-              click_ok={this.click_ok} cancel_clicked={this.click_cancel}>
-              <div className="row columns">
-                {columns.filter(col=>!col.sticky).map(col=>
-                  <div key={col.key} className="col-md-6">
-                    <T>{t=>
-                      <Checkbox text={t(col.title)} value={col.key}
-                        on_change={this.on_change}
-                        checked={!!this.state.selected_cols[col.key]}/>
-                    }</T>
-                  </div>
-                )}
+          click_ok={this.click_ok} cancel_clicked={this.click_cancel}>
+          <div className="row columns">
+            {columns.filter(col=>!col.sticky).map(col=>
+              <div key={col.key} className="col-md-6">
+                  <Checkbox
+                    text={t(col.title)}
+                    value={col.key}
+                    on_change={this.on_change}
+                    checked={!!this.state.selected_cols[col.key]}
+                  />
               </div>
-            </Modal>;
+            )}
+          </div>
+        </Modal>;
     }
 }
 
@@ -545,6 +556,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             open_delete_dialog: false,
             delete_proxies: [],
             errors: [],
+            err_ntf_list: []
         };
         setdb.set('head.proxies.update', this.update);
     }
@@ -564,6 +576,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             const countries = locations.countries_by_code;
             this.setState({countries});
+        });
+        this.setdb_on('head.settings', settings=>{
+            if (!settings)
+                return;
+            this.setState({settings});
         });
         this.setdb_on('ws.zones', zones=>{
             if (!zones)
@@ -587,7 +604,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         if (proxy_filter===undefined)
             proxy_filter = this.state.proxy_filter;
         sort = sort||this.state.sort;
-        const is_master_proxy = port=>proxy=>proxy.port==port;
+        const master_ports_idx = new Map();
+        proxies.forEach(p=>!p.master_port && master_ports_idx.set(p.port, p));
         proxies = proxies.filter(p=>{
             if (proxy_filter &&
                 !(p.internal_name||'').includes(proxy_filter) &&
@@ -596,11 +614,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             {
                 return false;
             }
+            if (p.master_port && !master_ports_idx.has(p.master_port))
+                throw 'duplicate_port_number';
             if (p.proxy_type=='duplicate')
-            {
-                return proxies.filter(is_master_proxy(p.master_port))[0]
-                    .expanded;
-            }
+                return master_ports_idx.get(p.master_port).expanded;
             return true;
         });
         let {zones} = this.state;
@@ -617,7 +634,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         return res;
     };
     prepare_proxies = proxies=>{
-        proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
         for (let i=0; i<proxies.length; i++)
         {
             const cur = proxies[i];
@@ -633,9 +649,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxies.Proxies.req_status');
             }));
-            const params = {};
-            const url = zescape.uri('/api/recent_stats', params);
-            const stats = yield ajax.json({url});
+            const stats = yield Api.json.get('recent_stats');
             setdb.set('head.recent_stats', stats);
             if (!_this.state.proxies.length ||
                 zutil.equal_deep(stats, _this.state.stats))
@@ -693,7 +707,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     update = ()=>{
         this.setState({selected_proxies: {}, checked_all: false});
         return this.etask(function*(){
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            const proxies = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies);
         });
     };
@@ -708,9 +722,13 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return val;
             });
         }));
+        ws.post_event('Toolbar Download CVS Clicked');
         filesaver.saveAs(csv.to_blob(data), 'proxies.csv');
     };
-    edit_columns = ()=>$('#edit_columns').modal('show');
+    edit_columns = ()=>{
+        ws.post_event('Toolbar Edit Columns Clicked');
+        $('#edit_columns').modal('show');
+    };
     update_selected_columns = new_columns=>
         this.setState({selected_cols: new_columns});
     select_renderer = function Select_renderer(props){
@@ -718,9 +736,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return <div className="cp_td"></div>;
         const {selected_proxies} = this.state;
         const checked = !!selected_proxies[props.rowData.port];
-        return <Checkbox checked={checked}
+        return <Checkbox
+          checked={checked}
           on_change={()=>this.on_row_select(props.rowData)}
-          on_click={e=>e.stopPropagation()}/>;
+          on_click={e=>e.stopPropagation()}
+        />;
     };
     on_row_select = proxy=>{
         const {selected_proxies} = this.state;
@@ -740,11 +760,16 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             }, {}) : {};
         this.setState({selected_proxies, checked_all});
     };
+    show_error_ntf = err_ntf_list=>{
+        this.setState({err_ntf_list});
+        $('#proxy_errors').modal('show');
+    };
     cell_renderer = function Cell_renderer(props){
         return <Cell {...props}
             mgr={this}
             history={this.props.history}
-            open_delete_dialog={this.open_delete_dialog}/>;
+            open_delete_dialog={this.open_delete_dialog}
+            show_error_ntf={this.show_error_ntf}/>;
     };
     on_row_click = e=>{
         const proxy = e.rowData;
@@ -752,6 +777,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return;
         if (proxy.master_port)
             return;
+        ws.post_event('Proxy Port Click', {port: proxy.port});
         this.props.history.push(`/proxy/${proxy.port}`);
     };
     get_cols = ()=>{
@@ -760,9 +786,15 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             const actions_idx = columns.findIndex(col=>col.key=='actions');
             columns[actions_idx].width = 60;
         }
-        return columns.filter(col=>this.state.selected_cols.includes(col.key)
-            || col.sticky || col.calc_show && col.calc_show(
-                this.state.visible_proxies||[]));
+        return columns.filter(col=>{
+            if (col.sticky)
+                return true;
+            if (col.calc_show && col.calc_show(this.state.visible_proxies||[]))
+                return true;
+            if (col.calc_available && !col.calc_available(this.state.settings))
+                return false;
+            return this.state.selected_cols.includes(col.key);
+        });
     };
     open_delete_dialog = proxies=>{
         this.setState({delete_proxies: proxies, open_delete_dialog: true});
@@ -822,7 +854,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                   <div className="main_panel flex">
                   <AutoSizer>
                     {({height, width})=>
-                      <T>{t=><Table width={width}
+                      <Table width={width}
                         height={height}
                         onRowClick={this.on_row_click}
                         onHeaderClick={({dataKey})=>dataKey=='select' &&
@@ -842,8 +874,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                           visible_proxies[index]||'filler'}>
                         <Column key="select"
                           cellRenderer={this.select_renderer.bind(this)}
-                          label={<Checkbox checked={this.state.checked_all}
-                            on_change={()=>null}/>}
+                          label={
+                            <Checkbox
+                              checked={this.state.checked_all}
+                              on_change={()=>null}
+                            />
+                          }
                           dataKey="select"
                           className="cp_td"
                           flexGrow={0}
@@ -860,7 +896,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                               col.shrink : 1}
                             width={col.width||100}/>
                         )}
-                      </Table>}</T>
+                      </Table>
                     }
                   </AutoSizer>
                   </div>
@@ -873,13 +909,17 @@ const Proxies = withRouter(class Proxies extends Pure_component {
               close_dialog={this.close_delete_dialog}
               proxies={this.state.delete_proxies}
               update_proxies={this.update}/>
+            <Modal className="warnings_modal" id="proxy_errors"
+                   title="Errors:" no_cancel_btn>
+                <Warnings warnings={this.state.err_ntf_list}/>
+            </Modal>
           </React.Fragment>;
     }
 });
 
 const Header_panel = props=>
     <div className="cp_panel_header">
-      <h2>Proxy ports</h2>
+      <h2><T>Proxy ports</T></h2>
       <Toolbar {...props}/>
     </div>;
 
@@ -889,11 +929,7 @@ class Delete_dialog extends Pure_component {
         const _this = this;
         const ports = _this.props.proxies.map(p=>p.port);
         this.etask(function*(){
-            yield window.fetch('/api/proxies/delete', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ports}),
-            });
+            yield yield Api.json.post('proxies/delete', {ports});
             yield _this.props.update_proxies();
             _this.props.close_dialog();
         });
@@ -920,13 +956,17 @@ class Toolbar extends Pure_component {
     };
     open_delete_dialog_with_proxies = e=>{
         e.stopPropagation();
-        this.props.open_delete_dialog(this.get_to_delete());
+        const to_delete = this.get_to_delete();
+        ws.post_event('Toolbar Action Remove Click', {ports: to_delete});
+        this.props.open_delete_dialog(to_delete);
     };
     get_to_delete = ()=>{
         const {selected} = this.props;
         return Object.values(selected).filter(p=>p.proxy_type=='persist');
     };
     toggle_filters(){
+        if (!this.state.filters)
+            ws.post_event('Toolbar Filters Clicked');
         this.setState({filters: !this.state.filters});
     }
     render(){
@@ -963,6 +1003,7 @@ class Cell extends React.Component {
         if (p.master_port)
             return;
         e.stopPropagation();
+        ws.post_event('Proxy Port Click', {port: p.port});
         this.props.history.push({
             pathname: `/proxy/${p.port}`,
             state: {field: this.props.dataKey},
@@ -983,7 +1024,8 @@ class Cell extends React.Component {
                 <S_cell proxy={props.rowData}
                   mgr={props.mgr}
                   col={props.dataKey}
-                  open_delete_dialog={props.open_delete_dialog}/>
+                  open_delete_dialog={props.open_delete_dialog}
+                  show_error_ntf={props.show_error_ntf}/>
               </span>;
         }
         return props.cellData||'';
@@ -995,11 +1037,16 @@ class Actions extends Pure_component {
         if (!this.props.proxy.status)
             this.get_status();
     }
+    componentWillUnmount(){
+        if (this.status_req)
+            ajax.abort(this.status_req);
+    }
     // XXX krzysztof: this logic is a mess, rewrite it
     get_status = (opt={})=>{
         const proxy = this.props.proxy;
         if (!opt.force && proxy.status=='ok')
             return;
+        const _this = this;
         return this.etask(function*(){
             this.on('uncaught', e=>{
                 proxy.status = 'error';
@@ -1016,9 +1063,16 @@ class Actions extends Pure_component {
             }
             if (proxy.status=='testing')
                 setdb.emit_path('head.proxies_running');
-            const uri = '/api/proxy_status/'+proxy.port;
-            const url = zescape.uri(uri, params);
-            const res = yield ajax.json({url, timeout: 25000});
+            _this.status_req = yield Api.json.get('proxy_status/'+proxy.port,
+                {qs: params});
+            const res = yield _this.status_req;
+            delete _this.status_req;
+            if (res===undefined)
+            {
+                delete proxy.status;
+                setdb.emit_path('head.proxies_running');
+                return;
+            }
             if (res.status!='ok')
             {
                 const errors = res.status_details||[];
@@ -1031,13 +1085,17 @@ class Actions extends Pure_component {
             setdb.emit_path('head.proxies_running');
         });
     };
+    post_action(action){
+        ws.post_event(`Port Action ${action} Click`,
+            {port: this.props.proxy.port});
+    }
     refresh_sessions = e=>{
         e.stopPropagation();
         const _this = this;
         this.etask(function*(){
-            const url = '/api/refresh_sessions/'+_this.props.proxy.port;
-            yield ajax.json({url, method: 'POST'});
+            yield Api.json.post('refresh_sessions/'+_this.props.proxy.port);
             yield _this.get_status({force: true});
+            _this.post_action('Refresh');
         });
     };
     duplicate = event=>{
@@ -1047,16 +1105,17 @@ class Actions extends Pure_component {
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxies.Actions.duplicate');
             }));
-            yield window.fetch('/api/proxy_dup', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({port: _this.props.proxy.port}),
-            });
+            const resp = yield Api.json.post('proxy_dup',
+                {port: _this.props.proxy.port});
+            if (resp.errors)
+                _this.props.show_error_ntf(resp.errors);
+            _this.post_action('Duplicate');
             yield _this.props.update_proxies();
         });
     };
     open_delete_dialog_with_port = e=>{
         e.stopPropagation();
+        this.post_action('Remove');
         this.props.open_delete_dialog([this.props.proxy]);
     };
     render(){
@@ -1089,9 +1148,9 @@ const Action_icon = props=>{
         {invisible});
     if (scrolling)
         return <div className={classes}/>;
-    return <T>{t=><Tooltip title={t(tooltip)}>
+    return <Tooltip title={t(tooltip)}>
           <div onClick={on_click} className={classes}/>
-        </Tooltip>}</T>;
+        </Tooltip>;
 };
 
 export default Proxies;

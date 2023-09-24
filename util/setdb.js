@@ -3,18 +3,18 @@
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
-        require('lodash'), require('/util/events.js'));
+        require('lodash4'), require('/util/events.js'));
 }
 else if (!is_node_ff)
     define = self.define;
 else
     define = require('./require_node.js').define(module, '../');
-define(['lodash', 'events'], (_, EventEmitter)=>{
+define(['lodash4', 'events'], (_, EventEmitter)=>{
 
 const RECURSIVE = '.';
 
@@ -29,6 +29,14 @@ E.on = (path, fn, opt)=>{
     if (opt.init)
         fn(E.get(path));
     return {path, fn, recursive: opt.recursive};
+};
+
+E.once = (path, fn, opt)=>{
+    let listener;
+    listener = E.on(path, (...args)=>{
+        E.off(listener);
+        return fn(...args);
+    }, _.assign({init: false}, opt));
 };
 
 E.off = listener=>{
@@ -47,8 +55,15 @@ E.set = (path, curr, opt)=>{
     if (!opt.force_emit && _.get(E.state, path)===curr)
         return;
     _.set(E.state, path, curr);
-    E.emit_path(path);
-    // XXX colin/ilgiz: add recurisve notify when using recursive flag
+    let depth = opt.recursive ? Number.POSITIVE_INFINITY : opt.depth||0;
+    let _path;
+    do {
+        _path = path;
+        E.emit_path(_path);
+        if (depth--<=0)
+            return;
+        path = path.replace(/\.[^.]+$/, '');
+    } while (_path!=path);
 };
 
 E.delete = path=>E.set(path, undefined);

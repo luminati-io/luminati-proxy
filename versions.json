@@ -1,10 +1,1446 @@
 [
     {
+        "ver": "1.410.597",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix handling uninitialized port"
+            }
+        ]
+    },
+    {
+        "ver": "1.407.3",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix Ban IP rules created from UI not apply"
+            }
+        ]
+    },
+    {
+        "ver": "1.404.754",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix UI crash on unknown zone type"
+            }
+        ]
+    },
+    {
+        "ver": "1.404.212",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Use correct port in intermediary sockets for SSL"
+            },
+            {
+                "type": "bug",
+                "text": "Allow Refresh IP rule for request dur actions"
+            },
+            {
+                "type": "star",
+                "text": "Default rule action 'Retry with the same IP'"
+            }
+        ]
+    },
+    {
+        "ver": "1.402.365",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Introduce follow redirect port option"
+            }
+        ]
+    },
+    {
+        "ver": "1.399.639",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix mem leak on tls sockets"
+            },
+            {
+                "type": "bug",
+                "text": "Fix overflowed General Settings page display"
+            },
+            {
+                "type": "star",
+                "text": "Default rule action refresh_ip"
+            },
+            {
+                "type": "star",
+                "text": "Ban IP rule actions unavailable if Request details disabled"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI design changes"
+            }
+        ]
+    },
+    {
+        "ver": "1.394.442",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix logs noice if recent stats disabled on lpm first run"
+            }
+        ]
+    },
+    {
+        "ver": "1.391.825",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix update general settings via UI"
+            }
+        ]
+    },
+    {
+        "ver": "1.390.445",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix unable update port to number less then UI port"
+            },
+            {
+                "type": "bug",
+                "text": "fix wrong responce for CONNECT request errors"
+            },
+            {
+                "type": "bug",
+                "text": "fix unable to change boolean port settings via UI"
+            }
+        ]
+    },
+    {
+        "ver": "1.388.252",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "introduce lpm token protected API v2"
+            },
+            {
+                "type": "sparkles",
+                "text": "update dependencies"
+            },
+            {
+                "type": "sparkles",
+                "text": "update docker base image to node:18.16.0-bullseye"
+            }
+        ]
+    },
+    {
+        "ver": "1.385.646",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add rate limit for API state changing calls"
+            }
+        ]
+    },
+    {
+        "ver": "1.384.439",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Alert before save about config spread"
+            },
+            {
+                "type": "star",
+                "text": "Deprecate POST /add_whitelist_ip /add_wip"
+            },
+            {
+                "type": "star",
+                "text": "Add PUT /whitelist_ip /wip"
+            },
+            {
+                "type": "star",
+                "text": "Add DELETE /whitelist_ip /wip"
+            },
+            {
+                "type": "star",
+                "text": "Allow zone type auth on premise"
+            }
+        ]
+    },
+    {
+        "ver": "1.379.317",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Prevent writing to closed stream on rules chain apply"
+            }
+        ]
+    },
+    {
+        "ver": "1.376.171",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Support NodeJS 18"
+            }
+        ]
+    },
+    {
+        "ver": "1.375.164",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Updated settings FAQ links"
+            },
+            {
+                "type": "star",
+                "text": "Refresh connection to lpm_f by interval"
+            },
+            {
+                "type": "star",
+                "text": "Introduced zip code targeting"
+            },
+            {
+                "type": "bug",
+                "text": "Fix port's Whitelisted IPs are erased on settings update"
+            }
+        ]
+    },
+    {
+        "ver": "1.370.592",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Updated links to FAQ pages"
+            },
+            {
+                "type": "bug",
+                "text": "Fix proxy port users change does not apply if multiply proxy port enabled"
+            },
+            {
+                "type": "star",
+                "text": "Update default installed node version to 14.19.0"
+            },
+            {
+                "type": "star",
+                "text": "Better UI to backend socket connection"
+            }
+        ]
+    },
+    {
+        "ver": "1.359.448",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix windows version upgrade"
+            }
+        ]
+    },
+    {
+        "ver": "1.358.906",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Apply log level for daily rotate file"
+            }
+        ]
+    },
+    {
+        "ver": "1.357.632",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix docker image build"
+            },
+            {
+                "type": "sparkles",
+                "text": "Better startup logging"
+            }
+        ]
+    },
+    {
+        "ver": "1.352.979",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix Ban IP per Domain rule not apply"
+            },
+            {
+                "type": "star",
+                "text": "Better CPU usage on high load"
+            }
+        ]
+    },
+    {
+        "ver": "1.351.969",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix memory leak on long running proxy manager"
+            }
+        ]
+    },
+    {
+        "ver": "1.337.781",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix premise pmgr NodeJS 12.18.3 compatibility"
+            }
+        ]
+    },
+    {
+        "ver": "1.337.221",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix autogenerated port numbering"
+            },
+            {
+                "type": "sparkles",
+                "text": "Disable debug headers by default"
+            },
+            {
+                "type": "bug",
+                "text": "Fix 2fa authentication in premise pmgr"
+            }
+        ]
+    },
+    {
+        "ver": "1.317.660",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix update default proxy port"
+            }
+        ]
+    },
+    {
+        "ver": "1.315.269",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix docker build"
+            }
+        ]
+    },
+    {
+        "ver": "1.314.864",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix 'certificate has expired' error"
+            }
+        ]
+    },
+    {
+        "ver": "1.313.493",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Increased the headers size. Fixed: Parse Error: Header overflow"
+            }
+        ]
+    },
+    {
+        "ver": "1.312.660",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Zone auth allowed only for whitelisted customers"
+            }
+        ]
+    },
+    {
+        "ver": "1.307.810",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix 'Host' header behavior"
+            }
+        ]
+    },
+    {
+        "ver": "1.303.587",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Remove usage of username.json file"
+            }
+        ]
+    },
+    {
+        "ver": "1.302.488",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Correct username in event log"
+            }
+        ]
+    },
+    {
+        "ver": "1.300.693",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Prefill username in report a bug modal"
+            },
+            {
+                "type": "bug",
+                "text": "Fix Ban IP globally rule doesn't unban after 1 minute"
+            }
+        ]
+    },
+    {
+        "ver": "1.293.147",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix can't change default zone with sync config off"
+            }
+        ]
+    },
+    {
+        "ver": "1.283.18",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix can't get property 'plan' of undefined error"
+            }
+        ]
+    },
+    {
+        "ver": "1.282.255",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add nodejs version check"
+            }
+        ]
+    },
+    {
+        "ver": "1.280.385",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add render option for unblocker and serp zones"
+            }
+        ]
+    },
+    {
+        "ver": "1.277.863",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Use random session id for rotating IPs"
+            }
+        ]
+    },
+    {
+        "ver": "1.275.824",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Pin colors@1.4.0"
+            }
+        ]
+    },
+    {
+        "ver": "1.273.170",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix lpm UI doesnt show Forbidden page if IP is not whitelisted"
+            },
+            {
+                "type": "star",
+                "text": "Fix Readme"
+            }
+        ]
+    },
+    {
+        "ver": "1.272.573",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Preserve request headers order in HAR log"
+            }
+        ]
+    },
+    {
+        "ver": "1.272.43",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "API domain fallback for CN"
+            }
+        ]
+    },
+    {
+        "ver": "1.271.782",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Sync LPM language with CP current language for cloud instances"
+            },
+            {
+                "type": "bug",
+                "text": "Added missing translation tags"
+            },
+            {
+                "type": "star",
+                "text": "Use local server for API calls from CN"
+            }
+        ]
+    },
+    {
+        "ver": "1.271.471",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Real time language updates"
+            }
+        ]
+    },
+    {
+        "ver": "1.270.370",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Use different superproxy on long session"
+            },
+            {
+                "type": "star",
+                "text": "Increased superproxy hosts update frequency"
+            }
+        ]
+    },
+    {
+        "ver": "1.269.473",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "x-lpm-ports header support"
+            }
+        ]
+    },
+    {
+        "ver": "1.268.704",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix multiply setting drop on port preset change"
+            }
+        ]
+    },
+    {
+        "ver": "1.267.718",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix ports not working in docker container"
+            }
+        ]
+    },
+    {
+        "ver": "1.266.433",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Updated dependencies"
+            }
+        ]
+    },
+    {
+        "ver": "1.266.175",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added alert message on port number conflict"
+            }
+        ]
+    },
+    {
+        "ver": "1.264.173",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Removed max ext proxy limitation for on premise pmgr"
+            }
+        ]
+    },
+    {
+        "ver": "1.263.145",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Reduce net load on port update"
+            }
+        ]
+    },
+    {
+        "ver": "1.258.249",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix duplicate cache events listeners"
+            }
+        ]
+    },
+    {
+        "ver": "1.256.472",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "X-lpm-authorization header to separate setting"
+            }
+        ]
+    },
+    {
+        "ver": "1.256.271",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Abort unnecessary proxy status requests"
+            }
+        ]
+    },
+    {
+        "ver": "1.256.139",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed multiple listeners caching error"
+            }
+        ]
+    },
+    {
+        "ver": "1.255.903",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Keep session proxy setting"
+            }
+        ]
+    },
+    {
+        "ver": "1.255.850",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Option to change default debug value in General Settings"
+            }
+        ]
+    },
+    {
+        "ver": "1.255.592",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Enable request stats in Cloud Proxy Manager"
+            }
+        ]
+    },
+    {
+        "ver": "1.255.419",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix HAR logs for caching css and js"
+            }
+        ]
+    },
+    {
+        "ver": "1.255.171",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Updated version of react-tooltip"
+            }
+        ]
+    },
+    {
+        "ver": "1.254.777",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Async rules post check on retry request"
+            }
+        ]
+    },
+    {
+        "ver": "1.254.439",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Separate button for collecting recent stats"
+            }
+        ]
+    },
+    {
+        "ver": "1.254.277",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Moved cache to single parent process"
+            }
+        ]
+    },
+    {
+        "ver": "1.253.757",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed too many setdb listeners bug"
+            }
+        ]
+    },
+    {
+        "ver": "1.253.382",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed inability to remove rotating ip preset header"
+            }
+        ]
+    },
+    {
+        "ver": "1.253.120",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed change default settings"
+            }
+        ]
+    },
+    {
+        "ver": "1.252.735",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Download CSV button for proxy manager stats"
+            }
+        ]
+    },
+    {
+        "ver": "1.245.259",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed using new IP on 'Retry with same IP' rule"
+            }
+        ]
+    },
+    {
+        "ver": "1.239.207",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Improved stability"
+            }
+        ]
+    },
+    {
+        "ver": "1.237.854",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed bandwidth calculation when using unblocker zone"
+            },
+            {
+                "type": "bug",
+                "text": "Stop redirections when using bypass rule"
+            }
+        ]
+    },
+    {
+        "ver": "1.236.925",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed in place updates only when synchronization is turned on"
+            }
+        ]
+    },
+    {
+        "ver": "1.236.237",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed bandwidth calculation when using unblocker zone"
+            }
+        ]
+    },
+    {
+        "ver": "1.236.100",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added more details to the logs at debug level"
+            }
+        ]
+    },
+    {
+        "ver": "1.235.456",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed connectivity issues from China"
+            }
+        ]
+    },
+    {
+        "ver": "1.235.67",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed memory leaks"
+            }
+        ]
+    },
+    {
+        "ver": "1.234.135",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved text and explanations"
+            }
+        ]
+    },
+    {
+        "ver": "1.233.836",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed updating disabled zones"
+            }
+        ]
+    },
+    {
+        "ver": "1.232.896",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed updating flags when setting or unsetting unblocker"
+            }
+        ]
+    },
+    {
+        "ver": "1.231.909",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added links to FAQ pages with the instrucitons"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed banning IPs feature"
+            }
+        ]
+    },
+    {
+        "ver": "1.230.178",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed sending usage stat with invalid domain name"
+            }
+        ]
+    },
+    {
+        "ver": "1.230.0",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved FAQ and linked with relevant places in Proxy Manager"
+            }
+        ]
+    },
+    {
+        "ver": "1.229.796",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed targeting options from China"
+            }
+        ]
+    },
+    {
+        "ver": "1.228.877",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed updating password when updating proxy port"
+            }
+        ]
+    },
+    {
+        "ver": "1.228.582",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed updating password when changing zone settings"
+            }
+        ]
+    },
+    {
+        "ver": "1.228.121",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Fixed bandwidth calculation for the HTTPS requests"
+            }
+        ]
+    },
+    {
+        "ver": "1.228.97",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improvements for Chinese users: Proxy Manager works with slower connections"
+            }
+        ]
+    },
+    {
+        "ver": "1.227.883",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved the process of renaming the Proxy Manager work directory at startup"
+            }
+        ]
+    },
+    {
+        "ver": "1.227.290",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Introduced a mechanism to rename the Proxy Manager working directory at the process startup"
+            }
+        ]
+    },
+    {
+        "ver": "1.226.959",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Connection improvements with Bright Data servers"
+            }
+        ]
+    },
+    {
+        "ver": "1.226.680",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Refresh IP rule when working with ports that are multiplied per IP"
+            }
+        ]
+    },
+    {
+        "ver": "1.226.376",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Further improvements in the communication with servers over WS"
+            }
+        ]
+    },
+    {
+        "ver": "1.226.157",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improve Proxy Manager communication with lpm_f over WS"
+            }
+        ]
+    },
+    {
+        "ver": "1.226.49",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improve Proxy Manager communication with lpm_f over WS"
+            }
+        ]
+    },
+    {
+        "ver": "1.225.712",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI fixes"
+            }
+        ]
+    },
+    {
+        "ver": "1.225.541",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI design changes"
+            }
+        ]
+    },
+    {
+        "ver": "1.225.497",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed process crashing on some linux server machines due to missing web socket library"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added an option to select the SSL library to be used when SSL analyzing is activated"
+            }
+        ]
+    },
+    {
+        "ver": "1.225.430",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed connection issues from China"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed a memory leak in web socket connections"
+            },
+            {
+                "type": "star",
+                "text": "Introduced an option to allow using BoringSSL in Cloud Proxy Manager"
+            }
+        ]
+    },
+    {
+        "ver": "1.223.826",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added an option to add extra debug info to the responses (DNS resolution)"
+            }
+        ]
+    },
+    {
+        "ver": "1.223.771",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed external proxies, setting a correct port number"
+            }
+        ]
+    },
+    {
+        "ver": "1.223.605",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed a memory leak involving bypassed and cached requests statistics"
+            }
+        ]
+    },
+    {
+        "ver": "1.223.70",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Configurable API body limit"
+            }
+        ]
+    },
+    {
+        "ver": "1.222.778",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed memory leak"
+            }
+        ]
+    },
+    {
+        "ver": "1.222.632",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed missing ports dropdown in the Proxy Manager Web tester UI"
+            }
+        ]
+    },
+    {
+        "ver": "1.222.104",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Stability fixes on Windows"
+            },
+            {
+                "type": "star",
+                "text": "Improved error handling: added more details if the request fails"
+            }
+        ]
+    },
+    {
+        "ver": "1.221.905",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Logging more details to the changelog and keeping the whole history of configuration files"
+            }
+        ]
+    },
+    {
+        "ver": "1.221.843",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved monitoring of potential issues"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed a bug with refreshing sessions after resetting the explicit session field in the IP control tab"
+            }
+        ]
+    },
+    {
+        "ver": "1.220.899",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Updated the publisher name to match new certificate"
+            }
+        ]
+    },
+    {
+        "ver": "1.220.764",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Full synchronization of the statistics between all the instances"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed keeping IPs withing the same session"
+            }
+        ]
+    },
+    {
+        "ver": "1.220.91",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Refresh IP rule action"
+            }
+        ]
+    },
+    {
+        "ver": "1.219.637",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Selecting all IPs in the Pool size allocation modal will now properly select only the filtered IPs"
+            }
+        ]
+    },
+    {
+        "ver": "1.219.457",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Introduced a mechanism to allow throttling requests per domain name"
+            }
+        ]
+    },
+    {
+        "ver": "1.219.343",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed whitelisted IPs when using SOCKS5"
+            }
+        ]
+    },
+    {
+        "ver": "1.218.904",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Resolving super proxies over web socket instead of HTTP"
+            }
+        ]
+    },
+    {
+        "ver": "1.218.331",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Performance optimizations in proxies overview UI"
+            }
+        ]
+    },
+    {
+        "ver": "1.218.23",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Introduced Cache based on the URL as part of the Rules"
+            }
+        ]
+    },
+    {
+        "ver": "1.217.753",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improve Proxy Manager communication with lpm_f over WS"
+            }
+        ]
+    },
+    {
+        "ver": "1.216.924",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Show statistics start time"
+            },
+            {
+                "type": "star",
+                "text": "Removed \"Refresh zones\" button because of websocket implementation"
+            }
+        ]
+    },
+    {
+        "ver": "1.216.840",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed auth on WS connections"
+            }
+        ]
+    },
+    {
+        "ver": "1.216.736",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved builder for regular expressions on the trigger side for any actions"
+            },
+            {
+                "type": "bug",
+                "text": "WS connection is always created which fixes zones updates"
+            },
+            {
+              "type": "star",
+              "text": "Added filter by country in alloc modal"
+            }
+        ]
+    },
+    {
+        "ver": "1.216.628",
+        "type": "stable",
+        "changes": [
+             {
+                 "type": "star",
+                 "text": "Added \"Country\" column in the alloc IPs modal"
+             }
+        ]
+    },
+    {
+        "ver": "1.216.473",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed updating SMTP configuration"
+            }
+        ]
+    },
+    {
+        "ver": "1.216.179",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed visual bugs in the alloc IPs modal"
+            }
+        ]
+    },
+    {
+        "ver": "1.216.52",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added an option to fetch single proxy ports over the API"
+            },
+            {
+                "type": "star",
+                "text": "Moved part of the API from HTTP to Web Socket"
+            }
+        ]
+    },
+    {
+        "ver": "1.215.236",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed lpm_f communication in Cloud Proxy Manager servers after a new server assignment"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed a bug where some credential fields were not cleared from proxies memory on logout"
+            }
+        ]
+    },
+    {
+        "ver": "1.213.501",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix zone updates not being reflected when Sync configuration option is turned on"
+            }
+        ]
+    },
+    {
+        "ver": "1.213.356",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved resolving superproxies periodically"
+            },
+            {
+                "type": "star",
+                "text": "Speed optimization"
+            }
+        ]
+    },
+    {
         "ver": "1.212.374",
         "type": "stable",
         "changes": [
             {
-                "text": "bug",
+                "type": "bug",
                 "text": "Skip x-lpm-port and x-lpm-authorization response headers when Request details option is disabled"
             }
         ]
@@ -109,7 +1545,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed LPM upgrade on Windows"
+                "text": "Fixed Proxy Manager upgrade on Windows"
             }
         ]
     },
@@ -119,7 +1555,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Consistency improvements with LPM browser timezone emulation"
+                "text": "Consistency improvements with Proxy Manager browser timezone emulation"
             }
         ]
     },
@@ -247,7 +1683,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed LPM installation script for Mac OS"
+                "text": "Fixed Proxy Manager installation script for Mac OS"
             }
         ]
     },
@@ -271,7 +1707,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Added a targeting option to select a timezone to be used by the LPM browser"
+                "text": "Added a targeting option to select a timezone to be used by the Proxy Manager browser"
             }
         ]
     },
@@ -375,7 +1811,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed out of memory crashes on Cloud LPM servers"
+                "text": "Fixed out of memory crashes on Cloud Proxy Manager servers"
             }
         ]
     },
@@ -409,7 +1845,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed restarting Cloud LPM button from luminati.io/cp/lpm"
+                "text": "Fixed restarting Cloud Proxy Manager button from brightdata.com/cp/lpm"
             },
             {
                 "type": "star",
@@ -447,7 +1883,7 @@
             },
             {
                 "type": "star",
-                "text": "Display modal when upgrading LPM from UI without root permissions"
+                "text": "Display modal when upgrading Proxy Manager from UI without root permissions"
             },
             {
                 "type": "star",
@@ -489,7 +1925,7 @@
             },
             {
                 "type": "star",
-                "text": "Request is canceled if all the IPs LPM is getting are banned"
+                "text": "Request is canceled if all the IPs Proxy Manager is getting are banned"
             }
         ]
     },
@@ -857,7 +2293,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Adjustments for LPM in the Cloud"
+                "text": "Adjustments for Proxy Manager in the Cloud"
             }
         ]
     },
@@ -991,7 +2427,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Added reporting capabilities to Cloud LPM"
+                "text": "Added reporting capabilities to Cloud Proxy Manager"
             }
         ]
     },
@@ -1081,7 +2517,7 @@
             },
             {
                 "type": "star",
-                "text": "Improved security in Cloud LPM"
+                "text": "Improved security in Cloud Proxy Manager"
             }
         ]
     },
@@ -1175,7 +2611,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Always enable config synchronization for Cloud LPM"
+                "text": "Always enable config synchronization for Cloud Proxy Manager"
             }
         ]
     },
@@ -1189,11 +2625,11 @@
             },
             {
                 "type": "bug",
-                "text": "Fix websocket error when LPM works on default port 80"
+                "text": "Fix websocket error when Proxy Manager works on default port 80"
             },
             {
                 "type": "sparkles",
-                "text": "Enable config synchronization for new LPM users by default"
+                "text": "Enable config synchronization for new Proxy Manager users by default"
             }
         ]
     },
@@ -1237,7 +2673,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Cloud LPM release - Host the LPM on Luminati server. Check luminati.io/cp/lpm"
+                "text": "Cloud Proxy Manager release - Host the Proxy Manager on Luminati server. Check luminati.io/cp/lpm"
             }
         ]
     },
@@ -1326,7 +2762,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "UI Improvements in the embedded Cloud LPM"
+                "text": "UI Improvements in the embedded Cloud Proxy Manager"
             }
         ]
     },
@@ -1364,7 +2800,7 @@
             },
             {
                 "type": "bug",
-                "text": "Start LPM even if some ports failed to start"
+                "text": "Start Proxy Manager even if some ports failed to start"
             }
         ]
     },
@@ -1374,7 +2810,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Adjustemnts for LPM in the Cloud"
+                "text": "Adjustemnts for Proxy Manager in the Cloud"
             }
         ]
     },
@@ -1388,7 +2824,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Adjustemnts for LPM in the Cloud"
+                "text": "Adjustemnts for Proxy Manager in the Cloud"
             }
         ]
     },
@@ -1418,7 +2854,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Serving UI on HTTPS when LPM in the cloud"
+                "text": "Serving UI on HTTPS when Proxy Manager in the cloud"
             }
         ]
     },
@@ -1504,7 +2940,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Support TLS connection between client and LPM"
+                "text": "Support TLS connection between client and Proxy Manager"
             }
         ]
     },
@@ -1658,7 +3094,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Running LPM on all the CPUs for all the presets"
+                "text": "Running Proxy Manager on all the CPUs for all the presets"
             },
             {
                 "type": "bug",
@@ -2173,7 +3609,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Added --downgrade option that will downgrade LPM to the version before upgrades"
+                "text": "Added --downgrade option that will downgrade Proxy Manager to the version before upgrades"
             },
             {
                 "type": "star",
@@ -2195,7 +3631,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Adjustments for LPM <> Extension integration"
+                "text": "Adjustments for Proxy Manager <> Extension integration"
             }
         ]
     },
@@ -2295,7 +3731,7 @@
             },
             {
                 "type": "sparkles",
-                "text": "Add --show-logs feature that follows LPM daemon process logs"
+                "text": "Add --show-logs feature that follows Proxy Manager daemon process logs"
             },
             {
                 "type": "sparkles",
@@ -2329,7 +3765,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "CPU and mem usage are now shown per LPM process in --status"
+                "text": "CPU and mem usage are now shown per Proxy Manager process in --status"
             },
             {
                 "type": "bug",
@@ -2491,7 +3927,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Improved --upgrade argument behavior: it will now upgrade LPM and restart previously running daemons"
+                "text": "Improved --upgrade argument behavior: it will now upgrade Proxy Manager and restart previously running daemons"
             },
             {
                 "type": "sparkles",
@@ -2499,7 +3935,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed LPM's memory usage"
+                "text": "Fixed Proxy Manager's memory usage"
             }
         ]
     },
@@ -2531,7 +3967,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed error handling for SOCKS5 connections between LPM and Super Proxies"
+                "text": "Fixed error handling for SOCKS5 connections between Proxy Manager and Super Proxies"
             },
             {
                 "type": "bug",
@@ -2545,7 +3981,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Added --read_only CLI option that prevents LPM from writing to the config file"
+                "text": "Added --read_only CLI option that prevents Proxy Manager from writing to the config file"
             }
         ]
     },
@@ -2583,7 +4019,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed LPM crash on subsequent Proxy Tester calls with unexistent proxy ports"
+                "text": "Fixed Proxy Manager crash on subsequent Proxy Tester calls with unexistent proxy ports"
             }
         ]
     },
@@ -2643,7 +4079,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Added option to use SOCKS to connect LPM and Super Proxy"
+                "text": "Added option to use SOCKS to connect Proxy Manager and Super Proxy"
             },
             {
                 "type": "sparkles",
@@ -2665,7 +4101,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed 'Cannnot read property 'toLowerCase' of undefined' when running LPM on Docker"
+                "text": "Fixed 'Cannnot read property 'toLowerCase' of undefined' when running Proxy Manager on Docker"
             }
         ]
     },
@@ -3099,7 +4535,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fixed LPM WS connection when accessed with https"
+                "text": "Fixed Proxy Manager WS connection when accessed with https"
             },
             {
                 "type": "bug",
@@ -3347,7 +4783,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "fix LPM response when cert is wrong and not using insecure flag"
+                "text": "fix Proxy Manager response when cert is wrong and not using insecure flag"
             },
             {
                 "type": "sparkles",
@@ -3404,7 +4840,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Super Proxy's icon flag in LPM isn't changing"
+                "text": "Super Proxy's icon flag in Proxy Manager isn't changing"
             },
             {
                 "type": "bug",
@@ -4125,7 +5561,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Separation between multiple LPM instances"
+                "text": "Separation between multiple Proxy Manager instances"
             },
             {
                 "type": "bug",
@@ -4397,7 +5833,7 @@
             },
             {
                 "type": "bug",
-                "text": "Fixed running LPM without UI"
+                "text": "Fixed running Proxy Manager without UI"
             }
         ]
     },
@@ -5006,7 +6442,7 @@
             },
             {
                 "type": "star",
-                "text": "Refreshing IPs/gIPs from LPM"
+                "text": "Refreshing IPs/gIPs from Proxy Manager"
             },
             {
                 "type": "bug",
@@ -5064,7 +6500,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Refreshing IPs/gIPs from LPM"
+                "text": "Refreshing IPs/gIPs from Proxy Manager"
             },
             {
                 "type": "star",
@@ -7533,7 +8969,7 @@
         "changes": [
             {
                 "type": "boom",
-                "text": "Luminati Proxy Manager will now refuse to run on older versions of Node.js"
+                "text": "Proxy Manager will now refuse to run on older versions of Node.js"
             }
         ]
     },

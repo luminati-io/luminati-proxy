@@ -104,12 +104,16 @@ E.fread_e = (fd, start, size, opt)=>{
     return ret;
 };
 E.write_e = (file, data, opt)=>{
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     check_file(file, opt);
     fs.writeFileSync(file, data, opt);
     return true;
 };
 E.write_atomic_e = (file, data, opt)=>{
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     check_file(file, opt);
     let tmpfile = file+'.'+(1000000*Math.random()|0)+'.tmp';
@@ -128,6 +132,8 @@ E.write_lines_e = (file, data, opt)=>{
     return E.write_e(file, data, opt);
 };
 E.append_e = (file, data, opt)=>{
+    if (typeof data == 'number')
+        data = ''+data;
     opt = opt||{};
     check_file(file, opt);
     fs.appendFileSync(file, data, opt);
@@ -235,6 +241,12 @@ function copy_file(src, dst, opt){
             return true;
         }
         throw FileError(`file already exists: ${dst}`, 'EEXIST');
+    }
+    if (opt.if_newer && E.exists(dst) && stat.mtime<=E.mtime(dst))
+    {
+        if (opt.verbose)
+            console.log(`Skipping copy (src is not newer): ${src}->${dst}`);
+        return true;
     }
     check_file(dst, opt);
     mode = 'mode' in opt ? opt.mode : stat.mode & 0o777;
@@ -542,7 +554,14 @@ E.absolutize = (p, d1, d2)=>{
 };
 E.normalize = p=>E.cyg2unix(E.win2unix(path.normalize(p)));
 E.is_subdir = (root, sub)=>{
-    let nroot = root.length;
+    let nroot = root && root.length ? root.length : 0;
     return !root || sub.startsWith(root) && (root[nroot-1]=='/' ||
         sub[nroot]===undefined || sub[nroot]=='/');
 };
+E.chown_e = (src, opt)=>{
+    let stat = fs.statSync(src);
+    let owner = get_owner(stat, opt);
+    if (owner)
+        return fs.chownSync(src, owner.user, owner.group);
+};
+E.chmod_e = (src, mode)=>fs.chmodSync(src, mode);

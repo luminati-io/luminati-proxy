@@ -1,8 +1,21 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, esnext:true*/
-const E = module.exports;
+'use strict'; /*jslint node:true, react:true*/
+let is_node = typeof module=='object' && module.exports;
+let define;
+if (is_node)
+{
+    try {
+        define = require('./require_node.js').define(module, '..');
+    } catch(e){
+        define = require('../../util/require_node.js').define(module, '..');
+    }
+}
+else
+    define = self.define;
+define([], ()=>{
+const E = {};
 
-E.WWW_API = 'https://luminati.io';
+E.WWW_API = 'https://brightdata.com';
 
 E.no_ssl_trigger_types = [
     {key: '--Select--', value: '', tooltip: `Choose a trigger type.
@@ -30,6 +43,9 @@ E.default_action = {key: '--Select--', value: '', tooltip: `Select an
     automatically.`};
 
 E.action_types = [
+    {key: 'Retry with the same IP', value: 'retry_same', tooltip: `System will
+        send the exact same request again using the existing session/IP`,
+        min_req_time: true},
     {key: 'Retry with new IP', value: 'retry', tooltip: `System will send
         the exact same request again with newly generated session`,
         min_req_time: true},
@@ -43,24 +59,29 @@ E.action_types = [
         url: true, type: 'post'},
     {key: 'Ban IP globally', value: 'ban_ip_global', tooltip: `The same as
         'Ban IP' action but will ban the IP globally for all the proxy ports
-        configured on this LPM.`, min_req_time: true, url: true, type: 'post'},
+        configured on this Proxy Manager.`, min_req_time: true, url: true,
+        type: 'post'},
     {key: 'Ban IP per domain', value: 'ban_ip_domain', tooltip: `Will ban the
         IP for custom amount of time per domain.`, min_req_time: true,
         url: true, type: 'post'},
     {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
-        Data center IP with new allocated IP. This action contain
+        Data Center IP with new allocated IP. This action contain
         additional charges. View the cost of IP refreshing in your zones
-        page ${E.WWW_API}/cp/zones`, type: 'post'},
+        page ${E.WWW_API}/cp/zones`, type: 'post', min_req_time: true},
     {key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: `Save
         the current IP to a pool of reserved IPs.  you can then download all
         the IPs at a later time.`, type: 'post'},
-    {key: 'Null response', value: 'null_response', tooltip: `LPM will return a
-        "null response" without proxying. It is useful when users do not want
-        to make a request, but a browser expects 200 response.`, type: 'pre',
-        only_url: true, url: true},
+    {key: 'Null response', value: 'null_response', tooltip: `Proxy Manager will
+        return a "null response" without proxying. It is useful when users do
+        not want to make a request, but a browser expects 200 response.`,
+        type: 'pre', only_url: true, url: true},
     {key: 'Bypass proxy', value: 'bypass_proxy', tooltip: `Requests will be
         passed directly to target site without any proxy (super proxy or
         peer).`, type: 'pre', only_url: true, url: true},
+    {key: 'Cache the response', value: 'cache', tooltip: `The response will be
+        served from a local cache if exists. If the action is triggered and
+        cache for this specific URL does not exist then it will be cached`,
+        only_url: false, url: true, type: 'pre'},
     {key: 'Direct super proxy', value: 'direct', tooltip: `Requests will be
         passed through super proxy (not through peers)`, type: 'pre',
         only_url: true, url: true},
@@ -125,17 +146,4 @@ E.migrate_trigger = rule=>{
         trigger_code: gen_function('trigger', body)});
 };
 
-const stringify_obj = obj=>{
-    let str = '{';
-    const keys = Object.keys(obj);
-    for (let i=0; i<keys.length; ++i)
-    {
-        const k = keys[i], v = obj[k];
-        const val = typeof v=='object' ?
-            stringify_obj(v) : JSON.stringify(v);
-        str += `${k}: ${val}`;
-        if (i<keys.length-1)
-            str += ', ';
-    }
-    return str + '}';
-};
+return E; }); // eslint-disable-line

@@ -1,0 +1,52 @@
+@import (reference) 'common.less';
+.proxies {
+    &.nav_header { padding: 0 15px 10px; }
+    .proxies_panel {
+        padding-bottom: 0;
+    }
+    .proxies_actions {
+        visibility: hidden;
+        display: grid;
+        grid-template-columns: repeat(3, 30%);
+        .action_icon { width: 16px; height:16px; }
+        .remove { grid-column: 1; }
+        .duplicate { grid-column: 2; }
+        .refresh { grid-column: 3; }
+    }
+    .proxies_actions_local {
+        visibility: hidden;
+        display: grid;
+        grid-template-columns: 33% 33% 33%;
+        .action_icon { width: 16px; height:16px; }
+        .remove { grid-column: 1; }
+        .duplicate { grid-column: 2; }
+        .refresh { grid-column: 3; }
+    }
+    .port_cell {
+        &.master {
+            flex-direction: row;
+            display: flex;
+        }
+        &.multiplied {
+            padding: 10px;
+        }
+    }
+}
+
+div[role=columnheader], div[role=cell] {
+    white-space: nowrap;
+    div:not(.context-menu-wrapper + div) {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    div[role=tooltip] {
+        white-space: normal;
+        overflow: unset;
+        div {
+            overflow: unset;
+        }
+    }
+    div[role=button] > div {
+        overflow: unset;
+    }
+}

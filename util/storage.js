@@ -1,93 +1,148 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint br*//*jslint node:true, browser:true*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
-var define;
 var is_node = typeof module=='object' && module.exports;
-if (!is_node)
-    define = self.define;
-else
-    define = function(){};
-
+var define = !is_node ? self.define
+    : require('./require_node.js').define(module, '../');
 define(['cookie', '/util/util.js'], function(cookie, zutil){
 var E = {};
 var storage;
 
-function have_local_storage(){
-    try {
-        var _ = window.localStorage;
-        if (_.length)
-            return true;
-        _.setItem('_', 0);
-        _.removeItem('_');
+E.get = function(key, opt){
+    return storage.getItem(key);
+};
+
+E.get_auto = function(key){
+    var val = storage.getItem(key);
+    if (val==null)
+        return val;
+    if (val=='undefined')
+        return undefined;
+    if (val=='null')
+        return null;
+    if (val=='true')
         return true;
-    } catch(e){}
-}
-
-function select_local_storage(){ storage = window.localStorage; }
-
-function select_cookies(domain){
-    var cookie_opt = {domain: '.'+domain, path: '/', expires: 30};
-    storage = {getItem: cookie.get,
-        setItem: function(key, val){ cookie.set(key, val, cookie_opt); },
-        removeItem: function(key){ cookie.remove(key, cookie_opt); },
-    };
-}
-
-E.init = function(opt){
-    var domain;
-    try { domain = document.location.hostname; }
-    catch(e){ domain = 'luminati.io'; }
-    if (typeof opt=='string')
-        domain = opt;
-    // XXX arik HACK: remove test_storage once all tests are fixed and we can
-    // enable it
-    if (E.is_test_storage = zutil.get(opt, 'test_storage') && zutil.is_mocha())
-        return E.test_storage = {};
-    if (have_local_storage())
-        return select_local_storage();
-    console.error('cannot use localStorage, using cookies instead');
-    select_cookies(domain);
-};
-E.init();
-
-E.on_err = function(){};
-
-// XXX arik: add simple storage test
-E.set = function(key, val){
-    if (E.is_test_storage)
-        return E.test_storage[key] = val;
-    try { return storage.setItem(key, val); }
-    catch(e){ E.on_err('storage_set', key, e); }
+    if (val=='false')
+        return false;
+    if (/^([+-])?(\d+)?(\.\d+)?$/.test(val))
+        return +val;
+    return val;
 };
 
-E.get = function(key){
-    if (E.is_test_storage)
-        return E.test_storage[key];
-    try { return storage.getItem(key); }
-    catch(e){ E.on_err('storage_get', key, e); }
+E.get_bool = function(key){
+    var val = storage.getItem(key);
+    return !(val==null || val==='' || val=='0' || val=='false' || val=='no');
 };
 
-E.get_int = function(key){ return +E.get(key)||0; };
-
-E.clr = function(key){
-    if (E.is_test_storage)
-        return delete E.test_storage[key];
-    try { storage.removeItem(key); }
-    catch(e){ E.on_err('storage_clr', key, e); }
-};
-
-E.set_json = function(key, val){
-    try { return E.set(key, JSON.stringify(val||null)); }
-    catch(e){ E.on_err('storage_set_json', key, e); }
+E.get_num = function(key){
+    var val = storage.getItem(key);
+    return +val||0;
 };
 
 E.get_json = function(key){
     var val = E.get(key);
-    if (!val)
-        return val;
-    try { val = JSON.parse(val); }
-    catch(e){ console.log('err '+e); }
-    return val;
+    if (val!=null)
+    {
+        try { return JSON.parse(val); }
+        catch(e){ console.log('err', e); }
+    }
+    return null;
 };
+
+E.set = function(key, val){
+    storage.setItem(key, val);
+};
+
+E.set_auto = function(key, val){
+    if (val==null || val==='')
+        return storage.removeItem(key);
+    var str_val;
+    if (typeof val=='string')
+        str_val = val;
+    else if (typeof val!='object')
+        str_val = ''+val;
+    else if (val instanceof Date)
+        str_val = val.toISOString();
+    else
+        str_val = JSON.stringify(val);
+    storage.setItem(key, str_val);
+};
+
+E.set_json = function(key, val){
+    var json_val = val==null ? null : val;
+    storage.setItem(key, JSON.stringify(json_val));
+};
+
+E.remove = function(key){
+    storage.removeItem(key);
+};
+
+// (legacy)
+E.get_int = E.get_number;
+E.clr = E.remove;
+
+// -- init/bootstrapping --
+
+E.init = function(opt){
+    opt = opt||{};
+    var mode = resolve_mode(opt);
+    storage = get_mode_storage(mode, opt);
+    if (!is_node)
+        window.zstorage = storage;
+};
+
+var get_mode_storage = function(mode, opt){
+    if (mode=='local_storage')
+        return window.localStorage;
+    if (mode=='cookies')
+    {
+        var domain;
+        if (!(domain = opt.domain))
+        {
+            try { domain = document.location.hostname; }
+            catch(e){ domain = 'brightdata.com'; }
+        }
+        var cookie_opt = {domain: '.'+domain, path: '/', expires: 30};
+        return {
+            getItem: function(key){ return cookie.get(key); },
+            setItem: function(key, val){ cookie.set(key, val, cookie_opt); },
+            removeItem: function(key){ cookie.remove(key, cookie_opt); },
+        };
+    }
+    if (mode=='fake')
+    {
+        E.t = {data: {}};
+        return {
+            getItem: function(k){ return E.t.data[k]; },
+            setItem: function(k, v){ E.t.data[k] = ''+v; },
+            removeItem: function(k){ delete E.t.data[k]; },
+        };
+    }
+    throw new Error('Invalid mode: '+mode);
+};
+
+var resolve_mode = function(opt){
+    if (opt.mode)
+        return opt.mode;
+    if (!is_node && is_local_storage_obj(window.localStorage))
+        return 'local_storage';
+    if (!is_node)
+        return 'cookies';
+    return 'fake';
+};
+
+var is_local_storage_obj = function(obj){
+    try {
+        if (obj.length)
+            return true;
+        obj.setItem('_', 0);
+        obj.removeItem('_');
+        return true;
+    } catch(e){
+        return false;
+    }
+};
+
+E.init();
 
 return E; }); })();
