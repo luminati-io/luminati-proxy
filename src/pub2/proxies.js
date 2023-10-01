@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import React from 'react';
+import React, {useMemo} from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
@@ -27,7 +27,6 @@ import {
     flag_with_title,
     No_zones,
     Inline_wrapper,
-    Toolbar_button,
     Tooltip_bytes,
     Warnings,
     Icon_text,
@@ -43,7 +42,7 @@ import {main as Api} from './api.js';
 import Toolbar from './proxies_toolbar.js';
 import './css/proxies.less';
 
-const {Popup} = Modal, {Checkbox} = Input, {keys} = Object;
+const {Popup} = Modal, {Checkbox} = Input, {keys, values, assign} = Object;
 
 const Actions_cell = ({row, column})=>{
     const {proxy, mgr} = row.original;
@@ -432,7 +431,8 @@ const columns = [
     },
     {
         id: 'throttle',
-        title: 'Throttle concurrent connections',
+        title: 'Throttle',
+        tooltip: 'Throttle concurrent connections',
         ext: true,
     },
     {
@@ -522,7 +522,7 @@ const columns = [
         hide_col_title: true,
     },
 
-].map(col=>Object.assign({
+].map(col=>assign({
     Header: Header_cell,
     accessor: ({proxy})=>proxy[col.id]||'',
     width: 30,
@@ -544,7 +544,7 @@ class Columns_modal extends Pure_component {
             this.setState({settings});
         });
         const selected_cols = this.props.selected_cols.reduce((acc, e)=>
-            Object.assign(acc, {[e]: true}), {});
+            assign(acc, {[e]: true}), {});
         this.setState({selected_cols, saved_cols: selected_cols});
     }
     on_change = value=>{
@@ -566,12 +566,12 @@ class Columns_modal extends Pure_component {
             this.props.on_hide);
     select_all = ()=>{
         this.setState({selected_cols: columns.filter(c=>!c.sticky)
-            .reduce((acc, e)=>Object.assign(acc, {[e.key]: true}), {})});
+            .reduce((acc, e)=>assign(acc, {[e.key]: true}), {})});
     };
     select_none = ()=>this.setState({selected_cols: {}});
     select_default = ()=>{
         this.setState({selected_cols: columns.filter(c=>!c.sticky&&c.default)
-            .reduce((acc, e)=>Object.assign(acc, {[e.key]: true}), {})});
+            .reduce((acc, e)=>assign(acc, {[e.key]: true}), {})});
     };
     render(){
         const header = <Inline_wrapper>
@@ -693,9 +693,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             mgr: this,
             ext: true,
             sticky: true,
-            width: 20,
-            maxWidth: 20,
-            minWidth: 20,
+            style: {
+                width: 'fit-content',
+            },
+            maxWidth: 40,
             shrink: 0,
             grow: 0,
             csv: false,
@@ -778,7 +779,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 const new_proxies = {};
                 for (let p of new_proxies_a)
                     new_proxies[p.port] = p;
-                for (let p of Object.values(new_proxies))
+                for (let p of values(new_proxies))
                 {
                     if (p.proxy_type=='duplicate')
                     {
@@ -797,8 +798,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                     }
                 }
                 const visible_proxies = _this.get_visible_proxies(
-                    Object.values(new_proxies));
-                return {proxies: Object.values(new_proxies), visible_proxies,
+                    values(new_proxies));
+                return {proxies: values(new_proxies), visible_proxies,
                     stats};
             });
             yield etask.sleep(1000);
@@ -838,7 +839,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     on_row_select = (proxy, value, e)=>{
         e.stopPropagation();
         const {selected_proxies, visible_proxies} = this.state;
-        const new_selected = Object.assign({}, selected_proxies);
+        const new_selected = assign({}, selected_proxies);
         if (!value)
             delete new_selected[proxy.port];
         else
@@ -923,7 +924,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return <Proxy_blank/>;
         return <React.Fragment>
             <div className="main_panel vbox cp_panel proxies_panel
-                force_no_border">
+                force_cp_panel">
               <Header_panel
                 selected={this.state.selected_proxies}
                 open_delete_dialog={this.open_delete_dialog}
@@ -973,18 +974,56 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     }
 });
 
-const Header_panel = props=>
-    <div className="cp_panel_header">
-      <h2>
-        <Icon_text
-          color="gray_11"
-          name="MenuExpand"
-          verticalAlign="middle"
-          text="All ports"
+const Actions_bulk = ({selected, open_delete_dialog})=>{
+    const to_delete = useMemo(()=>
+        values(selected).filter(p=>p.proxy_type=='persist'), [selected]);
+    const bulk_refresh_session = e=>{
+        e.stopPropagation();
+        ws.post_event('Toolbar Action Refresh Click',
+            {ports: to_delete.map(p=>p.port)});
+        values(selected).forEach(p=>
+            setdb.emit_path('actions.refresh_sessions.'+p.port));
+    };
+    const bulk_open_delete_dialog = e=>{
+        e.stopPropagation();
+        ws.post_event('Toolbar Action Remove Click',
+            {ports: to_delete.map(p=>p.port)});
+        open_delete_dialog(to_delete);
+    };
+    return <div className="cp_panel_header bulk_actions">
+        <Link
+            icon="Refresh"
+            onClick={bulk_refresh_session}
+            text={t('Refresh')}
+            size="lg"
         />
-      </h2>
-      <Toolbar {...props}/>
+        {to_delete.length && <Link
+            icon="Delete"
+            onClick={bulk_open_delete_dialog}
+            text={t('Delete')}
+            size="lg"
+        />}
     </div>;
+};
+
+const Header_panel = props=>{
+    const {selected, open_delete_dialog} = props;
+    const any_selected = useMemo(()=>values(selected).length,
+        [selected]);
+    return any_selected ? <Actions_bulk selected={selected}
+        open_delete_dialog={open_delete_dialog} />
+        : <div className="cp_panel_header">
+            <h2>
+            <Icon_text
+                color="gray_11"
+                name="MenuExpand"
+                verticalAlign="middle"
+                text="All ports"
+            />
+            </h2>
+            <Toolbar {...props}/>
+        </div>;
+};
 
 class Delete_dialog extends Pure_component {
     delete_proxies = e=>{
@@ -1016,37 +1055,25 @@ class Delete_dialog extends Pure_component {
     }
 }
 
-class Toolbar_old extends Pure_component {
-    open_delete_dialog_with_proxies = e=>{
-        e.stopPropagation();
-        const to_delete = this.get_to_delete();
-        ws.post_event('Toolbar Action Remove Click', {ports: to_delete});
-        this.props.open_delete_dialog(to_delete);
-    };
-    get_to_delete = ()=>{
-        const {selected} = this.props;
-        return Object.values(selected).filter(p=>p.proxy_type=='persist');
-    };
-    render(){
-        const to_delete = this.get_to_delete();
-        return <div className="toolbar">
-            {!!to_delete.length &&
-              <Toolbar_button tooltip="Delete selected proxies"
-                on_click={this.open_delete_dialog_with_proxies} id="remove"/>
-            }
-          </div>;
-    }
-}
-
 class Actions extends Pure_component {
     componentDidMount(){
         if (!this.props.proxy.status)
             this.get_status();
+        this.add_refresh_listener();
     }
     componentWillUnmount(){
         if (this.status_req)
             ajax.abort(this.status_req);
     }
+    componentDidUpdate(prev_props){
+        this.remove_refresh_listener(prev_props.proxy.port);
+        this.add_refresh_listener();
+    }
+    add_refresh_listener = (port=this.props.proxy.port)=>
+        this.setdb_on('actions.refresh_sessions.'+port, this.refresh_sessions,
+            {init: false});
+    remove_refresh_listener = (port=this.props.proxy.port)=>
+        this.setdb_off('actions.refresh_sessions.'+port);
     get items(){
         const persist = this.props.proxy.proxy_type=='persist';
         return [
@@ -1126,12 +1153,14 @@ class Actions extends Pure_component {
             {port: this.props.proxy.port});
     }
     refresh_sessions = e=>{
-        e.stopPropagation();
+        if (e)
+            e.stopPropagation();
         const _this = this;
         this.etask(function*(){
             yield Api.json.post('refresh_sessions/'+_this.props.proxy.port);
             yield _this.get_status({force: true});
-            _this.post_action('Refresh');
+            if (e)
+                _this.post_action('Refresh');
         });
     };
     duplicate = event=>{

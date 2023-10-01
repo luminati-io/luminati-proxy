@@ -297,7 +297,7 @@ E.to_str = function(csv, opt){
         return '';
     if (Array.isArray(csv[0]) && !opt.flatten)
     {
-        if (opt.keys)
+        if (opt.keys && (opt.print_keys===undefined || opt.print_keys))
             s += line_to_str(opt.keys);
         for (i=0; i<csv.length; i++)
             s += line_to_str(csv[i]);

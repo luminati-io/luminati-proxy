@@ -772,16 +772,26 @@ span.icon_link {
     }
 }
 
-.force_no_border {
-    border: none !important;
+.force {
+    &_cp_panel {
+        border: none !important;
+        padding: unset !important;
+        padding-top: 5px !important;
+    }
 }
 
 .cp_panel {
     background: white;
     padding: 20px;
+    .bulk_actions {
+        display: flex;
+        align-items: center;
+        column-gap: 15px;
+    }
     .cp_panel_header {
         display: flex;
         margin-bottom: 10px;
+        min-height: 32px;
         h2 {
             font-size: 20px;
             flex: 1;

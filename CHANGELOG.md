@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.413.15 Stable
+- :star: Remove deprecated DNS usage
+- :star: Raise min Node version to 14.19.0
+
 ## 1.410.597 Stable
 - :bug: Fix handling uninitialized port
 

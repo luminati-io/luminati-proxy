@@ -1,7 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
-require('./config.js');
+const assert = require('assert');
 const fs = require('fs');
+const os = require('os');
+require('./config.js');
 const string = require('./string.js');
 const zerr = require('./zerr.js');
 const file = require('./file.js');
@@ -9,10 +11,8 @@ const etask = require('./etask.js');
 const efile = require('./efile.js');
 const array = require('./array.js');
 const zutil = require('./util.js');
-const assert = require('assert');
 const cli = require('./cli.js');
 const exec = require('./exec.js');
-const os = require('os');
 const E = exports;
 const env = process.env, qw = string.qw, KB = 1024, MB = KB*KB;
 let fallocate;
@@ -51,6 +51,25 @@ function read_procfs_line(filepath, type){
     var res = {}, parts = str.split(/ +/);
     procfs_fmt[type].forEach((name, idx)=>res[name] = parts[idx]||0);
     return res;
+}
+
+function parse_stat(file_path){
+    const ll = file.read_lines_e(file_path), data = {};
+    for (let i = 0; i<ll.length; i += 2)
+    {
+        const counters = ll[i].split(' ');
+        const values = ll[i+1].split(' ');
+        if (counters[0]!=values[0])
+            throw new Error(`Can't parse ${file_path} lines ${i}, ${i+1}`);
+        const ext_name = string.to_snake_case(counters[0].slice(0, -1));
+        data[ext_name] = {};
+        for (let j = 1; j<values.length; j++)
+        {
+            data[ext_name][string.to_snake_case(counters[j])] =
+                parseInt(values[j], 10);
+        }
+    }
+    return data;
 }
 
 // on some machines the lines are in a different order
@@ -467,48 +486,8 @@ E.sockets_count = proto=>etask(function*(){
     return v;
 });
 
-E.netstat = ()=>{
-    const netstat_path = `${PROC_DIR}/net/netstat`;
-    const ll = file.read_lines_e(netstat_path), data = {};
-    for (let i = 0; i<ll.length; i += 2)
-    {
-        const counters = ll[i].split(' ');
-        const values = ll[i+1].split(' ');
-        if (counters[0]!=values[0])
-            throw new Error(`Can't parse ${netstat_path} lines ${i}, ${i+1}`);
-        const ext_name = string.to_snake_case(counters[0].slice(0, -1));
-        data[ext_name] = {};
-        for (let j = 1; j<values.length; j++)
-        {
-            data[ext_name][string.to_snake_case(counters[j])] =
-                parseInt(values[j], 10);
-        }
-    }
-    return data;
-};
-
-E.tcp_stats = ()=>{
-    let ll = file.read_lines_e(`${PROC_DIR}/net/snmp`), i = 0;
-    for (; i<ll.length && !ll[i].startsWith('Tcp'); i++);
-    if (i<ll.length-1)
-    {
-        let l = ll[i+1].split(/\s+/);
-        return {in_segs: +l[10], out_segs: +l[11], retrans_segs: +l[12],
-            in_errs: +l[13], in_csum_errs: +l[15]};
-    }
-};
-
-E.udp_stats = ()=>{
-    let ll = file.read_lines_e(`${PROC_DIR}/net/snmp`), i = 0;
-    for (; i<ll.length && !ll[i].startsWith('Udp'); i++);
-    if (i<ll.length-1)
-    {
-        let l = ll[i+1].split(/\s+/);
-        return {in_datagrams: +l[1], no_ports: +l[2], in_errors: +l[3],
-            out_datagrams: +l[4], rcvbuf_errors: +l[5], sndbuf_errors: +l[6],
-            in_csum_errors: +l[7]};
-    }
-};
+E.snmp_stat = ()=>parse_stat(`${PROC_DIR}/net/snmp`);
+E.netstat = ()=>parse_stat(`${PROC_DIR}/net/netstat`);
 
 E.vmstat = function(){
     var vmstat = file.read_lines_e(`${PROC_DIR}/vmstat`);
