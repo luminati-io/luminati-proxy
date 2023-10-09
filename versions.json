@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.414.367",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix unable to deactivate rules via UI"
+            }
+        ]
+    },
+    {
         "ver": "1.413.15",
         "type": "stable",
         "changes": [

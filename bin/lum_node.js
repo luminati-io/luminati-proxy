@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
+const dns = require('dns');
+configure_dns();
+const child_process = require('child_process');
+const os = require('os');
+const fs = require('fs');
+const path = require('path');
 const Manager = require('../lib/manager.js');
 const file = require('../util/file.js');
 const etask = require('../util/etask.js');
@@ -13,12 +19,19 @@ const cluster_ipc = require('../util/cluster_ipc.js');
 const perr = require('../lib/perr.js');
 const E = module.exports = {};
 const shutdown_timeout = 3000;
-const child_process = require('child_process');
-const os = require('os');
-const fs = require('fs');
-const path = require('path');
 const logger = require('../lib/logger.js').child({category: 'lum_node'});
 let version_msg = null;
+
+function configure_dns(){
+    const google_dns = ['8.8.8.8', '8.8.4.4'];
+    const original_dns = dns.getServers();
+    const servers = google_dns.concat(original_dns.filter(
+        d=>!google_dns.includes(d)));
+    // dns.setServers cashes node if there is an in-flight dns resolution
+    // should be done before any requests are made
+    // https://github.com/nodejs/node/issues/14734
+    dns.setServers(servers);
+}
 
 E.shutdown = (reason, error=null)=>{
     if (E.shutdowning)

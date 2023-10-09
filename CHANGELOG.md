@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.414.367 Development Latest
+- :bug: Fix unable to deactivate rules via UI
+
 ## 1.413.15 Stable
 - :star: Remove deprecated DNS usage
 - :star: Raise min Node version to 14.19.0

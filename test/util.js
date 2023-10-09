@@ -3,14 +3,17 @@
 const assert = require('assert');
 const os = require('os');
 const path = require('path');
+const {Readable, Writable} = require('stream');
 const sinon = require('sinon');
 const pki = require('node-forge').pki;
 const zerr = require('../util/zerr.js');
 const lpm_file = require('../util/lpm_file.js');
 const lpm_util = require('../util/lpm_util.js');
 const Cert_gen = require('../util/cert_util.js');
+const mixin_core =require('../lib/mixins/core.js');
 const date = require('../util/date.js');
 const util = require('../lib/util.js');
+const Server = require('../lib/server.js');
 
 describe('util', ()=>{
     describe('param_rand_range', ()=>{
@@ -157,6 +160,77 @@ describe('util', ()=>{
             let {not_before, not_after} = Cert_gen.create_root_ca();
             assert.deepStrictEqual(not_after, date.add(not_before,
                 {year: 20}), 'not_after is not 20 years in future');
+        });
+    });
+    describe('create_count_stream', ()=>{
+        let t = (name, limit, chunks, expected)=>it(name, function(done){
+            let resp = {body_size: 0, body: []};
+            let $count = Server.create_count_stream(resp, limit);
+            let src = new Readable({
+                read(){ this.push('1234567890'); this.push(null); }
+            });
+            let dst = new Writable({
+                write(chunk, encoding, callback){ callback(); },
+            });
+            src.pipe($count).pipe(dst).on('finish', ()=>{
+                assert.equal(resp.body.length, chunks);
+                if (chunks)
+                    assert.equal(resp.body[0].length, expected);
+                done();
+            });
+        });
+        t('disabled', -1, 0, 0);
+        t('cut', 5, 1, 5);
+        t('enough', 15, 1, 10);
+        t('unlimited', 0, 1, 10);
+        t('undefined means unlimited', undefined, 1, 10);
+    });
+    describe('decode_body', ()=>{
+        let t = (name, limit, expected)=>it(name, ()=>{
+            let buffer = Buffer.from('1234567890');
+            let body = util.decode_body([buffer], '', limit);
+            assert.equal(body, expected);
+        });
+        t('disabled', -1, '');
+        t('cut', 5, '12345');
+        t('enough', 15, '1234567890');
+        t('unlimited', 0, '1234567890');
+        t('undefined means unlimited', undefined, '1234567890');
+    });
+    describe('mixins', ()=>{
+        const label = 'test_mixin';
+        const mixin_bp = {prototype: {}, static: {}};
+        beforeEach('before each', ()=>mixin_core.flush());
+        it('Should save new mixin', ()=>{
+            mixin_core.new_mixin(label);
+            assert.equal(mixin_core.as_array.length, 1, 'Doesnt save');
+        });
+        it('Should flush', ()=>{
+            mixin_core.new_mixin(label);
+            mixin_core.flush();
+            assert.equal(mixin_core.as_array.length, 0, 'Doesnt flush');
+        });
+        it('Should create fixed interface', ()=>{
+            let mixin = mixin_core.new_mixin(label);
+            assert.deepStrictEqual(mixin, Object.assign({label}, mixin_bp),
+                'wrong fields');
+        });
+        it('Should mix instance methods', ()=>{
+            let mixin = mixin_core.new_mixin(label);
+            mixin.prototype.test_method = ()=>true;
+            class Test_class {}
+            mixin_core.assign(Test_class, label);
+            let test_instance = new Test_class();
+            assert.ok(test_instance.test_method(),
+                'Doesnt assign method to class proto');
+        });
+        it('Should mix static methods', ()=>{
+            let mixin = mixin_core.new_mixin(label);
+            mixin.static.test_method = ()=>true;
+            class Test_class {}
+            mixin_core.assign(Test_class, label);
+            assert.ok(Test_class.test_method(),
+                'Doesnt assign static method to class proto');
         });
     });
 });

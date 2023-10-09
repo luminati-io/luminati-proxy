@@ -146,22 +146,25 @@ const App = withRouter(class App extends Pure_component {
     };
     load_data = ()=>this.etask(function*(){
         const errors = [];
-        const err_handler = msg=>etask.fn(function*(e){
-            errors.push(`${msg}: ${e.message}`);
+        const err_handler = (type, no_throw=false)=>etask.fn(function*(e){
+            const msg = `Error fetching ${type}: ${e.message}`;
+            if (!no_throw)
+                errors.push(msg);
+            console.error(msg);
             yield report_exception(e, 'app.App.componentDidMount.load_data');
         });
         this.spawn(etask(function*(){
-            this.on('uncaught', err_handler('Error fetching locations'));
+            this.on('uncaught', err_handler('locations'));
             const locations = yield Api.json.get('all_locations');
             setdb.set('head.locations', locations);
         }));
         this.spawn(etask(function*(){
-            this.on('uncaught', err_handler('Error fetching carriers'));
+            this.on('uncaught', err_handler('carriers'));
             const carriers = yield Api.json.get('all_carriers');
             setdb.set('head.carriers', carriers);
         }));
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching lang data'));
+            this.on('uncaught', err_handler('lang data'));
             this.finally(()=>setdb.set('i18n_loaded', true));
             const res = yield Api.json.get('i18n');
             Object.keys(res).forEach(lang_code=>{
@@ -170,47 +173,47 @@ const App = withRouter(class App extends Pure_component {
             });
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching settings'));
+            this.on('uncaught', err_handler('settings'));
             const settings = yield Api.json.get('settings');
             setdb.set('head.settings', settings);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching conn'));
+            this.on('uncaught', err_handler('conn'));
             const conn = yield Api.json.get('conn');
             setdb.set('head.conn', conn);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching last_version'));
+            this.on('uncaught', err_handler('last_version', true));
             const version = yield Api.json.get('last_version');
             setdb.set('head.ver_last', version);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching defaults'));
+            this.on('uncaught', err_handler('defaults'));
             const defaults = yield Api.json.get('defaults');
             setdb.set('head.defaults', defaults);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching node_version'));
+            this.on('uncaught', err_handler('node_version'));
             const node = yield Api.json.get('node_version');
             setdb.set('head.ver_node', node);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching proxies_running'));
+            this.on('uncaught', err_handler('proxies_running'));
             const proxies = yield Api.json.get('proxies_running');
             setdb.set('head.proxies_running', proxies);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching consts'));
+            this.on('uncaught', err_handler('consts'));
             const consts = yield Api.json.get('consts');
             setdb.set('head.consts', consts);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching zones'));
+            this.on('uncaught', err_handler('zones'));
             const zones = yield Api.json.get('zones');
             setdb.set('ws.zones', zones);
         });
         etask(function*(){
-            this.on('uncaught', err_handler('Error fetching tls_warning'));
+            this.on('uncaught', err_handler('tls_warning'));
             const w = yield Api.json.get('tls_warning');
             setdb.set('ws.tls_warning', w);
         });

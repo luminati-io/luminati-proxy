@@ -1,6 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const assert = require('assert');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const http = require('http');
 const https = require('https');
 const net = require('net');
@@ -12,19 +15,88 @@ const {Netmask} = require('netmask');
 const forge = require('node-forge');
 const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
-const {SSL_OP_NO_TLSv1_1} = require('../lib/consts.js');
+const Server = require('../lib/server.js');
+const Worker = require('../lib/worker.js');
+const Manager = require('../lib/manager.js');
+const consts = require('../lib/consts.js');
 const etask = require('../util/etask.js');
 const date = require('../util/date.js');
 const zutil = require('../util/util.js');
+const lpm_util = require('../util/lpm_util.js');
 const restore_case = require('../util/takeup_util.js').restore_case;
 const customer = 'abc';
 const password = 'xyz';
-
+const test_url = {http: 'http://lumtest.com/test',
+    https: 'https://lumtest.com/test'};
+const zone_auth_type_whitelist = [customer];
 const E = module.exports = {};
 
 E.keys = forge.pki.rsa.generateKeyPair(2048);
 E.keys.privateKeyPem = forge.pki.privateKeyToPem(E.keys.privateKey);
 E.keys.publicKeyPem = forge.pki.publicKeyToPem(E.keys.publicKey);
+
+E.init_lum = proxy=>opt=>etask(function*(){
+    opt = opt||{};
+    if (opt.ssl===true)
+        opt.ssl = Object.assign({requestCert: false}, ssl(E.keys));
+    const l = new Server(Object.assign({
+        proxy: '127.0.0.1',
+        proxy_port: proxy.port,
+        customer,
+        password,
+        zone_auth_type_whitelist,
+        log: 'none',
+        logs: 1000,
+        port: 24000,
+    }, opt), new Worker().run().setup({keys: E.keys}));
+    l.test = etask._fn(function*(_this, req_opt){
+        if (typeof req_opt=='string')
+            req_opt = {url: req_opt};
+        req_opt = req_opt||{};
+        req_opt.url = req_opt.url || test_url.http;
+        req_opt.json = true;
+        req_opt.rejectUnauthorized = false;
+        if (req_opt.fake)
+        {
+            req_opt.headers = {
+                'x-lpm-fake': true,
+                'x-lpm-fake-status': req_opt.fake.status,
+                'x-lpm-fake-data': req_opt.fake.data,
+            };
+            if (req_opt.fake.headers)
+            {
+                req_opt.headers['x-lpm-fake-headers'] =
+                    JSON.stringify(req_opt.fake.headers);
+            }
+            delete req_opt.fake;
+        }
+        if (!req_opt.skip_proxy)
+        {
+            req_opt.proxy = req_opt.proxy ||
+                `http://127.0.0.1:${opt.port||'24000'}`;
+        }
+        let req = request(req_opt, (err, res)=>
+            this.continue(etask.err_res(err, res)));
+        if (req_opt.lb_data)
+            req.on('socket', socket=>socket.write(req_opt.lb_data));
+        if (req_opt.no_usage)
+            return yield this.wait();
+        const w = etask.wait();
+        l.on('error', e=>w.throw(e));
+        l.on('request_error', e=>w.throw(e));
+        l.on('usage', ()=>w.continue());
+        l.on('usage_abort', ()=>w.continue());
+        l.on('switched', ()=>w.continue());
+        const res = yield this.wait();
+        yield w;
+        return res;
+    });
+    yield l.listen();
+    l.history = [];
+    l.on('usage', data=>l.history.push(data));
+    l.on('usage_abort', data=>l.history.push(data));
+    return l;
+});
 
 E.assert_has = (value, has, prefix)=>{
     prefix = prefix||'';
@@ -107,7 +179,7 @@ E.http_proxy = port=>etask(function*(){
             {
                 proxy.https = https.createServer(
                     Object.assign({requestCert: false}, ssl(E.keys),
-                    {secureOptions: SSL_OP_NO_TLSv1_1}),
+                    {secureOptions: consts.SSL_OP_NO_TLSv1_1}),
                     (_req, _res, _head)=>{
                         zutil.defaults(_req.headers,
                             headers[_req.socket.remotePort]||{});
@@ -244,3 +316,175 @@ E.http_ping = ()=>etask(function*(){
     });
     return ping;
 });
+
+const get_param = (args, param)=>{
+    let i = args.indexOf(param)+1;
+    return i ? args[i] : null;
+};
+
+E.app_with_args = (args, opt={})=>etask(function*(){
+    let manager, {only_explicit, start_manager, server_conf} = opt;
+    this.finally(()=>{
+        if (this.error && manager)
+            return manager.stop(true);
+    });
+    args = args||[];
+    if (!only_explicit)
+    {
+        if (!get_param(args, '--proxy'))
+            args = args.concat(['--proxy', '127.0.0.1']);
+        if (!get_param(args, '--proxy_port'))
+            args = args.concat(['--proxy_port', 24000]);
+        if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
+            args.push('--no-config');
+        if (!get_param(args, '--customer'))
+            args = args.concat(['--customer', customer]);
+        if (!get_param(args, '--password'))
+            args = args.concat(['--password', password]);
+        if (!get_param(args, '--dropin')&&!get_param(args, '--no-dropin'))
+            args = args.concat(['--no-dropin']);
+        if (!get_param(args, '--local_login') &&
+            !get_param(args, '--no-local_login'))
+        {
+            args = args.concat(['--no-local_login']);
+        }
+        args = args.concat('--loki', '/tmp/testdb');
+    }
+    Manager.prototype.set_current_country = ()=>null;
+    Manager.prototype.lpm_users_get = ()=>null;
+    manager = new Manager(lpm_util.init_args(args));
+    manager.lpm_conn.init = ()=>null;
+    manager.lpm_f.init = ()=>null;
+    manager.lpm_f.get_meta_conf = ()=>({
+        _defaults: {
+            account_id: 'c_123',
+            customer_id: 'hl_123',
+            customer: 'test_cust',
+            password: 'pass123',
+            debug: 'full',
+            zone: 'static',
+            zones: {
+                static: {
+                    ips: 'any',
+                    password: ['pass1'],
+                    plan: {
+                        type: 'resident',
+                        city: 1,
+                    },
+                    perm: 'country',
+                    kw: {},
+                    cost: {'precommit': 1000, 'gb': 24},
+                    refresh_cost: null,
+                },
+                foo: {
+                    ips: 'any',
+                    password: ['pass2'],
+                    plan: {
+                        type: 'resident',
+                        city: 1,
+                    },
+                    perm: 'country city',
+                    kw: {},
+                    cost: {'precommit': 500, 'gb': 32},
+                    refresh_cost: 0.5,
+                },
+            },
+        },
+        customers: ['test_cust'],
+        logins: [],
+    });
+    manager.lpm_f.get_server_conf = ()=>{
+        manager.lpm_f.emit('server_conf', Object.assign({client: {}},
+            server_conf));
+    };
+    manager.lpm_f.get_lb_ips = ()=>{
+        manager.lpm_f.emit('lb_ips', []);
+    };
+    if (start_manager!==false)
+        yield manager.start();
+    return {manager};
+});
+
+let tmp_file_counter = 0;
+
+E.temp_file_path = (ext='tmp')=>({
+    path: path.join(os.tmpdir(),
+        `test-${Date.now()}-${tmp_file_counter++}.${ext}`),
+    done(){
+        if (!this.path)
+            return;
+        try { fs.unlinkSync(this.path); }
+        catch(e){ console.error(e.message); }
+        this.path = null;
+    },
+});
+
+E.temp_file = (content, ext)=>{
+    const temp = E.temp_file_path(ext);
+    fs.writeFileSync(temp.path, JSON.stringify(content));
+    return temp;
+};
+
+E.init_app_with_config = temp_files=>(opt={})=>etask(function*(){
+    const args = [];
+    const cli = opt.cli||{};
+    Object.keys(cli).forEach(k=>{
+        if (typeof cli[k]=='boolean')
+        {
+            if (cli[k])
+                args.push('--'+k);
+            else
+                args.push('--no-'+k);
+            return;
+        }
+        args.push('--'+k);
+        if (Array.isArray(cli[k]))
+            args.push(...cli[k]);
+        else
+            args.push(cli[k]);
+    });
+    if (opt.config)
+    {
+        const config_file = E.temp_file(opt.config, 'json');
+        args.push('--config');
+        args.push(config_file.path);
+        temp_files.push(config_file);
+    }
+    return yield E.app_with_args(args, opt);
+});
+
+E.init_app_with_proxies = app_with_config=>(proxies, cli)=>etask(function*(){
+    return yield app_with_config({config: {proxies}, cli});
+});
+
+E.api = (_path, method, data, json, headers)=>etask(function*(){
+    const admin = 'http://127.0.0.1:'+Manager.default.www;
+    const opt = {
+        url: admin+'/'+_path,
+        method: method||'GET',
+        json,
+        body: data,
+        headers: headers || {'x-lpm-fake': true},
+    };
+    return yield etask.nfn_apply(request, [opt]);
+});
+
+E.api_json = (_path, opt={})=>etask(function*(){
+    return yield E.api(_path, opt.method, opt.body, true, opt.headers);
+});
+
+E.json = (_path, method, data)=>etask(function*(){
+    const res = yield E.api(_path, method, data, true);
+    assert.equal(res.statusCode, 200);
+    return res.body;
+});
+
+E.make_user_req = (port=24000, status=200)=>{
+    return E.api_json('api/test/'+port, {
+        method: 'POST',
+        body: {
+            url: 'http://lumtest.com/myip.json',
+            headers: {'x-lpm-fake': true, 'x-lpm-fake-status': status},
+        },
+    });
+};

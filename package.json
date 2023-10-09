@@ -297,6 +297,13 @@
       "lib/md5_util.js",
       "lib/middleware.js",
       "lib/migration.js",
+      "lib/mixins/core.js",
+      "lib/mixins/mgr_config.js",
+      "lib/mixins/mgr_proxy.js",
+      "lib/mixins/server_handle.js",
+      "lib/mixins/server_send.js",
+      "lib/mixins/web_api.js",
+      "lib/mixins/web_server.js",
       "lib/perr.js",
       "lib/proxy_port.js",
       "lib/puppeteer.js",
@@ -467,12 +474,14 @@
       "src/pub2/util.js",
       "src/pub2/whitelist_ips.js",
       "src/pub2/ws.js",
+      "test/api.js",
       "test/common.js",
       "test/config.js",
       "test/index.js",
       "test/ip_cache.js",
       "test/manager.js",
       "test/migration.js",
+      "test/rules.js",
       "test/scripts.js",
       "test/username.js",
       "test/util.js",
@@ -491,7 +500,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "09cc951a22f8e34c23d9c9daae0bf948"
+    "md5": "7e59c8483d5b2e3bcb0740e2b692c581"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -523,5 +532,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.413.15"
+  "version": "1.414.367"
 }
