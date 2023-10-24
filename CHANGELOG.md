@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.417.160 Stable
+- :bug: Fix unable to deactivate render port setting via UI
+
 ## 1.414.367 Development Latest
 - :bug: Fix unable to deactivate rules via UI
 

@@ -1,7 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 import React from 'react';
-import Pure_component from '/www/util/pub/pure_component.js';
 import React_select from 'react-select/creatable';
 import React_tooltip from 'react-tooltip';
 import {withRouter} from 'react-router-dom';
@@ -9,18 +8,24 @@ import classnames from 'classnames';
 import {Netmask} from 'netmask';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import codemirror from 'codemirror/lib/codemirror';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/lib/codemirror.css';
+import styled from 'styled-components';
+import {Link, Button, IconButton, Input as UIKitInput} from 'uikit';
+import Pure_component from '/www/util/pub/pure_component.js';
 import zurl from '../../../util/url.js';
+import {Ext_tooltip} from '../common.js';
+import {Clipboard} from '../util.js';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
-import {Ext_tooltip} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
 import Toggle_on_off from './toggle_on_off.js';
 import {get_plan_network, network_types} from './network_types.js';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/lib/codemirror.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 const ANY_IP = '0.0.0.0/0';
+
+const {Textbox} = UIKitInput;
 
 export class Pins extends Pure_component {
     state = {
@@ -155,6 +160,139 @@ export class Pins extends Pure_component {
     }
 }
 
+export class Pins_new extends Pure_component {
+    state = {
+        pins: [],
+        max_id: 0,
+        modal_open: false,
+        pending: this.props.pending||[],
+        disabled: false,
+    };
+    static getDerivedStateFromProps(props, state){
+        if (state.disabled==props.disabled &&
+            (props.val==state.raw_val||!props.val))
+        {
+            return null;
+        }
+        const ips = props.val||[];
+        const disabled_ips = props.disabled_ips||[];
+        const pins = ips.map((p, id)=>({
+            id,
+            val: p,
+            edit: false,
+            disabled: props.disabled || !!disabled_ips.find(i=>i==p),
+        }));
+        if (!props.disabled)
+        {
+            const edited_pin = state.pins.find(p=>p.edit);
+            if (edited_pin)
+                pins.push(edited_pin);
+        }
+        return {
+            raw_val: props.val,
+            pins,
+            max_id: ips.length,
+            disabled: props.disabled,
+        };
+    }
+    add_pin = (pin='')=>{
+        this.setState(prev=>({
+            pins: [...prev.pins, {id: prev.max_id+1, val: pin, edit: true}],
+            max_id: prev.max_id+1,
+        }));
+        if (pin && this.state.pending.includes(pin))
+            this.setState({pending: this.state.pending.filter(p=>p!=pin)});
+    };
+    add_empty_pin = ()=>{
+        this.add_pin();
+    };
+    remove = id=>{
+        this.setState(prev=>({
+            pins: prev.pins.filter(p=>p.id!=id),
+        }), this.fire_on_change);
+    };
+    set_edit = (id, edit)=>{
+        this.setState(prev=>({
+            pins: prev.pins.map(p=>{
+                if (p.id!=id)
+                    return p;
+                return {...p, edit};
+            }),
+        }));
+    };
+    update_pin = (id, val)=>{
+        this.setState(prev=>({
+            pins: prev.pins.map(p=>{
+                if (p.id!=id)
+                    return p;
+                return {...p, val};
+            }),
+        }));
+    };
+    fire_on_change = ()=>{
+        const val = this.state.pins.map(p=>p.val);
+        this.props.on_change_wrapper(val);
+    };
+    save_pin = (id, val)=>{
+        if (this.state.pins.find(p=>p.id!=id && p.val==val))
+            return this.remove(id);
+        this.setState(prev=>({
+            pins: prev.pins.map(p=>{
+                if (p.id!=id)
+                    return p;
+                return {...p, val, edit: false};
+            }),
+        }), this.fire_on_change);
+    };
+    dismiss_modal = ()=>this.setState({modal_open: false});
+    open_modal = ()=>this.setState({modal_open: true});
+    render(){
+        const {pending, disabled, pins} = this.state;
+        const has_any = pins.find(p=>p.val==ANY_IP);
+        const shown_pins = pins.filter(p=>!has_any || p.val==ANY_IP);
+        return <div className="pins_field_new">
+          <div className="pins_data">
+            {shown_pins.map(p=>
+              <Pin_new
+                key={p.id}
+                update_pin={this.update_pin}
+                id={p.id}
+                set_edit={this.set_edit}
+                edit={p.edit}
+                exact={this.props.exact}
+                save_pin={this.save_pin}
+                show_any={!this.props.no_any && !has_any}
+                remove={this.remove} disabled={p.disabled}>
+                {p.val}
+              </Pin_new>
+            )}
+          </div>
+          <div className='pins_controls'>
+            <Pin_pending_btn
+                pending={pending}
+                open={this.open_modal}
+                disabled={disabled}
+            />
+            <Pin_add_btn
+                add={this.add_empty_pin}
+                disabled={disabled||has_any}
+            />
+          </div>
+          <Modal_dialog title="Add recent IPs"
+            open={this.state.modal_open}
+            ok_clicked={this.dismiss_modal} no_cancel_btn>
+            {pending.map(ip=>
+              <Add_pending_btn key={ip} ip={ip}
+                add_pin={this.add_pin}/>
+            )}
+            {!pending.length &&
+              <span>No more pending IPs to whitelist</span>
+            }
+          </Modal_dialog>
+        </div>;
+    }
+}
+
 const Add_pending_btn = ({ip, add_pin})=>
     <div>
       <span style={{marginRight: 10}}>{ip}</span>
@@ -234,6 +372,109 @@ class Pin extends Pure_component {
     }
 }
 
+class Pin_new extends Pure_component {
+    input = React.createRef();
+    componentDidMount(){
+        this.input.current.focus();
+    }
+    componentDidUpdate(){
+        if (this.props.edit)
+            this.input.current.focus();
+    }
+    edit = ()=>{
+        if (!this.props.disabled)
+            this.props.set_edit(this.props.id, true);
+    };
+    key_up = e=>{
+        if (e.keyCode==13)
+            this.validate_and_save();
+    };
+    validate_and_save = ()=>{
+        let val = (this.props.children||'').trim();
+        if (this.props.exact && val)
+            return this.props.save_pin(this.props.id, val);
+        try {
+            const netmask = new Netmask(val);
+            val = netmask.base;
+            if (netmask.bitmask!=32)
+                val += '/'+netmask.bitmask;
+        } catch(e){ val = ''; }
+        if (!val)
+            return this.props.remove(this.props.id);
+        this.props.save_pin(this.props.id, val);
+    };
+    on_change = e=>this.props.update_pin(this.props.id, e.target.value);
+    on_any_click = ()=>{
+        this.props.update_pin(this.props.id, ANY_IP);
+        this.setState({children: ANY_IP}, this.validate_and_save);
+    };
+    remove = ()=>this.props.remove(this.props.id);
+    on_blur = e=>{
+        const target = e.relatedTarget;
+        const any_click = target && target.classList.contains('any');
+        if (!any_click)
+            this.validate_and_save();
+    };
+    get_label = ip=>ip==ANY_IP ? 'any' : ip;
+    render(){
+        const {children, edit, disabled, show_any} = this.props;
+        const input_classes = classnames({hidden: !edit});
+        return <div className={classnames('pin', {active: edit, disabled})}
+          onBlur={this.on_blur}>
+          <div className="content" onClick={this.edit}>
+            {!edit && this.get_label(children)}
+            <input ref={this.input} type="text" value={children}
+              onChange={this.on_change} className={input_classes}
+              onKeyUp={this.key_up}/>
+          </div>
+          {!edit && <div className="copy">
+            <IconButton
+                aria-label="Icon Button"
+                icon="Copy"
+                noBackColor
+                onClick={()=>Clipboard.copy(children)}
+                size="xs"
+                tooltip="Copy"
+                variant="icon"
+            />
+          </div>}
+          {!disabled && !edit && <div className="remove">
+            <IconButton
+                aria-label="Icon Button"
+                icon="Close"
+                noBackColor
+                onClick={this.remove}
+                size="xs"
+                tooltip="Remove"
+                variant="icon"
+            />
+          </div>}
+          {edit && show_any && <div className="any_ip">
+            <IconButton
+                aria-label="Icon Button"
+                icon="Field"
+                noBackColor
+                onClick={this.on_any_click}
+                size="xs"
+                tooltip="Any"
+                variant="icon"
+            />
+          </div>
+          }
+          {edit &&
+            <IconButton
+                aria-label="Icon Button"
+                icon="Check"
+                noBackColor
+                onClick={this.validate_and_save}
+                size="xs"
+                variant="icon"
+            />
+          }
+        </div>;
+    }
+}
+
 export const Pin_btn = ({on_click, title, tooltip, disabled})=>
     <Tooltip title={tooltip}>
       <button className="btn btn_lpm btn_lpm_small add_pin"
@@ -242,6 +483,27 @@ export const Pin_btn = ({on_click, title, tooltip, disabled})=>
         <i className="glyphicon glyphicon-plus"/>
       </button>
     </Tooltip>;
+
+export const Pin_pending_btn = ({open, pending, disabled})=>
+    <div className="pin_pending_btn">
+        {!!pending.length && !disabled && <Link
+            size="lg"
+            onClick={open}
+            text={`Add recent IPs (${pending.length})`}
+        />}
+    </div>;
+
+export const Pin_add_btn = ({add, disabled})=>
+    <div className="pin_add_btn">
+        <Button
+            icon="Add"
+            onClick={add}
+            text="Add allowed IPs"
+            variant="white"
+            disabled={disabled}
+            size="sm"
+        />
+    </div>;
 
 export class Select_status extends Pure_component {
     status_types = ['200', '2..', '403', '404', '500', '503', '(4|5)..'];
@@ -315,6 +577,58 @@ export class Select_number extends Pure_component {
     }
 }
 
+export class Select_number_new extends Pure_component {
+    _fmt_num = n=>n && n.toLocaleString({useGrouping: true}) || n;
+    _get_data = ()=>{
+        if (!this.props.data)
+            return this.opt_from_range();
+        if (this.props.data[0] && this.props.data[0].value!==undefined)
+            return this.props.data.map(d=>d.value);
+        return this.props.data;
+    };
+    value_to_option = value=>{
+        if (value && value.label)
+            return value;
+        let option = (this.props.data||[]).find(el=>el&&el.value==value);
+        if (option)
+            return option;
+        if (value==null)
+            return false;
+        const label = value==0 ? <T>Disabled</T> : this._fmt_num(+value);
+        return {value, label};
+    };
+    opt_from_range = ()=>{
+        let res;
+        if (this.props.range=='medium')
+            res = [0, 1, 10, 100, 1000];
+        else if (this.props.range=='ms')
+            res = [0, 500, 2000, 5000, 10000];
+        else
+            res = [0, 1, 3, 5, 10, 20];
+        return res;
+    };
+    on_change = e=>{
+        let value = e && +e.value || '';
+        const allow_zero = this._get_data().includes(0);
+        if (!value && !allow_zero)
+            value = this.props.default||1;
+        this.props.on_change_wrapper(value);
+    };
+    validation = s=>!!s && Number(s)==s;
+    render(){
+        const data = this._get_data();
+        const options = data.map(this.value_to_option);
+        return <Select_multiple_new
+          {...this.props}
+          options={options}
+          on_change={this.on_change}
+          validation={this.validation}
+          value_to_option={this.value_to_option}
+          no_options_message={()=>'You can use only numbers here'}
+        />;
+    }
+}
+
 export class Select_multiple extends Pure_component {
     styles = {
         clearIndicator: base=>({
@@ -350,6 +664,56 @@ export class Select_multiple extends Pure_component {
         return <React_select
           styles={this.styles}
           className={classnames('select_multiple', this.props.class_name)}
+          isClearable
+          noOptionsMessage={this.props.no_options_message}
+          classNamePrefix="react_select"
+          value={this.props.value_to_option(this.props.val)}
+          onChange={this.props.on_change}
+          options={this.props.options}
+          isValidNewOption={this.props.validation}
+          pageSize={9}
+          placeholder={this.props.placeholder}
+          blurInputOnSelect={true}
+          isDisabled={this.props.disabled}
+        />;
+    }
+}
+
+export class Select_multiple_new extends Pure_component {
+    styles = {
+        clearIndicator: base=>({
+            ...base,
+            padding: '1px',
+        }),
+        dropdownIndicator: base=>({
+            ...base,
+            padding: '1px',
+        }),
+        option: (base, state)=>({
+            ...base,
+            padding: '2px 12px',
+            backgroundColor: state.isFocused ? '#f5f5f5' : 'white',
+            color: '#004d74',
+        }),
+        control: (_, state)=>({
+            alignItems: 'center',
+            display: 'flex',
+            height: 32,
+            borderRadius: 3,
+            border: 'solid 1px',
+            borderColor: state.isFocused ? '#004d74' :
+                state.isDisabled ? '#e0e9ee' : '#ccdbe3',
+            backgroundColor: state.isDisabled ? '#f5f5f5;' : 'white',
+        }),
+        singleValue: (base, state)=>({
+            ...base,
+            color: state.isDisabled ? '#8e8e8e' : '#004d74',
+        }),
+    };
+    render(){
+        return <React_select
+          styles={this.styles}
+          className={classnames('select_multiple_new', this.props.class_name)}
           isClearable
           noOptionsMessage={this.props.no_options_message}
           classNamePrefix="react_select"
@@ -513,6 +877,29 @@ export class Url_input extends Pure_component {
     }
 }
 
+export class Url_input_new extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {url: props.val, valid: true};
+    }
+    on_url_change = (url, id)=>{
+        // XXX egor: always call on_change
+        const valid = this.props.allow_empty_url && !url
+            || zurl.is_valid_url(url);
+        if (this.props.allow_bad_url_change || valid)
+            this.props.on_change_wrapper(url, id);
+        this.setState({url, valid});
+    };
+    render(){
+        const input_props = Object.assign({}, this.props, {
+            val: this.state.url,
+            on_change_wrapper: this.on_url_change,
+            className: classnames({error: !this.state.valid}),
+        });
+        return <Input_new {...input_props}/>;
+    }
+}
+
 export const Textarea = props=>{
     return <textarea value={props.val} rows={props.rows||3}
           placeholder={props.placeholder}
@@ -579,6 +966,31 @@ export const Select = props=>{
     </Tooltip>;
 };
 
+export const Select_new = props=>{
+    const update = val=>{
+        if (val=='true')
+            val = true;
+        else if (val=='false')
+            val = false;
+        if (props.on_change_wrapper)
+            props.on_change_wrapper(val);
+    };
+    const conf = (props.data||[]).find(c=>c.value==props.val);
+    const val = props.val||props.default;
+    return <Tooltip key={val} title={conf&&conf.tooltip||''}>
+        <T>{t=><select className="select_new" value={''+val}
+        onChange={e=>update(e.target.value)}
+        disabled={props.disabled}>
+        {props.with_categories && props.data.map(i=>
+          <Section key={i.category} name={i.category} data={i.data} t={t}/>
+        )}
+        {!props.with_categories &&
+          <Section data={props.data||[]} t={t}/>
+        }
+      </select>}</T>
+    </Tooltip>;
+};
+
 const Section = props=>{
     const options = props.data.map((c, i)=>
       <option key={i} value={c.value !== undefined ? c.value : c}>
@@ -608,6 +1020,31 @@ export const Input = props=>{
       placeholder={t(props.placeholder)}
       onBlur={props.on_blur}
       onKeyUp={props.on_key_up}
+    />}</T>;
+};
+
+const Text_inpit = styled(Textbox)`
+    margin-top: 10px;
+`;
+
+export const Input_new = props=>{
+    const update = val=>{
+        if (props.type=='number' && val)
+            val = Number(val);
+        if (props.on_change_wrapper)
+            props.on_change_wrapper(val, props.id);
+    };
+    return <T>{t=><Text_inpit
+      style={props.style}
+      type={props.type}
+      value={props.val}
+      disabled={props.disabled}
+      onChange={update}
+      className={props.className}
+      placeholder={t(props.placeholder)}
+      onBlur={props.on_blur}
+      onKeyUp={props.on_key_up}
+      onFocus={props.on_focus}
     />}</T>;
 };
 
@@ -654,5 +1091,36 @@ class Select_zone extends Pure_component {
               with_categories data={items} disabled={disabled}/>
           </span>
         </Tooltip>;
+    }
+});
+
+export const Select_zone_new = withRouter(
+class Select_zone_new extends Pure_component {
+    state = {zones: {zones: []}};
+    componentDidMount(){
+        this.setdb_on('ws.zones', zones=>{
+            if (zones)
+                this.setState({zones});
+        });
+    }
+    render(){
+        const {val, on_change_wrapper, disabled} = this.props;
+        const format = z=>{
+            if (z.name==this.state.zones.def)
+                return {key: `${z.name} (default)`, value: z.name};
+            return {key: z.name, value: z.name};
+        };
+        const items = [];
+        for (let n in network_types)
+        {
+            const data = this.state.zones.zones
+                .filter(z=>get_plan_network(z.plan)==n).map(format);
+            if (data.length)
+                items.push({category: network_types[n].label, data});
+        }
+        const selected = val || this.state.zones.def;
+        return <Select val={selected} type="select"
+            on_change_wrapper={on_change_wrapper}
+            with_categories data={items} disabled={disabled}/>;
     }
 });

@@ -124,19 +124,19 @@ var get_mode_storage = function(mode, opt){
 var resolve_mode = function(opt){
     if (opt.mode)
         return opt.mode;
-    if (!is_node && is_local_storage_obj(window.localStorage))
+    if (!is_node && has_local_storage())
         return 'local_storage';
     if (!is_node)
         return 'cookies';
     return 'fake';
 };
 
-var is_local_storage_obj = function(obj){
+var has_local_storage = function(){
     try {
-        if (obj.length)
+        if (window.localStorage.length)
             return true;
-        obj.setItem('_', 0);
-        obj.removeItem('_');
+        window.localStorage.setItem('_', 0);
+        window.localStorage.removeItem('_');
         return true;
     } catch(e){
         return false;

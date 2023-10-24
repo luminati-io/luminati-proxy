@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.417.160",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix unable to deactivate render port setting via UI"
+            }
+        ]
+    },
+    {
         "ver": "1.414.367",
         "type": "dev",
         "changes": [

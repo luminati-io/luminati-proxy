@@ -1,55 +1,88 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
+import React, {useState, useEffect} from 'react';
+import _ from 'lodash4';
+import $ from 'jquery';
+import {
+    Modal,
+    Button,
+    Layout,
+    Typography,
+    Tooltip,
+    Input,
+    IconButton
+} from 'uikit';
 import Pure_component from '/www/util/pub/pure_component.js';
-import React, {useState} from 'react';
-import {Labeled_controller, Loader_small, Alert} from './common.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {report_exception} from './util.js';
-import _ from 'lodash4';
-import $ from 'jquery';
-import {Select_zone, Pins} from './common/controls.js';
+import {Select_zone_new, Pins_new} from './common/controls.js';
 import Warnings_modal from './common/warnings_modal.js';
-import {Modal} from './common/modals.js';
 import Logs_settings_modal from './common/logs_settings_modal.js';
 import {Back_btn} from './proxy_edit/index.js';
-import {tips} from './proxy_edit/fields.js';
-import './css/settings.less';
 import {T} from './common/i18n.js';
+import {
+    Labeled_controller_new,
+    Form_controller_new,
+    Alert,
+    Faq_button,
+} from './common.js';
 import {main as Api} from './api.js';
+import './css/settings.less';
 
-export default function Settings(props){
+const {Popup} = Modal;
+const {Toggle} = Input;
+
+const Settings = props=>{
     const [show_alert, set_show_alert] = useState(false);
-    const [show_conf, set_show_conf] = useState(false);
+    const [show_confirm, set_show_confirm] = useState(false);
+    const [settings_changed, set_settings_changed] = useState(false);
+    const [history_change, set_history_change] = useState({});
     const back_func = ()=>props.history.push({pathname: '/overview'});
-    const btn_click = ()=>show_conf ? $('#settings_confirmation_modal').modal()
-        : back_func();
+    const confirm_ok = ()=>{
+        if (!_.isEmpty(history_change))
+            props.history.push(history_change);
+    };
+    useEffect(()=>{
+      const unblock = props.history.block(change=>{
+          if (!settings_changed || show_confirm)
+              return true;
+          set_history_change(change);
+          set_show_confirm(true);
+          return false;
+      });
+      return ()=>unblock();
+    }, [settings_changed, show_confirm]);
     return <div className="settings vbox">
-          <div className="cp_panel vbox">
-            <div className="cp_panel_header">
-              {!props.zagent && <Back_btn click={btn_click}/>}
-              <h2><T>General settings</T></h2>
-            </div>
-            <Form show_alert={set_show_alert}
-              show_conf={set_show_conf}/>
-          </div>
-          {show_alert &&
-            <Alert
-              variant="success"
-              dismissible
-              text="Settings changes saved"
-              on_close={()=>set_show_alert(false)}
-            />
-          }
-          <Modal
-            id="settings_confirmation_modal"
-            title="You have unsaved settings changes"
-            ok_btn_title="Yes"
-            click_ok={back_func}>
-            <h4>Are you sure you want to exit?</h4>
-          </Modal>
-        </div>;
-}
+      <div className="cp_panel vbox force_cp_panel">
+        <div className="cp_panel_header">
+          {!props.zagent && <Back_btn click={back_func}/>}
+          <h2 className="section_title"><T>General settings</T></h2>
+        </div>
+        <Form show_alert={set_show_alert}
+          settings_changed={set_settings_changed}/>
+      </div>
+      {show_alert &&
+        <Alert
+          variant="success"
+          dismissible
+          text="Settings changes saved"
+          on_close={()=>set_show_alert(false)}
+        />
+      }
+      <Popup
+        show={show_confirm}
+        onOk={confirm_ok}
+        onCancel={()=>set_show_confirm(false)}
+        title="You have unsaved settings changes"
+        content={<h4>Are you sure you want to exit?</h4>}
+        shadow="sm"
+        size="md"
+      />
+    </div>;
+};
+
+export default Settings;
 
 const tooltips = {
     zone: `Default zone will be used automatically when creating a new
@@ -101,17 +134,36 @@ let har_limit_options = [
     {value: 0, label: 'Unlimited'},
 ];
 
+class Form_toggle_transform {
+    constructor(in_fn, out_fn){
+        this.in_fn = in_fn || _.noop;
+        this.out_fn = out_fn || _.noop;
+    }
+    in = v=>this.in_fn(v);
+    out = v=>this.out_fn(v);
+}
+
 class Form extends Pure_component {
-    state = {saving: false, form: {}, pending_settings: {}};
-    logs_metric_opts = [
-        {key: 'requests', value: 'requests'},
-        {key: 'megabytes', value: 'megabytes'},
-    ];
-    log_level_opts = ['error', 'warn', 'notice', 'info', 'debug'];
-    default_yes_no_select_opts = [
-        {key: 'No', value: 'none'},
-        {key: 'Yes', value: 'full'}
-    ];
+    constructor(props){
+        super(props);
+        this.state = {
+            saving: false,
+            form: {},
+            pending_settings: {},
+            show_save_settings_modal: false,
+        };
+        this.logs_metric_opts = [
+            {key: 'requests', value: 'requests'},
+            {key: 'megabytes', value: 'megabytes'},
+        ];
+        this.log_level_opts = ['error', 'warn', 'notice', 'info', 'debug'];
+        this.toggle_transform = new Form_toggle_transform(v=>v=='full',
+            v=>v ? 'full' : 'none');
+        this.default_yes_no_select_opts = [
+            {key: 'No', value: 'none'},
+            {key: 'Yes', value: 'full'}
+        ];
+    }
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
             if (!settings)
@@ -157,7 +209,7 @@ class Form extends Pure_component {
             pending_settings: {...pending_settings, ...changes_obj},
             is_changed
         });
-        this.props.show_conf(is_changed);
+        this.props.settings_changed(is_changed);
     };
     on_change_handler = (field, opt)=>value=>
         this.on_multi_change_handler([{field, opt, value}]);
@@ -200,7 +252,10 @@ class Form extends Pure_component {
             return;
         }
         this.lock_nav(true);
-        this.setState({saving: true});
+        this.setState({
+            saving: true,
+            show_save_settings_modal: false,
+        });
         this.saving = true;
         const _this = this;
         this.etask(function*(){
@@ -227,7 +282,7 @@ class Form extends Pure_component {
             _this.setState({is_changed: false, pending_settings: {},
                 default_settings: _this.state.settings});
             _this.props.show_alert(true);
-            _this.props.show_conf(false);
+            _this.props.settings_changed(false);
             if (_this.state.settings.sync_config)
             {
                 const proxies = yield Api.json.get('proxies_running');
@@ -237,6 +292,8 @@ class Form extends Pure_component {
     };
     open_logs_settings_modal = ()=>$('#logs_settings_modal').modal('show');
     debounced_save = _.debounce(this.save, 500);
+    set_show_save_settings_modal = (val=true)=>
+        this.setState({show_save_settings_modal: val});
     render(){
         const s = this.state.settings;
         if (!s)
@@ -246,9 +303,15 @@ class Form extends Pure_component {
         const har_limit_data = s.zagent ? har_limit_options.filter(({value})=>
             [-1, 1024].includes(value)) : har_limit_options;
         const note_logs = this.logs_enabled() ?
-            <a className="link" onClick={this.open_logs_settings_modal}>
-                <T>Logs settings</T>
-            </a> : null;
+            <IconButton
+              aria-label="Icon Button"
+              icon="Settings"
+              noBackColor
+              onClick={this.open_logs_settings_modal}
+              size="xs"
+              tooltip="Logs settings"
+              variant="icon"
+            /> : null;
         return <div className="settings_form">
           <Warnings_modal
             id='upd_settings_error'
@@ -265,48 +328,48 @@ class Form extends Pure_component {
                   remote_enabled={this.remote_logs_enabled()}
               />
           }
-          <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
-            <Select_zone
-              val={s.zone}
-              preview
-              on_change_wrapper={this.on_change_handler('zone')}
-            />
-          </Labeled_controller>
-          <Labeled_controller
+          <Labeled_section label="Presets configuration">
+            <Labeled_controller_new label="Default zone"
+              tooltip={tooltips.zone}>
+              <Select_zone_new
+                val={s.zone}
+                preview
+                on_change_wrapper={this.on_change_handler('zone')}
+              />
+            </Labeled_controller_new>
+          </Labeled_section>
+          <Labeled_section
             label="Admin whitelisted IPs"
             faq={{anchor: 'whitelisted_ips'}}
             tooltip={tooltips.www_whitelist_ips}>
-            <Pins
-              val={s.www_whitelist_ips}
-              pending={s.pending_www_ips}
-              no_any={s.zagent}
-              on_change_wrapper={this.on_change_handler('www_whitelist_ips')}
+            <Pins_new
+                val={s.www_whitelist_ips}
+                pending={s.pending_www_ips}
+                no_any={s.zagent}
+                on_change_wrapper={this.on_change_handler('www_whitelist_ips')}
             />
-          </Labeled_controller>
-          <Labeled_controller
-            type="pins"
-            faq={{anchor: 'whitelisted_ips'}}
+          </Labeled_section>
+          <Labeled_section
             label="Proxy whitelisted IPs"
+            faq={{anchor: 'whitelisted_ips'}}
             tooltip={tooltips.whitelist_ips}>
-            <Pins
-              val={wl}
-              pending={s.pending_ips}
-              no_any={s.zagent}
-              disabled_ips={s.fixed_whitelist_ips}
-              on_change_wrapper={this.on_change_handler('whitelist_ips')}
+            <Pins_new
+                val={wl}
+                pending={s.pending_ips}
+                no_any={s.zagent}
+                disabled_ips={s.fixed_whitelist_ips}
+                on_change_wrapper={this.on_change_handler('whitelist_ips')}
             />
-          </Labeled_controller>
-          {!s.zagent &&
-            <Labeled_controller
-              val={s.request_stats}
-              type="yes_no"
-              on_change_wrapper={this.on_change_handler('request_stats')}
-              label="Enable recent stats"
-              default={true}
-              tooltip={tooltips.request_stats}
-            />
-          }
-          {!s.zagent && <Labeled_controller
+          </Labeled_section>
+          {!s.zagent && <Labeled_section
+            label="Enable recent stats"
+            tooltip={tooltips.request_stats}
+            type="toggle"
+            on_change_wrapper={this.on_change_handler('request_stats')}
+            val={s.request_stats}
+            default={true}
+          />}
+          {!s.zagent && <Labeled_section
             val={s.logs}
             type="select_number"
             on_change_wrapper={this.on_change_handler('logs', {number: 1})}
@@ -314,15 +377,15 @@ class Form extends Pure_component {
             label="Limit for request logs"
             default tooltip={tooltips.logs}
           />}
-          {s.zagent && <Labeled_controller
-            val={this.logs_enabled()}
-            type="yes_no"
-            on_change_wrapper={this.toggle_logs}
+          {s.zagent && <Labeled_section
             label="Enable request logs"
-            default tooltip={tooltips.logs}
+            tooltip={tooltips.logs}
+            type="toggle"
+            on_change_wrapper={this.toggle_logs}
+            val={this.logs_enabled()}
             note={note_logs}
           />}
-          <Labeled_controller
+          <Labeled_section
             val={s.har_limit}
             type="select_number"
             on_change_wrapper={this.on_change_handler('har_limit',
@@ -332,45 +395,45 @@ class Form extends Pure_component {
             default={1024}
             tooltip={tooltips.har_limit}
           />
-          <Labeled_controller
-            val={s.debug}
-            type="select"
-            faq={{anchor: 'request_details'}}
-            on_change_wrapper={this.on_change_handler('debug')}
-            data={this.default_yes_no_select_opts}
+          <Labeled_section
             label="Default requests details"
+            faq={{anchor: 'request_details'}}
             tooltip={tooltips.debug}
+            type="toggle"
+            toggle_transform={this.toggle_transform}
+            on_change_wrapper={this.on_change_handler('debug')}
+            val={s.debug}
           />
-          <Labeled_controller
-            val={s.lpm_auth}
-            type="select"
-            on_change_wrapper={this.on_change_handler('lpm_auth')}
-            data={this.default_yes_no_select_opts}
+          <Labeled_section
             label="Default LPM auth. header"
             tooltip={tooltips.lpm_auth}
+            type="toggle"
+            toggle_transform={this.toggle_transform}
+            on_change_wrapper={this.on_change_handler('lpm_auth')}
+            val={s.lpm_auth}
           />
-          <Labeled_controller
+          <Labeled_section
             val={s.log}
             type="select"
+            faq={{article: '13596408374417', anchor: 'gathering_logs'}}
             on_change_wrapper={this.on_change_handler('log')}
             data={this.log_level_opts}
-            disabled={s.zagent}
             label="Log level / API logs"
-            tooltip={tooltips.log_level}
-            faq={{article: '13596408374417', anchor: 'gathering_logs'}}
-          />
-          <Labeled_controller
-            val={s.sync_config}
-            type="yes_no"
-            on_change_wrapper={this.on_change_handler('sync_config')}
-            label="Sync configuration"
-            default={!!s.zagent}
-            tooltip={tooltips.sync_config}
             disabled={s.zagent}
-            faq={{anchor: 'sync_configuration'}}
+            tooltip={tooltips.log_level}
           />
-          {s.zagent && <Labeled_controller
-            val={s.bw_limit_webhook_url || ''}
+          <Labeled_section
+            label="Sync configuration"
+            faq={{anchor: 'sync_configuration'}}
+            tooltip={tooltips.sync_config}
+            type="toggle"
+            on_change_wrapper={this.on_change_handler('sync_config')}
+            default={!!s.zagent}
+            disabled={s.zagent}
+            val={s.sync_config}
+          />
+          {s.zagent && <Labeled_section
+            val={s.bw_limit_webhook_url||''}
             allow_empty_url
             allow_bad_url_change
             type="url"
@@ -378,8 +441,8 @@ class Form extends Pure_component {
             label="BW limit webhook URL"
             tooltip={tooltips.bw_limit_webhook_url}
           />}
-          {s.zagent && <Labeled_controller
-            val={s.bw_th_webhook_url || ''}
+          {s.zagent && <Labeled_section
+            val={s.bw_th_webhook_url||''}
             allow_empty_url
             allow_bad_url_change
             type="url"
@@ -387,21 +450,58 @@ class Form extends Pure_component {
             label="BW threshold webhook URL"
             tooltip={tooltips.bw_th_webhook_url}
           />}
-          <Loader_small show={this.state.saving}/>
-          <button className="btn btn_lpm btn_lpm_primary"
-            onClick={()=>$('#save_settings_confirmation_modal').modal()}
-            disabled={!this.state.is_changed || this.state.saving}>
-            <T>Save changes</T>
-          </button>
-          <Modal
-            id="save_settings_confirmation_modal"
+          <div className='settings_btn_container'>
+            <Button
+              text="Save"
+              loadingText="Saving"
+              onClick={()=>this.set_show_save_settings_modal(true)}
+              disabled={!this.state.is_changed}
+              loading={this.state.saving}
+            />
+          </div>
+          <Popup
+            show={this.state.show_save_settings_modal}
+            onOk={this.save}
+            okLabel="Yes"
+            onCancel={()=>this.set_show_save_settings_modal(false)}
             title="Accept save changes"
-            ok_btn_title="Yes"
-            click_ok={this.save}>
-            {s.sync_config && !s.zagent && <span>
-              {tips.sync_config_warn}
-            </span>}
-          </Modal>
+            shadow="sm"
+            size="md"
+          />
         </div>;
     }
 }
+
+const Labeled_section = props=>{
+    const is_toggle = props.type=='toggle';
+    const typed = props.type && !is_toggle;
+    const {label, tooltip, val, default: def, on_change_wrapper, faq,
+        disabled, children, note, toggle_transform} = props;
+    const toggle_on_change = toggle_state=>{
+        if (toggle_transform instanceof Form_toggle_transform)
+            toggle_state = toggle_transform.out(toggle_state);
+        on_change_wrapper(toggle_state);
+    };
+    const toggle_val = toggle_transform instanceof Form_toggle_transform ?
+        toggle_transform.in(val) : val!=undefined ? !!val : !!def;
+    return <Layout.Box width="500px" max_width="500px">
+      <div className='labeled_section'>
+        <div className='labeled_section_label'>
+          <Typography.Label variant="lg">
+            <Tooltip tooltip={tooltip}>{label}</Tooltip>
+          </Typography.Label>
+          {faq && <Faq_button article={faq.article} anchor={faq.anchor}/>}
+        </div>
+        {is_toggle && <div className='labeled_section_toggle'>
+          {note||null}
+          <Toggle
+            value={toggle_val}
+            disabled={disabled}
+            onChange={toggle_on_change}
+          />
+        </div>}
+      </div>
+      {typed && <Form_controller_new {...props} />}
+      {!is_toggle && !typed && children}
+    </Layout.Box>;
+};

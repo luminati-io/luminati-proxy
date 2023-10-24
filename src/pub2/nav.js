@@ -1,11 +1,11 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
-import {Route, withRouter, Link} from 'react-router-dom';
-import React from 'react';
-import _ from 'lodash4';
+import {withRouter, Link} from 'react-router-dom';
+import React, {useMemo} from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
+import {Tooltip as UIKitTooltip} from 'uikit';
 import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
@@ -15,6 +15,7 @@ import Report_bug_modal from './report_bug.js';
 import Cpu_warning from './cpu_warning.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
+import Sidebar from './common/sidebar.js';
 import {T} from './common/i18n.js';
 import {Language} from './common/i18n.js';
 import {with_www_api} from './common.js';
@@ -23,11 +24,12 @@ import {main as Api} from './api.js';
 import './css/nav.less';
 
 class Nav extends Pure_component {
-    state = {lock: false};
+    state = {lock: false, ver: ''};
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>
             lock!==undefined && this.setState({lock}));
         this.setdb_on('head.settings', settings=>this.setState({settings}));
+        this.setdb_on('head.version', ver=>this.setState({ver}));
     }
     render(){
         if (!this.state.settings)
@@ -35,7 +37,7 @@ class Nav extends Pure_component {
         return <div className="nav">
           <Nav_top/>
           <Nav_left zagent={this.state.settings.zagent}
-            lock={this.state.lock}/>
+            lock={this.state.lock} ver={this.state.ver}/>
           <Report_bug_modal username={this.state.settings.username}/>
           <Upgrade_downgrade_modal action='upgrade'/>
           <Upgrade_downgrade_modal action='downgrade'/>
@@ -50,52 +52,75 @@ const Nav_left = with_www_api(withRouter(props=>{
     const faq_url = props.www_help+'/hc/en-us/sections/12571042542737'
         +'-Proxy-Manager';
     const api_url = props.www_help+'/hc/en-us/articles/13595498290065-API';
-    const howto_click = ()=>ws.post_event('Howto Nav Left Click');
-    return <div className="nav_left">
-          <div className={classnames('menu', {lock: props.lock})}>
-            <Nav_link to="/overview" name="overview" label="Overview" />
-            <Nav_link to="/howto" name="howto" on_click={howto_click}
-              label="How to use Proxy Manager"/>
-            <Nav_link to="/logs" name="logs" label="Request logs" />
-            <Nav_link to="/settings" name="general_config"
-              label="General settings" />
-            <Nav_link to="/config" name="config"
-                label="Manual configuration" />
-            <Nav_link ext to={api_url} name="api"
-              label="API documentation" />
-            <Nav_link ext to={faq_url} name="faq" label="FAQ" />
-          </div>
-          <div className="menu_filler"/>
-        </div>;
-}));
-
-const Nav_link = ({label, to, name, ext, on_click})=>
-    <Route path={to}>
-      {({match})=>
-        <Nav_link_inner label={label} to={to} name={name} match={match}
-          ext={ext} on_click={on_click}/>}
-    </Route>;
-
-const Nav_link_inner = ({label, to, name, match, ext, on_click})=>{
-    if (ext)
-    {
-        return <a href={to} target="_blank" rel="noopener noreferrer"
-            onClick={on_click||_.noop}>
-            <div className="menu_item">
-                <T>{t=><Tooltip title={t(label)} placement="right">
-                    <div className={classnames('icon', name)}/>
-                </Tooltip>}</T>
-            </div>
-        </a>;
-    }
-    return <Link to={{pathname: to}} onClick={on_click||_.noop}>
-        <div className={classnames('menu_item', {active: match})}>
-            <T>{t=><Tooltip title={t(label)} placement="right">
-                <div className={classnames('icon', name)}/>
-            </Tooltip>}</T>
+    const howto_click = ()=>{
+        ws.post_event('Howto Nav Left Click');
+        path_to('/howto')();
+    };
+    const path_to = path=>()=>props.history.replace(path);
+    const is_path = (path, exact)=>exact && props.location.pathname==exact
+        || props.location.pathname.startsWith(path);
+    const go_to = path=>()=>window.open(path, '_blank');
+    const items = useMemo(()=>[
+        {
+            id: 'overview',
+            active: is_path('/overview', '/'),
+            onClick: path_to('/overview'),
+            tooltip: 'Overview',
+            icon: 'Dashboard',
+        },
+        {
+            id: 'logs',
+            active: is_path('/logs'),
+            onClick: path_to('/logs'),
+            tooltip: 'Request logs',
+            icon: 'CrawlLog',
+        },
+        {
+            id: 'settings',
+            active: is_path('/settings'),
+            onClick: path_to('/settings'),
+            tooltip: 'General settings',
+            icon: 'Settings',
+        },
+    ], [props.location.pathname]);
+    const bottom_items = useMemo(()=>[
+        {
+            id: 'howto',
+            active: is_path('/howto'),
+            onClick: howto_click,
+            tooltip: 'How to use',
+            icon: 'Bulb',
+        },
+        {
+            id: 'api',
+            onClick: go_to(api_url),
+            tooltip: 'Api documentation',
+            icon: 'Api',
+        },
+        {
+            id: 'faq',
+            onClick: go_to(faq_url),
+            tooltip: 'FAQ',
+            icon: 'Question',
+        },
+    ], [props.location.pathname]);
+    const manual_conf_item = useMemo(()=>({
+        id: 'config',
+        active: is_path('/config'),
+        onClick: path_to('/config'),
+        tooltip: 'Manual configuration',
+    }), [props.location.pathname]);
+    return <div className="nav_left2">
+        <div className={classnames('menu', {lock: props.lock})}>
+            <Sidebar
+                items={items}
+                tooltip={props.ver}
+                bottom_items={bottom_items}
+                settings_item={manual_conf_item}
+            />
         </div>
-    </Link>;
-};
+    </div>;
+}));
 
 class Nav_top extends Pure_component {
     constructor(props){
@@ -103,9 +128,9 @@ class Nav_top extends Pure_component {
         const url_o = zurl.parse(document.location.href);
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
         this.state = {
-            ver: '',
             lock: false,
             embedded: qs_o.embedded=='true' || window.self!=window.top,
+            ver: '',
         };
     }
     componentDidMount(){
@@ -121,9 +146,9 @@ class Nav_top extends Pure_component {
         const tooltip = `Proxy Manager v.${ver}`;
         return <div className="nav_top">
             {!settings.zagent &&
-                <Tooltip title={tooltip} placement="right">
+                <UIKitTooltip tooltip={tooltip} placement="right">
                     <div><Logo lock={this.state.lock}/></div>
-                </Tooltip>
+                </UIKitTooltip>
             }
             <Nav_right settings={settings} embedded={embedded}/>
         </div>;
@@ -131,7 +156,7 @@ class Nav_top extends Pure_component {
 }
 
 const Logo = withRouter(({lock})=>
-    <Link to="/overview" className={classnames('logo', {lock})}/>);
+    <Link to="/overview" className={classnames('logo2', {lock})}/>);
 
 const Nav_right = props=>
     <div className="nav_top_right">

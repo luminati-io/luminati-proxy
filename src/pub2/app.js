@@ -351,7 +351,7 @@ class Page extends Pure_component {
         return <div>
           <Nav/>
           <Proxy_add settings={settings}/>
-          <div className={classnames('page_body vbox', {zagent})}>
+          <div className={classnames('page_body2 vbox', {zagent})}>
             <Error_boundry>
               <Validator zagent={zagent}/>
               <Switch>

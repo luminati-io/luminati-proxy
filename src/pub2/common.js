@@ -23,7 +23,9 @@ import conv from '../../util/conv.js';
 import date from '../../util/date.js';
 import presets from './common/presets.js';
 import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
-    Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
+    Typeahead_wrapper, Input, Select, Url_input, Select_number_new, Select_new,
+    Url_input_new,
+} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
 import {T, t, Language} from './common/i18n.js';
 import {bytes_format, report_exception} from './util.js';
@@ -39,6 +41,13 @@ export const Inline_wrapper = styled.div`
     column-gap: 5px;
 `;
 Inline_wrapper.displayName = 'Inline_wrapper';
+
+export const Column_wrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+`;
+Column_wrapper.displayName = 'Column_wrapper';
 
 const uikit_from_theme = (pname, default_value)=>props=>{
         let value = props[pname]||default_value;
@@ -301,6 +310,33 @@ export const Form_controller = props=>{
     return <Input {...props}/>;
 };
 
+export const Form_controller_new = props=>{
+    const type = props.type;
+    if (type=='select')
+        return <Select_new {...props}/>;
+    else if (type=='typeahead')
+        return <Typeahead_wrapper {...props}/>;
+    else if (type=='textarea')
+        return <Textarea {...props}/>;
+    else if (type=='json')
+        return <Json {...props}/>;
+    else if (type=='url')
+        return <Url_input_new {...props}/>;
+    else if (type=='regex')
+        return <Regex {...props}/>;
+    else if (type=='regex_text')
+        return <Regex {...props} no_tip_box={true}/>;
+    else if (type=='yes_no')
+        return <Yes_no {...props}/>;
+    else if (type=='select_number')
+        return <Select_number_new {...props}/>;
+    else if (type=='select_status')
+        return <Select_status {...props}/>;
+    else if (type=='pins')
+        return <Pins {...props}/>;
+    return <Input {...props}/>;
+};
+
 export class Copy_btn extends Pure_component {
     textarea = React.createRef();
     btn = React.createRef();
@@ -388,6 +424,22 @@ export const Faq_link = with_www_api(props=>{
     </Tooltip>;
 });
 
+export const Faq_button = with_www_api(props=>{
+    const art = props.article || lpm_faq_article;
+    const anc = props.anchor ? `#${props.anchor}` : '';
+    const url = `${props.www_help}/hc/en-us/articles/${art}${anc}`;
+    return <IconButton
+        aria-label="Icon Button"
+        icon="Info"
+        as="a"
+        href={url}
+        size="sm"
+        target="_blank"
+        tooltip="Read more"
+        variant="icon"
+    />;
+});
+
 export const Note = props=>
     <div className="note">
       <span>{props.children}</span>
@@ -398,6 +450,19 @@ export const Field_row_raw = ({disabled, animated, ...props})=>{
     const inner_classes = classnames('field_row_inner', props.inner_class_name,
         {animated});
     return <div className="field_row_wrapper">
+      <div className={classes}>
+        <div className={inner_classes} style={props.inner_style}>
+          {props.children}
+        </div>
+      </div>
+    </div>;
+};
+
+export const Field_col_raw = ({disabled, animated, ...props})=>{
+    const classes = classnames('field_col', {disabled});
+    const inner_classes = classnames('field_col_inner', props.inner_class_name,
+        {animated});
+    return <div className="field_col_wrapper">
       <div className={classes}>
         <div className={inner_classes} style={props.inner_style}>
           {props.children}
@@ -433,6 +498,36 @@ export const Labeled_controller = props=>
           {props.note && <Note>{t(props.note)}</Note>}
         </div>
     </Field_row_raw>;
+
+export const Labeled_controller_new = props=>
+    <Field_col_raw
+      disabled={props.disabled}
+      animated={props.animated}
+      inner_style={props.field_row_inner_style}>
+        <div className="desc" style={props.desc_style}>
+          <UIKitTooltip tooltip={t(props.tooltip)}>
+            {t(props.label)}
+          </UIKitTooltip>
+          {props.faq && <Faq_link article={props.faq.article}
+                anchor={props.faq.anchor}/>}
+        </div>
+        <div>
+          <div className="field" data-tip data-for={props.id+'tip'}>
+            {props.prefix && <span className="prefix">{t(props.prefix)}</span>}
+            {props.children ||
+              <Form_controller disabled={props.disabled} {...props}/>
+            }
+            {props.sufix && <span className="sufix">{t(props.sufix)}</span>}
+            {props.field_tooltip &&
+              <React_tooltip id={props.id+'tip'} type="light" effect="solid"
+                delayHide={30} delayUpdate={300} place="right">
+                {t(props.field_tooltip)}
+              </React_tooltip>
+            }
+          </div>
+          {props.note && <Note>{t(props.note)}</Note>}
+        </div>
+    </Field_col_raw>;
 
 export const Checkbox = props=>
   <div className="form-check">

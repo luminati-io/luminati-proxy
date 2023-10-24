@@ -249,6 +249,23 @@ h4 { margin: 0; }
             cursor: default;
         }
     }
+    .logo2 {
+        pointer-events: none;
+        height: 60px;
+        width: 50px;
+        display: inline-block;
+        background-image: @logo_icon;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: @logo_bg_size;
+        margin-left: 13px;
+        cursor: pointer;
+        &.lock {
+            pointer-events: none;
+            opacity: 0.4;
+            cursor: default;
+        }
+    }
     .nav_top_right {
         margin-right: 10px;
         flex: 1;
@@ -257,7 +274,7 @@ h4 { margin: 0; }
         .patent_note {
             position: absolute;
             top: -4px;
-            left: 75px;
+            left: 85px;
             font-size: 9px;
         }
         .notif_icon {
@@ -505,6 +522,10 @@ input[type=email], input[type=url], textarea, .code_mirror_wrapper {
     &::placeholder { color: #8e8e8e; }
     &[disabled], &[disabled]::placeholder { color: #8e8e8e; }
 }
+.select_new {
+    margin-top: 10px;
+    width: 100%;
+}
 input[disabled], select[disabled] {
     background-color: @light_grey;
     border-color: @grey_border;
@@ -540,6 +561,13 @@ input.regex {
 input[type=url].error { border-color: @error_dark; }
 .select_multiple {
     min-width: 113px;
+    input { min-width: 0; }
+    &.status { min-width: 130px; }
+    &.duration { min-width: 175px; }
+}
+.select_multiple_new {
+    padding-top: 10px;
+    width: 100%;
     input { min-width: 0; }
     &.status { min-width: 130px; }
     &.duration { min-width: 175px; }
@@ -610,6 +638,131 @@ ul.bullets {
                     padding: 0;
                 }
             }
+        }
+    }
+    .pins_data {
+        display: grid;
+        grid-template-columns: 130px 130px 130px;
+        .pin {
+            background-color: @light_grey;
+            border: 1px solid @grey_border;
+            border-radius: 3px;
+            padding: 3px;
+            display: flex;
+            margin: 0 6px 2px 0;
+            &.active {
+                border-color: @first_color;
+            }
+            &.disabled {
+                background-color: @dark_grey;
+            }
+            .x, .v {
+                width: 16px;
+                font-size: 10px;
+                text-align: center;
+                cursor: pointer;
+                &:hover {
+                    background-color: @first_color;
+                    color: white;
+                }
+                .glyphicon-remove {
+                    position: relative;
+                    top: 1px;
+                }
+            }
+            .any {
+                font-size: 12px;
+                margin: 0 5px;
+                padding: 0 2px;
+                text-align: center;
+                border: none;
+                background-color: @light_grey;
+                &:hover {
+                    background-color: @first_color;
+                    color: white;
+                }
+            }
+            .content {
+                padding: 0 2px 0 2px;
+                input {
+                    width: 120px;
+                    height: 23px;
+                    border: none;
+                    padding: 0;
+                }
+            }
+        }
+    }
+    .pins_controls {
+        display: flex;
+        justify-content: space-between;
+    }
+    .add_pin {
+        margin-left: 0;
+        cursor: pointer;
+        height: 31px;
+        .glyphicon-plus {
+            margin-left: 5px;
+        }
+    }
+}
+.pins_field_new {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    .pins_data {
+        display: grid;
+        grid-template-columns: repeat(3, 165px);
+        .pin {
+            padding: 3px;
+            display: grid;
+            grid-template-columns: 115px 25px 25px;
+            margin: 0 6px 2px 0;
+            &.active {
+                border-color: @first_color;
+            }
+            &.disabled {
+                color: @dark_grey;
+            }
+            .x, .v {
+                width: 16px;
+                font-size: 10px;
+                text-align: center;
+                cursor: pointer;
+                &:hover {
+                    background-color: @first_color;
+                    color: white;
+                }
+                .glyphicon-remove {
+                    position: relative;
+                    top: 1px;
+                }
+            }
+            .content {
+                padding: 0 2px 0 2px;
+                input {
+                    width: 120px;
+                    height: 23px;
+                    border: none;
+                    padding: 0;
+                }
+            }
+        }
+    }
+    .pins_controls {
+        display: flex;
+        justify-content: space-between;
+        .pin_pending_btn {
+            width: 50%;
+            display: flex;
+            justify-content: flex-start;
+        }
+        .pin_add_btn {
+            width: 50%;
+            display: flex;
+            justify-content: flex-end;
         }
     }
     .add_pin {
@@ -1030,6 +1183,51 @@ span.icon_link {
         }
     }
 }
+.field_col_wrapper {
+    .field_col {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        .field_col_inner {
+            min-height: 38px;
+            align-items: center;
+            padding-top: 3px;
+            .info_icon {
+                display: inline-block;
+                position: relative;
+                top: 1px;
+                left: 5px;
+            }
+            &.disabled {
+                color: @grey;
+                input, select {
+                    background-color: @light_grey;
+                    border-color: @grey_border;
+                }
+                label { cursor: default; }
+            }
+            &.animated {
+                border-radius: 3px;
+                animation: field_highlight 900ms;
+                animation-iteration-count: 3;
+                border: 1px solid white;
+            }
+            .field {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                select {
+                    width: 100%;
+                }
+            }
+        }
+        .double_field { display: flex; }
+        .double_field>* {
+            &:first-child { margin-right: 5px; }
+            &:last-child { margin-left: 5px; }
+        }
+    }
+}
 .flex_auto { flex: auto; }
 .browser_icon {
     width: 20px;
@@ -1354,11 +1552,27 @@ span.icon_link {
 .zagent .alert_wrapper {
     left: 10px;
 }
-
 .transparent {
     background: transparent !important;
 }
-
 .padding_right_10 {
     padding-right: 10px !important;
+}
+.labeled_section {
+    height: 24px;
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+    &_label {
+        align-items: center;
+        width: 80%;
+        display: flex;
+        justify-content: flex-start;
+    }
+    &_toggle {
+        width: 20%;
+        display: flex;
+        justify-content: flex-end;
+        column-gap: 5px;
+    }
 }

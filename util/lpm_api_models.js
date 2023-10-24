@@ -101,6 +101,7 @@ E.proxy_fields = {
         }
     },
     follow_redirect: {type: 'boolean', desc: 'Auto redirect requests'},
+    render: {type: 'boolean', desc: 'Process scripts from HTML pages'},
 };
 
 E.manager_fields = {

@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.414.367/luminati-proxy-manager-v1.414.367-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.417.160/luminati-proxy-manager-v1.417.160-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -220,6 +220,7 @@ Options:
       --bw_limit                   BW limit params
       --follow_redirect            Auto redirect requests
                                                       [boolean] [default: false]
+      --render                     Process scripts from HTML pages     [boolean]
       --whitelist_ips              Default for all proxies whitelist ip list for
                                    granting access to them [array] [default: []]
       --www_whitelist_ips          Whitelist ip list for granting access to

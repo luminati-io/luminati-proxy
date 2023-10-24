@@ -412,6 +412,7 @@
       "src/pub2/common/nav_tabs.js",
       "src/pub2/common/network_types.js",
       "src/pub2/common/presets.js",
+      "src/pub2/common/sidebar.js",
       "src/pub2/common/ssl_modal.js",
       "src/pub2/common/toggle_on_off.js",
       "src/pub2/common/tooltip.js",
@@ -500,7 +501,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "7e59c8483d5b2e3bcb0740e2b692c581"
+    "md5": "fcbe328f891c66686b93af7d73eca7eb"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -532,5 +533,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.414.367"
+  "version": "1.417.160"
 }

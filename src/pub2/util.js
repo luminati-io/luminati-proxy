@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
+import _ from 'lodash4';
 import React from 'react';
 import semver from 'semver';
 import etask from '../../util/etask.js';
@@ -302,4 +303,24 @@ export const in_cp = ()=>window.location!==window.parent.location;
 
 export const with_zagent_fn = zagent=>Comp=>function with_zagent(props){
     return <Comp {...props} zagent={zagent} />;
+};
+
+export const Clipboard = ()=><textarea className="copy_area"/>;
+Clipboard.copy = text=>{
+    if (!text)
+        return;
+    if (_.get(navigator, 'clipboard.writeText'))
+    {
+        navigator.clipboard.writeText(text);
+        return true;
+    }
+    const textarea = document.querySelector('textarea.copy_area');
+    if (!textarea)
+        return;
+    textarea.value = text;
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        return true;
+    } catch(e){ return void console.log('Unable to copy'); }
 };
