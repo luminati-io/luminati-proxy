@@ -775,7 +775,8 @@ class Client extends WS {
             {
                 opt.lookup = (h, o, cb)=>{
                     cb = cb||o;
-                    next_tick(()=>cb(undefined, lookup_ip, v));
+                    next_tick(()=>cb(undefined, o && o.all ?
+                        [{address: lookup_ip, family: v}] : lookup_ip, v));
                 };
             }
         }
@@ -1672,9 +1673,12 @@ class Mux {
                 stream.once('finish', this.continue_fn());
                 try { yield this.wait(opt.fin_timeout/2); }
                 catch(e){
-                    stream.end();
-                    try { yield this.wait(opt.fin_timeout/2); }
-                    catch(_e){ w_log(_e, 'fin_wait2'); }
+                    if (!stream.destroyed)
+                    {
+                        stream.end();
+                        try { yield this.wait(opt.fin_timeout/2); }
+                        catch(_e){ w_log(_e, 'fin_wait2'); }
+                    }
                 }
             }
             if (pending && !etask.is_final(pending))

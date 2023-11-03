@@ -288,7 +288,7 @@ describe('api', function(){
                 {rotate_session: true}, {code: 204});
         });
     });
-    // XXX arkadii: remove after migration
+    // XXX antons: remove after migration
     const har_log_tests = function(_this, prefix){
         _this.timeout(6000);
         beforeEach(()=>etask(function*(){

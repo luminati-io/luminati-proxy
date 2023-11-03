@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.419.693 Stable
+- :sparkles: Move some api calls to ws
+
 ## 1.417.160 Stable
 - :bug: Fix unable to deactivate render port setting via UI
 

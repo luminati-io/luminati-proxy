@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.419.693",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Move some api calls to ws"
+            }
+        ]
+    },
+    {
         "ver": "1.417.160",
         "type": "stable",
         "changes": [

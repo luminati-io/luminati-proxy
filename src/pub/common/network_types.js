@@ -43,7 +43,7 @@ export const network_types = {
     },
     serp: {
         label: 'SERP',
-        tooltip: 'Send requests to various serach engines',
+        tooltip: 'Send requests to various search engines',
     },
     disable: {
         label: 'Disabled',
