@@ -7,6 +7,7 @@ import moment from 'moment-timezone';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import zcountry from '../../../util/country.js';
+import ztz from '../../../util/tz.js';
 import {qw} from '../../../util/string.js';
 import {T} from '../common/i18n.js';
 import {Select_multiple} from '../common/controls.js';
@@ -21,7 +22,7 @@ import {Config, Tab_context} from './common.js';
 const timezone_opt = [
     {key: 'Disabled (default)', value: ''},
     {key: 'Automatic', value: 'auto'},
-    ...Object.entries(zcountry.timezone||{}).map(([code, timezone])=>({
+    ...Object.entries(ztz.timezone||{}).map(([code, timezone])=>({
         key: `${zcountry.list[code]||timezone} `
             +`(GMT${moment.tz(timezone).format('Z')})`,
         value: timezone,

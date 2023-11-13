@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.421.780 Stable
+- :star: Introduce api parameter limit control flag
+
 ## 1.419.693 Stable
 - :sparkles: Move some api calls to ws
 

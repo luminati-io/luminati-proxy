@@ -4,6 +4,7 @@
 let define;
 let next_tick;
 let is_node = typeof module=='object' && module.exports && module.children;
+let is_node20;
 var is_rn = typeof global=='object' && !!global.nativeRequire ||
     typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
@@ -49,7 +50,10 @@ else if (!is_node)
     })();
 }
 else
+{
     define = require('./require_node.js').define(module, '../');
+    is_node20 = require('semver').gte(process.version, '20.0.0');
+}
 next_tick = next_tick || process.nextTick;
 define(['/util/conv.js', '/util/etask.js', '/util/events.js',
     '/util/string.js', '/util/zerr.js', '/util/util.js', '/util/date.js'],
@@ -1931,6 +1935,8 @@ class Mux {
 }
 
 function lib(impl){
+    if (is_node20)
+        return require('ws');
     if (impl=='ws')
         return require('ws');
     if (impl=='uws' && !is_win)

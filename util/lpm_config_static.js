@@ -120,6 +120,7 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     cn: false,
     api_body_limit: '2mb',
     new_ui: false,
+    api_parameter_limit: 10000,
 });
 delete conf.manager_default.port;
 conf.log_levels = {

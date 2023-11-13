@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.421.780",
+        "type": "stable",
+        "changes": [
+            {
+            "type": "star",
+            "text": "Introduce api parameter limit control flag"
+            }
+        ]
+    },
+    {
         "ver": "1.419.693",
         "type": "stable",
         "changes": [

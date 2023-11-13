@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.419.693-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.421.780-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -231,6 +231,11 @@ Options:
       --bw_th_webhook_url          URL to send webhook messages to when BW limit
                                    threshold is reached                 [string]
       --new_ui                     Enable UiKit UI    [boolean] [default: false]
+      --api_body_limit             Controls the maximum request body size
+                                                       [string] [default: "2mb"]
+      --api_parameter_limit        Controls the maximum number of parameters
+                                   that are allowed in the URL-encoded data
+                                                       [number] [default: 10000]
       --no-www                     Disable local web
       --no-config                  Working without a config file
   -d, --daemon, --start-daemon     Start as a daemon
@@ -253,7 +258,6 @@ Options:
       --info                                                    [default: false]
       --av_server                                               [default: false]
       --cn                                                      [default: false]
-      --api_body_limit                                          [default: "2mb"]
       --api_domain_fallback                               [default: "l-lpm.com"]
 ```
 

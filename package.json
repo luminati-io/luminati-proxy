@@ -53,7 +53,7 @@
     "user-agents": "~1.0.1056",
     "colors": "1.4.0",
     "snyk": "1.1100.0",
-    "body-parser": "1.19.0",
+    "body-parser": "1.20.2",
     "check-node-version": "4.0.1",
     "electron-updater": "4.3.1",
     "express": "4.17.1",
@@ -501,7 +501,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "f0c39986b0382f23b08f67942007a537"
+    "md5": "a7801be7f28c755bd16279572b6d59aa"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -533,5 +533,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.419.693"
+  "version": "1.421.780"
 }
