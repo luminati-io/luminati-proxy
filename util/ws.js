@@ -4,7 +4,6 @@
 let define;
 let next_tick;
 let is_node = typeof module=='object' && module.exports && module.children;
-let is_node20;
 var is_rn = typeof global=='object' && !!global.nativeRequire ||
     typeof navigator=='object' && navigator.product=='ReactNative';
 if (is_rn)
@@ -13,7 +12,7 @@ if (is_rn)
         require('/util/conv.js'), require('/util/etask.js'),
         require('/util/events.js'), require('/util/string.js'),
         require('/util/zerr.js'), require('/util/util.js'),
-        require('/util/date.js'));
+        require('/util/date.js'), require('/util/url.js'));
 }
 else if (!is_node)
 {
@@ -50,14 +49,12 @@ else if (!is_node)
     })();
 }
 else
-{
     define = require('./require_node.js').define(module, '../');
-    is_node20 = require('semver').gte(process.version, '20.0.0');
-}
 next_tick = next_tick || process.nextTick;
 define(['/util/conv.js', '/util/etask.js', '/util/events.js',
-    '/util/string.js', '/util/zerr.js', '/util/util.js', '/util/date.js'],
-    function(conv, etask, events, string, zerr, zutil, date){
+    '/util/string.js', '/util/zerr.js', '/util/util.js', '/util/date.js',
+    '/util/url.js'],
+    function(conv, etask, events, string, zerr, zutil, date, zurl){
 
 const ef = etask.ef, assign = Object.assign;
 // for security reasons 'func' is disabled by default
@@ -291,7 +288,7 @@ class WS extends EventEmitter {
         if (opt && opt.bin_throttle)
             this._send_throttle(msg, opt.bin_throttle);
         else
-            this.ws.send(msg, opt);
+            this.ws.send(msg, this.uws2 ? typeof msg!='string' : opt);
         if (this.zc_tx)
         {
             this._counter.inc(`${this.zc}_tx_msg`);
@@ -341,10 +338,11 @@ class WS extends EventEmitter {
     _on_disconnected(){ this.emit('destroyed'); }
     _assign(ws){
         this.ws = ws;
+        this.uws2 = this.ws.uws2;
         this.ws.onopen = this._on_open.bind(this);
         this.ws.onclose = this._on_close.bind(this);
         this.ws.onmessage = this._on_message.bind(this);
-        this.ws.onerror = this._on_error.bind(this);
+        (this.ws.handlers||this.ws).onerror = this._on_error.bind(this);
         if (is_node)
         {
             this.ws.on('upgrade', this._on_upgrade.bind(this));
@@ -384,7 +382,7 @@ class WS extends EventEmitter {
         this.ws.onopen = undefined;
         this.ws.onclose = undefined;
         this.ws.onmessage = undefined;
-        this.ws.onerror = noop;
+        (this.ws.handlers||this.ws).onerror = noop;
         if (is_node)
         {
             this.ws.removeAllListeners('unexpected-response');
@@ -1026,6 +1024,296 @@ class Server {
     }
 }
 
+class Uws2_impl extends EventEmitter {
+    constructor(ws_opt, handlers = {onconnection: noop}){
+        super();
+        this.lib = require('uws2');
+        this.verifyClient = ws_opt.verifyClient;
+        this.handlers = handlers;
+        this.listen_socket = null;
+        const app_opt = {};
+        if (ws_opt.ssl_conf)
+        {
+            app_opt.key_file_name = ws_opt.ssl_conf.key;
+            app_opt.cert_file_name = ws_opt.ssl_conf.cert;
+        }
+        const ws_handler = {
+            idleTimeout: Math.min(ws_opt.srv_timeout, 960),
+            maxPayloadLength: ws_opt.maxPayloadLength||1024*1024*100,
+            upgrade: (res, req, context)=>{
+                let req_aborted = {aborted: false};
+                res.onAborted(()=>{ req_aborted.aborted = true; });
+                const _handlers = Object.assign({}, this.handlers);
+                const emitter = new EventEmitter();
+                emitter.on('error', (...args)=>
+                    _handlers.onerror && _handlers.onerror(...args));
+                const headers = {
+                    origin: req.getHeader('origin')||undefined,
+                    'x-real-ip': req.getHeader('x-real-ip'),
+                    'x-forwarded-for': req.getHeader('x-forwarded-for'),
+                    'user-agent': req.getHeader('user-agent'),
+                    'client-no-mask-support':
+                        req.getHeader('client-no-mask-support'),
+                };
+                if (!this.verify(res, headers))
+                    return;
+                const user_data = {
+                    headers,
+                    handlers: _handlers,
+                    emitter,
+                    uws2: true,
+                    _socket: {
+                        remoteAddress: Buffer.from(Buffer.from(
+                            res.getRemoteAddressAsText())).toString(),
+                        localPort: ws_opt.port,
+                    },
+                    on: (event, handler)=>emitter.on(event, handler),
+                    emit: (event, msg)=>emitter.emit(event, msg),
+                    removeAllListeners: ev=>emitter.removeAllListeners(ev),
+                };
+                res.upgrade(user_data, req.getHeader('sec-websocket-key'),
+                    req.getHeader('sec-websocket-protocol'),
+                    req.getHeader('sec-websocket-extensions'), context);
+            },
+            open: ws=>this.handlers.onconnection &&
+                this.handlers.onconnection(ws),
+            close: (ws, code, message)=>{
+                message = Buffer.from(message).toString();
+                if (message=='WebSocket timed out from inactivity')
+                {
+                    if (this.handlers.ontimeout)
+                        this.handlers.ontimeout(ws);
+                }
+                return ws.onclose && ws.onclose({code, message});
+            },
+            message: (ws, message, is_bin)=>{
+                if (!is_bin)
+                    message = Buffer.from(Buffer.from(message));
+                return ws.onmessage && ws.onmessage({
+                    data: is_bin ? message : message.toString()});
+            },
+            pong: (ws, message)=>ws.emitter.emit('pong', {ws, message}),
+        };
+        const req_handler = (res, req)=>{
+            if (!this.handlers.onreq)
+                return res.end();
+            let req_aborted = {aborted: false};
+            res.onAborted(()=>{ req_aborted.aborted = true; });
+            this.handlers.onreq(req, res, req_aborted);
+        };
+        this.server = this.lib[ws_opt.ssl_conf ? 'SSLApp' : 'App'](app_opt)
+            .ws('/', ws_handler).any('/*', req_handler);
+        if (ws_opt.ssl_conf && ws_opt.ssl_conf.sni)
+        {
+            for (let servername in ws_opt.ssl_conf.sni)
+            {
+                this.server.addServerName('*.'+servername, {
+                    key_file_name: ws_opt.ssl_conf.sni[servername]+'.key',
+                    cert_file_name: ws_opt.ssl_conf.sni[servername]+'.crt'
+                }).domain('*.'+servername)
+                    .ws('/', ws_handler).any('/*', req_handler);
+            }
+        }
+        this.server.listen(ws_opt.host||'0.0.0.0', ws_opt.port, token=>{
+            if (token)
+            {
+                this.emit('listening');
+                this.listen_socket = token;
+            }
+        });
+    }
+    on(event, handler){
+        if (event=='listening' && this.listen_socket)
+            handler();
+        else
+            super.on(event, handler);
+    }
+    close(){
+        if (!this.listen_socket)
+            return;
+        this.lib.us_listen_socket_close(this.listen_socket);
+        this.listen_socket = null;
+        this.emit('close');
+    }
+    verify(res, headers){
+        if (!this.verifyClient)
+            return true;
+        let verify_res, arg = {
+            origin: headers.origin,
+            secure: false,
+            req: {headers}
+        };
+        const cb = (v_res, status='403', reason='Unauthorized', _headers={})=>{
+            verify_res = v_res;
+            if (!v_res)
+            {
+                res.cork(()=>{
+                    res.writeStatus(status);
+                    for (let h in _headers)
+                        res.writeHeader(h, _headers[h]);
+                    res.end(reason);
+                });
+            }
+        };
+        if (this.verifyClient.length==1)
+        {
+            verify_res = this.verifyClient(arg);
+            if (!verify_res)
+                res.end();
+        }
+        else
+            this.verifyClient(arg, cb);
+        return verify_res;
+    }
+}
+
+class Server_uws2 {
+    constructor(opt={}, handler=undefined){
+        if (opt.mux)
+            opt.mux = assign({}, {dec_vfd: true}, opt.mux);
+        make_ipc_server_class(opt);
+        make_ipc_client_class(opt);
+        this.handler = handler;
+        let ws_opt = {
+            host: opt.host,
+            port: opt.port,
+            ssl_conf: opt.ssl_conf,
+            srv_timeout: opt.srv_timeout,
+            on_timeout: opt.on_timeout,
+            req_handler: opt.req_handler,
+        };
+        if (opt.max_payload)
+            ws_opt.maxPayloadLength = opt.max_payload;
+        if (opt.verify)
+            ws_opt.verifyClient = opt.verify;
+        this.ws_server = new Uws2_impl(ws_opt, {
+            onconnection: this.accept.bind(this),
+            ontimeout: opt.on_timeout,
+            onreq: opt.req_handler,
+        });
+        this.server_no_mask_support = false;
+        this.opt = opt;
+        this.label = opt.label;
+        this.connections = new Set();
+        this.zc = opt.zcounter!=false ? opt.label ? `${opt.label}_ws` : 'ws'
+            : undefined;
+        if (opt.port)
+            zerr.notice(`${this}: listening on port ${opt.port}`);
+        if (!zcounter)
+            zcounter = require('./zcounter.js');
+        this._counter = make_counter(opt);
+        // ensure the metric exists, even if 0
+        if (this.zc)
+            this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
+    }
+    toString(){ return this.label ? `${this.label} WS server` : 'WS server'; }
+    // XXX igors: check if it breaks anything since uws2 doesnt have upgrade
+    // method
+    upgrade(req, socket, head){ }
+    accept(ws, i){
+        if (!ws._socket.remoteAddress)
+        {
+            ws.handlers.onerror = noop;
+            return zerr.warn(`${this}: dead incoming connection`);
+        }
+        let headers = ws.headers || {};
+        if (this.opt.origin_whitelist)
+        {
+            if (!this.opt.origin_whitelist.includes(headers.origin))
+            {
+                ws.close();
+                return zerr.notice('incoming conn from %s rejected',
+                    headers.origin||'unknown origin');
+            }
+            zerr.notice('incoming conn from %s', headers.origin);
+        }
+        let zws = new WS(this.opt, i);
+        if (this.opt.conn_max_event_listeners!==undefined)
+            zws.setMaxListeners(this.opt.conn_max_event_listeners);
+        if (this.opt.trust_forwarded)
+        {
+            let forwarded = headers['x-real-ip'];
+            if (!forwarded)
+            {
+                forwarded = headers['x-forwarded-for'];
+                if (forwarded)
+                {
+                    let ips = forwarded.split(',');
+                    forwarded = ips[ips.length-1];
+                }
+            }
+            if (forwarded)
+            {
+                zws.remote_addr = forwarded;
+                zws.remote_forwarded = true;
+            }
+        }
+        let ua = headers['user-agent'];
+        let m = /^Hola (.+)$/.exec(ua);
+        zws.remote_label = m ? m[1] : ua ? 'web' : undefined;
+        zws._assign(ws, true);
+        zws._on_open();
+        if (this.server_no_mask_support && headers['client-no-mask-support'])
+            zws.send(SERVER_NO_MASK_SUPPORT);
+        this.connections.add(zws);
+        if (this.zc)
+        {
+            this._counter.inc(`${this.zc}_conn`);
+            this._counter.inc_level(`level_${this.zc}_conn`, 1, 'sum');
+        }
+        zws.addListener('disconnected', ()=>{
+            this.connections.delete(zws);
+            if (this.zc)
+                this._counter.inc_level(`level_${this.zc}_conn`, -1, 'sum');
+        });
+        if (this.handler)
+        {
+            try {
+                zws.data = this.handler(zws);
+            } catch(e){ ef(e);
+                zerr(zerr.e2s(e));
+                return zws.close(1011, String(e));
+            }
+        }
+        return zws;
+    }
+    broadcast(msg){
+        if (zerr.is.debug())
+        {
+            zerr.debug(typeof msg=='string'
+                ? `${this}> broadcast str: ${string.trunc(msg, DEBUG_STR_LEN)}`
+                : `${this}> broadcast buf: ${msg.length} bytes`);
+        }
+        for (let zws of this.connections)
+            zws.send(msg);
+    }
+    broadcast_json(data){
+        if (this.connections.size)
+            this.broadcast(JSON.stringify(data));
+    }
+    broadcast_zjson(data){
+        if (this.connections.size)
+            this.broadcast(conv.JSON_stringify(data, this.zjson_opt_send));
+    }
+    close(code, reason){
+        zerr.notice(`${this}: closed`);
+        this.ws_server.close();
+        for (let zws of this.connections)
+            zws.close(code, reason);
+    }
+    inspect(){
+        let connections = [];
+        for (let c of this.connections)
+            connections.push(c.inspect());
+        return {
+            class: this.constructor.name,
+            label: this.toString(),
+            opt: this.opt,
+            connections,
+        };
+    }
+}
+
 let ipc_clients_cookie = 0;
 const ERROR_CODES = {bad_ipc_call_attempt: 'bad_ipc_call_attempt'};
 class IPC_client_base {
@@ -1218,7 +1506,6 @@ class IPC_server_base {
     static build(ws_opt){
         const ipc_opt = {
             zjson: ws_opt.ipc_zjson,
-            sync: ws_opt.ipc_sync,
             call_zerr: ws_opt.ipc_call_zerr,
             mux: ws_opt.mux,
         };
@@ -1252,36 +1539,20 @@ class IPC_server_base {
         this.ws = zws;
         this.mux = opt.mux;
         this.zjson = !!opt.zjson;
-        this.sync = !!opt.sync;
         this.call_zerr = !!opt.call_zerr;
-        this.pending = this.sync ? undefined : new Set();
-        if (this.sync)
-            zws.addListener(json_event(this.zjson), v=>this._on_call_sync(v));
-        else
-        {
-            zws.addListener(json_event(this.zjson), v=>this._on_call_async(v));
-            zws.addListener('disconnected', this._on_disconnected.bind(this));
-        }
+        this.pending = new Set();
+        zws.addListener(json_event(this.zjson), v=>this._on_call(v));
+        zws.addListener('disconnected', this._on_disconnected.bind(this));
     }
-    _on_call_sync(msg){
+    _on_call(msg){
         if (!msg || !msg.cmd)
             return;
         if (!msg.type || msg.type=='ipc_call')
-            return void new IPC_server_resp_call_sync(this, msg);
+            return void new IPC_server_resp_call(this, msg);
         if (msg.type=='ipc_post')
-            return void new IPC_server_resp_post_sync(this, msg);
+            return void new IPC_server_resp_post(this, msg);
         if (msg.type=='ipc_mux')
-            return void new IPC_server_resp_mux_sync(this, msg);
-    }
-    _on_call_async(msg){
-        if (!msg || !msg.cmd)
-            return;
-        if (!msg.type || msg.type=='ipc_call')
-            return void new IPC_server_resp_call_async(this, msg);
-        if (msg.type=='ipc_post')
-            return void new IPC_server_resp_post_async(this, msg);
-        if (msg.type=='ipc_mux')
-            return void new IPC_server_resp_mux_async(this, msg);
+            return void new IPC_server_resp_mux(this, msg);
     }
     _on_disconnected(){
         for (let task of this.pending)
@@ -1391,72 +1662,59 @@ class IPC_server_resp {
         });
     }
 }
-class IPC_server_resp_call_sync extends IPC_server_resp {
+class IPC_server_resp_call extends IPC_server_resp {
     constructor(ipc, msg){
         super(ipc, msg);
         if (this.base_is_method_undefined())
             return;
-        try { this.call_response(this.exec()); }
-        catch(e){ this.base_fail(e); }
-    }
-}
-class IPC_server_resp_call_async extends IPC_server_resp {
-    constructor(ipc, msg){
-        super(ipc, msg);
-        if (this.base_is_method_undefined())
-            return;
+        let et;
+        try {
+            if (!((et = this.exec()) instanceof etask))
+                return void this.call_response(et);
+        } catch(e){ return this.base_fail(e); }
         const _this = this;
         etask(function*IPC_server_handle(){
             _this.assign_info(this);
-            try { _this.call_response(yield _this.exec()); }
+            try { _this.call_response(yield et); }
             catch(e){ _this.base_fail(e); }
         });
     }
 }
-class IPC_server_resp_post_sync extends IPC_server_resp {
+class IPC_server_resp_post extends IPC_server_resp {
     constructor(ipc, msg){
         super(ipc, msg);
         if (this.post_is_method_undefined())
             return;
-        try { this.exec(); }
-        catch(e){ this.post_fail(e); }
-    }
-}
-class IPC_server_resp_post_async extends IPC_server_resp {
-    constructor(ipc, msg){
-        super(ipc, msg);
-        if (this.post_is_method_undefined())
-            return;
+        let et;
+        try {
+            if (!((et = this.exec()) instanceof etask))
+                return;
+        } catch(e){ return this.post_fail(e); }
         const _this = this;
         etask(function*IPC_server_handle(){
             _this.add_pending(this);
             _this.assign_info(this);
-            try { yield _this.exec(); }
+            try { yield et; }
             catch(e){ _this.post_fail(e); }
         });
     }
 }
-class IPC_server_resp_mux_sync extends IPC_server_resp {
+class IPC_server_resp_mux extends IPC_server_resp {
     constructor(ipc, msg){
         super(ipc, msg);
         if (this.base_is_method_undefined())
             return;
         this.mux_open();
-        try { this.exec(); }
-        catch(e){ this.base_fail(e); }
-    }
-}
-class IPC_server_resp_mux_async extends IPC_server_resp {
-    constructor(ipc, msg){
-        super(ipc, msg);
-        if (this.base_is_method_undefined())
-            return;
-        this.mux_open();
+        let et;
+        try {
+            if (!((et = this.exec()) instanceof etask))
+                return;
+        } catch(e){ return this.base_fail(e); }
         const _this = this;
         etask(function*IPC_server_handle(){
             _this.add_pending(this);
             _this.assign_info(this);
-            try { yield _this.exec(); }
+            try { yield et; }
             catch(e){ _this.base_fail(e); }
         });
     }
@@ -1935,11 +2193,9 @@ class Mux {
 }
 
 function lib(impl){
-    if (is_node20)
-        return require('ws');
     if (impl=='ws')
         return require('ws');
-    if (impl=='uws' && !is_win)
+    if ((impl=='uws' || impl=='uws2') && !is_win)
         return require('uws');
     zerr.zexit(`WS library ${impl} is not available`);
 }
@@ -1963,6 +2219,7 @@ function server_impl(opt){
     return l;
 }
 
-return {Client, Server, Mux, t: {WS, IPC_server_base}, ERROR_CODES};
+return {Client, Server, Server_uws2, Mux, t: {WS, IPC_server_base},
+    ERROR_CODES};
 
 }); }());

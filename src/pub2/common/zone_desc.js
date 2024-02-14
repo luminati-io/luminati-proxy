@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 import React from 'react';
+import {Typography} from 'uikit';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {get_static_country} from '../util.js';
 import {flag_with_title, any_flag} from '../common.js';
@@ -40,6 +41,9 @@ export default class Zone_description extends Pure_component {
         if (!network_desc)
             network_desc = network_types.fallback;
         return <div className="zone_settings">
+          <Typography.Label className="zone_label" variant="lg">
+            {zone_name}
+          </Typography.Label>
           <ul className="bullets">
             <Zone_bullet atr="Network type"
               tip="The network accessible by this zone">

@@ -3,7 +3,6 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
-import $ from 'jquery';
 import styled from 'styled-components';
 import {Button, Tooltip, IconButton, Input, Icon} from 'uikit';
 import {Inline_wrapper, Vertical_divider} from './common.js';
@@ -39,10 +38,10 @@ const Search_box = props=>{
   />;
 };
 
-const Add_proxy_btn = ()=>{
+const Add_proxy_btn = withRouter(props=>{
   const open_modal = ()=>{
       ws.post_event('Add New Port Click');
-      return $('#add_new_proxy_modal').modal('show');
+      return props.history.push('/proxy_add');
   };
   return <T>{t=>
     <Tooltip tooltip={t('New port')}>
@@ -54,7 +53,7 @@ const Add_proxy_btn = ()=>{
       />
     </Tooltip>
   }</T>;
-};
+});
 
 const Nav_icon = withRouter(props=>{
   const navigate_to = path=>{

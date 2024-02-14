@@ -693,20 +693,13 @@ function deref_obj(obj){
 E.JSON_parse = function(s, opt){
     opt = Object.assign({date: true, re: true, bigint: true, func: true,
         inf: true, circular: true}, opt);
-    var has_circular, ret = {};
-    var reviver = function(k, v){
+    var has_circular;
+    var ret = JSON.parse(s, function(k, v){
         v = parse_leaf(v, opt);
         if (v && typeof v.__Ref__=='string')
             has_circular = true;
         return v;
-    };
-    try {
-        ret = JSON.parse(s, reviver);
-    } catch(e){
-        if (!opt.date)
-            throw e;
-        ret = JSON.parse(JSON.stringify(s), reviver);
-    }
+    });
     if (has_circular && opt.circular)
         deref_obj(ret);
     return ret;

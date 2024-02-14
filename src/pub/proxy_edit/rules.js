@@ -68,6 +68,7 @@ const rule_prepare = (rule={})=>{
             action_type: rule.action,
             trigger_type: rule.trigger_type,
             url: rule.trigger_url_regex,
+            domain: rule.trigger_url_domain,
         };
         if (rule.active===false)
             result.active = false;
@@ -95,6 +96,7 @@ export const map_rule_to_form = rule=>{
     const result = {};
     result.status = rule.status;
     result.trigger_url_regex = rule.url;
+    result.trigger_url_domain = rule.domain;
     result.trigger_type = rule.trigger_type;
     result.body_regex = rule.body;
     result.min_req_time = rule.min_req_time;
@@ -336,6 +338,7 @@ class Rule_config extends Pure_component {
         const id = this.props.id;
         const tab_id = 'rules';
         const disabled = this.props.disabled||this.state.disabled_fields[id];
+        const cls = classnames('rule_toggle', this.props.class_name);
         return <Labeled_controller
               id={id}
               style={this.props.style}
@@ -353,7 +356,8 @@ class Rule_config extends Pure_component {
               on_blur={this.on_blur}
               label={tabs[tab_id].fields[id].label}
               tooltip={tabs[tab_id].fields[id].tooltip}
-              class_name={this.props.class_name}/>;
+              class_name={cls}
+            />;
     }
 }
 
@@ -516,7 +520,7 @@ class Action extends Pure_component {
         if (['static', 'static_res'].includes(plan.type))
             return plan.ips>0;
         if (plan.type=='resident')
-            return plan.vips>0;
+            return plan.vips>0||plan.vips_type=='shared';
         return false;
     };
     request_methods = ()=>
@@ -703,7 +707,13 @@ class Trigger extends Pure_component {
             {rule.trigger_type &&
               <Rule_config id="trigger_url_regex" type="regex"
                 rule={rule} style={{width: '100%'}}
-                field_row_inner_style={{paddingBottom: '1em'}}/>}
+                field_row_inner_style={{paddingBottom: '1em'}}/>
+            }
+            {rule.trigger_type && ssl &&
+              <Rule_config id="trigger_url_domain" type="yes_no"
+                rule={rule} style={{width: '100%'}}
+                field_row_inner_style={{paddingBottom: '1em'}}/>
+            }
           </div>
           <Trigger_code
             rule={rule}

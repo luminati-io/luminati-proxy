@@ -1,9 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 define(['react', 'jquery', 'classnames', '/www/util/pub/pure_component.js',
-    '/util/util.js', '/util/setdb.js'],
+    '/util/util.js', '/util/setdb.js', '/www/util/pub/tooltip.js'],
     function(React, $, classnames, Pure_component, zutil,
-    setdb)
+    setdb, Tooltip)
 {
 
 const E = {};
@@ -13,8 +13,9 @@ const Toolbar_button = ({id, tooltip, active, href, placement, ...props})=>
     <a className={classnames('toolbar_item toolbar_button', id, {active})}
       onClick={props.on_click||(()=>null)} href={href}
     >
-      <span className={classnames(id, 't_button', 'chrome_icon')}/>
-      {props.children}
+      <Tooltip title={tooltip}>
+        <span className={classnames(id, 't_button', 'chrome_icon')}/>
+      </Tooltip>
     </a>;
 
 class Preview extends Pure_component {

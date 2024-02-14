@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.440.909 Stable
+- :star: Add apply regex only to target domain option for URL triggered rules
+- :star: Change test domain from lumtest.com to geo.brdtest.com
+- :star: Add tooltip for the HAR viewer icon buttons
+
 ## 1.421.780 Stable
 - :star: Introduce api parameter limit control flag
 

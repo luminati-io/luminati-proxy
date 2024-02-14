@@ -54,7 +54,7 @@ class Request extends Pure_component {
     state = {
         headers: [this.first_header],
         max_idx: 0,
-        params: {url: 'http://lumtest.com/myip.json'},
+        params: {url: 'http://geo.brdtest.com/mygeo.json'},
         show_loader: false,
         lock: false,
     };

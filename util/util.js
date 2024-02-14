@@ -668,4 +668,26 @@ function get_map_fn(v){
 E.make_error = (message, code, extra)=>
     Object.assign(new Error(message), code&&{code}, extra&&{extra});
 
+// allows to destructure functions from E or E.t, while still being able to
+// stub them. also allows stubbing these functions after they are re-exported.
+// using `stub` or `spy` methods on returned function is optional, but it
+// allows to make sure the function supports it and will be stubbed correctly
+// example:
+//   const some_fn = stub_wrapper(()=>{ /* ... */ });
+//   E.t = {some_fn};
+//   ---
+//   const {t: {some_fn}} = require('./some_module.js');
+//   some_fn.stub(sb, ()=>'stubbed');
+//   const result = some_fn(); // 'stubbed'
+//   const spy = some_fn.spy(sb);
+E.stub_wrapper = fn=>{
+    if (!E.is_mocha())
+        return fn;
+    const wrapper = function(){ return wrapper.fn.apply(this, arguments); };
+    wrapper.fn = fn;
+    wrapper.stub = (sb, ...args)=>sb.stub(wrapper, 'fn', ...args);
+    wrapper.spy = (sb, ...args)=>sb.spy(wrapper, 'fn', ...args);
+    return wrapper;
+};
+
 return E; }); }());

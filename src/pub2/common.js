@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 /* eslint-disable react/display-name */
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_tooltip from 'react-tooltip';
 import {Alert as RB_Alert} from 'react-bootstrap';
@@ -13,8 +13,11 @@ import $ from 'jquery';
 import styled from 'styled-components';
 import {
     Tooltip as UIKitTooltip,
+    Input as UIKitInput,
+    Typography,
     withPopover,
     IconButton,
+    Layout,
     Menu,
     Icon,
     theme,
@@ -28,7 +31,12 @@ import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
 } from './common/controls.js';
 import Tooltip from './common/tooltip.js';
 import {T, t, Language} from './common/i18n.js';
-import {bytes_format, report_exception} from './util.js';
+import {
+    bytes_format,
+    report_exception,
+    Form_toggle_transform,
+    Clipboard,
+} from './util.js';
 import CP_ipc from './cp_ipc.js';
 
 export const www_api = 'https://brightdata.com';
@@ -75,6 +83,32 @@ export const Vertical_divider = styled.div`
     margin: ${uikit_from_theme('margin')};
 `;
 Vertical_divider.displayName = 'Vertical_divider';
+
+export const Copy_icon = ({text, size, tooltip_placement})=>{
+    let tt_timeout = null;
+    const [tt, set_tt] = useState('Copy');
+    const on_click = useCallback(()=>{
+        if (!Clipboard.copy(text))
+            return;
+        if (tt_timeout)
+            clearTimeout(tt_timeout);
+        tt_timeout = setTimeout(()=>set_tt('Copy'), 3*date.ms.SEC);
+        set_tt('Copied!');
+    }, [text]);
+    useEffect(()=>()=>{
+        if (tt_timeout)
+            clearTimeout(tt_timeout);
+    }, []);
+    return <IconButton
+        aria-label="Icon Button"
+        icon="Copy"
+        onClick={on_click}
+        tooltip={t(tt)}
+        tooltipPlacement={tooltip_placement||'right'}
+        size={size||'xs'}
+        variant="ghost"
+    />;
+};
 
 export const Tooltip_bytes = props=>{
     let {bytes, bytes_out, bytes_in, cost} = props;
@@ -504,13 +538,13 @@ export const Labeled_controller_new = props=>
       disabled={props.disabled}
       animated={props.animated}
       inner_style={props.field_row_inner_style}>
-        <div className="desc" style={props.desc_style}>
+        {props.label && <div className="desc" style={props.desc_style}>
           <UIKitTooltip tooltip={t(props.tooltip)}>
             {t(props.label)}
           </UIKitTooltip>
           {props.faq && <Faq_link article={props.faq.article}
                 anchor={props.faq.anchor}/>}
-        </div>
+        </div>}
         <div>
           <div className="field" data-tip data-for={props.id+'tip'}>
             {props.prefix && <span className="prefix">{t(props.prefix)}</span>}
@@ -528,6 +562,46 @@ export const Labeled_controller_new = props=>
           {props.note && <Note>{t(props.note)}</Note>}
         </div>
     </Field_col_raw>;
+
+export const Labeled_section = props=>{
+    const is_toggle = props.type=='toggle';
+    const typed = props.type && !is_toggle;
+    const {label, tooltip, val, default: def, on_change_wrapper, faq,
+        disabled, children, note, toggle_transform, class_name,
+        label_variant='lg', inline, short, small, w20} = props;
+    const toggle_on_change = toggle_state=>{
+        if (toggle_transform instanceof Form_toggle_transform)
+            toggle_state = toggle_transform.out(toggle_state);
+        on_change_wrapper(toggle_state);
+    };
+    const toggle_val = toggle_transform instanceof Form_toggle_transform ?
+        toggle_transform.in(val) : val!=undefined ? !!val : !!def;
+    const content = useMemo(()=><>
+        <div className='labeled_section'>
+            <div className={classnames('labeled_section_label',
+                {short, small, w20})}>
+            <Typography.Label variant={label_variant}>
+                <UIKitTooltip tooltip={tooltip}>{label}</UIKitTooltip>
+            </Typography.Label>
+            {faq && <Faq_button article={faq.article} anchor={faq.anchor}/>}
+            </div>
+            {is_toggle && <div className='labeled_section_toggle'>
+            {note||null}
+            <UIKitInput.Toggle
+                value={toggle_val}
+                disabled={disabled}
+                onChange={toggle_on_change}
+            />
+            </div>}
+        </div>
+        {typed && <Form_controller_new {...props} />}
+        {!is_toggle && !typed && children}
+    </>, [label_variant, tooltip, label, faq, is_toggle, note, toggle_val,
+        disabled, short]);
+    return <Layout.Box width="500px" max_width="500px" className={class_name}>
+        {inline ? <Inline_wrapper>{content}</Inline_wrapper> : content}
+    </Layout.Box>;
+};
 
 export const Checkbox = props=>
   <div className="form-check">

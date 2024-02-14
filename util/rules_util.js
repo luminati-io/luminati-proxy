@@ -138,7 +138,8 @@ E.migrate_trigger = rule=>{
     }
     if (rule.url)
     {
-        body += `if (!new RegExp(String.raw\`${rule.url}\`).test(opt.url))\n`
+        const k = rule.domain ? 'domain' : 'url';
+        body += `if (!new RegExp(String.raw\`${rule.url}\`).test(opt.${k}))\n`
         +`  return false;\n`;
     }
     body += `return true;`;

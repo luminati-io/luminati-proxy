@@ -31,7 +31,7 @@ import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
-import {report_exception, in_cp, with_zagent_fn} from './util.js';
+import {report_exception, in_cp, with_props_fn} from './util.js';
 import i18n, {TranslationContext, is_except_path} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
@@ -347,16 +347,17 @@ class Page extends Pure_component {
     render(){
         const {settings} = this.state;
         const {zagent} = settings;
-        const with_zagent = with_zagent_fn(zagent);
+        const with_zagent = with_props_fn({zagent});
+        const with_settings = with_props_fn({settings});
         return <div>
           <Nav/>
-          <Proxy_add settings={settings}/>
           <div className={classnames('page_body2 vbox', {zagent})}>
             <Error_boundry>
               <Validator zagent={zagent}/>
               <Switch>
                 <Route path="/overview" exact render={with_zagent(Overview)} />
                 <Route path="/proxy/:port" render={with_zagent(Proxy_edit)} />
+                <Route path="/proxy_add" render={with_settings(Proxy_add)} />
                 <Route path="/howto/:option?/:suboption?" exact
                   render={with_zagent(Howto)} />
                 <Route path="/logs" exact render={with_zagent(Logs)} />
@@ -371,7 +372,8 @@ class Page extends Pure_component {
 }
 
 const Validator = ({zagent})=>{
-    if (zagent && !in_cp())
+    // eslint-disable-next-line
+    if (!ENV_DEV && zagent && !in_cp())
         throw 'cp_required';
     return <React.Fragment></React.Fragment>;
 };

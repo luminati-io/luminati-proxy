@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.421.780-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.440.909-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -196,7 +196,7 @@ Options:
       --request_stats              Enable requests statistics
                                                        [boolean] [default: true]
       --test_url                   Url for testing proxy
-                              [string] [default: "http://lumtest.com/myip.json"]
+                         [string] [default: "http://geo.brdtest.com/mygeo.json"]
       --log                        Log level        [string] [default: "notice"]
       --logs                       Number of request logs to store
                                                         [number] [default: 1000]
@@ -309,7 +309,7 @@ const proxy = new Server({
 });
 proxy.on('response', res=>console.log('Response:', res));
 proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
-    proxy.request('http://lumtest.com/myip', (err, res)=>{
+    proxy.request('http://geo.brdtest.com/mygeo.json', (err, res)=>{
         if (err)
             return reject(err);
         resolve(res);
@@ -335,7 +335,7 @@ etask(function*(){
     });
     yield proxy.listen(0, '127.0.0.1'); // port and ip to listen to
     let res = yield etask.nfn_apply(proxy, '.request',
-        ['http://lumtest.com/myip']);
+        ['http://geo.brdtest.com/mygeo.json']);
     console.log('Result:', res.statusCode, res.body);
     yield proxy.stop();
 });

@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.421.780"
+VERSION="1.440.909"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -550,7 +550,7 @@ check_env()
 
 setup_npm_registry()
 {
-    if curl -s http://lumtest.com/myip.json | grep -q '"country":"CN"'; then
+    if curl -s http://geo.brdtest.com/mygeo.json | grep -q '"country":"CN"'; then
         npm config set registry https://r.cnpmjs.org/
     fi
 }

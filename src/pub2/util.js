@@ -18,6 +18,19 @@ export const bytes_format = (bytes, number)=>{
     return n+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
 };
 
+export const networks = [
+    {
+        label: 'Bright Data',
+        value: 'brd',
+        desc: 'Proxy port using your Bright Data account',
+    },
+    {
+        label: 'External',
+        value: 'ext',
+        desc: 'Proxy port configured with external IP and credentials',
+    }
+];
+
 const error_desc = [
     // proxy.js
     {
@@ -301,8 +314,8 @@ export const is_local = ()=>{
 
 export const in_cp = ()=>window.location!==window.parent.location;
 
-export const with_zagent_fn = zagent=>Comp=>function with_zagent(props){
-    return <Comp {...props} zagent={zagent} />;
+export const with_props_fn = add_props=>Comp=>function with_zagent(props){
+    return <Comp {...props} {...add_props} />;
 };
 
 export const Clipboard = ()=><textarea className="copy_area"/>;
@@ -324,3 +337,23 @@ Clipboard.copy = text=>{
         return true;
     } catch(e){ return void console.log('Unable to copy'); }
 };
+
+// Helper for UIKit Toggle to transform bool value to out fn return
+export class Form_toggle_transform {
+    constructor(in_fn, out_fn){
+        this.in_fn = in_fn || _.noop;
+        this.out_fn = out_fn || _.noop;
+    }
+    in = v=>this.in_fn(v); // is toggle on
+    out = v=>this.out_fn(v); // transform toggle bool value to data item
+}
+
+// data: array [toggle_is_off, toggle_is_on]
+export const get_form_toggle_transform = _.memoize(data=>{
+    if (!Array.isArray(data))
+        throw new Error('Form_toggle_transform data should be an array');
+    const [val_off, val_on] = data;
+    const is_on = v=>v==val_on;
+    const bool_to_val = v=>v ? val_on : val_off;
+    return new Form_toggle_transform(is_on, bool_to_val);
+});

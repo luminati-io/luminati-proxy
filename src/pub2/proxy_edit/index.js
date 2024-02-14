@@ -455,7 +455,7 @@ const Index = withRouter(class Index extends Pure_component {
                 saving={this.state.saving}
                 save={()=>$('#save_port_confirmation_modal').modal()}
               />
-              <Nav_tabs_wrapper/>
+              <Nav_tabs_wrapper zagent={gs.zagent} />
             </div>
             {this.state.zones && <Main_window/>}
             <Warnings_modal id="save_proxy_errors"
@@ -518,21 +518,30 @@ const Index = withRouter(class Index extends Pure_component {
 });
 
 const Nav_tabs_wrapper = withRouter(
-class Nav_tabs_wrapper extends Pure_component {
-    tabs = ['logs', 'target', 'rotation', 'rules', 'browser', 'general'];
-    set_tab = id=>{
-        ws.post_event('Tab Click', {tab: id});
-        const port = this.props.match.params.port;
-        const pathname = `/proxy/${port}/${id}`;
-        this.props.history.push({pathname});
-    };
-    render(){
-        return <Nav_tabs set_tab={this.set_tab}>
-          {this.tabs.map(t=><Nav_tab key={t} id={t} title={tabs[t].label}
-            tooltip={tabs[t].tooltip}/>)}
-        </Nav_tabs>;
-    }
-});
+    class Nav_tabs_wrapper extends Pure_component {
+        get tabs(){
+            return [
+                'logs',
+                'target',
+                'rotation',
+                'rules',
+                ...!this.props.zagent?['browser']:[],
+                'general',
+            ];
+        }
+        set_tab = id=>{
+            ws.post_event('Tab Click', {tab: id});
+            const port = this.props.match.params.port;
+            const pathname = `/proxy/${port}/${id}`;
+            this.props.history.push({pathname});
+        };
+        render(){
+            return <Nav_tabs set_tab={this.set_tab}>
+              {this.tabs.map(t=><Nav_tab key={t} id={t} title={tabs[t].label}
+                tooltip={tabs[t].tooltip}/>)}
+            </Nav_tabs>;
+        }
+    });
 
 const Header = props=>{
     let title = props.zagent ? 'the Cloud' : 'Proxy Manager';

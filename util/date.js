@@ -862,10 +862,24 @@ E.compile_schedule = function(expr){
     };
 };
 
+var short_timezone_offsets = {
+    AST: 'GMT-4', ADT: 'GMT-3',
+    EST: 'GMT-5', EDT: 'GMT-4',
+    CST: 'GMT-6', CDT: 'GMT-5',
+    MST: 'GMT-7', MDT: 'GMT-6',
+    PST: 'GMT-8', PDT: 'GMT-7',
+    HST: 'GMT-9', HDT: 'GMT-8',
+    AKST: 'GMT-10', AKDT: 'GMT-9',
+};
+// compatible with Date.getTimezoneOffset (which works only with current TZ)
+// returns negative UTC offset (UTC+3 -> -180, UTC -> 0, UTC-2 -> 120)
+// example: Israel winter timezone is IST which is UTC+2, return value is -120
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
 E.timezone_offset = function(tz, dt){
     dt = dt || E.get();
     tz = dt.toLocaleString('en', {timeZone: tz, timeStyle: 'long'})
-    .split(' ').slice(-1)[0];
+        .split(' ').slice(-1)[0];
+    tz = short_timezone_offsets[tz] || tz;
     var dt_str = dt.toString();
     var offset = Date.parse(dt_str+' '+tz)-Date.parse(dt_str+' UTC');
     return offset/ms.MIN;

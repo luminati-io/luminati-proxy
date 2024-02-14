@@ -20,7 +20,12 @@ import setdb from '../../util/setdb.js';
 import csv from '../../util/csv.js';
 import etask from '../../util/etask.js';
 import zutil from '../../util/util.js';
-import {get_static_country, report_exception, is_local} from './util.js';
+import {
+    get_static_country,
+    report_exception,
+    networks,
+    is_local,
+} from './util.js';
 import Proxy_blank from './proxy_blank.js';
 import {
     any_flag,
@@ -138,18 +143,9 @@ const Static_ip_cell = props=>{
 };
 
 const Type_cell = ({value: ext_proxy})=>{
-    let val, tip;
-    if (ext_proxy)
-    {
-        val = 'External';
-        tip = 'Proxy port configured with external IP and credentials';
-    }
-    else
-    {
-        val = 'Bright Data';
-        tip = 'Proxy port using your Bright Data account';
-    }
-    return <Tooltip tooltip={t(tip)}>{t(val)}</Tooltip>;
+    let nw = ext_proxy ? 'ext' : 'brd';
+    let {label, desc} = networks.find(n=>n.value==nw)||{};
+    return <Tooltip tooltip={t(desc)}>{t(label||nw)}</Tooltip>;
 };
 
 class Browser_cell extends Pure_component {
@@ -291,7 +287,7 @@ const columns = [
     },
     {
         id: 'proxy_type',
-        accessor: 'proxy.ext_proxy',
+        accessor: 'proxy.ext_proxies',
         title: 'Type',
         Cell: Type_cell,
         tooltip: 'Type of connected proxy - Bright Data proxy or external'

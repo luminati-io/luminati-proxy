@@ -104,13 +104,15 @@ E.clock_set = function(opt){
     _clock.setTimeout = function(){
         var r = _cst.apply(_clock, arguments);
         if (r instanceof Object) // support node ver>10
+        {
             var _timer = _clock.timers[r.id];
             r.refresh = function(){
-                _timer.callAt = _clock.now +
-                    (_timer.delay || (_clock.duringTick ? 1 : 0));
+                _timer.callAt = _clock.now
+                    +(_timer.delay || (_clock.duringTick ? 1 : 0));
                 _clock.timers[_timer.id] = _timer;
                 return r;
             };
+        }
         return r;
     };
     var _clock_restore = _clock.restore;

@@ -11,10 +11,10 @@ const E = {};
 E.code = (proxy=22225, lpm_token, hostname=document.location.hostname)=>({
     shell: `curl --proxy ${hostname}:${proxy} ${!is_local() && lpm_token ?
         `--proxy-user brd-auth-token:${lpm_token} ` : ''}`
-        +`"http://lumtest.com/myip.json"`,
+        +`"http://geo.brdtest.com/mygeo.json"`,
     node: `#!/usr/bin/env node
 require('request-promise')({
-    url: 'https://lumtest.com/myip.json',
+    url: 'https://geo.brdtest.com/mygeo.json',
     proxy: 'http://${!is_local() && lpm_token ? `brd-auth-token:${lpm_token}@`
         : ''}${hostname}:${proxy}',
     rejectUnauthorized: false
@@ -44,7 +44,7 @@ public class Example {
         TrustManager[] trust_all = new TrustManager[]{ trust_manager };
         sc.init(null, trust_all, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        URL url = new URL("https://lumtest.com/myip.json");
+        URL url = new URL("https://geo.brdtest.com/mygeo.json");
         Proxy proxy = new Proxy(Proxy.Type.HTTP,
             new InetSocketAddress("${hostname}", ${proxy}));
         URLConnection yc = url.openConnection(proxy);${!is_local() &&
@@ -76,7 +76,7 @@ class Example
             lpm_token? `
         client.Proxy.Credentials = new NetworkCredential("brd-auth-token", "${lpm_token}");` : ''};
         Console.WriteLine(client.DownloadString(
-            "https://lumtest.com/myip.json"));
+            "https://geo.brdtest.com/mygeo.json"));
     }
 }`,
     vb: `Imports System.Net
@@ -88,7 +88,7 @@ Module Example
             !is_local() && lpm_token ? `
         Client.Proxy.Credentials = New NetworkCredential("brd-auth-token", "${lpm_token}")` : ''}
         Console.WriteLine(Client.DownloadString(
-            "http://lumtest.com/myip.json"))
+            "http://geo.brdtest.com/mygeo.json"))
     End Sub
 End Module`,
     python: `#!/usr/bin/env python
@@ -105,7 +105,7 @@ if sys.version_info[0]==2:
         request.ProxyHandler({'http': 'http://${!is_local && lpm_token ?
         `brd-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
         request.HTTPSHandler(context=ctx))
-    print(opener.open('https://lumtest.com/myip.json').read())
+    print(opener.open('https://geo.brdtest.com/mygeo.json').read())
 if sys.version_info[0]==3:
     import urllib.request
     ctx = ssl.create_default_context()
@@ -114,7 +114,7 @@ if sys.version_info[0]==3:
         urllib.request.ProxyHandler({'http': 'http://${!is_local() && lpm_token
             ? `brd-auth-token:${lpm_token}@` : ''}${hostname}:${proxy}'}),
         urllib.request.HTTPSHandler(context=ctx))
-    print(opener.open('https://lumtest.com/myip.json').read())`,
+    print(opener.open('https://geo.brdtest.com/mygeo.json').read())`,
     ruby: `#!/usr/bin/ruby
 
 require 'uri'
@@ -132,7 +132,7 @@ end
 
 puts result.body`,
     php: `<?php
-    $curl = curl_init('https://lumtest.com/myip.json');
+    $curl = curl_init('https://geo.brdtest.com/mygeo.json');
     curl_setopt($curl, CURLOPT_PROXY, 'http://${hostname}:${proxy}');${!is_local() && lpm_token ? `
     curl_setopt($curl, CURLOPT_PROXYUSERPWD, 'brd-auth-token:${lpm_token}')` : ''}
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
@@ -143,7 +143,7 @@ use LWP::UserAgent;
 my $agent = LWP::UserAgent->new();
 $agent->proxy(['http', 'https'], "http://${!is_local() && lpm_token ?
     `brd-auth-token:${lpm_token}\\@` : ''}${hostname}:${proxy}");
-print $agent->get('http://lumtest.com/myip.json')->content();`,
+print $agent->get('http://geo.brdtest.com/mygeo.json')->content();`,
 });
 
 const Last_step = ()=>

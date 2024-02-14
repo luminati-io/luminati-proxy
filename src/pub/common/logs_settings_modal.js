@@ -342,11 +342,11 @@ export default class Logs_settings_modal extends Pure_component {
             {field: 'logs', value: s.logs_num, opt: {number: 1}},
             {field: remote_field, value: {}},
         ];
+        let sid = settings.findIndex(st=>st.field==remote_field);
         if (s.use_limit)
-        {
-            let sid = settings.findIndex(st=>st.field==remote_field);
             settings[sid].value = assign({}, s.remote, {type: s.cur_tab});
-        }
+        else if (this.props.settings?.type)
+            settings[sid].value = assign({}, {disable: true});
         this.props.on_save(settings);
     };
     render(){

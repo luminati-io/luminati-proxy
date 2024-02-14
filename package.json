@@ -118,7 +118,7 @@
     "js-cookie": "2.2.1",
     "styled-components": "5.3.11",
     "cli-progress": "3.10.0",
-    "lru-cache": "7.14.1"
+    "lru-cache": "10.0.1"
   },
   "description": "A configurable local proxy for brightdata.com",
   "devDependencies": {
@@ -404,6 +404,7 @@
       "src/pub2/app.js",
       "src/pub2/chrome_widgets.js",
       "src/pub2/common/api_url_modal.js",
+      "src/pub2/common/box_radio.js",
       "src/pub2/common/controls.js",
       "src/pub2/common/error_boundry.js",
       "src/pub2/common/i18n.js",
@@ -414,6 +415,7 @@
       "src/pub2/common/presets.js",
       "src/pub2/common/sidebar.js",
       "src/pub2/common/ssl_modal.js",
+      "src/pub2/common/tab_group.js",
       "src/pub2/common/toggle_on_off.js",
       "src/pub2/common/tooltip.js",
       "src/pub2/common/warnings_modal.js",
@@ -424,6 +426,7 @@
       "src/pub2/cp_ipc.js",
       "src/pub2/css/api_url_modal.less",
       "src/pub2/css/app.less",
+      "src/pub2/css/box_radio.less",
       "src/pub2/css/chrome_widgets.less",
       "src/pub2/css/common.less",
       "src/pub2/css/config.less",
@@ -440,6 +443,7 @@
       "src/pub2/css/proxy_tester.less",
       "src/pub2/css/report_bug.less",
       "src/pub2/css/settings.less",
+      "src/pub2/css/tab_group.less",
       "src/pub2/css/tooltip.less",
       "src/pub2/css/whitelist_ips.less",
       "src/pub2/css/zone_desc.less",
@@ -501,7 +505,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "a7801be7f28c755bd16279572b6d59aa"
+    "md5": "910bc4d51ce6dbc987a3adff101ff339"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -533,5 +537,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.421.780"
+  "version": "1.440.909"
 }

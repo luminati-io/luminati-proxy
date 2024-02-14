@@ -16,6 +16,7 @@ const presets = {
             session: true,
             rotate_session: true,
         },
+        proxy_add: true,
     },
     rotating: {
         title: 'Rotating (IPs)',
@@ -46,6 +47,7 @@ const presets = {
             session: true,
             rotate_session: true,
         },
+        proxy_add: true,
     },
     unblocker: {
         title: 'Automatic (Unblocker)',
@@ -106,6 +108,8 @@ const E = {
     },
     get: key=>presets[key],
     get_default: ()=>presets[default_preset],
+    proxy_add_options: Object.entries(presets).filter(([, p])=>p.proxy_add)
+        .map(([value, p])=>({value, label: p.new_title, desc: p.subtitle})),
 };
 
 export default E;

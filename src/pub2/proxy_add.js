@@ -1,38 +1,46 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import etask from '../../util/etask.js';
-import setdb from '../../util/setdb.js';
-import React from 'react';
-import $ from 'jquery';
-import classnames from 'classnames';
-import {Loader, Warnings, Code, Preset_description,
-    with_www_api} from './common.js';
-import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
-import {report_exception} from './util.js';
-import presets from './common/presets.js';
-import Pure_component from '/www/util/pub/pure_component.js';
+import React, {useMemo} from 'react';
+import styled from 'styled-components';
 import {withRouter} from 'react-router-dom';
-import prism from 'prismjs';
-import instructions from './instructions.js';
-import Tooltip from './common/tooltip.js';
-import {Textarea, Select_zone} from './common/controls.js';
+import {
+  Modal,
+  Button,
+  Layout,
+  Typography,
+  CodeBlock,
+} from 'uikit';
+import Pure_component from '/www/util/pub/pure_component.js';
+import etask from '../../util/etask.js';
+import presets from './common/presets.js';
+import {Textarea, Select_zone_new} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
-import {Modal} from './common/modals.js';
 import {T, t} from './common/i18n.js';
+import Box_radio from './common/box_radio.js';
+import {Back_btn} from './proxy_edit/index.js';
 import {main as Api} from './api.js';
-import {Instructions, Li} from '/www/util/pub/bullets.js';
+import {networks} from './util.js';
+import instructions from './instructions.js';
+import {Labeled_section, Labeled_controller_new, Copy_icon} from './common.js';
+import {report_exception} from './util.js';
 import './css/proxy_add.less';
 
+const {Popup} = Modal;
+
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
-    init_state = {
-        zone: '',
-        preset: 'session_long',
-        show_loader: false,
-        cur_tab: 'proxy_lum',
-        error_list: [],
-        step: 0,
-    };
-    state = Object.assign({}, this.init_state);
+    constructor(props){
+        super(props);
+        this.state = {
+            zones: null,
+            zone: '',
+            preset: 'session_long',
+            saving: false,
+            error_list: [],
+            network: 'brd',
+            parse_error: null,
+            ips_list: '',
+        };
+    }
     static getDerivedStateFromProps(props, state){
         const is_unblocker = ()=>{
             if (!state.zones)
@@ -57,9 +65,10 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             this.setState({zones});
         });
     }
+    back_func = ()=>this.props.history.push({pathname: '/overview'});
     persist = ()=>{
         const form = {};
-        if (this.state.cur_tab=='proxy_lum')
+        if (this.state.network=='brd')
         {
             form.preset = this.state.preset;
             form.zone = this.state.zone;
@@ -75,7 +84,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         return etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxy_add.Proxy_add.persist');
-                _this.setState({show_loader: false});
+                _this.setState({saving: false});
             }));
             const resp = yield Api.json.post('proxies', {proxy: form});
             if (resp.errors)
@@ -83,153 +92,199 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             return {port: resp.data.port};
         });
     };
-    save = (opt={})=>{
+    save = ()=>{
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'proxy_add.Proxy_add.save');
             }));
             this.finally(()=>{
-                _this.setState({show_loader: false});
+                _this.setState({saving: false});
                 if (resp && resp.port && !resp.errors)
                     _this.next_step();
             });
-            _this.setState({show_loader: true});
+            _this.setState({saving: true});
             const resp = yield _this.persist();
             if (resp.errors)
-            {
                 _this.setState({error_list: resp.errors});
-                $('#add_proxy_errors').modal('show');
-            }
             if (resp.port)
                 _this.setState({created_port: resp.port});
-            if (!resp.errors)
-            {
-                const proxies = yield Api.json.get('proxies_running');
-                setdb.set('head.proxies_running', proxies);
-            }
         });
     };
-    field_changed = id=>value=>this.setState({[id]: value});
-    set_tab = id=>this.setState({cur_tab: id});
-    on_hidden = ()=>this.setState(this.init_state);
-    next_step = ()=>this.setState(prev=>({step: prev.step+1}));
+    change_field = field=>value=>this.setState({[field]: value});
     render(){
         if (!this.state.proxies_running || !this.state.zones)
             return null;
-        const disabled = this.state.cur_tab=='proxy_ext'&&
+        const disabled = this.state.network=='ext'&&
             !this.state.valid_json;
-        const Footer_wrapper = <Footer
-            save_clicked={this.save}
-            disabled={disabled}
-            step={this.state.step}
-            next_step={this.next_step}
-            created_port={this.state.created_port}/>;
         const {settings: {lpm_token='', zagent, cloud_url_address}}
             = this.props;
         const hostname = zagent ? cloud_url_address : undefined;
-        return <div className="lpm">
-              <Loader show={this.state.show_loader}/>
-              <Modal id="add_new_proxy_modal" no_header no_close
-                on_hidden={this.on_hidden} footer={Footer_wrapper}
-                className="add_proxy_modal">
-                <div className="proxy_form">
-                  <Instructions>
-                    <Li>
-                      <Step curr_step={this.state.step} step={0}
-                        title={t('Network')}>
-                        <Note>
-                          <T>Select your prefered network: Bright Data or an
-                          external vendor?</T>
-                        </Note>
-                        <Nav_tabs_wrapper set_tab={this.set_tab}
-                          cur_tab={this.state.cur_tab}/>
-                        {this.state.cur_tab=='proxy_lum' &&
-                          <Lum_proxy
-                            def_zone={this.state.zones.def}
-                            created_port={this.state.created_port}
-                            zone={this.state.zone}
-                            on_field_change={this.field_changed}/>
-                        }
-                        {this.state.cur_tab=='proxy_ext' &&
-                          <Ext_proxy
-                            parse_error={this.state.parse_error}
-                            ips_list={this.state.ips_list}
-                            on_field_change={this.field_changed}
-                            zagent={zagent}/>
-                        }
-                      </Step>
-                    </Li>
-                    <Li>
-                      <Step curr_step={this.state.step} step={1}
-                        title={t('Configuration')}>
-                        <Note>
-                          <T>Using this proxy with a browser or a scraper?</T>
-                        </Note>
-                        <Nav_tabs set_tab={this.field_changed('preset')}
-                          cur_tab={this.state.preset}>
-                          <Preset_nav_tab id="session_long"/>
-                          <Preset_nav_tab id="rotating"/>
-                        </Nav_tabs>
-                        <Preview
-                          title={presets.get(this.state.preset).new_title}>
-                          <Preset_description preset={this.state.preset}/>
-                        </Preview>
-                      </Step>
-                    </Li>
-                    <Li>
-                      <Step curr_step={this.state.step} step={2}
-                        title={t('Example')}>
-                        <Created_port
-                          port={this.state.created_port}
-                          lpm_token={lpm_token.split('|')[0]}
-                          hostname={hostname}
-                        />
-                      </Step>
-                    </Li>
-                  </Instructions>
-                </div>
-              </Modal>
-              <Modal className="warnings_modal" id="add_proxy_errors"
-                title="Errors:" no_cancel_btn>
-                <Warnings warnings={this.state.error_list}/>
-              </Modal>
-            </div>;
+        const {network, preset, zone, ips_list, parse_error, error_list,
+            created_port} = this.state;
+        const error_list_body = error_list.length &&
+            <ul>{error_list.map((e, i)=><li key={`e_${i}`}>{e}</li>)}</ul>;
+        return <div className="proxy_add vbox">
+          <div className="cp_panel vbox force_cp_panel">
+            {!zagent &&
+              <div className="cp_panel_header">
+                <Back_btn click={this.back_func}/>
+                <h2 className="section_title"><T>New proxy port</T></h2>
+              </div>
+            }
+            <div className="proxy_add_form">
+              <Network
+                network={network}
+                zone={zone}
+                ips_list={ips_list}
+                change_fn={this.change_field}
+                parse_error={parse_error}
+                zagent={this.props.zagent}
+              />
+              {network=='brd' && <Configuration
+                preset={preset}
+                on_change={this.change_field('preset')}
+              />}
+              <div className='proxy_add_btn_container'>
+                <Button
+                  text="Create proxy"
+                  loadingText="Creating"
+                  onClick={this.save}
+                  disabled={disabled}
+                  loading={this.state.saving}
+                />
+              </div>
+            </div>
+          </div>
+          <Popup
+            show={!!error_list.length}
+            onOk={()=>this.setState({error_list: []})}
+            onCancel={null}
+            title="Saving error"
+            content={error_list_body}
+            shadow="sm"
+            size="md"
+          />
+          <Created_port_popup
+            port={created_port}
+            hostname={hostname}
+            lpm_token={lpm_token.split('|')[0]}
+            back={this.back_func}
+          />
+        </div>;
     }
 });
 
-const Note = ({children})=><div className="note">{children}</div>;
-
-const Step = ({title, step, curr_step, children})=>{
-    const classes = classnames('step_content', 'animated', {
-        shown: step==curr_step,
-        fadeIn: step==curr_step,
-    });
-    return <div>
-      <div className="step_title">{title}</div>
-      <div className={classes}>{children}</div>
-    </div>;
+const Created_port_popup = props=>{
+    const {port, back} = props;
+    let content = useMemo(()=><Created_port {...props}/>, [port]);
+    return <Popup
+      show={!!port}
+      onOk={back}
+      okLabel="Close and continue"
+      onCancel={null}
+      title="Proxy summary"
+      content={content}
+      shadow="sm"
+      size="lg"
+    />;
 };
 
+const Section_label = styled(Typography.Label)`
+    font-size: 18px;
+    padding-bottom: 10px;
+`;
+
+const Section_desc = styled(Typography.Paragraph)`
+    padding-bottom: 10px;
+`;
+
+const Section = ({label, desc, children})=>
+  <Layout.Box width="500px" max_width="500px">
+    <Section_label variant="lg">
+      {label}
+    </Section_label>
+    <Section_desc variant="lg_snug">
+      {desc}
+    </Section_desc>
+    {children}
+  </Layout.Box>;
+
+const Network = props=>
+  <Section label="Network" desc={`Select your prefered network:
+    Bright Data or an external vendor?`}>
+    <Box_radio
+      options={networks}
+      value={props.network}
+      on_change={props.change_fn('network')}
+    />
+    {props.network=='brd' ?
+      <Zone_select
+        zone={props.zone}
+        on_change={props.change_fn('zone')}
+      /> : <Ext_proxy
+        parse_error={props.parse_error}
+        ips_list={props.ips_list}
+        on_field_change={props.change_fn}
+        zagent={props.zagent}
+      />}
+  </Section>;
+
+const Configuration = ({preset, on_change})=>
+  <Section label="Configuration" desc={`Using this proxy with a browser
+    or a scraper?`}>
+    <Box_radio
+      options={presets.proxy_add_options}
+      value={preset}
+      on_change={on_change}
+    />
+  </Section>;
+
+const Zone_select = ({zone, on_change})=>{
+  return <>
+    <Labeled_section
+      label="Zone selection"
+      tooltip="Zone that will be used by this proxy port"
+      class_name="proxy_add_zone_select_section">
+      <Labeled_controller_new>
+          <Select_zone_new
+            val={zone}
+            preview
+            on_change_wrapper={on_change}
+          />
+      </Labeled_controller_new>
+    </Labeled_section>
+    <Zone_description zone_name={zone}/>
+  </>;
+};
+
+const Note = ({children})=><div className="note">{children}</div>;
+
+const Port_code = styled(CodeBlock)`
+    margin-top: 10px;
+`;
+
 const Created_port = ({port, hostname, lpm_token})=>{
-    const to_copy = instructions.code(port, lpm_token, hostname).shell;
-    const code = prism.highlight(to_copy, prism.languages.clike);
+    const code = instructions.code(port, lpm_token, hostname).shell;
     return <div className="howto">
       <Note>
-        <T>Congrats! You've created a new port</T>: {port}.
+        <Layout.Flex>
+          <div>
+          <T>Congrats!!! You've created a new port</T>: {port}
+          </div>
+          <Copy_icon text={port} />
+        </Layout.Flex>
       </Note>
-      <div>
-        <Note>
-          <T>Start using the port by running the following command</T>:
-        </Note>
-        <div className="well instructions_well">
-          <pre>
-            <Code>
-              <div dangerouslySetInnerHTML={{__html: code}}/>
-            </Code>
-          </pre>
-        </div>
-      </div>
+      <Note>
+        <T>Start using the port by running the following command</T>:
+      </Note>
+      <Port_code
+        copyButton
+        lineNumbers
+        header={<Typography.Label>Code overview</Typography.Label>}
+        code={code}
+        lang="shell"
+      />
     </div>;
 };
 
@@ -273,7 +328,9 @@ class Ext_proxy extends Pure_component {
         }
     };
     render(){
-        return <div className="ext_proxy">
+        return <Labeled_section
+          label="What should we collect?"
+          class_name="ext_proxy">
           <Textarea rows={6} val={this.props.ips_list}
             placeholder={t(this.placeholder)}
             on_change_wrapper={this.on_change_list}/>
@@ -281,87 +338,8 @@ class Ext_proxy extends Pure_component {
             <strong><T>Example</T>: </strong>{this.json_example}
           </div>
           <div className="json_error">{this.props.parse_error}</div>
-        </div>;
+        </Labeled_section>;
     }
 }
-
-const Lum_proxy = with_www_api(props=>{
-    const {zone, def_zone, on_field_change} = props;
-    const zone_tip = `Zone that will be used by this proxy port`;
-    return <div className="lum_proxy">
-      <Field icon_class="zone_icon" title="Zone">
-        <Select_zone val={zone} tooltip={zone_tip}
-          on_change_wrapper={on_field_change('zone')}/>
-      </Field>
-      <Preview title={zone||def_zone}>
-        <Zone_description zone_name={zone}/>
-        <a className="link" href={`${props.www_api}/cp/zones`}
-          target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
-      </Preview>
-    </div>;
-});
-
-const Preset_nav_tab = ({id, ...props})=>{
-    const preset = presets.get(id);
-    return <Nav_tab
-      title={preset.new_title}
-      id={id}
-      {...props}
-    />;
-};
-
-const Preview = ({title, children})=>{
-    return <div className="preview">
-      <div className="header">{title}</div>
-      {children}
-    </div>;
-};
-
-const Nav_tabs_wrapper = ({set_tab, cur_tab})=>
-    <Nav_tabs set_tab={set_tab} cur_tab={cur_tab}>
-      <Nav_tab title="Bright Data" id="proxy_lum"
-        tooltip="Proxy port using your Bright Data account"/>
-      <Nav_tab title="External" id="proxy_ext"
-        tooltip="Proxy port configured with external IP and credentials"/>
-    </Nav_tabs>;
-
-const Field = props=>
-    <div className="field">
-      <div className="field_header">
-        <div className={classnames('icon', props.icon_class)}/>
-        <h4>{t(props.title)}:</h4>
-      </div>
-      {props.children ||
-        <Tooltip title={t(props.tooltip)}>
-          <select onChange={e=>props.on_change(e.target.value)}
-            value={props.val}>
-            {props.options.map((o, i)=>
-              <option key={i} value={o.value}>
-                {props.i18n ? t(o.key) : o.key}
-              </option>)}
-          </select>
-        </Tooltip>
-      }
-    </div>;
-
-const Footer = props=>{
-    const btn_labels = ['Next', 'Create proxy port', 'Close'];
-    const btn_clicked = ()=>{
-        if (props.disabled)
-            return;
-        if (props.step==1)
-            return props.save_clicked();
-        if (props.step==2)
-            return $('#add_new_proxy_modal').modal('hide');
-        props.next_step();
-    };
-    const classes = classnames('btn', 'btn_lpm', 'btn_lpm_primary',
-        {disabled: props.disabled});
-    return <div className="footer">
-      <button onClick={btn_clicked} className={classes}>
-        <T>{btn_labels[props.step]}</T>
-      </button>
-    </div>;
-};
 
 export default Proxy_add;

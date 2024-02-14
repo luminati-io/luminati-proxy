@@ -12,9 +12,9 @@ import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import zurl from '../../../util/url.js';
+import {Ext_tooltip} from '../common.js';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
-import {Ext_tooltip} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
 import Toggle_on_off from './toggle_on_off.js';
@@ -374,6 +374,7 @@ export class Yes_no extends Pure_component {
           val={this.props.val}
           on_click={this.toggle_active}
           disabled={this.props.disabled}
+          class_name={this.props.class_name}
         />;
     }
 }

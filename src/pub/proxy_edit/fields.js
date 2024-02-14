@@ -95,6 +95,11 @@ export const tabs = {
                     regex manually or generate it by choosing from the offered
                     formats above the input.`,
             },
+            trigger_url_domain: {
+                label: `Apply regex only to URL domain`,
+                tooltip: `If url is http://example.com/sub/index.html then
+                    check will be performed only agains example.com`,
+            },
             status: {
                 label: `Status code (string or regexp)`,
                 tooltip: `Status code to be scanned in the response headers`,

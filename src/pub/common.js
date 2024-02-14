@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 /* eslint-disable react/display-name */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_tooltip from 'react-tooltip';
 import {Alert as RB_Alert} from 'react-bootstrap';
@@ -17,12 +17,33 @@ import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
     Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
 import {T, t, Language} from './common/i18n.js';
-import {bytes_format, report_exception} from './util.js';
+import {bytes_format, report_exception, Clipboard} from './util.js';
 import CP_ipc from './cp_ipc.js';
 
 export const www_api = 'https://brightdata.com';
 export const www_help = 'https://help.brightdata.com';
 export const lpm_faq_article = '12632549957649';
+
+export const Copy_icon = ({text})=>{
+    let tt_timeout = null;
+    const orig_tt = 'Copy to clipboard';
+    const [tt, set_tt] = useState(orig_tt);
+    const on_click = useCallback(()=>{
+        if (!Clipboard.copy(text))
+            return;
+        if (tt_timeout)
+            clearTimeout(tt_timeout);
+        tt_timeout = setTimeout(()=>set_tt(orig_tt), 3*date.ms.SEC);
+        set_tt('Copied!');
+    }, [text]);
+    useEffect(()=>()=>{
+        if (tt_timeout)
+            clearTimeout(tt_timeout);
+    }, []);
+    return <Tooltip title={t(tt)}>
+      <div className="ic_copy pointer" onClick={on_click}/>
+    </Tooltip>;
+};
 
 export const Tooltip_bytes = props=>{
     let {bytes, bytes_out, bytes_in, cost} = props;

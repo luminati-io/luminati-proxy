@@ -64,7 +64,7 @@ conf.server_default = {
     ssl: false,
     tls_lib: 'open_ssl',
     av_check: false,
-    test_url: 'http://lumtest.com/myip.json',
+    test_url: 'http://geo.brdtest.com/mygeo.json',
     proxy: 'brd.superproxy.io',
     proxy_port: 22225,
     proxy_retry: 2,

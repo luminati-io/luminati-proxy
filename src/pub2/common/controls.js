@@ -713,7 +713,8 @@ export class Select_multiple_new extends Pure_component {
     render(){
         return <React_select
           styles={this.styles}
-          className={classnames('select_multiple_new', this.props.class_name)}
+          className={classnames('select_multiple_new', this.props.class_name,
+            this.props.class_name_select)}
           isClearable
           noOptionsMessage={this.props.no_options_message}
           classNamePrefix="react_select"
@@ -738,6 +739,7 @@ export class Yes_no extends Pure_component {
           val={this.props.val}
           on_click={this.toggle_active}
           disabled={this.props.disabled}
+          class_name={this.props.class_name}
         />;
     }
 }

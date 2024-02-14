@@ -11,15 +11,22 @@ const etask = require('./etask.js');
 const zerr = require('./zerr.js');
 const file = require('./file.js');
 const date = require('./date.js');
+
 const E = exports, ef = etask.ef, assign = Object.assign, ms = date.ms;
-const KB = 1024, MB = 1024*KB;
+
+const KB = 1024, MB = 1024*KB, GB = 1024*MB, TB = 1024*GB, PB = 1024*TB;
+
+E.bytes = {KB, MB, GB, TB, PB};
+
 E.read_buf_size = 128*KB;
 E.write_buf_size = 1*MB;
+
 E.log = 1;
 let log = msg=>{
     if (E.log)
         zerr(msg);
 };
+
 let check_file = (dst, opt)=>etask(function*check_file(){
     opt = opt||{};
     if (opt.rm_rf)
@@ -29,9 +36,12 @@ let check_file = (dst, opt)=>etask(function*check_file(){
     if (opt.unlink)
         yield E.unlink(dst);
 });
+
 // xxx_e() throws, xxx() does not.
 E.open_e = (path, flags, mode)=>etask.nfn_apply(fs.open, [path, flags, mode]);
+
 E.close_e = fd=>etask.nfn_apply(fs.close, [fd]);
+
 E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
     let ret, fd = yield E.open_e(path, flags, mode);
     try { ret = yield cb(fd); }
@@ -42,6 +52,7 @@ E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
     yield E.close_e(fd);
     return ret;
 });
+
 E.write_e = (path, data, opt)=>etask(function*write_e(){
     if (typeof data == 'number')
         data = ''+data;
@@ -49,10 +60,12 @@ E.write_e = (path, data, opt)=>etask(function*write_e(){
     yield check_file(path, opt);
     yield etask.nfn_apply(fs.writeFile, [path, data, opt]);
 });
+
 E.tmp_path = file=>{
     let name = path.basename(file), dir = path.dirname(file);
     return dir+'/.'+name+'.'+(1000000*Math.random()|0)+'.tmp';
 };
+
 E.write_atomic_e = (file, data, opt)=>etask(function*write_atomic_e(){
     if (typeof data == 'number')
         data = ''+data;
@@ -68,10 +81,14 @@ E.write_atomic_e = (file, data, opt)=>etask(function*write_atomic_e(){
     }
     return true;
 });
+
 E.rename_e = (old_path, new_path)=>
     etask.nfn_apply(fs.rename, [old_path, new_path]);
+
 E.unlink_e = path=>etask.nfn_apply(fs.unlink, [path]);
+
 E.mkdir_e = (path, mode)=>etask.nfn_apply(fs.mkdir, [path, mode]);
+
 E.mkdirp_e = (p, mode)=>etask(function*mkdirp_e(){
     if (mode!==undefined && process.umask)
     {
@@ -93,11 +110,16 @@ E.mkdirp_e = (p, mode)=>etask(function*mkdirp_e(){
         }
     }
 });
+
 E.mkdirp_file_e = f=>E.mkdirp_e(path.dirname(f));
+
 E.readdir_e = path=>etask.nfn_apply(fs.readdir, [path]);
+
 E.rmdir_e = path=>etask.nfn_apply(fs.rmdir, [path]);
+
 E.rmdir_r_e = (p, opt)=>
     etask.nfn_apply(fs.rmdir, [p, assign({recursive: true}, opt)]);
+
 E.rmdirs_empty_e = (dir, base)=>etask(function*(){
     dir = path.resolve(dir);
     if (base)
@@ -121,7 +143,9 @@ E.rmdirs_empty_e = (dir, base)=>etask(function*(){
         }
     }
 });
+
 E.rmdirs_empty_file_e = (f, base)=>E.rmdirs_empty_e(path.dirname(f), base);
+
 E.fwrite_e = (fd, buf, pos, size, len)=>etask(function*fwrite_e(){
     let written, offset = 0;
     len = len||buf.length;
@@ -136,9 +160,11 @@ E.fwrite_e = (fd, buf, pos, size, len)=>etask(function*fwrite_e(){
     }
     return true;
 });
+
 // XXX vladislav: merge to fread_e
 E.fread_chunk_e = (fd, buffer, offset, length, pos)=>
     etask.nfn_apply(fs.read, [fd, buffer, offset, length, pos]);
+
 E.read_e = (path, opt)=>etask(function*read_e(){
     opt = opt||{};
     let buf_size = opt.buf_size||E.read_buf_size;
@@ -153,6 +179,7 @@ E.read_e = (path, opt)=>etask(function*read_e(){
     yield E.close_e(fd);
     return data;
 });
+
 // XXX vladislav: should be named just 'copy'?
 E.copy_e = (old_path, new_path, opt)=>etask(function*copy_e(){
     opt = opt||{};
@@ -182,6 +209,7 @@ E.copy_e = (old_path, new_path, opt)=>etask(function*copy_e(){
         yield E.unlink_e(new_path);
     }
 });
+
 E.read_line_e = path=>etask(function*read_line_e(){
     let ret;
     yield E.read_line_cb_e(path, line=>{
@@ -190,12 +218,14 @@ E.read_line_e = path=>etask(function*read_line_e(){
     });
     return ret;
 });
+
 E.read_lines_e = path=>etask(function*read_lines_e(){
     let ret = (yield E.read_e(path)).split(/\r?\n/);
     if (ret[ret.length-1]==='')
         ret.pop();
     return ret;
 });
+
 E.fread_e = (fd, start, size, opt)=>etask(function*fread_e(){
     start = start||0;
     opt = opt||{};
@@ -210,6 +240,7 @@ E.fread_e = (fd, start, size, opt)=>etask(function*fread_e(){
     });
     return ret;
 });
+
 E.find_e = (dir, opt)=>etask(function*find_e(){
     opt = opt||{};
     let ret = [];
@@ -242,6 +273,7 @@ E.find_e = (dir, opt)=>etask(function*find_e(){
         ret = ret.filter(f=>match.test(f));
     return ret;
 });
+
 E.tail_e = (filename, count)=>etask(function*tail_e(){
     count = count||E.read_buf_size;
     let start = (yield E.size_e(filename))-count;
@@ -249,22 +281,30 @@ E.tail_e = (filename, count)=>etask(function*tail_e(){
         start = 0;
     return yield E.open_cb_e(filename, 'r', null, fd=>E.fread_e(fd, start));
 });
+
 E.head_e = (filename, size)=>etask(function*head_e(){
     if (size<0)
         size = 0;
     return yield E.open_cb_e(filename, 'r', null, fd=>E.fread_e(fd, 0, size));
 });
+
 E.size_e = filename=>etask(function*size_e(){
     return (yield E.stat_e(filename)).size; });
+
 E.hashsum_e = (filename, type)=>etask(function*hashsum_e(){
     let hash = crypto.createHash(type||'md5');
     yield E.read_cb_e(filename, 0, buf=>void hash.update(buf));
     return hash.digest('hex');
 });
+
 E.stat_e = path=>etask.nfn_apply(fs.stat, [path]);
+
 E.lstat_e = path=>etask.nfn_apply(fs.lstat, [path]);
+
 E.realpath_e = path=>etask.nfn_apply(fs.realpath, [path]);
+
 E.readlink_e = src=>etask.nfn_apply(fs.readlink, [src]);
+
 let hash_re = /([0-9a-fA-F]+) [ |*](.*)/;
 E.hashsum_check_e = (type, filename)=>etask(function*hashsum_check_e(){
     let base = path.dirname(filename);
@@ -280,6 +320,7 @@ E.hashsum_check_e = (type, filename)=>etask(function*hashsum_check_e(){
     }
     return true;
 });
+
 E.fread_cb_e = (fd, pos, cb)=>etask(function*fread_cb_e(){
     let res, buf = buf_pool.alloc(E.read_buf_size);
     this.finally(()=>buf_pool.free(buf));
@@ -291,8 +332,10 @@ E.fread_cb_e = (fd, pos, cb)=>etask(function*fread_cb_e(){
     }
     return true;
 });
+
 E.read_cb_e = (filename, pos, cb)=>
     E.open_cb_e(filename, 'r', null, fd=>E.fread_cb_e(fd, pos, cb));
+
 E.fread_line_cb_e = (fd, cb, opt)=>etask(function*fread_line_cb_e(){
     opt = assign({encoding: 'utf8', buf_size: E.read_buf_size}, opt);
     let read, buf = buf_pool.alloc(opt.buf_size);
@@ -313,13 +356,16 @@ E.fread_line_cb_e = (fd, cb, opt)=>etask(function*fread_line_cb_e(){
         yield cb(strbuf);
     return true;
 });
+
 E.read_line_cb_e = (filename, cb, opt)=>
     E.open_cb_e(filename, 'r', null, fd=>E.fread_line_cb_e(fd, cb, opt));
+
 E.write_lines_e = (file, data, opt)=>etask(function*write_lines_e(){
     data = Array.isArray(data) ?
         data.length ? data.join('\n')+'\n' : '' : ''+data+'\n';
     return yield E.write_e(file, data, opt);
 });
+
 E.append_e = (file, data, opt)=>etask(function*append_e(){
     if (typeof data == 'number')
         data = ''+data;
@@ -328,12 +374,15 @@ E.append_e = (file, data, opt)=>etask(function*append_e(){
     yield etask.nfn_apply(fs.appendFile, [file, data, opt]);
     return true;
 });
+
 E.rm_rf_e = path=>etask.nfn_apply(rimraf, [path]);
+
 E.touch_e = (path, d)=>E.open_cb_e(path, 'a', null, function*touch_e(fd){
     let tm = (d||Date.now())/1000;
     yield etask.nfn_apply(fs.futimes, [fd, tm, tm]);
     return true;
 });
+
 E.link_e = (src, dst, opt)=>etask(function*line_e(){
     opt = opt||{};
     src = file.normalize(src);
@@ -347,6 +396,7 @@ E.link_e = (src, dst, opt)=>etask(function*line_e(){
     }
     return true;
 });
+
 E.link_r_e = (src, dst, opt)=>etask(function*link_r_e(){
     opt = opt||{};
     src = file.normalize(src);
@@ -363,6 +413,7 @@ E.link_r_e = (src, dst, opt)=>etask(function*link_r_e(){
     }
     return true;
 });
+
 E.symlink_e = (src, dst, opt)=>etask(function*symlink_e(){
     opt = opt||{};
     if (file.is_win && !opt.force)
@@ -378,18 +429,22 @@ E.symlink_e = (src, dst, opt)=>etask(function*symlink_e(){
     yield etask.nfn_apply(fs.symlink, [target, dst]);
     return true;
 });
+
 E.mtime_e = path=>etask(function*mtime_e(){
     return +(yield E.stat_e(path)).mtime; });
+
 E.exists = path=>etask(function*exists(){
     try { yield etask.nfn_apply(fs.access, [path]); }
     catch(e){ ef(e, this); return false; }
     return true;
 });
+
 E.is_exec = path=>etask(function*is_exec(){
     try { yield etask.nfn_apply(fs.access, [path, fs.X_OK]); }
     catch(e){ ef(e, this); return false; }
     return true;
 });
+
 let false_stat = {isSymbolicLink: ()=>false, isCharacterDevice: ()=>false,
     isFile: ()=>false, isDirectory: ()=>false, isSocket: ()=>false};
 E.is_file = path=>etask(function*is_file(){
@@ -402,6 +457,7 @@ E.is_socket = path=>etask(function*is_socket(){
     return ((yield E.stat(path))||false_stat).isSocket(); });
 E.is_symlink = path=>etask(function*is_symlink(){
     return ((yield E.lstat(path))||false_stat).isSymbolicLink(); });
+
 E.write_stream = (stream, data, opt)=>etask(function*write_stream(){
     if (stream.finished)
         return;
@@ -414,6 +470,7 @@ E.write_stream = (stream, data, opt)=>etask(function*write_stream(){
     }, opt);
     return yield wait;
 });
+
 E.pipe_stream = (fd, pos, len, stream, opt)=>etask(function*pipe_stream(){
     opt = assign({buf_size: 1*MB, stream_write_timeout: 10*ms.MIN}, opt);
     let buf, close, err, cur_pos = pos, size = opt.buf_size;
@@ -462,6 +519,7 @@ E.pipe_stream = (fd, pos, len, stream, opt)=>etask(function*pipe_stream(){
         buf = null;
     }
 });
+
 let call_safe = (method, func, ret, args)=>etask(method, function*(){
     E.errno = 0;
     E.error = null;

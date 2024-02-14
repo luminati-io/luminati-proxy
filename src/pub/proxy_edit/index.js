@@ -455,7 +455,7 @@ const Index = withRouter(class Index extends Pure_component {
                 saving={this.state.saving}
                 save={()=>$('#save_port_confirmation_modal').modal()}
               />
-              <Nav_tabs_wrapper/>
+              <Nav_tabs_wrapper zagent={gs.zagent} />
             </div>
             {this.state.zones && <Main_window/>}
             <Warnings_modal id="save_proxy_errors"
@@ -519,7 +519,16 @@ const Index = withRouter(class Index extends Pure_component {
 
 const Nav_tabs_wrapper = withRouter(
 class Nav_tabs_wrapper extends Pure_component {
-    tabs = ['logs', 'target', 'rotation', 'rules', 'browser', 'general'];
+    get tabs(){
+        return [
+            'logs',
+            'target',
+            'rotation',
+            'rules',
+            ...!this.props.zagent?['browser']:[],
+            'general',
+        ];
+    }
     set_tab = id=>{
         ws.post_event('Tab Click', {tab: id});
         const port = this.props.match.params.port;

@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.421.780/luminati-proxy-manager-v1.421.780-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.440.909/luminati-proxy-manager-v1.440.909-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -248,7 +248,7 @@ Options:
       --request_stats              Enable requests statistics
                                                        [boolean] [default: true]
       --test_url                   Url for testing proxy
-                              [string] [default: "http://lumtest.com/myip.json"]
+                         [string] [default: "http://geo.brdtest.com/mygeo.json"]
       --log                        Log level        [string] [default: "notice"]
       --logs                       Number of request logs to store
                                                         [number] [default: 1000]

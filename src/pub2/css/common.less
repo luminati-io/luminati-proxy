@@ -39,6 +39,15 @@
 @color-alert-danger: #E22541;
 @color-alert-success: #0BE597;
 
+@color-base: #C7D1DC;
+@color-base-accent: #F8F9FB;
+@color-base-lightest: #FBFCFD;
+@color-base-lighter: #F2F4F7;
+@color-base-light: #E0E5EB;
+@color-base-dark: #C7D1DC;
+@color-base-darker: #A4B2C0;
+@color-base-darkest: #6E8094;
+
 @keyframes field_highlight {
     0% {
         border: 1px solid white;
@@ -571,6 +580,9 @@ input[type=url].error { border-color: @error_dark; }
     input { min-width: 0; }
     &.status { min-width: 130px; }
     &.duration { min-width: 175px; }
+}
+.clogs_limit_select {
+    width: 40%;
 }
 ul.bullets {
     padding-left: 0;
@@ -1339,6 +1351,9 @@ span.icon_link {
             height: 24px;
             width: 90px;
         }
+        .react_select__menu {
+            z-index: 999;
+        }
     }
     .table_buttons {
         display: inline-block;
@@ -1568,11 +1583,24 @@ span.icon_link {
         width: 80%;
         display: flex;
         justify-content: flex-start;
+        white-space: nowrap;
     }
     &_toggle {
         width: 20%;
         display: flex;
         justify-content: flex-end;
         column-gap: 5px;
+    }
+    .short {
+        width: 30%;
+        justify-content: flex-start;
+    }
+    .w20 {
+        width: 20%;
+        justify-content: flex-start;
+    }
+    .small {
+        width: 10%;
+        justify-content: flex-start;
     }
 }

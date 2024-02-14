@@ -1,0 +1,33 @@
+@import (reference) 'common.less';
+
+.box_radio {
+    border: 1px solid @color-base-light;
+    border-radius: 4px;
+    overflow: hidden;
+    max-height: 480px;
+    &_opt {
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        background-color: @color-white;
+        padding: 0.8em;
+        column-gap: 0.8em;
+        width: 100%;
+    }
+    &_opt:not(:last-child) {
+        border-bottom: 1px solid @color-base-light;
+    }
+    &_opt:hover, &_opt.checked {
+        background-color: @color-base-accent;
+    }
+    &_opt-text {
+        display: flex;
+        flex-direction: column;
+        row-gap: 2px;
+    }
+    &_opt.disabled {
+        cursor: not-allowed;
+        background-color: @color-base-accent;
+    }
+}

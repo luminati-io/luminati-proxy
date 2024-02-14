@@ -6,16 +6,12 @@ import $ from 'jquery';
 import {
     Modal,
     Button,
-    Layout,
-    Typography,
-    Tooltip,
-    Input,
     IconButton
 } from 'uikit';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
-import {report_exception} from './util.js';
+import {report_exception, get_form_toggle_transform} from './util.js';
 import {Select_zone_new, Pins_new} from './common/controls.js';
 import Warnings_modal from './common/warnings_modal.js';
 import Logs_settings_modal from './common/logs_settings_modal.js';
@@ -23,15 +19,13 @@ import {Back_btn} from './proxy_edit/index.js';
 import {T} from './common/i18n.js';
 import {
     Labeled_controller_new,
-    Form_controller_new,
+    Labeled_section,
     Alert,
-    Faq_button,
 } from './common.js';
 import {main as Api} from './api.js';
 import './css/settings.less';
 
 const {Popup} = Modal;
-const {Toggle} = Input;
 
 const Settings = props=>{
     const [show_alert, set_show_alert] = useState(false);
@@ -55,10 +49,12 @@ const Settings = props=>{
     }, [settings_changed, show_confirm]);
     return <div className="settings vbox">
       <div className="cp_panel vbox force_cp_panel">
-        <div className="cp_panel_header">
-          {!props.zagent && <Back_btn click={back_func}/>}
-          <h2 className="section_title"><T>General settings</T></h2>
-        </div>
+        {!props.zagent &&
+          <div className="cp_panel_header">
+            <Back_btn click={back_func}/>
+            <h2 className="section_title"><T>General settings</T></h2>
+          </div>
+        }
         <Form show_alert={set_show_alert}
           settings_changed={set_settings_changed}/>
       </div>
@@ -100,6 +96,7 @@ const tooltips = {
     request_stats: `Enable saving statistics to database`,
     logs: `Specify how many requests you want to keep in database. The
         limit may be set as a number or maximum database size.`,
+    logs_settings: `Limit is 1000`,
     har_limit: `Define the limit for the size of the response body to save in
         the logs`,
     debug: `Default value for Bright Data request details like response
@@ -134,14 +131,7 @@ let har_limit_options = [
     {value: 0, label: 'Unlimited'},
 ];
 
-class Form_toggle_transform {
-    constructor(in_fn, out_fn){
-        this.in_fn = in_fn || _.noop;
-        this.out_fn = out_fn || _.noop;
-    }
-    in = v=>this.in_fn(v);
-    out = v=>this.out_fn(v);
-}
+const debug_values = ['none', 'full'];
 
 class Form extends Pure_component {
     constructor(props){
@@ -151,18 +141,13 @@ class Form extends Pure_component {
             form: {},
             pending_settings: {},
             show_save_settings_modal: false,
+            show_logs_settings_modal: false,
         };
         this.logs_metric_opts = [
             {key: 'requests', value: 'requests'},
             {key: 'megabytes', value: 'megabytes'},
         ];
         this.log_level_opts = ['error', 'warn', 'notice', 'info', 'debug'];
-        this.toggle_transform = new Form_toggle_transform(v=>v=='full',
-            v=>v ? 'full' : 'none');
-        this.default_yes_no_select_opts = [
-            {key: 'No', value: 'none'},
-            {key: 'Yes', value: 'full'}
-        ];
     }
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
@@ -290,7 +275,8 @@ class Form extends Pure_component {
             }
         });
     };
-    open_logs_settings_modal = ()=>$('#logs_settings_modal').modal('show');
+    ch_logs_settings_modal = val=>()=>
+        this.setState({show_logs_settings_modal: val});
     debounced_save = _.debounce(this.save, 500);
     set_show_save_settings_modal = (val=true)=>
         this.setState({show_save_settings_modal: val});
@@ -307,7 +293,7 @@ class Form extends Pure_component {
               aria-label="Icon Button"
               icon="Settings"
               noBackColor
-              onClick={this.open_logs_settings_modal}
+              onClick={this.ch_logs_settings_modal(true)}
               size="xs"
               tooltip="Logs settings"
               variant="icon"
@@ -319,13 +305,15 @@ class Form extends Pure_component {
           />
           {this.logs_enabled() &&
               <Logs_settings_modal
-                  tooltip={tooltips.logs}
+                  tooltip={tooltips.logs_settings}
                   logs_data={logs_data}
                   logs_disabled_num={logs_data[0]||0}
                   logs_enabled_num={logs_data[1]||1000}
                   settings={s.logs_settings}
                   on_save={this.on_multi_change_handler}
                   remote_enabled={this.remote_logs_enabled()}
+                  show={this.state.show_logs_settings_modal}
+                  on_hide={this.ch_logs_settings_modal(false)}
               />
           }
           <Labeled_section label="Presets configuration">
@@ -400,7 +388,7 @@ class Form extends Pure_component {
             faq={{anchor: 'request_details'}}
             tooltip={tooltips.debug}
             type="toggle"
-            toggle_transform={this.toggle_transform}
+            toggle_transform={get_form_toggle_transform(debug_values)}
             on_change_wrapper={this.on_change_handler('debug')}
             val={s.debug}
           />
@@ -408,7 +396,7 @@ class Form extends Pure_component {
             label="Default LPM auth. header"
             tooltip={tooltips.lpm_auth}
             type="toggle"
-            toggle_transform={this.toggle_transform}
+            toggle_transform={get_form_toggle_transform(debug_values)}
             on_change_wrapper={this.on_change_handler('lpm_auth')}
             val={s.lpm_auth}
           />
@@ -471,37 +459,3 @@ class Form extends Pure_component {
         </div>;
     }
 }
-
-const Labeled_section = props=>{
-    const is_toggle = props.type=='toggle';
-    const typed = props.type && !is_toggle;
-    const {label, tooltip, val, default: def, on_change_wrapper, faq,
-        disabled, children, note, toggle_transform} = props;
-    const toggle_on_change = toggle_state=>{
-        if (toggle_transform instanceof Form_toggle_transform)
-            toggle_state = toggle_transform.out(toggle_state);
-        on_change_wrapper(toggle_state);
-    };
-    const toggle_val = toggle_transform instanceof Form_toggle_transform ?
-        toggle_transform.in(val) : val!=undefined ? !!val : !!def;
-    return <Layout.Box width="500px" max_width="500px">
-      <div className='labeled_section'>
-        <div className='labeled_section_label'>
-          <Typography.Label variant="lg">
-            <Tooltip tooltip={tooltip}>{label}</Tooltip>
-          </Typography.Label>
-          {faq && <Faq_button article={faq.article} anchor={faq.anchor}/>}
-        </div>
-        {is_toggle && <div className='labeled_section_toggle'>
-          {note||null}
-          <Toggle
-            value={toggle_val}
-            disabled={disabled}
-            onChange={toggle_on_change}
-          />
-        </div>}
-      </div>
-      {typed && <Form_controller_new {...props} />}
-      {!is_toggle && !typed && children}
-    </Layout.Box>;
-};

@@ -372,7 +372,8 @@ class Page extends Pure_component {
 }
 
 const Validator = ({zagent})=>{
-    if (zagent && !in_cp())
+    // eslint-disable-next-line
+    if (!ENV_DEV && zagent && !in_cp())
         throw 'cp_required';
     return <React.Fragment></React.Fragment>;
 };

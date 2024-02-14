@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.440.909",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add apply regex only to target domain option for URL triggered rules"
+            },
+            {
+                "type": "star",
+                "text": "Change test domain from lumtest.com to geo.brdtest.com"
+            },
+            {
+                "type": "star",
+                "text": "Add tooltip for the HAR viewer icon buttons"
+            }
+        ]
+    },
+    {
         "ver": "1.421.780",
         "type": "stable",
         "changes": [

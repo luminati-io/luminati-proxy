@@ -5,7 +5,7 @@ import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Loader, Warnings, Code, Preset_description,
+import {Loader, Warnings, Code, Preset_description, Copy_icon,
     with_www_api} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {report_exception} from './util.js';
@@ -216,7 +216,12 @@ const Created_port = ({port, hostname, lpm_token})=>{
     const code = prism.highlight(to_copy, prism.languages.clike);
     return <div className="howto">
       <Note>
-        <T>Congrats! You've created a new port</T>: {port}.
+        <div className="created_port_number">
+          <div>
+          <T>Congrats!!! You've created a new port</T>: {port}
+          </div>
+          <Copy_icon text={port} />
+        </div>
       </Note>
       <div>
         <Note>
