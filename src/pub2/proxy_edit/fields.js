@@ -76,6 +76,12 @@ export const tabs = {
                     manually or generate it by choosing from the offered
                     formats above the input`,
             },
+            min_conn_time: {
+                label: 'Connection time more than',
+                placeholder: '2000',
+                tooltip: `Any request connection time above the given value
+                    (in milliseconds) will trigger the action`,
+            },
             min_req_time: {
                 label: 'Request time more than',
                 placeholder: '500',

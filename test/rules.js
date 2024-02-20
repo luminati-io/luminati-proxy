@@ -597,6 +597,37 @@ describe('rules', ()=>{
             assert.ok(called);
             assert.equal(r, 'switched');
         }));
+        it('connection timeout', ()=>etask(function*(){
+            l = yield lum({rules: [
+                {action_type: 'retry', min_conn_time: 1,
+                trigger_type: 'min_conn_time', action: {}}
+            ]});
+            l.on('retry', opt=>{
+                // XXX: this.continue is not working here
+                this.return();
+            });
+            sinon.stub(l.rules, 'can_retry').returns(true);
+            // host which is unabled to connect
+            yield l.test('http://127.0.0.1:3000');
+            yield this.wait();
+        }));
+        it('connection timeout trigger suspended', ()=>etask(function*(){
+            l = yield lum({rules: [
+                {action_type: 'retry', min_conn_time: 100000,
+                trigger_type: 'min_conn_time', action: {}}
+            ]});
+            let called;
+            const handle_proxy_resp_org = l.handle_proxy_resp.bind(l);
+            sinon.stub(l, 'handle_proxy_resp').callsFake((...args)=>
+            _res=>{
+                let req = args[0];
+                req.min_conn_task.return();
+                req.min_conn_task = {return(){ called=true; }};
+                return handle_proxy_resp_org(...args)(_res);
+            });
+            yield l.test(ping.http.url);
+            assert.ok(called);
+        }));
     });
     describe('call post after pre', ()=>{
         const t = action=>it(action, ()=>etask(function*(){

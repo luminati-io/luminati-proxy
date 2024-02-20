@@ -77,6 +77,8 @@ const rule_prepare = (rule={})=>{
         result.status = rule.status||'';
     else if (rule.trigger_type=='body' && rule.body_regex)
         result.body = rule.body_regex;
+    else if (rule.trigger_type=='min_conn_time' && rule.min_conn_time)
+        result.min_conn_time = rule.min_conn_time;
     else if (rule.trigger_type=='min_req_time' && rule.min_req_time)
         result.min_req_time = rule.min_req_time;
     else if (rule.trigger_type=='max_req_time' && rule.max_req_time)
@@ -99,6 +101,7 @@ export const map_rule_to_form = rule=>{
     result.trigger_url_domain = rule.domain;
     result.trigger_type = rule.trigger_type;
     result.body_regex = rule.body;
+    result.min_conn_time = rule.min_conn_time;
     result.min_req_time = rule.min_req_time;
     result.max_req_time = rule.max_req_time;
     result.action = rule.action_type;
@@ -656,6 +659,8 @@ class Trigger extends Pure_component {
             set_rule_field('status', '');
         if (val!='body')
             set_rule_field('body_regex', '');
+        if (val!='min_conn_time')
+            set_rule_field('min_conn_time', '');
         if (val!='min_req_time')
             set_rule_field('min_req_time', '');
         if (val!='max_req_time')
@@ -692,6 +697,11 @@ class Trigger extends Pure_component {
               <Rule_config id="body_regex" type="regex_text" rule={rule}
                 field_row_inner_style={{paddingBottom: '1em'}}
                 style={{borderRadius: '4px'}}/>
+            }
+            {rule.trigger_type=='min_conn_time' &&
+              <Rule_config id="min_conn_time" type="select_number"
+                data={[0, 2000, 3000, 5000, 10000]}
+                sufix="milliseconds" rule={rule}/>
             }
             {rule.trigger_type=='min_req_time' &&
               <Rule_config id="min_req_time" type="select_number"

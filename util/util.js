@@ -687,6 +687,7 @@ E.stub_wrapper = fn=>{
     wrapper.fn = fn;
     wrapper.stub = (sb, ...args)=>sb.stub(wrapper, 'fn', ...args);
     wrapper.spy = (sb, ...args)=>sb.spy(wrapper, 'fn', ...args);
+    wrapper.restore = ()=>wrapper.fn.restore();
     return wrapper;
 };
 

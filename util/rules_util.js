@@ -31,6 +31,9 @@ E.trigger_types = [
     ...E.no_ssl_trigger_types,
     {key: 'Response body', value: 'body', tooltip: `Trigger will be
         pulled when the response body contain the selected string`},
+    {key: 'Connection time more than', value: 'min_conn_time',
+        tooltip: 'Triggers when the connection time is above'+
+            'the selected value', type: 'pre'},
     {key: 'Request time more than', value: 'min_req_time',
         tooltip: `Triggers when the request time is above the selected value`,
         type: 'pre'},
@@ -110,6 +113,11 @@ E.migrate_trigger = rule=>{
     if (t=='pre' && rule.min_req_time)
     {
         body = `opt.timeout = ${rule.min_req_time};\n`;
+        type = 'timeout';
+    }
+    else if (t=='pre' && rule.min_conn_time)
+    {
+        body = `opt.timeout = ${rule.min_conn_time};\n`;
         type = 'timeout';
     }
     else if (t=='post' && rule.status)

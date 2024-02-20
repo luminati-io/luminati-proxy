@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.442.838 Stable
+- :star: Add new rule trigger -- Connection timeout
+
 ## 1.440.909 Stable
 - :star: Add apply regex only to target domain option for URL triggered rules
 - :star: Change test domain from lumtest.com to geo.brdtest.com

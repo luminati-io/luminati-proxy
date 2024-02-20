@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.442.838",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add new rule trigger -- Connection timeout"
+            }
+        ]
+    },
+    {
         "ver": "1.440.909",
         "type": "stable",
         "changes": [
