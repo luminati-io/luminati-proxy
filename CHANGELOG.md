@@ -1,6 +1,6 @@
 Proxy manager - Change Log
 
-## 1.443.353 Stable
+## 1.443.428 Stable
 - :bug: Fix "add new port" modal unable to click next when overflow
 
 ## 1.442.838 Stable

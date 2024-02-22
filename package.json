@@ -537,5 +537,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.443.353"
+  "version": "1.443.428"
 }
