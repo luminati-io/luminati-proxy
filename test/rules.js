@@ -606,7 +606,6 @@ describe('rules', ()=>{
                 // XXX: this.continue is not working here
                 this.return();
             });
-            sinon.stub(l.rules, 'can_retry').returns(true);
             // host which is unabled to connect
             yield l.test('http://127.0.0.1:3000');
             yield this.wait();

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.443.353",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix \"add new port\" modal unable to click next when overflow"
+            }
+        ]
+    },
+    {
         "ver": "1.442.838",
         "type": "stable",
         "changes": [

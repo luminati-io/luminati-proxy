@@ -1040,6 +1040,7 @@ class Uws2_impl extends EventEmitter {
         const ws_handler = {
             idleTimeout: Math.min(ws_opt.srv_timeout, 960),
             maxPayloadLength: ws_opt.maxPayloadLength||1024*1024*100,
+            maxBackpressure: 0,
             upgrade: (res, req, context)=>{
                 let req_aborted = {aborted: false};
                 res.onAborted(()=>{ req_aborted.aborted = true; });
@@ -1047,14 +1048,9 @@ class Uws2_impl extends EventEmitter {
                 const emitter = new EventEmitter();
                 emitter.on('error', (...args)=>
                     _handlers.onerror && _handlers.onerror(...args));
-                const headers = {
-                    origin: req.getHeader('origin')||undefined,
-                    'x-real-ip': req.getHeader('x-real-ip'),
-                    'x-forwarded-for': req.getHeader('x-forwarded-for'),
-                    'user-agent': req.getHeader('user-agent'),
-                    'client-no-mask-support':
-                        req.getHeader('client-no-mask-support'),
-                };
+                const headers = {};
+                // XXX igors: do we need to filter by allowed headers ?
+                req.forEach((key, value)=>headers[key] = value);
                 if (!this.verify(res, headers))
                     return;
                 const user_data = {
@@ -1205,6 +1201,69 @@ class Server_uws2 {
         // ensure the metric exists, even if 0
         if (this.zc)
             this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
+    }
+    add_handler(opt, pattern, handler){
+        let def_res = {
+            json(obj){
+                this.writeStatus('200').writeHeader('Content-Type',
+                    'application/json');
+                this.end(JSON.stringify(obj));
+            },
+            uncaught(url, e){
+                let err = zerr.e2s(e);
+                zerr.notice(`${url} uncaught ${err}`);
+                this.writeStatus('502').end(err);
+            },
+        };
+        let param_count = 0;
+        // XXX igors: find the better way to find parameters amount
+        if (typeof pattern=='string')
+            param_count = pattern.split(':').length-1;
+        this.ws_server.server[opt](pattern, (res, req)=>{
+            let active_et;
+            res.onAborted(()=>{
+                zerr.notice(`${opt.toUpperCase()} ${pattern} aborted`);
+                if (active_et)
+                    active_et.return();
+            });
+            let url = `${opt.toUpperCase()} ${req.getUrl()}${req.getQuery()}`;
+            return active_et = etask(function*(){
+                try {
+                    assign(res, def_res);
+                    let len = req.getHeader('content-length');
+                    let ctype = req.getHeader('content-type');
+                    // need to clone parameters, otherwise they will be
+                    // unaccessible
+                    req.query = zurl.qs_parse(req.getQuery()||'');
+                    if (param_count)
+                    {
+                        req.params = new Array(param_count);
+                        for (let p = 0; p<param_count; p++)
+                            req.params[p] = req.getParameter(p);
+                    }
+                    if (len)
+                    {
+                        let body = [], wait_body = etask.wait(20*SEC);
+                        res.onData((ch, is_last)=>{
+                            body.push(Buffer.from(Buffer.from(ch)));
+                            if (is_last)
+                                wait_body.return(Buffer.concat(body));
+                        });
+                        let obj_body = yield wait_body;
+                        if (ctype=='application/json')
+                            req.body = JSON.parse(String(obj_body));
+                        else if (ctype=='text/html')
+                            req.body = String(obj_body);
+                        else
+                            req.body = obj_body;
+                    }
+                    yield handler(res, req);
+                } catch(e){
+                    res.uncaught(url, e);
+                }
+            });
+        });
+        return this;
     }
     toString(){ return this.label ? `${this.label} WS server` : 'WS server'; }
     // XXX igors: check if it breaks anything since uws2 doesnt have upgrade
