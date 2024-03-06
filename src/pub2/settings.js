@@ -400,16 +400,15 @@ class Form extends Pure_component {
             on_change_wrapper={this.on_change_handler('lpm_auth')}
             val={s.lpm_auth}
           />
-          <Labeled_section
+          {!s.zagent && <Labeled_section
             val={s.log}
             type="select"
             faq={{article: '13596408374417', anchor: 'gathering_logs'}}
             on_change_wrapper={this.on_change_handler('log')}
             data={this.log_level_opts}
             label="Log level / API logs"
-            disabled={s.zagent}
             tooltip={tooltips.log_level}
-          />
+          />}
           <Labeled_section
             label="Sync configuration"
             faq={{anchor: 'sync_configuration'}}

@@ -27,7 +27,7 @@ let log = msg=>{
         zerr(msg);
 };
 
-let check_file = (dst, opt)=>etask(function*check_file(){
+let check_file = (dst, opt)=>etask(function*_check_file(){
     opt = opt||{};
     if (opt.rm_rf)
         yield E.rm_rf(dst);
@@ -546,6 +546,7 @@ for (let m in err_retval)
         return call_safe(m, E[m+'_e'], err_retval[m], arguments); };
 }
 
+E.concurrent_write_max_size = 256*MB;
 E.Concurrent_file_writer = etask._class(class Concurrent_file_writer {
     constructor(file, append_opt){
         this.file = file;
@@ -566,12 +567,23 @@ E.Concurrent_file_writer = etask._class(class Concurrent_file_writer {
             if (_this.buffer.length)
                 _this._write();
         });
-        let curr = _this.buffer;
+        let curr_buffer = _this.buffer;
         _this.buffer = [];
         try {
-            yield E.append_e(_this.file, curr.map(el=>el.data).join(''),
-                _this.append_opt);
-            curr.forEach(el=>el.et.return());
-        } catch(e){ curr.forEach(el=>el.et.throw(e)); }
+            let str = '';
+            for (let entry of curr_buffer)
+            {
+                if (str.length + entry.data.length >=
+                    E.concurrent_write_max_size)
+                {
+                    yield E.append_e(_this.file, str, _this.append_opt);
+                    str = '';
+                }
+                str += entry.data;
+            }
+            if (str.length)
+                yield E.append_e(_this.file, str, _this.append_opt);
+            curr_buffer.forEach(el=>el.et.return());
+        } catch(e){ curr_buffer.forEach(el=>el.et.throw(e)); }
     }
 });

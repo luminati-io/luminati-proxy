@@ -950,4 +950,19 @@ E.to_unix_secs = function(v){
     return Math.floor(+date_get(v)/E.ms.SEC);
 };
 
+// Calculates the date by incrementing the date while skipping over
+// Saturdays and Sundays.
+// This function does not skip holidays.
+E.add_business_days = function(from, bdays){
+    var res = date_get(from);
+    var count = 0;
+    while (count < bdays)
+    {
+        res.setDate(res.getDate() + 1);
+        if (![0, 6].includes(res.getDay()))
+            count++;
+    }
+    return res;
+};
+
 return E; }); }());

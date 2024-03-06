@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.446.170",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix datadog logs integration (upgraded ingestion endpoint)"
+            }
+        ]
+    },
+    {
         "ver": "1.443.428",
         "type": "stable",
         "changes": [

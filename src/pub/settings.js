@@ -349,16 +349,15 @@ class Form extends Pure_component {
             label="Default LPM auth. header"
             tooltip={tooltips.lpm_auth}
           />
-          <Labeled_controller
+          {!s.zagent && <Labeled_controller
             val={s.log}
             type="select"
             on_change_wrapper={this.on_change_handler('log')}
             data={this.log_level_opts}
-            disabled={s.zagent}
             label="Log level / API logs"
             tooltip={tooltips.log_level}
             faq={{article: '13596408374417', anchor: 'gathering_logs'}}
-          />
+          />}
           <Labeled_controller
             val={s.sync_config}
             type="yes_no"

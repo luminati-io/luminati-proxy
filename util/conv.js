@@ -246,7 +246,8 @@ E.scale_vals['1000'] = E.scale_vals.si;
 E.scaled_number = function(num, opt){
     opt = opt||{};
     var sign = '', per = opt.per, scale = opt.scale;
-    var base = opt.base==1024 ? 1024 : 1000, ratio = opt.ratio||1;
+    var base = opt.c_base || (opt.base == 1024 ? 1024 : 1000);
+    var ratio = opt.ratio||1;
     var units = opt.units===undefined||opt.units;
     function _per(){ return per ? E.fmt_per(per) : ''; }
     if (num<0)

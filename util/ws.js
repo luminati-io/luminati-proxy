@@ -259,7 +259,8 @@ class WS extends EventEmitter {
         this._buffers.push(msg);
         this._send_throttle_t = this._send_throttle_t || setTimeout(()=>{
             this._send_throttle_t = undefined;
-            this.ws.send(this._buffers.get_buffer());
+            this.ws.send(this._buffers.get_buffer(), this.uws2 ? true
+                : undefined);
             this._buffers.clean();
         }, throttle_ts);
     }
@@ -1201,6 +1202,11 @@ class Server_uws2 {
         // ensure the metric exists, even if 0
         if (this.zc)
             this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
+    }
+    wait_listen(){
+        let listen = etask.wait();
+        this.ws_server.once('listening', ()=>listen.return());
+        return listen;
     }
     add_handler(opt, pattern, handler){
         let def_res = {

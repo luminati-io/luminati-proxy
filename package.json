@@ -96,7 +96,6 @@
     "winston-syslog": "2.4.4",
     "winston-logzio": "5.1.7",
     "s3-streamlogger": "1.9.0",
-    "@shelf/winston-datadog-logs-transport": "2.0.1",
     "bootstrap": "3.4.1",
     "codemirror": "5.58.2",
     "es6-shim": "0.35.5",
@@ -505,7 +504,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "850eac17b230e4387c469e2494c893a8"
+    "md5": "9b8c75d3790f19a9ed116b47c2254582"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -537,5 +536,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.443.428"
+  "version": "1.446.170"
 }

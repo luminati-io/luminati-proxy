@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.446.170 Stable
+- :bug: Fix datadog logs integration (upgraded ingestion endpoint)
+
 ## 1.443.428 Stable
 - :bug: Fix "add new port" modal unable to click next when overflow
 
