@@ -410,6 +410,11 @@ var base_list = {
     ZM: {name: 'Zambia', cn_name: '赞比亚', alpha_3: 'ZMB', adj: 'Zambian'},
     ZW: {name: 'Zimbabwe', cn_name: '津巴布韦', alpha_3: 'ZWE',
         adj: 'Zimbabwean'},
+    BV: {name: 'Bouvet Island', alpha_3: 'BVT', adj: 'Bouvet Islanders',
+        cn_name: '布维岛'},
+    HM: {name: 'Heard Island and McDonald Islands', alpha_3: 'HMD',
+        adj: 'Heard Islanders, McDonald Islanders',
+        cn_name: '赫德岛和麦克唐纳群岛'},
 };
 
 E.list = Object.fromEntries(Object.entries(base_list).map(function(e){
@@ -685,6 +690,8 @@ E.regions = {
     ZA: ['Southern Africa', 'EMEA'],
     ZM: ['Eastern Africa', 'EMEA'],
     ZW: ['Eastern Africa', 'EMEA'],
+    BV: ['Southern Africa', 'EMEA'],
+    HM: ['South America', 'AMER'],
 };
 E.region = {};
 for (var cn in E.regions)
@@ -744,7 +751,7 @@ var terr_country = {
     'NG', 'MK', 'MT', 'OM', 'PS', 'PL', 'PT', 'QA', 'RO', 'RU', 'RW', 'SH',
     'ST', 'SA', 'SM', 'SN', 'RS', 'SC', 'SL', 'SK', 'SI', 'SO', 'ZA', 'SS',
     'SD', 'SY', 'TZ', 'TG', 'TN', 'TR', 'UG', 'UA', 'AE', 'UZ', 'EH', 'YE',
-    'ZM', 'ZW', 'XK'],
+    'ZM', 'ZW', 'XK', 'BV'],
     emea_w: ['AX', 'AT', 'BE', 'DK', 'FO', 'FI', 'FR', 'DE', 'GL', 'GG', 'VA',
     'IS', 'IE', 'IM', 'JE', 'LI', 'LU', 'MC', 'NO', 'SE', 'CH', 'UK', 'GB',
     'NL'],
@@ -1618,7 +1625,7 @@ var gs1_countries_list = {
     UY: '773',
     UZ: '478',
     VE: '759',
-    VN: '893'
+    VN: '893',
 };
 
 E.iata = {

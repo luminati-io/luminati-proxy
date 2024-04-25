@@ -1,28 +1,28 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint react:true, es6:true*/
+'use strict'; /*jslint react:true, es9:true*/
 import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash4';
-import classnames from 'classnames';
 import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import React_tooltip from 'react-tooltip';
 import Pure_component from '/www/util/pub/pure_component.js';
+import {Button, Tooltip, Layout, Input, Typography} from 'uikit';
 import etask from '../../../util/etask.js';
 import {ms} from '../../../util/date.js';
 import setdb from '../../../util/setdb.js';
 import {qw} from '../../../util/string.js';
-import {Loader, Loader_small, Preset_description, Ext_tooltip,
-    Checkbox, Faq_link, Alert} from '../common.js';
+import {Loader, Preset_description, Ext_tooltip, Faq_button, Alert}
+    from '../common.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import presets from '../common/presets.js';
-import Tooltip from '../common/tooltip.js';
-import {Modal} from '../common/modals.js';
+import {Accept_save_changes_popup, Modal_base} from '../common/modals.js';
 import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
 import {report_exception, bind_all, is_local} from '../util.js';
 import ws from '../ws.js';
 import {main as Api} from '../api.js';
 import Warnings_modal from '../common/warnings_modal.js';
+import Exit_confirm_modal from '../common/exit_confirm_modal.js';
 import {Rules, map_rule_to_form} from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
@@ -33,6 +33,7 @@ import Alloc_modal from './alloc_modal.js';
 import {tabs, all_fields, tips} from './fields.js';
 import '../css/proxy_edit.less';
 
+const {Checkbox} = Input, {Flex} = Layout, {Header} = Typography;
 const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
 const redirect_timeout = 5*ms.SEC;
 
@@ -46,9 +47,16 @@ const get_mount_error_message = error=>
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {form: {}, errors: {}, show_loader: false,
-            saving: false, is_changed: false, default_form: {},
-            show_alert: false};
+        this.state = {
+            form: {},
+            errors: {},
+            show_loader: false,
+            saving: false,
+            is_changed: false,
+            default_form: {},
+            show_alert: false,
+            show_save_port_confirmation_modal: false,
+        };
         this.debounced_save = _.debounce(this.save, 500);
         this.debounced = [];
         setdb.set('head.proxy_edit.set_field', this.set_field);
@@ -417,13 +425,8 @@ const Index = withRouter(class Index extends Pure_component {
         const zone = this.state.zones.zones.find(p=>p.name==zone_name) || {};
         return zone.plan || {};
     };
-    back_func = ()=>this.props.history.push({pathname: '/overview'});
-    on_back_click = ()=>{
-        ws.post_event('Back to Overview Click',
-            {settings_changed: this.state.is_changed});
-        return this.state.is_changed ? $('#port_confirmation_modal').modal()
-            : this.back_func();
-    };
+    set_show_save_port_confirmation_modal = v=>
+        this.setState({show_save_port_confirmation_modal: v});
     render(){
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
@@ -436,24 +439,21 @@ const Index = withRouter(class Index extends Pure_component {
             this.state.zones && this.state.zones.def;
         const gs = this.state.global_settings || {};
         return <div className="proxy_edit vbox">
-          <div className="cp_panel vbox">
+          <div className="cp_panel vbox force_cp_panel">
             <Loader show={this.state.show_loader||this.state.loading}/>
             <div>
-              <Header
+              <Nav
                 zagent={gs.zagent}
                 match={this.props.match}
                 internal_name={this.state.form.internal_name}
                 is_saving={this.state.saving}
-                on_back_click={this.on_back_click}
-              />
-              <Nav
-                disabled={!!this.state.form.ext_proxies}
+                nav_disabled={!!this.state.form.ext_proxies}
                 form={this.state.form}
                 plan={curr_plan}
                 on_change_preset={this.apply_preset}
                 is_changed={this.state.is_changed}
                 saving={this.state.saving}
-                save={()=>$('#save_port_confirmation_modal').modal()}
+                on_save={()=>this.set_show_save_port_confirmation_modal(true)}
               />
               <Nav_tabs_wrapper zagent={gs.zagent} />
             </div>
@@ -483,36 +483,15 @@ const Index = withRouter(class Index extends Pure_component {
               text={get_mount_error_message(this.state.mount_error)}
             />
           }
-          <Modal
-            id="port_confirmation_modal"
-            title="Would you like to save your changes?"
-            ok_btn_title="Save"
-            click_ok={()=>{
-              let _this = this;
-              etask(function*(){
-                _this.setState({saving: true}, ()=>_this.lock_nav(true));
-                const errs = yield _this.save();
-                if (!errs)
-                    _this.back_func();
-              });
-            }}
-            cancel_clicked={this.back_func}>
-            <h4>Looks like you did not save the changes you made to port
-                &nbsp;{this.props.match.params.port}.
-                Would you like to save them?</h4>
-            {gs.sync_config && !gs.zagent && <span>
+          <Accept_save_changes_popup
+            show={this.state.show_save_port_confirmation_modal}
+            onOk={this.start_saving}
+            onCancel={()=>this.set_show_save_port_confirmation_modal(false)}
+            content={gs.sync_config && !gs.zagent && <span>
               {tips.sync_config_warn}
             </span>}
-          </Modal>
-          <Modal
-            id="save_port_confirmation_modal"
-            title="Accept save changes"
-            ok_btn_title="Yes"
-            click_ok={this.start_saving}>
-            {gs.sync_config && !gs.zagent && <span>
-              {tips.sync_config_warn}
-            </span>}
-          </Modal>
+          />;
+          <Exit_confirm_modal should_show={this.state.is_changed} />
         </div>;
     }
 });
@@ -543,41 +522,10 @@ const Nav_tabs_wrapper = withRouter(
         }
     });
 
-const Header = props=>{
-    let title = props.zagent ? 'the Cloud' : 'Proxy Manager';
-    return <T>{t=>
-        <div className="cp_panel_header">
-        {!props.zagent && <Back_btn click={props.on_back_click}/>}
-        <Port_title port={props.match.params.port}
-            name={props.internal_name} t={t}/>
-        <Loader_small saving={props.is_saving}
-            std_msg={t(`All changes saved in ${title}`)}
-            std_tooltip=
-            {t(`All changes are automatically saved to ${title}`)}/>
-        </div>
-    }</T>;
-};
-
-export class Back_btn extends Pure_component {
-    state = {lock: false};
-    componentDidMount(){
-        this.setdb_on('head.lock_navigation', lock=>
-            lock!==undefined && this.setState({lock}));
-    }
-    render(){
-        const {lock} = this.state;
-        return <div className={classnames('back_wrapper', {lock})}
-          onClick={this.props.click}>
-          <div className="cp_icon back"/>
-          <span><T>Back to overview</T></span>
-        </div>;
-    }
-}
-
 const Port_title = ({port, name, t})=>{
     if (name)
         port = port+` (${name})`;
-    return <h2>{t('Proxy on port')} {port}</h2>;
+    return <h2>{t('Proxy port')}: {port}</h2>;
 };
 
 class Open_browser_btn extends Pure_component {
@@ -592,13 +540,16 @@ class Open_browser_btn extends Pure_component {
     };
     render(){
         return <T>{t=>
-          <Tooltip title={t('Open browser configured with this port')}
+          <Tooltip tooltip={t('Open browser configured with this port')}
             placement="bottom">
-            <button className="btn btn_lpm btn_browse"
-              onClick={this.open_browser}>
-              {t('Browse')}
-              <div className="icon browse_icon"></div>
-            </button>
+            <Button
+              size="sm"
+              icon="BrowserExtension"
+              iconPlacement="right"
+              text={t('Browse')}
+              variant="secondary"
+              onClick={this.open_browser}
+            />
           </Tooltip>
         }</T>;
     }
@@ -668,23 +619,29 @@ class Nav extends Pure_component {
         const {plan} = this.state.zones.zones.find(z=>z.name==zone_name)||{};
         return (plan||{}).type=='unblocker';
     };
+    hide_preset_confirm_modal = ()=>
+        this.setState({show_preset_confirm_modal: false});
     confirm_update(cb){
         let no_confirm = localStorage.getItem('no-confirm-zone-preset');
         if (no_confirm && JSON.parse(no_confirm))
             return cb();
-        this.setState({confirm_action: cb}, ()=>$('#confirm_modal').modal());
+        this.setState({confirm_action: cb, show_preset_confirm_modal: true});
     }
     render(){
         const opts = presets.opts(this.is_unblocker(this.props.form.zone));
         const preset = this.props.form.preset;
         const is_unblocker = this.props.plan.type=='unblocker';
-        const preset_disabled = this.props.disabled;
+        const preset_disabled = this.props.nav_disabled;
         return <div className="nav">
+          <T>{t=>
+            <Port_title port={this.props.match.params.port}
+              name={this.props.internal_name} t={t}/>
+          }</T>
           <Select_zone
             val={this.props.form.zone}
             on_change_wrapper={val=>
               this.confirm_update(()=>this.update_zone(val))}
-            disabled={this.props.disabled}
+            disabled={this.props.nav_disabled}
             preview
           />
           <Field
@@ -704,17 +661,26 @@ class Nav extends Pure_component {
           {is_local() &&
             <Open_browser_btn port={this.props.form.port}/>
           }
-          <button className="btn btn_lpm btn_lpm_primary"
-            onClick={this.props.save}
-            disabled={!this.props.is_changed || this.props.saving}>
-            <T>Save changes</T>
-          </button>
-          <Confirmation_modal on_ok={this.state.confirm_action}/>
+          <T>{t=>
+            <Button
+              size="sm"
+              text={t('Save')}
+              onClick={this.props.on_save}
+              disabled={!this.props.is_changed}
+              loading={this.props.saving}
+              loadingText={t('Saving')}
+            />
+          }</T>
+          <Preset_confirmation_modal
+            on_ok={this.state.confirm_action}
+            show={this.state.show_preset_confirm_modal}
+            on_hide={this.hide_preset_confirm_modal}
+          />
         </div>;
     }
 }
 
-class Confirmation_modal extends Pure_component {
+class Preset_confirmation_modal extends Pure_component {
     constructor(props){
         super(props);
         this.state = {no_confirm: false};
@@ -724,26 +690,48 @@ class Confirmation_modal extends Pure_component {
         let no_confirm = localStorage.getItem('no-confirm-zone-preset');
         this.setState({no_confirm: !!no_confirm && JSON.parse(no_confirm)});
     }
+    get modal_header(){
+        return <T>{t=><Header color="gray_11_75">
+            {t('Confirm changing preset or zone')}
+        </Header>}</T>;
+    }
+    get content(){
+        return <T>{t=><h4>
+            {t('Changing preset or zone may reset some other options.')}
+            {t('Are you sure you want to continue?')}
+        </h4>}</T>;
+    }
+    get modal_footer(){
+        return <T>{t=>{
+            const y = t('Yes'), n = t('No');
+            return <Flex justify_content="space-between" width="100%">
+                <Checkbox label={t('Do not show this message again')}
+                    verticalAlign="middle" checked={!!this.state.no_confirm}
+                    onChange={this.toggle_dismiss}/>
+                <Flex gap="10px">
+                    <Button size="sm" text={n} variant="secondary"
+                        onClick={this.handle_dismiss} />
+                    <Button size="sm" text={y} onClick={this.handle_ok} />
+                </Flex>
+            </Flex>;
+          }}</T>;
+    }
     toggle_dismiss(){
         this.setState({no_confirm: !this.state.no_confirm});
     }
     handle_ok(){
         localStorage.setItem('no-confirm-zone-preset', this.state.no_confirm);
         this.props.on_ok();
+        this.props.on_hide();
     }
     handle_dismiss(){
         this.setState({no_confirm: false});
+        this.props.on_hide();
     }
     render(){
-        let left_item = <Checkbox text="Don't show this message again"
-            value={this.state.no_confirm} checked={!!this.state.no_confirm}
-            on_change={this.toggle_dismiss}/>;
-        return <Modal title="Confirm changing preset or zone"
-          id="confirm_modal" click_ok={this.handle_ok} ok_btn_title="Yes"
-          left_footer_item={left_item} on_hidden={this.handle_dismiss}>
-          <h4>Changing preset or zone may reset some other options. Are you
-            sure you want to continue?</h4>
-        </Modal>;
+        return <Modal_base show={this.props.show} header={this.modal_header}
+            footer={this.modal_footer} content={this.content} shadow="sm"
+            size="lg"/>;
     }
 }
 
@@ -751,20 +739,22 @@ class Confirmation_modal extends Pure_component {
 const Field = ({id, disabled, children, i18n, ext_tooltip, ...props})=>{
     const options = props.options||[];
     return <T>{t=><div className="field" data-tip data-for={id+'tip'}>
-        <React_tooltip id={id+'tip'} type="light" effect="solid"
-            place="bottom" delayHide={0} delayUpdate={300}>
-            {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
-        </React_tooltip>
-        <select value={props.value} disabled={disabled}
-            onChange={e=>props.on_change(e.target.value)}>
-        {options.map(o=>
-            <option key={o.key} value={o.value}>
-            {i18n ? t(o.key) : o.key}
-            </option>
-        )}
-        </select>
-        {props.faq && <Faq_link article={props.faq.article}
-            anchor={props.faq.anchor}/>}
+        <Flex align_items="center">
+            <React_tooltip id={id+'tip'} type="light" effect="solid"
+                place="bottom" delayHide={0} delayUpdate={300}>
+                {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
+            </React_tooltip>
+            <select value={props.value} disabled={disabled}
+                onChange={e=>props.on_change(e.target.value)}>
+            {options.map(o=>
+                <option key={o.key} value={o.value}>
+                {i18n ? t(o.key) : o.key}
+                </option>
+            )}
+            </select>
+            {props.faq && <Faq_button article={props.faq.article}
+                anchor={props.faq.anchor} size="lg"/>}
+        </Flex>
     </div>}</T>;
 };
 

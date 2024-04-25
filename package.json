@@ -49,7 +49,7 @@
     "productName": "Proxy Manager"
   },
   "dependencies": {
-    "uikit": "npm:@luminati-io/uikit@3.0.9",
+    "uikit": "npm:@luminati-io/uikit@3.5.14",
     "user-agents": "~1.0.1056",
     "colors": "1.4.0",
     "snyk": "1.1100.0",
@@ -406,6 +406,7 @@
       "src/pub2/common/box_radio.js",
       "src/pub2/common/controls.js",
       "src/pub2/common/error_boundry.js",
+      "src/pub2/common/exit_confirm_modal.js",
       "src/pub2/common/i18n.js",
       "src/pub2/common/logs_settings_modal.js",
       "src/pub2/common/modals.js",
@@ -504,7 +505,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "9b8c75d3790f19a9ed116b47c2254582"
+    "md5": "4068f419eb7c23c104d84bfbbbbe81dd"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -518,8 +519,7 @@
     "heapdump": "0.3.12",
     "sinon": "14.0.0",
     "puppeteer": "14.1.2",
-    "longjohn": "0.2.12",
-    "uws": "@luminati-io/lum-uws#10.148.0-lum.12"
+    "longjohn": "0.2.12"
   },
   "preferGlobal": true,
   "recommendedNode": ">=14.19.0",
@@ -536,5 +536,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.446.170"
+  "version": "1.456.660"
 }

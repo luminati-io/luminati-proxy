@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.456.660",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed json_requester now sending json body"
+            }
+        ]
+    },
+    {
         "ver": "1.446.170",
         "type": "stable",
         "changes": [

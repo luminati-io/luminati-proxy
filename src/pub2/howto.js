@@ -10,7 +10,6 @@ import {Code, with_www_api} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
 import Pure_component from '/www/util/pub/pure_component.js';
-import {Back_btn} from './proxy_edit/index.js';
 
 const Howto = withRouter(class Howto extends Pure_component {
     state = {};
@@ -29,7 +28,6 @@ const Howto = withRouter(class Howto extends Pure_component {
         browser: 'Integrate Proxy Manager with your browser',
         proxy_tester: 'Test Proxy Manager from here',
     };
-    back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
     render(){
         if (!this.state.settings)
             return null;
@@ -54,7 +52,6 @@ const Howto = withRouter(class Howto extends Pure_component {
         return <T>{t=><div className="howto">
             <div className="cp_panel vbox">
               <div className="cp_panel_header">
-                {!zagent && <Back_btn click={this.back_btn_click}/>}
                 <h2>{t(cur_title)}</h2>
               </div>
               <div className="panel_inner vbox">

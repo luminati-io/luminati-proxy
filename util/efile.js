@@ -118,7 +118,7 @@ E.readdir_e = path=>etask.nfn_apply(fs.readdir, [path]);
 E.rmdir_e = path=>etask.nfn_apply(fs.rmdir, [path]);
 
 E.rmdir_r_e = (p, opt)=>
-    etask.nfn_apply(fs.rmdir, [p, assign({recursive: true}, opt)]);
+    etask.nfn_apply(fs.rm, [p, assign({recursive: true}, opt)]);
 
 E.rmdirs_empty_e = (dir, base)=>etask(function*(){
     dir = path.resolve(dir);
@@ -539,7 +539,7 @@ let err_retval = {open: null, close: false, rename: false,
     hashsum: null, realpath: null, readlink: null, hashsum_check: false,
     fread_cb: false, read_cb: false, read_line_cb: false, write_lines: false,
     append: false, rm_rf: false, touch: false, link: false, link_r: false,
-    symlink: false, mtime: -1};
+    symlink: false, mtime: -1, rmdir_r: false};
 for (let m in err_retval)
 {
     E[m] = function(){

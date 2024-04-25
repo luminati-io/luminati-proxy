@@ -17,7 +17,6 @@ import {Textarea, Select_zone_new} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
 import {T, t} from './common/i18n.js';
 import Box_radio from './common/box_radio.js';
-import {Back_btn} from './proxy_edit/index.js';
 import {main as Api} from './api.js';
 import {networks} from './util.js';
 import instructions from './instructions.js';
@@ -65,7 +64,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             this.setState({zones});
         });
     }
-    back_func = ()=>this.props.history.push({pathname: '/overview'});
     persist = ()=>{
         const form = {};
         if (this.state.network=='brd')
@@ -128,7 +126,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
           <div className="cp_panel vbox force_cp_panel">
             {!zagent &&
               <div className="cp_panel_header">
-                <Back_btn click={this.back_func}/>
                 <h2 className="section_title"><T>New proxy port</T></h2>
               </div>
             }

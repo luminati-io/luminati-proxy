@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true*/
+'use strict'; /*jslint node:true es9:true*/
 const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
@@ -21,37 +21,12 @@ const BIN_IP = '/bin/ip';
 const PROC_DIR = env.PROC_DIR||'/proc';
 
 var distro_release;
-var procfs_fmt = {
-    cpu: qw`cpu user nice system idle iowait irq softirq steal guest
-        guest_nice`,
-    pstat: qw`pid tcomm state ppid pgrp sid tty_nr tty_pgrp flags min_flt
-        cmin_flt maj_flt cmaj_flt utime stime cutime cstime priority nice
-        num_threads it_real_value start_time vsize rss rsslim start_code
-        end_code start_stack esp eip pending blocked sigign sigcatch notused
-        notused notused exit_signal task_cpu rt_priority policy blkio_ticks
-        gtime cgtime start_data end_data start_brk arg_start arg_end env_start
-        env_end exit_code`,
-    filenr: qw`open unused max`,
-    diskstats: qw`major minor reads reads_merged reads_sector reads_ms writes
-        writes_merged writes_sector writes_ms io_current io_ms io_weighted_ms`,
-};
-
 let cyg_readdir = dir=>
     file.is_win ? exec.get_lines(`ls -1 ${dir}`) : file.readdir(dir);
 let cyg_read_lines = path=>
     file.is_win ? exec.get_lines(`cat ${path}`) : file.read_lines(path);
 let cyg_read = path=>file.is_win ?
     exec.get(`cat ${path}`, {out: 'stdout', stdio: 'pipe'}) : file.read(path);
-
-// XXX vadim: all procfs-related funcs should use this and not magic numbers
-function read_procfs_line(filepath, type){
-    var str;
-    if (!(str = cyg_read(filepath)))
-        return;
-    var res = {}, parts = str.split(/ +/);
-    procfs_fmt[type].forEach((name, idx)=>res[name] = parts[idx]||0);
-    return res;
-}
 
 function parse_stat(file_path){
     const ll = file.read_lines_e(file_path), data = {};
@@ -488,6 +463,30 @@ E.sockets_count = proto=>etask(function*(){
 
 E.snmp_stat = ()=>parse_stat(`${PROC_DIR}/net/snmp`);
 E.netstat = ()=>parse_stat(`${PROC_DIR}/net/netstat`);
+
+E.sockstat = ()=>{
+    let res = {};
+    file.read_lines(`${PROC_DIR}/net/sockstat`)?.forEach(s=>{
+        let [prefix, ...fields] = s.split(' ');
+        if (!prefix.endsWith(':'))
+            return;
+        prefix = prefix.slice(0, -1).toLowerCase();
+        res[prefix] = {};
+        for (let i=0; i<fields.length; i+=2)
+        {
+            let k = fields[i];
+            let v = parseInt(fields[i+1]);
+            res[prefix][k] = v;
+        }
+    });
+    let limits;
+    if (limits = file.read_line(`${PROC_DIR}/sys/net/ipv4/tcp_mem`))
+    {
+        let [low, pressure, high] = limits.split(/[ \t]+/);
+        res.limits = {low: +low, pressure: +pressure, high: +high};
+    }
+    return res;
+};
 
 E.vmstat = function(){
     var vmstat = file.read_lines_e(`${PROC_DIR}/vmstat`);

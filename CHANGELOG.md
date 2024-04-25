@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.456.660 Stable
+- :bug: Fixed json_requester now sending json body
+
 ## 1.446.170 Stable
 - :bug: Fix datadog logs integration (upgraded ingestion endpoint)
 

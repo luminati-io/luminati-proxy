@@ -1,21 +1,18 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import _ from 'lodash4';
 import $ from 'jquery';
-import {
-    Modal,
-    Button,
-    IconButton
-} from 'uikit';
+import {Button, IconButton} from 'uikit';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {report_exception, get_form_toggle_transform} from './util.js';
 import {Select_zone_new, Pins_new} from './common/controls.js';
+import {Accept_save_changes_popup} from './common/modals.js';
 import Warnings_modal from './common/warnings_modal.js';
 import Logs_settings_modal from './common/logs_settings_modal.js';
-import {Back_btn} from './proxy_edit/index.js';
+import Exit_confirm_modal from './common/exit_confirm_modal.js';
 import {T} from './common/i18n.js';
 import {
     Labeled_controller_new,
@@ -25,33 +22,13 @@ import {
 import {main as Api} from './api.js';
 import './css/settings.less';
 
-const {Popup} = Modal;
-
 const Settings = props=>{
     const [show_alert, set_show_alert] = useState(false);
-    const [show_confirm, set_show_confirm] = useState(false);
     const [settings_changed, set_settings_changed] = useState(false);
-    const [history_change, set_history_change] = useState({});
-    const back_func = ()=>props.history.push({pathname: '/overview'});
-    const confirm_ok = ()=>{
-        if (!_.isEmpty(history_change))
-            props.history.push(history_change);
-    };
-    useEffect(()=>{
-      const unblock = props.history.block(change=>{
-          if (!settings_changed || show_confirm)
-              return true;
-          set_history_change(change);
-          set_show_confirm(true);
-          return false;
-      });
-      return ()=>unblock();
-    }, [settings_changed, show_confirm]);
     return <div className="settings vbox">
       <div className="cp_panel vbox force_cp_panel">
         {!props.zagent &&
           <div className="cp_panel_header">
-            <Back_btn click={back_func}/>
             <h2 className="section_title"><T>General settings</T></h2>
           </div>
         }
@@ -66,15 +43,7 @@ const Settings = props=>{
           on_close={()=>set_show_alert(false)}
         />
       }
-      <Popup
-        show={show_confirm}
-        onOk={confirm_ok}
-        onCancel={()=>set_show_confirm(false)}
-        title="You have unsaved settings changes"
-        content={<h4>Are you sure you want to exit?</h4>}
-        shadow="sm"
-        size="md"
-      />
+      <Exit_confirm_modal should_show={settings_changed} />
     </div>;
 };
 
@@ -446,14 +415,10 @@ class Form extends Pure_component {
               loading={this.state.saving}
             />
           </div>
-          <Popup
+          <Accept_save_changes_popup
             show={this.state.show_save_settings_modal}
             onOk={this.save}
-            okLabel="Yes"
             onCancel={()=>this.set_show_save_settings_modal(false)}
-            title="Accept save changes"
-            shadow="sm"
-            size="md"
           />
         </div>;
     }

@@ -38,12 +38,7 @@ const Requester = etask._class(class Requester {
             url = this.base_url+url;
         let _this = this;
         return etask(function*(){
-            this.on('uncaught', e=>{
-                console.error('Api requester error', {url, method, _qs,
-                _headers, body, json: !!_this.json, exp_hdr}, e);
-                throw e;
-            });
-            return yield ajax({
+            const req = {
                 url,
                 method,
                 qs: _qs,
@@ -53,7 +48,17 @@ const Requester = etask._class(class Requester {
                 timeout,
                 return_headers: exp_hdr,
                 no_throw: safe,
+            };
+            this.on('uncaught', e=>{
+                console.error('Api requester error', req, e);
+                throw e;
             });
+            if (_this.json)
+            {
+                req.data = JSON.stringify(req.data);
+                req.content_type = 'application/json';
+            }
+            return yield ajax(req);
         });
     }
     *get(_this, url, opt){

@@ -235,6 +235,9 @@ class WS extends EventEmitter {
         this.bin_methods = opt.bin_methods || this.ipc && this.ipc.bin_methods;
         this.time_parse = opt.time_parse;
         this.mux = opt.mux ? new Mux(this) : undefined;
+        // XXX igors: for uws2
+        this.max_backpressure = (is_node ?
+            process.env.MAX_BACKPRESSURE : null) || 50*1024;
         if ((this.zc || this.zc_mux) && !zcounter)
             zcounter = require('./zcounter.js');
         if (zcounter)
@@ -264,6 +267,20 @@ class WS extends EventEmitter {
             this._buffers.clean();
         }, throttle_ts);
     }
+    set_delay_send(v){
+        if (!this.ws)
+            return;
+        this.ws.delay_send = v;
+    }
+    get_delay_send(){ return this.ws && this.ws.delay_send; }
+    get_pending_mux_et(init = false){
+        if (!this.ws)
+            return;
+        let res = this.ws.pending_mux_et;
+        if (!res && init)
+            res = this.ws.pending_mux_et = new Set();
+        return res;
+    }
     send(msg, opt){
         if (zerr.is.debug())
         {
@@ -289,7 +306,11 @@ class WS extends EventEmitter {
         if (opt && opt.bin_throttle)
             this._send_throttle(msg, opt.bin_throttle);
         else
+        {
             this.ws.send(msg, this.uws2 ? typeof msg!='string' : opt);
+            if (this.uws2 && this.ws.getBufferedAmount()>this.max_backpressure)
+                this.set_delay_send(1);
+        }
         if (this.zc_tx)
         {
             this._counter.inc(`${this.zc}_tx_msg`);
@@ -1074,6 +1095,19 @@ class Uws2_impl extends EventEmitter {
             },
             open: ws=>this.handlers.onconnection &&
                 this.handlers.onconnection(ws),
+            drain: ws=>etask(function*(){
+                if (!ws.pending_mux_et)
+                    return;
+                let set = ws.pending_mux_et;
+                ws.delay_send = 0;
+                for (let task of set)
+                {
+                    task.continue();
+                    yield this.wait_ext(task);
+                    if (ws.delay_send)
+                        break;
+                }
+            }),
             close: (ws, code, message)=>{
                 message = Buffer.from(message).toString();
                 if (message=='WebSocket timed out from inactivity')
@@ -1126,6 +1160,14 @@ class Uws2_impl extends EventEmitter {
             super.on(event, handler);
     }
     close(){
+        if (this._server_closed)
+            return;
+        this._server_closed = true;
+        this.server.close();
+        this.listen_socket = null;
+        this.emit('close');
+    }
+    close_listen_socket(){
         if (!this.listen_socket)
             return;
         this.lib.us_listen_socket_close(this.listen_socket);
@@ -1359,6 +1401,9 @@ class Server_uws2 {
     broadcast_zjson(data){
         if (this.connections.size)
             this.broadcast(conv.JSON_stringify(data, this.zjson_opt_send));
+    }
+    close_listen_socket(){
+        this.ws_server.close_listen_socket();
     }
     close(code, reason){
         zerr.notice(`${this}: closed`);
@@ -1906,8 +1951,9 @@ class Mux {
         let pending, zfin_pending, send_ack_timeout, send_ack_ts = 0;
         const stream = new _lib.Duplex(assign({
             read(size){},
-            write(data, encoding, cb){
-                const {buf, buf_pending} = stream.process_data(data);
+            write(data, encoding, cb, force_delay_send){
+                const {buf, buf_pending, skip_process} = stream
+                    .process_data(data, force_delay_send);
                 if (buf)
                 {
                     if (!_this.ws.send(buf, bin_throttle_opt))
@@ -1923,16 +1969,26 @@ class Mux {
                 if (!buf_pending || !buf_pending.length)
                     return void (zasync ? setImmediate(cb) : cb());
                 pending = etask(function*_mux_stream_pending(){
+                    this.on('finally', ()=>{
+                        let pending_mux_et = _this.ws.get_pending_mux_et();
+                        if (pending_mux_et)
+                            pending_mux_et.delete(this);
+                    });
                     yield this.wait();
                     pending = null;
-                    stream._write(buf_pending, encoding, cb);
+                    stream._write(buf_pending, encoding, cb, true);
                 });
                 pending.buf_size = buf_pending.length;
+                if (skip_process)
+                {
+                    let pending_mux_et = _this.ws.get_pending_mux_et(true);
+                    pending_mux_et.add(pending);
+                }
             },
             // only Buffer chuncks supported
             writev: opt.decodeStrings===false ? null : function(chunks, cb){
                 stream._write(Buffer.concat(chunks.map(item=>item.chunk)),
-                    null, cb);
+                    null, cb, true);
             },
             destroy(err, cb){ return etask(function*_mux_stream_destroy(){
                 if (stream.zdestroy)
@@ -1966,7 +2022,9 @@ class Mux {
             if (!stream.win_size_got)
                 stream.win_size = size||Infinity;
         };
-        stream.process_data = data=>{
+        stream.process_data = (data, force_delay_send)=>{
+            if (_this.ws.get_delay_send() && !force_delay_send)
+                return {buf_pending: data, skip_process: true};
             let bytes = Math.min(stream.win_size-(stream.sent-stream.ack),
                 data.length);
             if (bytes<=0)

@@ -467,7 +467,7 @@ export const Faq_button = with_www_api(props=>{
         icon="Info"
         as="a"
         href={url}
-        size="sm"
+        size={props.size||'sm'}
         target="_blank"
         tooltip="Read more"
         variant="icon"

@@ -565,23 +565,27 @@ function run(){
     }
     else if (env.ZCOUNTER_STATS_URL && env.ZCOUNTER_LUM_URL)
     {
+        let allowed_hosts = [
+            'zs-graphite-log.luminati.io',
+            'zs-graphite-log.brdtnet.com',
+        ];
         let [stats, lum] = [env.ZCOUNTER_STATS_URL, env.ZCOUNTER_LUM_URL]
             .map(x=>x.split(';').filter(url=>{
                 let host = zurl.parse(url).hostname;
-                return host=='zs-graphite-log.luminati.io' ? !+env.LXC : url;
+                return allowed_hosts.includes(host) ? !+env.LXC : url;
             }));
         stats.forEach(u=>create_client('stats', u));
         lum.forEach(u=>create_client('lum', u));
     }
     else
     {
-        let lum = ['zs-graphite.luminati.io', 'zs-graphite-log.luminati.io'];
-        let stats = ['zs-graphite-stats.luminati.io',
-            'zs-graphite-log.luminati.io'];
+        let lum = ['zs-graphite.brdtnet.com', 'zs-graphite-log.brdtnet.com'];
+        let stats = ['zs-graphite-stats.brdtnet.com',
+            'zs-graphite-log.brdtnet.com'];
         if (+env.LXC)
         {
-            lum = ['zs-graphite.luminati.io'];
-            stats = ['zs-graphite-stats.luminati.io'];
+            lum = ['zs-graphite.brdtnet.com'];
+            stats = ['zs-graphite-stats.brdtnet.com'];
         }
         lum.forEach(h=>create_client('lum', `ws://${h}:${port}`));
         stats.forEach(h=>create_client('stats', `ws://${h}:${port}`));

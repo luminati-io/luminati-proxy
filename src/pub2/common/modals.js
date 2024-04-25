@@ -3,6 +3,7 @@
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
+import {Modal as UIKitModal} from 'uikit';
 import etask from '../../../util/etask.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {T} from './i18n.js';
@@ -147,3 +148,15 @@ const Footer_default = props=>{
           }
         </div>;
 };
+
+export const Accept_save_changes_popup = props=>
+<UIKitModal.Popup
+    {...props}
+    title="Accept save changes"
+    okLabel="Yes"
+    cancelLabel="No"
+    shadow="sm"
+    size="sm"
+/>;
+
+export const Modal_base = UIKitModal.withBackdrop(UIKitModal.Base);
