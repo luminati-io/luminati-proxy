@@ -170,7 +170,7 @@ E.read_e = (path, opt)=>etask(function*read_e(){
     let buf_size = opt.buf_size||E.read_buf_size;
     let buf = buf_pool.alloc(buf_size), data = '';
     this.finally(()=>buf_pool.free(buf));
-    let res, pos = 0, fd = yield E.open_e(path, 'r+', 0o777);
+    let res, pos = 0, fd = yield E.open_e(path);
     while (res = yield E.fread_chunk_e(fd, buf, 0, buf_size, pos))
     {
         pos += res;

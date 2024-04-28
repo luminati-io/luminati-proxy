@@ -1,6 +1,6 @@
 Proxy manager - Change Log
 
-## 1.456.660 Stable
+## 1.457.521 Stable
 - :bug: Fixed json_requester now sending json body
 
 ## 1.446.170 Stable

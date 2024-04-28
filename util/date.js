@@ -954,7 +954,7 @@ E.to_unix_secs = function(v){
 // Saturdays and Sundays.
 // This function does not skip holidays.
 E.add_business_days = function(from, bdays){
-    var res = date_get(from);
+    var res = date_get(from, true);
     var count = 0;
     while (count < bdays)
     {
