@@ -61,6 +61,7 @@ const ef = etask.ef, assign = Object.assign;
 const zjson_opt_default = {func: false, date: true, re: true};
 const is_win = /^win/.test((is_node||is_rn) && process.platform);
 const is_darwin = is_node && process.platform=='darwin';
+const is_k8s = is_node && !!process.env.CLUSTER_NAME;
 const default_user_agent = is_node ? (()=>{
     const zconf = require('./config.js');
     const conf = require('./conf.js');
@@ -2319,7 +2320,7 @@ function lib(impl){
     if (impl=='ws')
         return require('ws');
     if ((impl=='uws' || impl=='uws2') && !is_win)
-        return require('uws');
+        return require(/* brd-build-deps ignore */'uws');
     zerr.zexit(`WS library ${impl} is not available`);
 }
 
@@ -2335,7 +2336,12 @@ function client_impl(opt){
 function server_impl(opt){
     if (!is_node)
         throw new Error(`WS server is not available`);
-    const impl = opt.impl || (is_win || is_darwin ? 'ws' : 'uws');
+    const impl = opt.impl || (is_win||is_darwin||is_k8s ? 'ws' : 'uws');
+    if (is_k8s && impl=='uws')
+    {
+        throw new Error('uws is not supported in base Node20 image, '
+            + 'please migrate to uws2');
+    }
     const l = lib(impl);
     // XXX mikhailpo: disabled due to SIGSEGV err
     l.server_no_mask_support = false; // l.server_no_mask_support||impl=='ws';

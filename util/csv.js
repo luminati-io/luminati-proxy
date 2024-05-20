@@ -170,7 +170,7 @@ E.escape_field = function(v, opt){
     // opt not fully supported
     if (v==null && opt && opt.null_to_empty)
         return '';
-    if (is_complex(v))
+    if (Array.isArray(v) && opt && opt.keep_arrays || is_complex(v))
         v = JSON.stringify(v);
     else
     {

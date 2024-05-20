@@ -28,13 +28,13 @@ const tls_lib_opt = [
 
 const render_zones = ['unblocker', 'serp'];
 
-const Limit_zagent_note = with_www_api(({www_api})=>{
+const Limit_zagent_note = with_www_api(({www_api, prefix='This option'})=>{
     const path = '/cp/zones/lpm';
     const href = www_api+path;
     const display_url = new URL(www_api).hostname+path;
     return <T>{t=>
       <Note>
-        <span>{t('This option is available only in the Cloud Proxy '
+        <span>{t(prefix+' is available only in the Cloud Proxy '
           +'Manager, read more on')}</span>{' '}
         <a className="link" href={href} target="_blank"
           rel="noopener noreferrer">{display_url}</a>
@@ -188,7 +188,7 @@ export default class General extends Pure_component {
                 type="select"
                 id="tls_lib"
                 disabled={!zagent}
-                note={!zagent && <Limit_zagent_note/>}
+                note={!zagent && <Limit_zagent_note prefix='Boring SSL'/>}
                 data={tls_lib_opt}
               />
             }

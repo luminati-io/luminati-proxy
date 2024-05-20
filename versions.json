@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.461.863",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed SSL analyzing when socks5"
+            }
+        ]
+    },
+    {
         "ver": "1.457.521",
         "type": "stable",
         "changes": [

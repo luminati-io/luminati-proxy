@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.461.863 Stable
+- :bug: Fixed SSL analyzing when socks5
+
 ## 1.457.521 Stable
 - :bug: Fixed json_requester now sending json body
 

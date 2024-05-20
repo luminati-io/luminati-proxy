@@ -264,11 +264,7 @@ E.is_alias_email = function(email){
 };
 
 // XXX vadimr: move to email.js:is_need_sanitize
-E.is_email_need_sanitize = function(email, cfg){
-    if (cfg && !cfg.enabled)
-        return false;
-    if (cfg && cfg.exclude_re && new RegExp(cfg.exclude_re).test(email))
-        return false;
+E.is_email_need_sanitize = function(email){
     var valid_domains = ['gmail.com', 'googlemail.com', 'protonmail.ch',
         'protonmail.com'];
     return valid_domains.indexOf(E.get_domain_email(email)) !== -1;

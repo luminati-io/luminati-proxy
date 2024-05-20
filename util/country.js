@@ -820,7 +820,7 @@ E.is_country_code = function(c){
         &&E.country_codes_lowered.includes(c.toLowerCase());
 };
 
-E.non_iso = {GB: 1, EU: 1};
+E.non_iso = {UK: 1, EU: 1};
 
 E.lum_easy_pass = {
     AR: 1,

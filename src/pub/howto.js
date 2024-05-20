@@ -121,6 +121,7 @@ class Code_instructions extends Pure_component {
                 <Lang_btn_clickable lang="python" text="Python"/>
                 <Lang_btn_clickable lang="ruby" text="Ruby"/>
                 <Lang_btn_clickable lang="perl" text="Perl"/>
+                <Lang_btn_clickable lang="nim" text="Nim"/>
               </div>
               <div className="well instructions_well">
                 <pre>

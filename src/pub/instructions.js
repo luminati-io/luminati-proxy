@@ -28,11 +28,11 @@ require('request-promise')({
 import java.io.*;
 import java.net.*;
 import java.security.cert.X509Certificate;
-import javax.net.ssl.*;${
-    !is_local() && lpm_token ?`\nimport java.util.Base64;` : ''}
+import javax.net.ssl.*;
 
 public class Example {
     public static void main(String[] args) throws Exception {
+        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
         SSLContext sc = SSLContext.getInstance("SSL");
         TrustManager trust_manager = new X509TrustManager(){
             public X509Certificate[] getAcceptedIssuers(){ return null; }
@@ -49,11 +49,15 @@ public class Example {
             new InetSocketAddress("${hostname}", ${proxy}));
         URLConnection yc = url.openConnection(proxy);${!is_local() &&
             lpm_token ? `
-        String auth = "brd-auth-token:${lpm_token}";
-        String encoded_auth = Base64.getEncoder().encodeToString(
-            auth.getBytes());
-        yc.setRequestProperty("Proxy-Authorization", "Basic "+encoded_auth);`
-            : ''}
+        Authenticator.setDefault(
+          new Authenticator() {
+              @Override
+              public PasswordAuthentication getPasswordAuthentication() {
+                  return new PasswordAuthentication("brd-auth-token",
+                  "${lpm_token}".toCharArray());
+              }
+          });
+        ` : ''}
         BufferedReader in = new BufferedReader(new InputStreamReader(
             yc.getInputStream()));
         String input_line;
@@ -144,6 +148,18 @@ my $agent = LWP::UserAgent->new();
 $agent->proxy(['http', 'https'], "http://${!is_local() && lpm_token ?
     `brd-auth-token:${lpm_token}\\@` : ''}${hostname}:${proxy}");
 print $agent->get('http://geo.brdtest.com/mygeo.json')->content();`,
+    nim: `import std/httpclient
+import std/net
+
+let myProxy = newProxy("http://${hostname}:${proxy}"${
+    !is_local() && lpm_token ? ',\n  auth="brd-auth-token:'+lpm_token+'"' : ''})
+let client = newHttpClient(
+  proxy=myProxy, sslContext=newContext(verifyMode=CVerifyNone))
+try:
+  echo client.getContent("https://geo.brdtest.com/mygeo.json")
+finally:
+  client.close()
+`
 });
 
 const Last_step = ()=>

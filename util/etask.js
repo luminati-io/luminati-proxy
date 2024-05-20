@@ -1517,7 +1517,8 @@ function etask_fn(opt, states, push_this){
     let wrap = function(){
         const _opt = assign({}, opt);
         _opt.state0_args = new Array(arg_start+arguments.length);
-        _opt.state0_args[0] = this;
+        if (push_this)
+            _opt.state0_args[0] = this;
         for (var i=0; i<arguments.length; i++)
             _opt.state0_args[arg_start+i] = arguments[i];
         if (is_gen)
