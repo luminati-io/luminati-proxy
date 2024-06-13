@@ -8,7 +8,8 @@ import {Labeled_controller, Ext_tooltip} from '../common.js';
 import {tabs} from './fields.js';
 
 export const Tab_context = React.createContext('logs');
-const mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
+const mgr_proxy_shared_fields = ['debug', 'lpm_auth',
+    'socket_inactivity_timeout'];
 
 export const Config = withRouter(class Config extends Pure_component {
     state = {disabled_fields: {}};

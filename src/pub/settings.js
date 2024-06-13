@@ -89,6 +89,8 @@ const tooltips = {
         reached`,
     bw_th_webhook_url: `URL to send webhook messages to when BW limit threshold
         is reached`,
+    socket_inactivity_timeout: 'The amount of milliseconds a socket can be'
+        +' inactive before it times out and closes',
 };
 
 for (let f in tooltips)
@@ -99,6 +101,12 @@ let har_limit_options = [
     {value: 1024, label: '1Kb (default)'},
     {value: 100*1024, label: '100Kb'},
     {value: 0, label: 'Unlimited'},
+];
+
+let socket_timeout_options = [
+  {value: 120000, label: 'Default'},
+  {value: 240000, label: '240000'},
+  {value: 480000, label: '480000'},
 ];
 
 class Form extends Pure_component {
@@ -322,6 +330,16 @@ class Form extends Pure_component {
             default tooltip={tooltips.logs}
             note={note_logs}
           />}
+          <Labeled_controller
+            val={s.socket_inactivity_timeout}
+            type="select_number"
+            on_change_wrapper={this.on_change_handler(
+                'socket_inactivity_timeout', {number: 1})}
+            data={socket_timeout_options}
+            label="Inactivity timeout"
+            default={120000}
+            tooltip={tooltips.socket_inactivity_timeout}
+          />
           <Labeled_controller
             val={s.har_limit}
             type="select_number"

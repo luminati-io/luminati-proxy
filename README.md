@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.461.863/luminati-proxy-manager-v1.461.863-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.467.451/luminati-proxy-manager-v1.467.451-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -208,7 +208,6 @@ Options:
       --lpm_auth                   x-lpm-authorization header
                                                       [string] [default: "none"]
       --const                                         [boolean] [default: false]
-      --socket_inactivity_timeout                     [number] [default: 120000]
       --multiply_ips                                  [boolean] [default: false]
       --multiply_vips                                 [boolean] [default: false]
       --max_ban_retries                                   [number] [default: 10]
@@ -288,6 +287,9 @@ Options:
       --api_parameter_limit        Controls the maximum number of parameters
                                    that are allowed in the URL-encoded data
                                                        [number] [default: 10000]
+      --socket_inactivity_timeout  The amount of time a socket can be inactive
+                                   before it times out and closes
+                                                               [default: 120000]
       --no-www                     Disable local web
       --no-config                  Working without a config file
   -d, --daemon, --start-daemon     Start as a daemon

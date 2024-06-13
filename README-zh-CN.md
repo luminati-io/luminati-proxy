@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.461.863-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.467.451-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -156,7 +156,6 @@ Options:
       --lpm_auth                   x-lpm-authorization header
                                                       [string] [default: "none"]
       --const                                         [boolean] [default: false]
-      --socket_inactivity_timeout                     [number] [default: 120000]
       --multiply_ips                                  [boolean] [default: false]
       --multiply_vips                                 [boolean] [default: false]
       --max_ban_retries                                   [number] [default: 10]
@@ -236,6 +235,9 @@ Options:
       --api_parameter_limit        Controls the maximum number of parameters
                                    that are allowed in the URL-encoded data
                                                        [number] [default: 10000]
+      --socket_inactivity_timeout  The amount of time a socket can be inactive
+                                   before it times out and closes
+                                                               [default: 120000]
       --no-www                     Disable local web
       --no-config                  Working without a config file
   -d, --daemon, --start-daemon     Start as a daemon

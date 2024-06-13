@@ -363,7 +363,12 @@ export const tabs = {
             follow_redirect: {
                 label: 'Follow redirect',
                 tooltip: 'Auto redirect requests on status code 30x',
-            }
+            },
+            socket_inactivity_timeout: {
+                label: 'Inactivity timeout',
+                tooltip: 'The amount of milliseconds a socket'
+                    +' can be inactive before it times out and closes',
+            },
         },
     },
 };

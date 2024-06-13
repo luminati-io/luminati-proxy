@@ -236,13 +236,11 @@ class WS extends EventEmitter {
         this.bin_methods = opt.bin_methods || this.ipc && this.ipc.bin_methods;
         this.time_parse = opt.time_parse;
         this.mux = opt.mux ? new Mux(this) : undefined;
-        // XXX igors: for uws2
-        this.max_backpressure = (is_node ?
-            process.env.MAX_BACKPRESSURE : null) || 50*1024;
         if ((this.zc || this.zc_mux) && !zcounter)
             zcounter = require('./zcounter.js');
         if (zcounter)
             this._counter = make_counter(opt);
+        this.max_backpressure = opt.max_backpressure;
         this._send_throttle_t = undefined;
         this._buffers = undefined;
     }
@@ -267,20 +265,6 @@ class WS extends EventEmitter {
                 : undefined);
             this._buffers.clean();
         }, throttle_ts);
-    }
-    set_delay_send(v){
-        if (!this.ws)
-            return;
-        this.ws.delay_send = v;
-    }
-    get_delay_send(){ return this.ws && this.ws.delay_send; }
-    get_pending_mux_et(init = false){
-        if (!this.ws)
-            return;
-        let res = this.ws.pending_mux_et;
-        if (!res && init)
-            res = this.ws.pending_mux_et = new Set();
-        return res;
     }
     send(msg, opt){
         if (zerr.is.debug())
@@ -307,11 +291,7 @@ class WS extends EventEmitter {
         if (opt && opt.bin_throttle)
             this._send_throttle(msg, opt.bin_throttle);
         else
-        {
             this.ws.send(msg, this.uws2 ? typeof msg!='string' : opt);
-            if (this.uws2 && this.ws.getBufferedAmount()>this.max_backpressure)
-                this.set_delay_send(1);
-        }
         if (this.zc_tx)
         {
             this._counter.inc(`${this.zc}_tx_msg`);
@@ -446,6 +426,35 @@ class WS extends EventEmitter {
             res += ')';
         return res;
     }
+    test_ping({ping_timeout, pong_last_expire, ping_cb}){
+        if (pong_last_expire && date.monotonic()-this
+            .pong_last<pong_last_expire)
+        {
+            return true;
+        }
+        if (!this._test_ping_et)
+        {
+            try { this.ws.ping(); }
+            catch(e){ return false; }
+            if (ping_cb)
+                ping_cb();
+            this._test_ping_et = etask.wait();
+        }
+        let _this = this;
+        return etask(function*(){
+            this.on('finally', ()=>{
+                if (_this._test_ping_et && !etask
+                    .is_final(_this._test_ping_et))
+                {
+                    _this._test_ping_et.return();
+                }
+                _this._test_ping_et = null;
+            });
+            this.alarm(ping_timeout, ()=>this.return(false));
+            yield this.wait_ext(_this._test_ping_et);
+            return true;
+        });
+    }
     _on_open(){
         if (this.connected)
             return;
@@ -475,13 +484,15 @@ class WS extends EventEmitter {
     }
     _on_close(event){
         this.reason = event.reason||event.code;
-        zerr.notice(`${this}: closed by remote (${this.reason})`);
+        zerr.notice('%s: closed by remote (reason=%s, event=%O)', this,
+            this.reason, zutil.omit(event, 'target'));
         this._close();
         this._check_status();
     }
     _on_error(event){
         this.reason = event.message||'Network error';
-        zerr(`${this}: ${this.reason}`);
+        zerr('%s: got error event (reason=%s, event=%O)', this, this.reason,
+            zutil.omit(event, 'target'));
         if (this.zc)
             this._counter.inc(`${this.zc}_err`);
         this._close();
@@ -620,8 +631,15 @@ class WS extends EventEmitter {
         }
         if (this.zc)
         {
+            this.pong_last = date.monotonic();
             this._counter.avg(
-                `${this.zc}_ping_ms`, date.monotonic()-this.ping_last);
+                `${this.zc}_ping_ms`, this.pong_last-this.ping_last);
+        }
+        if (this._test_ping_et)
+        {
+            if (!etask.is_final(this._test_ping_et))
+                this._test_ping_et.return();
+            this._test_ping_et = null;
         }
     }
     _ping(){
@@ -707,6 +725,9 @@ class Client extends WS {
             opt.mux = assign({}, opt.mux);
         super(opt);
         this.status = 'connecting';
+        // XXX bruno: enable also for opt.zcounter=='all' after prd validations
+        if (opt.zcounter=='disconnected')
+            this._monitor_disconnected();
         this.impl = client_impl(opt);
         this.url = url;
         this.servername = opt.servername;
@@ -750,6 +771,37 @@ class Client extends WS {
                 {'client-no-mask-support': 1});
         }
         this._connect();
+    }
+    _monitor_disconnected(){
+        let disconnected_metric = `${this.zc}_disconnected_ms`;
+        let on_status = status=>{
+            if (status=='connected')
+            {
+                if (this.monitor_disconnected_et)
+                    this.monitor_disconnected_et.return();
+                return;
+            }
+            if (this.monitor_disconnected_et)
+                return;
+            let disconnected_ts = Date.now();
+            this.monitor_disconnected_et = etask.interval(10*SEC, ()=>{
+                this._counter.set_level(disconnected_metric,
+                    Date.now()-disconnected_ts);
+            });
+            this.monitor_disconnected_et.finally(()=>{
+                this._counter.set_level(disconnected_metric, 0);
+                this.monitor_disconnected_et = null;
+            });
+        };
+        on_status(this.status);
+        this.on('status', on_status);
+        let on_destroyed = ()=>{
+            if (this.monitor_disconnected_et)
+                this.monitor_disconnected_et.return();
+            this.off('status', on_status);
+            this.off('destroyed', on_destroyed);
+        };
+        this.on('destroyed', on_destroyed);
     }
     // we don't want WS to emit 'destroyed', Client controls it by itself,
     // because it supports reconnects
@@ -1096,20 +1148,19 @@ class Uws2_impl extends EventEmitter {
             },
             open: ws=>this.handlers.onconnection &&
                 this.handlers.onconnection(ws),
-            drain: ws=>etask(function*(){
+            drain: ws=>{
                 if (!ws.pending_mux_et)
                     return;
-                let set = ws.pending_mux_et;
-                ws.delay_send = 0;
-                for (let task of set)
+                for (let task of ws.pending_mux_et)
                 {
-                    task.continue();
-                    yield this.wait_ext(task);
-                    if (ws.delay_send)
+                    if (ws.getBufferedAmount()>this.max_backpressure)
                         break;
+                    task.continue(null, true);
                 }
-            }),
+            },
             close: (ws, code, message)=>{
+                if (ws.pending_mux_et)
+                    ws.pending_mux_et = null;
                 message = Buffer.from(message).toString();
                 if (message=='WebSocket timed out from inactivity')
                 {
@@ -1232,6 +1283,8 @@ class Server_uws2 {
             onreq: opt.req_handler,
         });
         this.server_no_mask_support = false;
+        opt.max_backpressure = this.ws_server.max_backpressure = (is_node
+            ? process.env.MAX_BACKPRESSURE : null) || 50*1024;
         this.opt = opt;
         this.label = opt.label;
         this.connections = new Set();
@@ -1952,9 +2005,18 @@ class Mux {
         let pending, zfin_pending, send_ack_timeout, send_ack_ts = 0;
         const stream = new _lib.Duplex(assign({
             read(size){},
-            write(data, encoding, cb, force_delay_send){
-                const {buf, buf_pending, skip_process} = stream
-                    .process_data(data, force_delay_send);
+            write(data, encoding, cb, ignore_backpressure){
+                let ws_channel = _this.ws.ws;
+                let buf, buf_pending, continue_on_drain;
+                if (_this.ws.uws2 && ws_channel && ws_channel
+                    .getBufferedAmount()>_this.ws.max_backpressure
+                    && !ignore_backpressure)
+                {
+                    buf_pending = data;
+                    continue_on_drain = true;
+                }
+                else
+                    ({buf, buf_pending} = stream.process_data(data));
                 if (buf)
                 {
                     if (!_this.ws.send(buf, bin_throttle_opt))
@@ -1970,26 +2032,37 @@ class Mux {
                 if (!buf_pending || !buf_pending.length)
                     return void (zasync ? setImmediate(cb) : cb());
                 pending = etask(function*_mux_stream_pending(){
+                    let force_continue, this_et = this;
+                    if (continue_on_drain)
+                    {
+                        force_continue = etask(function*(){
+                            yield etask.sleep(100);
+                            this_et.continue(1, true);
+                        });
+                    }
                     this.on('finally', ()=>{
-                        let pending_mux_et = _this.ws.get_pending_mux_et();
-                        if (pending_mux_et)
-                            pending_mux_et.delete(this);
+                        if (force_continue && !etask.is_final(force_continue))
+                            force_continue.return();
+                        if (ws_channel && ws_channel.pending_mux_et)
+                            ws_channel.pending_mux_et.delete(this);
                     });
-                    yield this.wait();
+                    let _ignore_backpressure = yield this.wait();
                     pending = null;
-                    stream._write(buf_pending, encoding, cb, true);
+                    stream._write(buf_pending, encoding, cb,
+                        _ignore_backpressure);
                 });
                 pending.buf_size = buf_pending.length;
-                if (skip_process)
+                if (continue_on_drain)
                 {
-                    let pending_mux_et = _this.ws.get_pending_mux_et(true);
-                    pending_mux_et.add(pending);
+                    ws_channel.pending_mux_et = ws_channel.pending_mux_et
+                        || new Set();
+                    ws_channel.pending_mux_et.add(pending);
                 }
             },
             // only Buffer chuncks supported
             writev: opt.decodeStrings===false ? null : function(chunks, cb){
                 stream._write(Buffer.concat(chunks.map(item=>item.chunk)),
-                    null, cb, true);
+                    null, cb);
             },
             destroy(err, cb){ return etask(function*_mux_stream_destroy(){
                 if (stream.zdestroy)
@@ -2023,9 +2096,7 @@ class Mux {
             if (!stream.win_size_got)
                 stream.win_size = size||Infinity;
         };
-        stream.process_data = (data, force_delay_send)=>{
-            if (_this.ws.get_delay_send() && !force_delay_send)
-                return {buf_pending: data, skip_process: true};
+        stream.process_data = data=>{
             let bytes = Math.min(stream.win_size-(stream.sent-stream.ack),
                 data.length);
             if (bytes<=0)

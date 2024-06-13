@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.467.451",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Process bw based on x-brd-debug header"
+            },
+            {
+                "type": "star",
+                "text": "Manage socket inactivity timeout in UI settings"
+            },
+            {
+                "type": "star",
+                "text": "Update Docker image npm version to 8.6.0"
+            }
+        ]
+    },
+    {
         "ver": "1.461.863",
         "type": "stable",
         "changes": [

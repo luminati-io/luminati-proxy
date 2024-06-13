@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.467.451 Stable
+- :star: Process bw based on x-brd-debug header
+- :star: Manage socket inactivity timeout in UI settings
+- :star: Update Docker image npm version to 8.6.0
+
 ## 1.461.863 Stable
 - :bug: Fixed SSL analyzing when socks5
 

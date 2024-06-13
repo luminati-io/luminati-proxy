@@ -82,7 +82,6 @@ E.proxy_fields = {
         values: 'full|none'},
     lpm_auth: {type: 'string', desc: 'x-lpm-authorization header'},
     const: {type: 'boolean'},
-    socket_inactivity_timeout: {type: 'integer'},
     multiply_ips: {type: 'boolean'},
     multiply_vips: {type: 'boolean'},
     max_ban_retries: {type: 'integer'},
@@ -165,5 +164,7 @@ E.manager_fields = {
         type: 'string'},
     api_parameter_limit: {type: 'number', desc: 'Controls the maximum number'
         +' of parameters that are allowed in the URL-encoded data'},
+    socket_inactivity_timeout: {type: 'integer', desc: 'The amount of time a'
+        +' socket can be inactive before it times out and closes'},
 };
 return E; }); // eslint-disable-line

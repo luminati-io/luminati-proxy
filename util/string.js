@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, browser:true*//*global Map*/
+'use strict'; /*jslint node:true, browser:true*/
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
@@ -62,6 +62,9 @@ E.template = function(strings){
         return result.join('');
     };
 };
+/**
+ * @deprecated use es6_str_template instead
+ */
 E.es6_str = function(args){
     var parts = args[0], s = '';
     if (!Array.isArray(parts))
@@ -74,24 +77,37 @@ E.es6_str = function(args){
     }
     return s;
 };
+E.es6_str_template = function(parts){
+    if (!Array.isArray(parts))
+        return parts;
+    var s = parts[0];
+    for (var i = 1; i<parts.length; i++)
+        s += arguments[i] + parts[i];
+    return s;
+};
 
+var ALIGN_REGEXP = {
+    first_or_empty_line: /^\n|(?<=^|\n)[\t ]+(?=(\n|$))/g,
+    line_start_spaces: /(?<=(^|\n))[\t ]*(?=[^\t\n ])/g,
+};
 // align paragraph to the left
 E.align = function(){
-    var str = E.es6_str(arguments), lines = str.split('\n');
-    if (!lines[0])
-        lines.shift();
-    var spaces = Infinity;
-    for (var i=0; i<lines.length; i++)
+    var str = E.es6_str_template.apply(null, arguments)
+        .replace(ALIGN_REGEXP.first_or_empty_line, '');
+    var spaces = str.match(ALIGN_REGEXP.line_start_spaces);
+    if (spaces == null)
+        return str;
+    var min_length = Infinity;
+    for (var i=0; i<spaces.length; i++)
     {
-        var space = lines[i].match(/^\s*/)[0];
-        if (space.length==lines[i].length)
-            space = lines[i] = '';
-        else
-            spaces = Math.min(spaces, space.length);
+        if (spaces[i].length<min_length)
+        {
+            min_length = spaces[i].length;
+            if (!min_length)
+                return str;
+        }
     }
-    if (spaces>0 && spaces!=Infinity)
-        lines = array.sed(lines, new RegExp('^ {'+spaces+'}'), '');
-    return lines.join('\n');
+    return E.dedent(min_length)(str);
 };
 // merge lines
 E.nl2sp = function(){ return E.es6_str(arguments).replace(/\n\s*/g, ' '); };
@@ -164,7 +180,7 @@ E.count = function(s, p){
 };
 
 E.internalize_pool = typeof Map=='function' ? function(){
-    var pool = new Map();
+    var pool = new Map(); // jshint ignore:line
     return function internalize_string(str){
         var v = pool.get(str);
         if (v===undefined)
@@ -204,4 +220,31 @@ E.sp2nbsp = function(){
     return E.es6_str(arguments).replace(/ /g, '\u00A0');
 };
 
-return E; }); }());
+var INDENT_REGEXP = /(?<=^|\n)(?=[\t ]*[^\s])/g;
+E.indent = function(space_amount){
+    if (space_amount<1)
+        return E.es6_str_template;
+    var template = new Array(space_amount+1).join(' ');
+    return function(){
+        var str = E.es6_str_template.apply(null, arguments);
+        return str.replace(INDENT_REGEXP, template);
+    };
+};
+E.dedent = function(space_amount){
+    if (space_amount<1)
+        return E.es6_str_template;
+    var dedent_regexp = new RegExp('(?<=^|\n)[\\t ]{1,'+space_amount+'}', 'g');
+    return function(){
+        var str = E.es6_str_template.apply(null, arguments);
+        return str.replace(dedent_regexp, '');
+    };
+};
+
+var SDK_UUID_REGEXP = /^sdk-[a-z]*-[0-9a-f]{32}$/;
+E.is_uuid = function(str){
+    return SDK_UUID_REGEXP.test(str);
+};
+
+return E;
+});
+})();

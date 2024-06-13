@@ -24,7 +24,7 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN rm google-chrome-stable_current_amd64.deb
 
 USER root
-RUN npm install -g npm@7.19.1
+RUN npm install -g npm@8.6.0
 RUN npm config set user root
 
 # Install Proxy Manager

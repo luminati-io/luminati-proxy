@@ -557,7 +557,11 @@ E.remove_www = function(url){
 };
 
 E.is_same_domain = function(domain, urls){
+    if (typeof domain !== 'string')
+        return false;
     var hostname = E.parse(domain).hostname;
+    if (!hostname)
+        return false;
     var _domain = E.get_root_domain(hostname);
     for (var i=0; i<urls.length; i++)
     {
