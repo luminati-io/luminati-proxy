@@ -624,6 +624,7 @@ class WS extends EventEmitter {
     }
     _on_pong(){
         this.pong_received = true;
+        this.pong_last = date.monotonic();
         if (zerr.is.debug())
         {
             zerr.debug(
@@ -631,7 +632,6 @@ class WS extends EventEmitter {
         }
         if (this.zc)
         {
-            this.pong_last = date.monotonic();
             this._counter.avg(
                 `${this.zc}_ping_ms`, this.pong_last-this.ping_last);
         }

@@ -209,7 +209,7 @@ class Schema extends Pure_component {
             return null;
         let peer_country = this.get_peer_country();
         if (peer_country=='any' || peer_country=='*')
-            peer_country=null;
+            peer_country = null;
         let peer_title = peer_country ? this.get_country_name(peer_country)
             : 'Peer';
         let peer_subtitle = peer_country ? 'Peer' : 'Description line';

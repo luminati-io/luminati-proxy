@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.476.196",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add Node option to port OS targeting settings"
+            }
+        ]
+    },
+    {
         "ver": "1.467.451",
         "type": "stable",
         "changes": [

@@ -27,6 +27,7 @@ export default with_www_api(class Targeting extends Pure_component {
             {key: 'Windows', value: 'win'},
             {key: 'MacOS', value: 'mac'},
             {key: 'Android', value: 'android'},
+            {key: 'Node', value: 'node'},
         ];
         this.set_field = setdb.get('head.proxy_edit.set_field');
         this.is_valid_field = setdb.get('head.proxy_edit.is_valid_field');

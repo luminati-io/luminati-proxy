@@ -39,10 +39,10 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.467.451-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.476.196-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
-- 安装 Node.js 10.15.3版 (最好用x
+- 安装 Node.js 20.12.1版 (最好用x
   [nave](https://github.com/isaacs/nave))
 - 从终端安装 Bright Data 代理:
 ```sh

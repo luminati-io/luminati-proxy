@@ -1027,7 +1027,7 @@ class Delete_dialog extends Pure_component {
         const _this = this;
         const ports = _this.props.proxies.map(p=>p.port);
         this.etask(function*(){
-            yield yield Api.json.post('proxies/delete', {ports});
+            yield Api.json.post('proxies/delete', {ports});
             yield _this.props.update_proxies();
             _this.props.close_dialog();
         });

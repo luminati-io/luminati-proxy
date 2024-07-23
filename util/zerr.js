@@ -144,6 +144,8 @@ function wrap_perr(perr_fn){
     };
 }
 E.perr_install = function(install_fn){
+    if (typeof install_fn=='string')
+        install_fn = E.make_nodejs_perr_install_fn(install_fn);
     E.perr = wrap_perr(install_fn(perr_orig, perr_pending||[]));
     perr_pending = null;
 };

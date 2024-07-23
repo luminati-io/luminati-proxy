@@ -13,7 +13,7 @@ const conf = {
     github_repo: 'luminati-io/luminati-proxy',
     work_dir: '',
     min_node: '14.19.0',
-    max_node: '18.17.0',
+    max_node: '20.12.1',
     is_electron: process.versions && !!process.versions.electron,
     proxy_fields: Object.assign({}, lpm_api_models.proxy_fields,
         lpm_api_models.manager_fields),

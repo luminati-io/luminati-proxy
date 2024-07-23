@@ -146,6 +146,157 @@ E.inet_addr = function(ip){
     return shift==0 && num!=undefined && num<256 ? res+(num|0)>>>0 : null;
 };
 
+// XXX vitalyma: mb refactor for readability but must keep/improve perf
+E.ipv6_to_oct = function(str){
+    var delim = ':', res = new Array(16), res_s = 0, res_e = 15, s = 0,
+        e = str.length-1, cur2b = '', char, cur2b_int;
+    for (var cur = ''; s<e;)
+    {
+        char = str[e--];
+        if (char==delim)
+        {
+            if (cur)
+            {
+                cur2b_int = parseInt(cur, 16);
+                res[res_e--] = cur2b_int&0xFF;
+                res[res_e--] = cur2b_int>>8;
+            }
+            break;
+        }
+        if (char=='.')
+        {
+            res[res_e--] = parseInt(cur, 10);
+            cur = '';
+            char = str[e--];
+            while (e>=0&&char!==':')
+            {
+                if (char=='.')
+                {
+                    res[res_e--] = parseInt(cur, 10);
+                    cur = '';
+                }
+                else
+                    cur = char + cur;
+                char = str[e--];
+            }
+            res[res_e--] = parseInt(cur, 10);
+            break;
+        }
+        cur = char + cur;
+    }
+    while (s<=e)
+    {
+        char = str[s];
+        if (char!=delim)
+        {
+            cur2b += char;
+            char = str[++s];
+            continue;
+        }
+        if (cur2b)
+        {
+            cur2b_int = parseInt(cur2b, 16);
+            res[res_s++] = cur2b_int>>8;
+            res[res_s++] = cur2b_int&0xFF;
+            cur2b = '';
+        }
+        char = str[++s];
+        if (char==delim)
+        {
+            while (s<e)
+            {
+                var ch = str[e--];
+                if (ch==delim)
+                {
+                    if (cur2b)
+                    {
+                        cur2b_int = parseInt(cur2b, 16);
+                        res[res_e--] = cur2b_int&0xFF;
+                        res[res_e--] = cur2b_int>>8;
+                        cur2b = '';
+                    }
+                }
+                else
+                    cur2b = ch + cur2b;
+            }
+            if (cur2b)
+            {
+                cur2b_int = parseInt(cur2b, 16);
+                res[res_e--] = cur2b_int&0xFF;
+                res[res_e--] = cur2b_int>>8;
+            }
+            while (res_s<=res_e)
+                res[res_s++] = 0;
+            return res;
+        }
+    }
+    cur2b_int = parseInt(cur2b+char, 16);
+    res[res_s++] = cur2b_int>>8;
+    res[res_s] = cur2b_int&0xFF;
+    return res;
+};
+
+// For instance: 2a00:1450:4013:c00::71
+// RFC 5952 (see https://tools.ietf.org/html/rfc5952#section-4)
+E.ipv6_oct_to_canon = function(arr){
+    var arr8 = new Array(8), delim = ':';
+    var max0len = 0, max0i, cur0len = 0, cur0i, res = '', cur2oct, i;
+    for (i = 0; i<8; ++i)
+    {
+        cur2oct = (arr[i*2]<<8)+arr[i*2+1];
+        if (!cur2oct)
+        {
+            if (!cur0len)
+            {
+                cur0i = i;
+                cur0len = 1;
+            }
+            else
+                ++cur0len;
+        }
+        else if (cur0len)
+        {
+            if (cur0len>max0len)
+            {
+                max0len = cur0len;
+                max0i = cur0i;
+            }
+            cur0len = 0;
+        }
+        arr8[i] = cur2oct;
+    }
+    if (cur0len>max0len)
+    {
+        max0len = cur0len;
+        max0i = cur0i;
+    }
+    if (max0len>1)
+    {
+        if (max0i)
+        {
+            for (i = 0; i<max0i; ++i)
+                res += arr8[i].toString(16) + delim;
+        }
+        else
+            res = delim;
+        var max0end_i = max0i+max0len;
+        if (max0end_i==8)
+            res += delim;
+        else
+        {
+            for (i = max0end_i; i<8; ++i)
+                res += delim + arr8[i].toString(16);
+        }
+    }
+    else
+    {
+        for (i = 0; i<7; ++i)
+            res += arr8[i].toString(16) + delim;
+        res += arr8[7].toString(16);
+    }
+    return res;
+};
+
 function flags_to_str_once(flags, conv){
     var f = 'var s = "";\n';
     f += 'if (!flags) return "";\n';

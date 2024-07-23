@@ -464,6 +464,24 @@ E.sockets_count = proto=>etask(function*(){
 E.snmp_stat = ()=>parse_stat(`${PROC_DIR}/net/snmp`);
 E.netstat = ()=>parse_stat(`${PROC_DIR}/net/netstat`);
 
+let last_snmp_tcp_stat;
+E.tcp_retrans_percent = curr_snmp_stat=>{
+    const snmp_stat = curr_snmp_stat || E.snmp_stat();
+    const {retrans_segs, out_segs} = snmp_stat.tcp;
+    if (!last_snmp_tcp_stat || last_snmp_tcp_stat.out_segs >= out_segs ||
+        last_snmp_tcp_stat.retrans_segs >= retrans_segs)
+    {
+        last_snmp_tcp_stat = snmp_stat.tcp;
+        return 0;
+    }
+    let percent = (retrans_segs-last_snmp_tcp_stat.retrans_segs)/
+        (out_segs-last_snmp_tcp_stat.out_segs)*100;
+    if (percent > 100)
+        percent = 100;
+    last_snmp_tcp_stat = snmp_stat.tcp;
+    return percent;
+};
+
 E.sockstat = ()=>{
     let res = {};
     file.read_lines(`${PROC_DIR}/net/sockstat`)?.forEach(s=>{

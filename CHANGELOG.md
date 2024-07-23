@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.476.196 Stable
+- :star: Add Node option to port OS targeting settings
+
 ## 1.467.451 Stable
 - :star: Process bw based on x-brd-debug header
 - :star: Manage socket inactivity timeout in UI settings
