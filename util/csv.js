@@ -147,6 +147,8 @@ E.to_obj = function(data, opt){
     if (!arr.length)
         return arr;
     var i, result = [], headers = arr[0];
+    if (opt && opt.lowercase)
+        headers = headers.map(function(h){ return h.toLowerCase(); });
     if ((i = headers.indexOf(''))!=-1)
         throw make_csv_error('Headers row-Missing column name for field ' + i);
     for (i=1; i<arr.length; i++)

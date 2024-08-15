@@ -150,7 +150,7 @@
     "react-table": "7.8.0"
   },
   "engines": {
-    "node": ">=14.19.0"
+    "node": ">=20.12.1"
   },
   "homepage": "https://brightdata.com",
   "api_domain": "lum-lpm.com",
@@ -505,7 +505,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "348261937ef38f9030d7b7384357a030"
+    "md5": "d1a23b0e7f749e9b52b5ef0106a2dd12"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -522,7 +522,7 @@
     "longjohn": "0.2.12"
   },
   "preferGlobal": true,
-  "recommendedNode": ">=14.19.0",
+  "recommendedNode": ">=20.12.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/luminati-io/luminati-proxy.git"
@@ -536,5 +536,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.476.196"
+  "version": "1.481.650"
 }

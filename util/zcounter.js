@@ -15,6 +15,7 @@ const env = process.env, ef = etask.ef, ms = date.ms;
 const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
+const worker_timeout = +env.ZCOUNTER_WORKER_TIMEOUT||5*ms.MIN;
 const global_only_worlds = new Set();
 
 E.enable_submit = when=>{
@@ -366,8 +367,8 @@ let loc_get_counters = update_prev=>etask(function*zcounter_loc_get_counters(){
 
 let mas_get_counters = update_prev=>etask(function*zcounter_mas_get_counters(){
     update_prev = update_prev||false;
-    let a = cluster_ipc.call_all_workers('get_zcounters', update_prev)
-    .concat(yield loc_get_counters(update_prev));
+    let a = cluster_ipc.call_all_workers('get_zcounters', update_prev,
+        worker_timeout).concat(yield loc_get_counters(update_prev));
     let counters = yield etask.all({allow_fail: true}, a);
     return mas_agg_counters(counters.filter(v=>v && !etask.is_err(v)));
 });

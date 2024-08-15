@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.481.650",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed migration for new style rules without version specified"
+            }
+        ]
+    },
+    {
         "ver": "1.476.196",
         "type": "stable",
         "changes": [

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.481.650 Stable
+- :bug: Fixed migration for new style rules without version specified
+
 ## 1.476.196 Stable
 - :star: Add Node option to port OS targeting settings
 

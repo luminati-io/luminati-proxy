@@ -337,7 +337,7 @@ E.last_day_of_month = function(month, year){
 
 E.add = function(d, dur){
     d = E.get(d, 1);
-    dur = normalize_dur(dur);
+    dur = E.normalize_dur(dur);
     // manual handling, because of '31-Jan + 1 month'
     // we are doing same as: momentjs, C# DateTime, Excel EDATE, R Lubridate
     // see: https://lubridate.tidyverse.org/reference/mplus.html
@@ -366,7 +366,7 @@ E.add = function(d, dur){
     return d;
 };
 
-function normalize_dur(dur){
+E.normalize_dur = function(dur){
     var aliases = {
         years: 'year', months: 'month', days: 'day',
         hours: 'hour', minutes: 'min', seconds: 'sec',
@@ -377,7 +377,7 @@ function normalize_dur(dur){
     for (var k in dur)
         norm[aliases[k]||k] = dur[k];
     return norm;
-}
+};
 
 E.describe_interval = function(_ms, decimals){
     var rmult = Math.pow(10, decimals||0);
