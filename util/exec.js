@@ -1,12 +1,12 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true*/
 require('./config.js');
+const child_process = require('child_process');
+const fs = require('fs');
 const etask = require('./etask.js');
 const file = require('./file.js');
 const string = require('./string.js');
 const array = require('./array.js');
-const child_process = require('child_process');
-const fs = require('fs');
 const E = exports;
 const assign = Object.assign;
 
@@ -316,7 +316,7 @@ E.which = bin=>{
 
 E.get = (cmd, opt)=>{
     opt = assign(Array.isArray(cmd) ? {} :
-         {shell: true, stdio: 'inherit'}, opt);
+        {shell: true, stdio: 'inherit'}, opt);
     if (opt.dry_run)
     {
         if (opt.verbose)
@@ -326,7 +326,7 @@ E.get = (cmd, opt)=>{
     return E.sys_sync(cmd, opt);
 };
 E.get_lines = (cmd, opt)=>{
-     let ret = E.get(cmd, assign({out: 'stdout', stdio: 'pipe'}, opt));
-     return string.split_crlf(ret);
+    let ret = E.get(cmd, assign({out: 'stdout', stdio: 'pipe'}, opt));
+    return string.split_crlf(ret);
 };
 E.get_line = (cmd, opt)=>E.get_lines(cmd, opt)[0];

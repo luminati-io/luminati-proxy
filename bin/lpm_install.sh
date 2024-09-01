@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.481.650"
+VERSION="1.485.258"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -21,8 +21,8 @@ INSTALL_NPM=0
 INSTALL_CURL=0
 INSTALL_BREW=0
 USE_NVM=0
-NODE_VER='14.19.0'
-NPM_VER='6.14.16'
+NODE_VER='20.12.1'
+NPM_VER='8.6.0'
 NETWORK_RETRY=3
 NETWORK_ERROR=0
 UPDATE_NODE=0

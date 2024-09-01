@@ -6,7 +6,7 @@ import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
 import Proxy_tester from './proxy_tester.js';
-import {Code, with_www_api} from './common.js';
+import {Code, with_www_api, Warning} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
 import Pure_component from '/www/util/pub/pure_component.js';
@@ -75,6 +75,7 @@ const Howto = withRouter(class Howto extends Pure_component {
                     tooltip="Send example requests from here"
                   />
                 </Nav_tabs>
+                {zagent && <Cert_warn />}
                 <Instructions
                   hostname={hostname}
                   lpm_token={lpm_token_value}
@@ -86,6 +87,20 @@ const Howto = withRouter(class Howto extends Pure_component {
             </div></div>}</T>;
     }
 });
+
+const Cert_warn = ()=>{
+  const help_link = 'https://docs.brightdata.com/general/account/'
+    +'ssl-certificate#installation-of-the-ssl-certificate';
+  return <Warning id='cloud_cert_warn' text={
+    <React.Fragment>
+      <span>
+        {'Make sure proxy manager certificate is '}
+        <a target="_black" href={help_link}><T>installed</T></a>
+        {' in to the system.'}
+      </span>
+    </React.Fragment>
+  }/>;
+};
 
 const Lang_btn = props=>{
     const class_names = 'btn btn_lpm btn_lpm_small btn_lang'

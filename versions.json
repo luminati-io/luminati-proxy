@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.485.258",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "NodeJS installation version updated to 20.12.1"
+            }
+        ]
+    },
+    {
         "ver": "1.481.650",
         "type": "stable",
         "changes": [
