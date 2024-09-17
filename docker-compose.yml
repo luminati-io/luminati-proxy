@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  luminati:
+    image: luminati/luminati-proxy:latest
+    container_name: luminati
+    restart: always
+    ports: ["22999:22999", "22225:22225", "24000:24000", "24002:24002"] # 24002, 24000 are the ports configured with proxies
+    environment:
+      # LPM_CUSTOMER: #####
+      # LPM_ZONE: static
+      # LPM_PASSWORD: #####
+      LPM_PROXY_PORT: 22225
+      LPM_WWW_WHITELIST_IPS: "0.0.0.0/0"
+      # LPM_SSL: "true"
+      LPM_CONFIG: "/etc/luminati/conf/.luminati-docker-conf.json"
+    command: ["luminati"]
+    volumes:
+      - ./conf:/etc/luminati/conf #
