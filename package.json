@@ -70,7 +70,7 @@
     "pm2": "5.3.0",
     "request": "2.88.0",
     "lum_request-stats": "3.2.0",
-    "semver": "6.3.0",
+    "semver": "6.3.1",
     "sudo-prompt": "9.0.0",
     "taskkill": "3.1.0",
     "tasklist": "4.0.1",
