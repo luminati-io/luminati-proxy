@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.503.964 Development Latest
+- :star: Updated dependencies
+
 ## 1.485.258 Stable
 - :star: NodeJS installation version updated to 20.12.1
 

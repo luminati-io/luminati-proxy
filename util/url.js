@@ -556,6 +556,13 @@ E.remove_www = function(url){
     return url.substr(4);
 };
 
+E.remove_hash = function(url){
+    if (!url)
+        return url;
+    var parsed = E.parse(url);
+    return parsed.href.replace(parsed.hash, '');
+};
+
 E.is_same_domain = function(domain, urls){
     if (typeof domain !== 'string')
         return false;

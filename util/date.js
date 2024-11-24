@@ -956,9 +956,11 @@ E.to_unix_secs = function(v){
 E.add_business_days = function(from, bdays){
     var res = date_get(from, true);
     var count = 0;
+    var delta = bdays < 0 ? -1 : 1;
+    bdays = Math.abs(bdays);
     while (count < bdays)
     {
-        res.setDate(res.getDate() + 1);
+        res.setDate(res.getDate() + delta);
         if (![0, 6].includes(res.getDay()))
             count++;
     }

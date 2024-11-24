@@ -57,6 +57,8 @@ define(['/util/conv.js', '/util/etask.js', '/util/events.js',
     function(conv, etask, events, string, zerr, zutil, date, zurl){
 
 const ef = etask.ef, assign = Object.assign;
+const E = {}, E_t = {};
+
 // for security reasons 'func' is disabled by default
 const zjson_opt_default = {func: false, date: true, re: true};
 const is_win = /^win/.test((is_node||is_rn) && process.platform);
@@ -218,7 +220,8 @@ class WS extends EventEmitter {
         if (this.ping = is_node && opt.ping!=false)
         {
             this.ping_interval = typeof opt.ping_interval=='function'
-                ? opt.ping_interval() : opt.ping_interval || 60000;
+                ? opt.ping_interval()
+                : opt.ping_interval || (is_k8s ? 30000 : 60000);
             this.ping_timeout = typeof opt.ping_timeout=='function'
                 ? opt.ping_timeout() : opt.ping_timeout || 10000;
             this.ping_timer = undefined;
@@ -491,8 +494,11 @@ class WS extends EventEmitter {
     }
     _on_error(event){
         this.reason = event.message||'Network error';
-        zerr('%s: got error event (reason=%s, event=%O)', this, this.reason,
-            zutil.omit(event, 'target'));
+        if (!is_error_event_silent(event))
+        {
+            zerr('%s: got error event (reason=%s, event=%O)', this,
+                this.reason, zutil.omit(event, 'target'));
+        }
         if (this.zc)
             this._counter.inc(`${this.zc}_err`);
         this._close();
@@ -757,7 +763,10 @@ class Client extends WS {
             ? 50000 : opt.handshake_timeout;
         this.handshake_timer = undefined;
         if (this.zc)
-            this._counter.inc_level(`level_${this.zc}_online`, 0, 'sum');
+        {
+            this._counter.inc_level(`level_${this.zc}_online`, 0, 'sum',
+                'sum');
+        }
         if (opt.proxy)
         {
             let _lib = require('https-proxy-agent');
@@ -821,11 +830,17 @@ class Client extends WS {
     _assign(ws){
         super._assign(ws);
         if (this.zc)
-            this._counter.inc_level(`level_${this.zc}_online`, 1, 'sum');
+        {
+            this._counter.inc_level(`level_${this.zc}_online`, 1, 'sum',
+                'sum');
+        }
     }
     _close(close, code, reason){
         if (this.zc && this.ws)
-            this._counter.inc_level(`level_${this.zc}_online`, -1, 'sum');
+        {
+            this._counter.inc_level(`level_${this.zc}_online`, -1, 'sum',
+                'sum');
+        }
         if (this.handshake_timer)
             this.handshake_timer = clearTimeout(this.handshake_timer);
         super._close(close, code, reason);
@@ -985,7 +1000,7 @@ class Server {
         this._counter = make_counter(opt);
         // ensure the metric exists, even if 0
         if (this.zc)
-            this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
+            this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum', 'sum');
     }
     toString(){ return this.label ? `${this.label} WS server` : 'WS server'; }
     upgrade(req, socket, head){
@@ -1044,12 +1059,15 @@ class Server {
         if (this.zc)
         {
             this._counter.inc(`${this.zc}_conn`);
-            this._counter.inc_level(`level_${this.zc}_conn`, 1, 'sum');
+            this._counter.inc_level(`level_${this.zc}_conn`, 1, 'sum', 'sum');
         }
         zws.addListener('disconnected', ()=>{
             this.connections.delete(zws);
             if (this.zc)
-                this._counter.inc_level(`level_${this.zc}_conn`, -1, 'sum');
+            {
+                this._counter.inc_level(`level_${this.zc}_conn`, -1, 'sum',
+                    'sum');
+            }
         });
         if (this.handler)
         {
@@ -1297,7 +1315,7 @@ class Server_uws2 {
         this._counter = make_counter(opt);
         // ensure the metric exists, even if 0
         if (this.zc)
-            this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum');
+            this._counter.inc_level(`level_${this.zc}_conn`, 0, 'sum', 'sum');
     }
     wait_listen(){
         let listen = etask.wait();
@@ -1420,12 +1438,15 @@ class Server_uws2 {
         if (this.zc)
         {
             this._counter.inc(`${this.zc}_conn`);
-            this._counter.inc_level(`level_${this.zc}_conn`, 1, 'sum');
+            this._counter.inc_level(`level_${this.zc}_conn`, 1, 'sum', 'sum');
         }
         zws.addListener('disconnected', ()=>{
             this.connections.delete(zws);
             if (this.zc)
-                this._counter.inc_level(`level_${this.zc}_conn`, -1, 'sum');
+            {
+                this._counter.inc_level(`level_${this.zc}_conn`, -1, 'sum',
+                    'sum');
+            }
         });
         if (this.handler)
         {
@@ -1723,6 +1744,67 @@ class IPC_server_base {
             task.return();
     }
 }
+const [comma, left_bracket, right_bracket] = [',', '[', ']'].map(v=>v
+    .charCodeAt(0));
+// do not use concurrently the same instance
+class Buffer_builder {
+    constructor(opt = {}){
+        this._head_size = opt.head_size||500;
+        this._inc = opt.inc||10e6;
+        this._clean();
+    }
+    _clean(){
+        this._offset = this._head_size+VFD_BIN_SZ;
+        this._empty = 1;
+        let buf = this._get_buffer(this._offset+1);
+        buf.writeUint8(left_bracket, this._offset);
+        this._offset++;
+    }
+    _get_buffer(next_offset){
+        let buf = this.buf;
+        if (!buf || buf.length<next_offset)
+        {
+            let size = Math.ceil(next_offset/this._inc)*this._inc;
+            let new_buf = new Buffer(size);
+            if (buf)
+                buf.copy(new_buf, 0);
+            buf = this.buf = new_buf;
+        }
+        return buf;
+    }
+    check_empty(){
+        if (this._empty)
+            return;
+        zerr.notice('Buffer_builder is not empty');
+        this._clean();
+    }
+    push(v){
+        let buf = this._get_buffer(this._offset+v.length+2);
+        if (!this._empty)
+        {
+            buf.writeUint8(comma, this._offset);
+            this._offset++;
+        }
+        v.copy(buf, this._offset);
+        this._offset += v.length;
+        this._empty = 0;
+    }
+    get_buffer(res_buf){
+        if (res_buf.length>this._head_size)
+            throw new Error(`Header should be $lte ${this._head_size}`);
+        let buf = this._get_buffer(this._offset+1);
+        let offset = this._head_size-res_buf.length;
+        buf.writeUInt32BE(0, offset);
+        buf.writeUInt32BE(BUFFER_CONTENT, offset+4);
+        buf.writeUInt32BE(res_buf.length, offset+VFD_SZ);
+        res_buf.copy(buf, offset+VFD_BIN_SZ);
+        buf.writeUint8(right_bracket, this._offset);
+        this._offset++;
+        let res = buf.slice(offset, this._offset);
+        this._clean();
+        return res;
+    }
+}
 class IPC_server_resp {
     constructor(ipc, msg){
         this.ipc = ipc;
@@ -1764,8 +1846,11 @@ class IPC_server_resp {
         return true;
     }
     call_response(rv){
-        if (this.msg.bin && rv instanceof Buffer)
+        if (this.msg.bin && (rv instanceof Buffer ||
+            rv instanceof Buffer_builder))
+        {
             return void this.call_response_buf(rv);
+        }
         this.json({
             type: 'ipc_result',
             cmd: this.msg.cmd,
@@ -1780,12 +1865,18 @@ class IPC_server_resp {
             cookie: this.msg.cookie,
         }));
         // [0|BUFFER_CONTENT|cmd length|...cmd bin|...cmd result bin]
-        const buf = Buffer.allocUnsafe(rv.length+VFD_BIN_SZ+res_buf.length);
-        buf.writeUInt32BE(0, 0);
-        buf.writeUInt32BE(BUFFER_CONTENT, 4);
-        buf.writeUInt32BE(res_buf.length, VFD_SZ);
-        res_buf.copy(buf, VFD_BIN_SZ);
-        rv.copy(buf, VFD_BIN_SZ+res_buf.length);
+        let buf;
+        if (rv instanceof Buffer_builder)
+            buf = rv.get_buffer(res_buf);
+        else
+        {
+            buf = Buffer.allocUnsafe(rv.length+VFD_BIN_SZ+res_buf.length);
+            buf.writeUInt32BE(0, 0);
+            buf.writeUInt32BE(BUFFER_CONTENT, 4);
+            buf.writeUInt32BE(res_buf.length, VFD_SZ);
+            res_buf.copy(buf, VFD_BIN_SZ);
+            rv.copy(buf, VFD_BIN_SZ+res_buf.length);
+        }
         this.ipc.ws.send(buf);
     }
     base_fail(e){
@@ -1833,7 +1924,8 @@ class IPC_server_resp_call extends IPC_server_resp {
             return;
         let et;
         try {
-            if (!((et = this.exec()) instanceof etask))
+            et = this.exec();
+            if (!et || typeof et.then!='function')
                 return void this.call_response(et);
         } catch(e){ return this.base_fail(e); }
         const _this = this;
@@ -1851,7 +1943,8 @@ class IPC_server_resp_post extends IPC_server_resp {
             return;
         let et;
         try {
-            if (!((et = this.exec()) instanceof etask))
+            et = this.exec();
+            if (!et || typeof et.then!='function')
                 return;
         } catch(e){ return this.post_fail(e); }
         const _this = this;
@@ -1871,7 +1964,8 @@ class IPC_server_resp_mux extends IPC_server_resp {
         this.mux_open();
         let et;
         try {
-            if (!((et = this.exec()) instanceof etask))
+            et = this.exec();
+            if (!et || typeof et.then!='function')
                 return;
         } catch(e){ return this.base_fail(e); }
         const _this = this;
@@ -1980,7 +2074,7 @@ class Mux {
                 if (zc)
                 {
                     this.ws._counter.inc_level(`level_${zc}_mux_vfd`,
-                        -1, 'sum');
+                        -1, 'sum', 'sum');
                 }
             }
         });
@@ -1989,7 +2083,7 @@ class Mux {
         if (this.ws.zc)
         {
             this.ws._counter.inc_level(`level_${this.ws.zc}_mux_vfd`,
-                1, 'sum');
+                1, 'sum', 'sum');
         }
         return stream;
     }
@@ -2291,13 +2385,19 @@ class Mux {
                 zerr.info(`${this.ws}: vfd ${vfd} closed`);
             let zc = this.ws.zc;
             if (zc)
-                this.ws._counter.inc_level(`level_${zc}_mux`, -1, 'sum');
+            {
+                this.ws._counter.inc_level(`level_${zc}_mux`, -1, 'sum',
+                    'sum');
+            }
         });
         this.streams.set(vfd, stream);
         if (zerr.is.info())
             zerr.info(`${this.ws}: vfd ${vfd} open`);
         if (this.ws.zc)
-            this.ws._counter.inc_level(`level_${this.ws.zc}_mux`, 1, 'sum');
+        {
+            this.ws._counter.inc_level(`level_${this.ws.zc}_mux`, 1, 'sum',
+                'sum');
+        }
         if (opt.compress || opt.decompress)
         {
             if (!SnappyStream || !UnsnappyStream)
@@ -2419,7 +2519,40 @@ function server_impl(opt){
     return l;
 }
 
-return {Client, Server, Server_uws2, Mux, t: {WS, IPC_server_base},
-    ERROR_CODES};
+function is_error_event_silent(event){
+    for (let {fn} of error_event_silence_patterns)
+    {
+        if (fn(event))
+            return true;
+    }
+    return false;
+}
+const error_event_silence_patterns = [];
+
+if (zutil.is_mocha())
+{
+    E_t.silence_error_events = function(rm_key, fn){
+        if (typeof rm_key=='function' || !rm_key)
+            throw new Error('Missing removal key');
+        error_event_silence_patterns.push({rm_key, fn});
+    };
+    E_t.reset_silenced_error_events = function(rm_key){
+        let num_del = 0;
+        for (let i=0; i<error_event_silence_patterns.length; i++)
+        {
+            let it = error_event_silence_patterns[i];
+            if (it.rm_key==rm_key)
+                num_del++;
+            else if (num_del>0)
+                error_event_silence_patterns[i-num_del] = it;
+        }
+        if (num_del)
+            error_event_silence_patterns.length -= num_del;
+    };
+}
+
+assign(E, {Client, Server, Server_uws2, Mux, ERROR_CODES, Buffer_builder});
+E.t = assign(E_t, {WS, IPC_server_base, BUFFER_CONTENT});
+return E;
 
 }); }());

@@ -12,7 +12,7 @@ const conf = {
     daemon_name: 'luminati_proxy_manager',
     github_repo: 'luminati-io/luminati-proxy',
     work_dir: '',
-    min_node: '14.19.0',
+    min_node: '16.9.0',
     max_node: '20.12.1',
     is_electron: process.versions && !!process.versions.electron,
     proxy_fields: Object.assign({}, lpm_api_models.proxy_fields,

@@ -38,7 +38,7 @@ define(['/util/util.js', '/util/date.js'], function(zutil, date){
 var E = {};
 
 var has_map = typeof Map=='function' && Map.prototype.get && Map.prototype.set;
-has_map = 0; // XXX: unit-test and remove
+has_map = 0; // XXX: unit test and remove
 E.cache_str_map_fn = function(fn){
     var cache = new Map();
     return function(s){

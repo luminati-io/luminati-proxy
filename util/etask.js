@@ -53,6 +53,9 @@ define(['/util/events.js', '/util/array.js', '/util/util.js'],
     function(events, array, zutil){
 const E = Etask;
 const GEN_FN = 'GeneratorFunction';
+// using symbols to avoid importing etasks into each other
+const ETASK1_SYMBOL = Symbol.for('etask1');
+const ETASK2_SYMBOL = Symbol.for('etask2');
 const env = process.env, assign = Object.assign;
 E.use_bt = +env.ETASK_BT;
 E.root = new Set();
@@ -265,6 +268,16 @@ E.prototype.emit_safe = function(){
     try { this.emit.apply(this, arguments); }
     catch(e){ this._call_err(e); }
 };
+E.prototype.emit_down = function(){
+    this.emit.apply(this, arguments);
+    if (this.down)
+        this.down.emit_down.apply(this.down, arguments);
+};
+E.prototype.emit_up = function(){
+    this.emit.apply(this, arguments);
+    if (this.up)
+        this.up.emit_up.apply(this.up, arguments);
+};
 E.prototype._call_safe = function(state_fn){
     try { return state_fn.call(this); }
     catch(e){ this._call_err(e); }
@@ -335,6 +348,18 @@ E.prototype._next = function(rv){
     this._complete();
     return false;
 };
+function setup_etask2(et1, et2){
+    et1.finally(et2._cancel.bind(et2)); // no-op if already settled
+    et1.emit_down = function(){
+        E.prototype.emit_down.apply(et1, arguments);
+        et2.emit_down.apply(et2, arguments);
+    };
+    et2.emit_up = function(){
+        et2.emit.apply(et2, arguments);
+        et1.emit_up.apply(et1, arguments);
+    };
+    et2.run(); // also run synchronously
+}
 E.prototype._handle_rv = function(rv){
     var wait_retval, _this = this, ret = rv.ret;
     if (ret===this.retval); // fast-path: retval already set
@@ -366,6 +391,8 @@ E.prototype._handle_rv = function(rv){
             wait_retval = this._set_wait_retval();
             ret.then(function(_ret){ _this._got_retval(wait_retval, _ret); },
                 function(err){ _this._got_retval(wait_retval, E.err(err)); });
+            if (ret[ETASK2_SYMBOL])
+                setup_etask2(this, ret);
             return true;
         }
         // generator
@@ -812,6 +839,11 @@ E.prototype._operation_opt = function(opt){
         return {ret: this.continue(opt.continue)};
 };
 
+E.prototype.alarm_throw = function(ms){
+    var _this = this;
+    this.alarm(ms, function(){ _this.throw(new Error('timeout')); });
+};
+
 E.prototype.alarm = function(ms, cb){
     var _this = this, opt, a;
     if (cb && typeof cb!='function')
@@ -960,12 +992,14 @@ E._res2rv = function(res){
         : {ret: res, err: undefined};
 };
 E.is_final = function(v){
-    return !v || typeof v.then!='function' || v instanceof Etask_err ||
-        v instanceof Etask && !!v.tm_completed;
+    return !v || typeof v.then!='function'
+        || v instanceof Etask_err
+        || v instanceof Etask && !!v.tm_completed
+        || !!v[ETASK2_SYMBOL] && v.settled;
 };
 
 // promise compliant .then() implementation for Etask and Etask_err.
-// for unit-test comfort, also .otherwise(), .catch(), .ensure(), resolve() and
+// for unit test comfort, also .otherwise(), .catch(), .ensure(), resolve() and
 // reject() are implemented.
 E.prototype.then = function(on_res, on_err){
     var _this = this;
@@ -1222,8 +1256,9 @@ E.sleep = function(ms){
         this.info.ms = ms+'ms';
         timer = setTimeout(this.continue_fn(), ms);
         return this.wait();
-    }, function finally$(){
+    }, /* javascript-obfuscator:disable */ function finally$(){
         '@jsdefender { localDeclarations: false }';
+        /* javascript-obfuscator:enable */
         clearTimeout(timer);
     }]);
 };
@@ -1239,10 +1274,13 @@ E.for = function(cond, inc, opt, states){
     }
     states = typeof states=='function' ? [states] : states;
     return new Etask({name: 'for', cancel: true, init: opt&&opt.init_parent},
+    /* javascript-obfuscator:disable */
     [function loop(){
+        /* javascript-obfuscator:enable */
         return !cond || cond.call(this);
-    }, function try_catch$(res){
+    }, /* javascript-obfuscator:disable */ function try_catch$(res){
         '@jsdefender { localDeclarations: false }';
+        /* javascript-obfuscator:enable */
         if (!res)
             return this.return();
         return new Etask({name: 'for_iter', cancel: true, init: opt&&opt.init},
@@ -1290,8 +1328,9 @@ E.all = function(a_or_o, ao2){
         return new Etask({name: 'all_a', cancel: true}, [function(){
             for (j=0; j<a.length; j++)
                 this.spawn(a[j]);
-        }, function try_catch$loop(){
+        }, /* javascript-obfuscator:disable */ function try_catch$loop(){
             '@jsdefender { localDeclarations: false }';
+            /* javascript-obfuscator:enable */
             if (i>=a.length)
                 return this.return(a);
             this.info.at = 'at '+i+'/'+a.length;
@@ -1318,8 +1357,9 @@ E.all = function(a_or_o, ao2){
         return new Etask({name: 'all_o', cancel: true}, [function(){
             for (j=0; j<keys.length; j++)
                 this.spawn(a_or_o[keys[j]]);
-        }, function try_catch$loop(){
+        }, /* javascript-obfuscator:diable */ function try_catch$loop(){
             '@jsdefender { localDeclarations: false }';
+            /* javascript-obfuscator:enable */
             if (i>=keys.length)
                 return this.return(o);
             var _i = keys[i], _a = a_or_o[_i];
@@ -1494,8 +1534,11 @@ E.wait = function(timeout){
         [function(){ return this.wait(timeout); }]);
 };
 E.to_nfn = function(promise, cb, opt){
-    return new Etask({name: 'to_nfn', async: true}, [function try_catch$(){
+    return new Etask({name: 'to_nfn', async: true}, [
+        /* javascript-obfuscator:disable */
+        function try_catch$(){
         '@jsdefender { localDeclarations: false }';
+        /* javascript-obfuscator:enable */
         return promise;
     }, function(res){
         var ret = [this.error];
@@ -1542,8 +1585,9 @@ E._generator = function(gen, ctor, opt){
         this.generator = gen = gen||ctor.apply(this, arguments);
         this.generator_ctor = ctor;
         return {ret: undefined, err: undefined};
-    }, function try_catch$loop(rv){
+    }, /* javascript-obfuscator:disable */ function try_catch$loop(rv){
         '@jsdefender { localDeclarations: false }';
+        /* javascript-obfuscator:enable */
         var res;
         try { res = rv.err ? gen.throw(rv.err) : gen.next(rv.ret); }
         catch(e){ return this.return(E.err(e)); }
@@ -1556,8 +1600,9 @@ E._generator = function(gen, ctor, opt){
     }, function(ret){
         return this.goto('loop', this.error ?
             {ret: undefined, err: this.error} : {ret: ret, err: undefined});
-    }, function finally$(){
+    }, /* javascript-obfuscator:disable */ function finally$(){
         '@jsdefender { localDeclarations: false }';
+        /* javascript-obfuscator:enable */
         // https://kangax.github.io/compat-table/es6/#test-generators_%GeneratorPrototype%.return
         // .return() supported only in node>=6.x.x
         if (!done && gen && gen.return)
@@ -1650,9 +1695,12 @@ const interval_spawn = (opt, states)=>{
     };
     states = typeof states=='function' ? [states] : states;
     return new Etask({name: 'interval_spawn', cancel: true, init},
+        /* javascript-obfuscator:disable */
         [function loop(){
-            new Etask({}, [function try_catch$(){
+        /* javascript-obfuscator:enable */
+            new Etask({}, /* javascript-obfuscator:disable */ [function try_catch$(){
                 '@jsdefender { localDeclarations: false }';
+                /* javascript-obfuscator:enable */
                 return new Etask({}, states);
             }, function(res){
                 if (!this.error)
@@ -1797,5 +1845,9 @@ E.any = function(opt, ets){
         return _race;
     }]);
 };
+
+Object.defineProperty(E.prototype, ETASK1_SYMBOL, {
+    get(){ return true; }, // etask interop
+});
 
 return Etask; }); }());

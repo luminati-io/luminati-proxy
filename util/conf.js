@@ -26,6 +26,18 @@ function _hostname(){
         .replace(/\.local$/, '').replace(/\.home$/, '');
 }
 
+function _hostname_base(){
+    if (env.AGENT_TYPE)
+        return 'agent_'+env.AGENT_TYPE;
+    if (_is_k8s() && env.CONFIG_APP)
+        return env.CONFIG_APP;
+    return _hostname().replace(/(-ec2)?\d*$/, '$1');
+}
+
+function _is_k8s(){
+    return !!env.CLUSTER_NAME;
+}
+
 function init(){
     let filename = script_path;
     if (filename)
@@ -44,6 +56,7 @@ init();
 
 module.exports = {
     hostname: _hostname(),
+    hostname_base: _hostname_base(),
     app: env.CONFIG_APP || script_path&&path.basename(script_path, '.js'),
     t: {parse},
 };

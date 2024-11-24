@@ -155,6 +155,7 @@ export default class General extends Pure_component {
             <a className="link" onClick={this.open_bw_limit_modal}>
                 <T>Set limit</T>
             </a> : null;
+        // XXX platon: use docs url from server_conf
         return <div className="general">
           <Tab_context.Provider value="general">
             <Users_modal form={this.state.form}/>
@@ -169,19 +170,23 @@ export default class General extends Pure_component {
               id="whitelist_ips"
               disabled_ips={disabled_wl}
               no_any={zagent}
-              faq={{anchor: 'whitelisted_ips'}}
+              faq={{url: 'https://docs.brightdata.com/proxy-networks/'
+                +'proxy-manager/security#block-unwanted-sources-from-using-'
+                +'the-proxy-managers-ports'}}
             />
             <T>{t=><Config type="select"
               disabled={zagent}
               data={this.proxy_connection_type_opt(t)}
               id="proxy_connection_type"
-              faq={{anchor: 'https'}}
+              faq={{url: 'https://docs.brightdata.com/proxy-networks/'
+                +'proxy-manager/faqs#how-to-connect-to-superproxy-via-https'}}
             />}</T>
             <Config
               type="yes_no"
               id="ssl"
               on_change={this.ssl_changed}
-              faq={{anchor: 'ssl_analyzing'}}
+              faq={{url: 'https://docs.brightdata.com/general/account/'
+                +'ssl-certificate#how-does-ssl-analyzing-works'}}
             />
             {form.ssl &&
               <Config
@@ -235,7 +240,8 @@ export default class General extends Pure_component {
               type="select"
               id="debug"
               data={yes_no_select_opt}
-              faq={{anchor: 'request_details'}}
+              faq={{url: 'https://docs.brightdata.com/proxy-networks/'
+                +'proxy-manager/faqs#how-can-i-view-my-request-details'}}
             />
             <Config type="select" id="lpm_auth" data={yes_no_select_opt}/>
             <Config type="yes_no" id="const" />

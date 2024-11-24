@@ -594,7 +594,7 @@ describe('manager', function(){
         it('refreshes ip & sessions and updates proxy port', etask._fn(
         function*(_this){
             const alloc_ip = '1.1.1.1';
-            const alloc_inet_addr = 16843009;
+            const alloc_inet_addr = '16843009';
             const new_ip = '2.2.2.2';
             const proxy = {port: 24000, zone: 'static', ips: [alloc_ip]};
             app = yield app_with_proxies([proxy]);

@@ -30,7 +30,7 @@ const rule_prepare = (rule={})=>{
     if (rule.action=='retry_same')
         action.retry_same = true;
     if (rule.action=='retry' && rule.retry_number)
-        action.retry = rule.retry_number;
+        action.retries = rule.retry_number;
     else if (rule.action=='retry_port')
         action.retry_port = Number(rule.retry_port);
     else if (rule.action=='ban_ip')

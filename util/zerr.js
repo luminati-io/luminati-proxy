@@ -446,6 +446,15 @@ E.set_logger = function(logger){
     };
 };
 
+E.add_logger = function(logger){
+    var __zerr_orig = __zerr;
+    __zerr = function(level, args){
+        __zerr_orig(level, args);
+        var msg = zerr_format(args);
+        logger(level, msg);
+    };
+};
+
 _zerr = function(level, args){
     if (level>E.level)
         return;

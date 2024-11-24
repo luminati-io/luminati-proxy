@@ -343,9 +343,13 @@ export class Cm_wrapper extends Pure_component {
 
 export const Faq_link = with_www_api(props=>{
     const click = ()=>{
-        const article = props.article || lpm_faq_article;
-        const anchor = props.anchor ? `#${props.anchor}` : '';
-        const url = `${props.www_help}/hc/en-us/articles/${article}${anchor}`;
+        let url = props.url;
+        if (!url)
+        {
+            const article = props.article || lpm_faq_article;
+            const anchor = props.anchor ? `#${props.anchor}` : '';
+            url = `${props.www_help}/hc/en-us/articles/${article}${anchor}`;
+        }
         window.open(url, '_blank');
     };
     return <Tooltip title={t('Read more')}>
@@ -381,7 +385,7 @@ export const Labeled_controller = props=>
         <div className="desc" style={props.desc_style}>
           <Tooltip title={t(props.tooltip)}>{t(props.label)}</Tooltip>
           {props.faq && <Faq_link article={props.faq.article}
-                anchor={props.faq.anchor}/>}
+                anchor={props.faq.anchor} url={props.faq.url}/>}
         </div>
         <div>
           <div className="field" data-tip data-for={props.id+'tip'}>

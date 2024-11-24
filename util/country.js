@@ -586,7 +586,7 @@ E.regions = {
     ML: ['Western Africa', 'EMEA'],
     MM: ['South-Eastern Asia', 'APAC'],
     MN: ['Eastern Asia', 'APAC'],
-    MO: ['Eastern Asia', 'EMEA'],
+    MO: ['Eastern Asia', 'APAC'],
     MP: ['Micronesia', 'APAC'],
     MQ: ['Caribbean', 'AMER'],
     MR: ['Western Africa', 'EMEA'],
@@ -638,10 +638,10 @@ E.regions = {
     SE: ['Scandinavia', 'EMEA', 'Northern Europe', 'EU'],
     SG: ['South-Eastern Asia', 'APAC'],
     SH: ['Western Africa', 'EMEA'],
-    SI: ['South-Eastern Europe', 'EMEA'],
-    SJ: ['Sourh America', 'AMER'],
+    SI: ['South-Eastern Europe', 'EMEA', 'EU'],
+    SJ: ['South America', 'AMER'],
     SK: ['Eastern Europe', 'EMEA', 'EU'],
-    SL: ['Western Africa', 'EMEA', 'EU'],
+    SL: ['Western Africa', 'EMEA'],
     SM: ['Southern Europe', 'EMEA'],
     SN: ['Western Africa', 'EMEA'],
     SO: ['Eastern Africa', 'EMEA'],
@@ -767,25 +767,6 @@ var terr_country = {
 };
 Object.entries(terr_country).forEach(function(ct){
     ct[1].forEach(function(c){ E.country_terr[c] = ct[0]; });
-});
-
-E.old_country_terr = {};
-var old_terr_country = {
-    apac_rest: 'VN SG JP MY KR AU TH ID NP PH AE PK NZ TW SA KW BN AF CX KH '
-    +'IR MM IQ YE OM LA MN PF BH KP NU NC BT VU WS FJ AQ CK CC KI PW TJ TM '
-    +'MP GU MH PG UM AU TL SB FM NR NF TK TO TV WF',
-    east_med_africa: 'IL TR CY ZA GR EG MU JO NG MG KE ET CM MO GH CH CI ZW '
-    +'SN BJ PS TZ NA SZ QA MW TG NE BF LR TD GN UG AO CV BW ML ZM SY SO SH SC '
-    +'MZ LS GM CG ER EH DJ CD RW SS KM GA GQ SL MR CF LY LB GW TF YT ST SD',
-    east_europe: 'RU RO CZ ME UA PL LT SI BY BG RS KZ AM EE LV GE MD HR HU SK '
-    +'MK AL AZ KG BA UZ BI XK SM',
-    in: 'IN BD LK RE MV',
-    uk_ie_dach: 'DE AT CH UK GB IE IM',
-    west_europe: 'FR ES NL IT PT BE AD MT MC MA LU TN DZ GI LI SE DK FI NO AX '
-    +'IS GG JE EU GL VA FX FO',
-};
-Object.entries(old_terr_country).forEach(function(ct){
-    ct[1].split(' ').forEach(function(c){ E.old_country_terr[c] = ct[0]; });
 });
 
 var state_terr_us_list = {

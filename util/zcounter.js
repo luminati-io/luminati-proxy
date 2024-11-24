@@ -164,12 +164,12 @@ E.max = (name, value, agg_srv='max', agg_tm='max')=>{
         entry.v = value;
 };
 
-E.min = (name, value, agg_srv='min')=>{
+E.min = (name, value, agg_srv='min', agg_tm='min')=>{
     if (!Number.isFinite(value))
         return void report_invalid_val(name, value);
     let _type = type.min_level, entry = _type[name];
     if (!entry)
-        entry = _type[name] = {v: value, agg_srv, agg_tm: 'min'};
+        entry = _type[name] = {v: value, agg_srv, agg_tm};
     if (entry.v>value)
         entry.v = value;
 };
@@ -229,15 +229,20 @@ if (env.ZCOUNTER_GROUP!==undefined)
         E.set_level('glob/'+name+g, value, agg_mas, agg_srv));
 }
 
-E.glob_inc = (name, inc, agg_srv)=>E.inc('glob/'+name, inc, agg_srv);
-E.glob_minc = (name, value, agg_srv)=>E.minc('glob/'+name, value, agg_srv);
+E.glob_inc = (name, inc, agg_srv, agg_tm)=>
+    E.inc('glob/'+name, inc, agg_srv, agg_tm);
+E.glob_minc = (name, value, agg_srv)=>
+    E.minc('glob/'+name, value, agg_srv);
 E.glob_inc_level = (name, inc, agg_mas, agg_srv)=>
     E.inc_level('glob/'+name, inc, agg_mas, agg_srv);
-E.glob_avg = (name, value, agg_srv)=>E.avg('glob/'+name, value, agg_srv);
-E.glob_max = (name, value, agg_srv)=>E.max('glob/'+name, value, agg_srv);
-E.glob_min = (name, value, agg_srv)=>E.min('glob/'+name, value, agg_srv);
-E.glob_set_level = (name, value, agg_mas, agg_srv)=>
-    E.set_level('glob/'+name, value, agg_mas, agg_srv);
+E.glob_avg = (name, value, agg_srv)=>
+    E.avg('glob/'+name, value, agg_srv);
+E.glob_max = (name, value, agg_srv, agg_tm)=>
+    E.max('glob/'+name, value, agg_srv, agg_tm);
+E.glob_min = (name, value, agg_srv, agg_tm)=>
+    E.min('glob/'+name, value, agg_srv, agg_tm);
+E.glob_set_level = (name, value, agg_mas, agg_srv, agg_tm)=>
+    E.set_level('glob/'+name, value, agg_mas, agg_srv, agg_tm);
 
 E.del = name=>{
     if (reported_names[name])
@@ -658,6 +663,8 @@ E.flush = ()=>etask(function*zcounter_flush(){
 
 let agent_conf, agent_num;
 E.is_debug = title=>{
+    if (!+env.AGENT_NUM)
+        return;
     if (!agent_conf)
     {
         let system_db = require('../system/db/db.js');
