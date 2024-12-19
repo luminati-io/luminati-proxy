@@ -224,7 +224,7 @@ if (env.ZCOUNTER_GROUP!==undefined)
     E.group_avg = (name, value, agg_srv)=>groups.forEach(g=>
         E.avg('glob/'+name+g, value, agg_srv));
     E.group_max = (name, value, agg_srv)=>groups.forEach(g=>
-        E.avg('glob/'+name+g, value, agg_srv));
+        E.max('glob/'+name+g, value, agg_srv, 'avg'));
     E.group_set_level = (name, value, agg_mas, agg_srv)=>groups.forEach(g=>
         E.set_level('glob/'+name+g, value, agg_mas, agg_srv));
 }
@@ -661,9 +661,9 @@ E.flush = ()=>etask(function*zcounter_flush(){
     }
 });
 
-let agent_conf, agent_num;
+let agent_conf, agent_num = +env.AGENT_NUM;
 E.is_debug = title=>{
-    if (!+env.AGENT_NUM)
+    if (!agent_num)
         return;
     if (!agent_conf)
     {
@@ -673,7 +673,7 @@ E.is_debug = title=>{
     let debug = agent_conf.debug_zcounter;
     let v = debug && debug[title];
     if (typeof v=='object')
-        return v.includes(agent_num || (agent_num = +env.AGENT_NUM));
+        return v.includes(agent_num);
     return !!v;
 };
 

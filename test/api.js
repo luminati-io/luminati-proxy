@@ -10,7 +10,11 @@ const nock = require('nock');
 process.argv.push('--dir', os.tmpdir());
 const lpm_file = require('../util/lpm_file.js');
 const cities = require('../lib/cities');
-sinon.stub(cities, 'ensure_data').returns(null);
+try {
+    sinon.stub(cities, 'ensure_data').returns(null);
+} catch(e){
+    // already wrapped
+}
 const etask = require('../util/etask.js');
 const pkg = require('../package.json');
 const puppeteer = require('../lib/puppeteer.js');

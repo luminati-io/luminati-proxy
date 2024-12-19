@@ -1,12 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const assert = require('assert');
-const request = require('request');
 const {Netmask} = require('netmask');
 const sinon = require('sinon');
 const ssl = require('../lib/ssl.js');
 const etask = require('../util/etask.js');
 const {ms} = require('../util/date.js');
+const lpm_request = require('../util/lpm_request.js');
 const Server = require('../lib/server.js');
 const Manager = require('../lib/manager.js');
 const {Timeline} = require('../lib/util.js');
@@ -240,7 +240,7 @@ describe('rules', ()=>{
             beforeEach(()=>etask(function*(){
                 l = yield lum({rules: []});
                 req = {ctx: {}};
-                req_stub = sinon.stub(request, 'Request').callsFake(
+                req_stub = sinon.stub(lpm_request, 'request').callsFake(
                     ()=>({on: ()=>null, end: ()=>null}));
             }));
             afterEach(()=>{

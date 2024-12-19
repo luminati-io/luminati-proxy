@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.510.674",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Remove deprecated request package dependency"
+            },
+            {
+                "type": "star",
+                "text": "Check for ReDoS user input"
+            },
+            {
+                "type": "star",
+                "text": "Introduce cloud shared banlist"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed unban ip handler"
+            }
+        ]
+    },
+    {
         "ver": "1.503.964",
         "type": "dev",
         "changes": [

@@ -2,7 +2,7 @@
 'use strict'; /*jslint node:true, mocha:true*/
 const assert = require('assert');
 const sinon = require('sinon');
-const Ip_cache = require('../lib/ip_cache.js');
+const {Ip_cache} = require('../lib/ip_cache.js');
 const etask = require('../util/etask.js');
 
 describe('ip_cache', ()=>{

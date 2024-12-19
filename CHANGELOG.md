@@ -1,5 +1,11 @@
 Proxy manager - Change Log
 
+## 1.510.674 Development Latest
+- :star: Remove deprecated request package dependency
+- :star: Check for ReDoS user input
+- :star: Introduce cloud shared banlist
+- :bug: Fixed unban ip handler
+
 ## 1.503.964 Development Latest
 - :star: Updated dependencies
 

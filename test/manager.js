@@ -12,7 +12,11 @@ const lpm_file = require('../util/lpm_file.js');
 const Manager = require('../lib/manager.js');
 const Proxy_port = require('../lib/proxy_port.js');
 const cities = require('../lib/cities');
-sinon.stub(cities, 'ensure_data').returns(null);
+try {
+    sinon.stub(cities, 'ensure_data').returns(null);
+} catch(e){
+    // already wrapped
+}
 const logger = require('../lib/logger.js');
 const etask = require('../util/etask.js');
 const zutil = require('../util/util.js');

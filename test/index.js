@@ -159,7 +159,7 @@ describe('proxy', ()=>{
             it('not added when accessing site directly', ()=>etask(function*(){
                 l = yield lum(pre_rule('bypass_proxy'));
                 const res = yield l.test(ping.http.url);
-                assert.ok(!res.body.headers['x-hola-agent']);
+                assert.ok(!res.toJSON().headers['x-hola-agent']);
             }));
         });
         describe('X-Hola-Context', ()=>{

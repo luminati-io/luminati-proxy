@@ -358,7 +358,6 @@ function setup_etask2(et1, et2){
         et2.emit.apply(et2, arguments);
         et1.emit_up.apply(et1, arguments);
     };
-    et2.run(); // also run synchronously
 }
 E.prototype._handle_rv = function(rv){
     var wait_retval, _this = this, ret = rv.ret;

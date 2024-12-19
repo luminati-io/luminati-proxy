@@ -14,7 +14,7 @@ import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import etask from '../../util/etask.js';
 import zurl from '../../util/url.js';
-import {App_new} from '../pub2/app.js';
+// import {App_new} from '../pub2/app.js';
 import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
@@ -411,7 +411,8 @@ class Root extends Pure_component {
     handle_ui_state_event = ({new_ui})=>
         this.setState({use_new_ui: !!+new_ui});
     render(){
-        let app_comp = this.state.use_new_ui ? App_new : App;
+        // let app_comp = this.state.use_new_ui ? App_new : App;
+        let app_comp = App;
         return <BrowserRouter>
             <Switch>
                 <Route path="/" component={app_comp}/>

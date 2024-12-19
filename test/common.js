@@ -93,8 +93,9 @@ E.init_lum = proxy=>opt=>etask(function*(){
     });
     yield l.listen();
     l.history = [];
-    l.on('usage', data=>l.history.push(data));
-    l.on('usage_abort', data=>l.history.push(data));
+    const lhpush = data=>l.history.push(data);
+    l.on('usage', lhpush);
+    l.on('usage_abort', lhpush);
     return l;
 });
 
@@ -350,7 +351,6 @@ E.app_with_args = (args, opt={})=>etask(function*(){
         }
         args = args.concat('--loki', '/tmp/testdb');
     }
-    Manager.prototype.set_current_country = ()=>null;
     Manager.prototype.lpm_users_get = ()=>null;
     manager = new Manager(lpm_util.init_args(args));
     manager.lpm_conn.init = ()=>null;
