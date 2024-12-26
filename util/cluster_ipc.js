@@ -12,6 +12,10 @@ const METRICS_IPC = +process.env.METRICS_IPC;
 let current_cookie = 1;
 let handlers = {}, waiting = {}, incoming_pending = {};
 
+const ZEXIT_ON_CLUSTER_IPC_NO_HANDLER =
+    process.env.ZEXIT_ON_CLUSTER_IPC_NO_HANDLER==undefined
+    || +process.env.ZEXIT_ON_CLUSTER_IPC_NO_HANDLER;
+
 let send = (to, msg, sock)=>{
     if (to=='master')
         process.send(msg);
@@ -82,6 +86,8 @@ let on_response = (sender, msg)=>{
     let handler = zutil.obj_pluck(waiting[sender], key);
     if (!handler)
     {
+        if (!ZEXIT_ON_CLUSTER_IPC_NO_HANDLER)
+            return;
         let err = `cluster_on_response: no handler: ${key} [${sender}]`;
         if (process.listeners('message')
             .filter(l=>l.name=='ipc_msg_handler').length>1)

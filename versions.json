@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.512.323",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Deamon mode using forever instead of pm2"
+            }
+        ]
+    },
+    {
         "ver": "1.510.674",
         "type": "dev",
         "changes": [

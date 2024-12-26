@@ -1,134 +1,239 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, esnext:true*/
+'use strict'; /*jslint node:true, esnext:true, es9: true*/
+const child_process = require('child_process');
+const path = require('path');
 const semver = require('semver');
+const _ = require('lodash4');
 const etask = require('../util/etask.js');
-const zerr = require('../util/zerr.js');
+const {e2s} = require('../util/zerr.js');
+const date = require('../util/date.js');
 const perr = require('../lib/perr.js');
 const logger = require('../lib/logger.js').child({category: 'lum_node_index'});
 const ssl = require('../lib/ssl.js');
 const lpm_config = require('../util/lpm_config.js');
 const lpm_file = require('../util/lpm_file.js');
 const file = require('../util/file.js');
-const child_process = require('child_process');
-const path = require('path');
 const util_lib = require('../lib/util.js');
-const upgrader = require('./upgrader.js');
 const string = require('../util/string.js'), {nl2sp} = string;
 const pkg = require('../package.json');
+const upgrader = require('./upgrader.js');
 const qw = string.qw;
-let pm2;
-try { pm2 = require('pm2'); }
-catch(e){ logger.warn('could not load pm2: daemon mode not supported'); }
+let forever, tail;
+try {
+    forever = require('forever');
+    tail = require('tail').Tail;
+} catch(e){
+    logger.warn('daemon mode not supported');
+}
+
+class Daemon_mgr {
+    #log = null;
+    constructor(log_path){
+        this.#log = new Daemon_log(log_path);
+    }
+    get log(){
+        return this.#log;
+    }
+    get script(){
+        return path.resolve(__dirname, 'index.js');
+    }
+}
+
+class Daemon_log {
+    #files = {};
+    constructor(log_path){
+        log_path = log_path||path.resolve(lpm_config.work_dir, 'daemon');
+        if (!file.is_dir(log_path))
+            file.mkdirp_e(log_path);
+        const files = ['out', 'err', 'daemon']
+            .map(t=>path.resolve(log_path, t+'.log'));
+        const [out, err, daemon] = files;
+        this.#files = {out, err, daemon};
+        this.str_success = ['Open admin browser'];
+        this.str_fail = ['Shutdown', 'is already running'];
+        this.str_continue = this.str_success.concat(this.str_fail);
+    }
+    get files(){
+        return this.#files;
+    }
+    is_continue_log = str=>this.str_continue.some(s=>str.includes(s));
+    is_success_log = str=>this.str_success.some(s=>str.includes(s));
+    is_fail_log = str=>this.str_fail.some(s=>str.includes(s));
+    clear(){
+        Object.values(this.#files).forEach(f=>{
+            if (file.exists(f))
+                file.unlink_e(f);
+        });
+    }
+    ensure(type, timeout=5*date.ms.SEC){
+        if (!this.#files[type])
+            throw new Error('Wrong log file type: '+type);
+        const file_path = this.#files[type];
+        return etask(function*(){
+            this.alarm(timeout, ()=>this.return(false));
+            while (!file.exists(file_path))
+                yield etask.sleep(0);
+            return true;
+        });
+    }
+}
+
+const watch_file = (filename, opt={}, watcher_opt={})=>{
+    if (!tail)
+        return;
+    const handle_line = typeof opt == 'function' ? opt
+        : typeof opt.handle_line == 'function' ? opt.handle_line : _.noop;
+    const watcher = new tail(filename, watcher_opt);
+    watcher.on('line', line=>{
+        if (opt.stdout)
+            process.stdout.write(line+'\n');
+        handle_line(line);
+    });
+    watcher.on('error', e=>{
+        throw new Error(e);
+    });
+    return watcher;
+};
+
+const wait_file_line = (filename, resolve, opt={}, wopt={})=>etask(function*(){
+    this.on('uncaught', ()=>this.return(''));
+    this.finally(()=>watcher&&watcher.unwatch());
+    let watcher;
+    if (!tail)
+        return '';
+    const handle_line = line=>resolve(line) ? this.continue(line) : null;
+    watcher = watch_file(filename, {...opt, handle_line}, wopt);
+    return yield this.wait(opt.timeout);
+});
+
+const handle_daemon_errors = et=>
+    et.on('uncaught', e=>logger.error('Daemon: Uncaught exception: '+e2s(e)));
+
+const check_deamon_supported = (no_throw=false)=>{
+    if (forever)
+        return true;
+    if (no_throw)
+        return false;
+    throw new Error('Deamon mode not supported');
+};
 
 class Lum_node_index {
     constructor(argv){
         this.argv = argv;
         perr.run({enabled: !argv.no_usage_stats, zagent: argv.zagent});
     }
-    is_daemon_running(list){
-        const daemon = list.find(p=>p.name==lpm_config.daemon_name);
-        return !!daemon &&
-            ['online', 'launching'].includes(daemon.pm2_env.status);
+    is_daemon_running(){
+        const _this = this;
+        if (!check_deamon_supported(true))
+            return false;
+        return etask(function*is_daemon_running(){
+            const {index} = yield _this._find_child(new Daemon_mgr().script);
+            return index > -1;
+        });
     }
-    pm2_cmd(command, opt){ return etask(function*pm2_cmd(){
-        this.on('uncaught', e=>{
-            if (e.message=='process name not found')
-                logger.notice('There is no running Proxy Manager daemons');
-            else
-                logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+    _find_child(script){
+        const _this = this;
+        return etask(function*(){
+            const list = (yield _this.ensure_daemon_processes(100))||[];
+            const index = list.findIndex(p=>p.running &&
+                p.uid==lpm_config.daemon_name && p.file==script);
+            return {index, ...list[index]||{}};
         });
-        this.on('finally', ()=>pm2.disconnect());
-        yield etask.nfn_apply(pm2, '.connect', []);
-        if (!Array.isArray(opt))
-            opt = [opt];
-        return yield etask.nfn_apply(pm2, '.'+command, opt);
-    }); }
-    start_daemon(){
-    return etask(function*start_daemon(){
-        this.on('uncaught', e=>{
-            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+    }
+    ensure_daemon_processes(max_tries=Infinity){
+        return etask(function*(){
+            let i = 0, list;
+            do {
+                forever.list(false, (e, res)=>{
+                    if (e)
+                        logger.error('Forever list: '+e2s(e));
+                    this.continue(res);
+                });
+                list = yield this.wait();
+            } while (!list && ++i<max_tries);
+            return list;
         });
-        this.on('finally', ()=>pm2.disconnect());
-        const script = path.resolve(__dirname, 'index.js');
-        logger.notice('Running in daemon: %s', script);
-        const daemon_start_opt = {
-            name: lpm_config.daemon_name,
-            script,
-            mergeLogs: false,
-            output: '/dev/null',
-            error: '/dev/null',
-            autorestart: true,
-            killTimeout: 5000,
-            restartDelay: 5000,
+    }
+    start_daemon(){ return etask(function*start_daemon(){
+        handle_daemon_errors(this);
+        check_deamon_supported();
+        const mgr = new Daemon_mgr();
+        logger.notice('Running in daemon: %s', mgr.script);
+        mgr.log.clear();
+        forever.startDaemon(mgr.script, {
+            max: 1,
+            minUptime: 2000,
+            silent: true,
+            uid: lpm_config.daemon_name,
+            logFile: mgr.log.files.daemon,
+            outFile: mgr.log.files.out,
+            errFile: mgr.log.files.err,
             args: process.argv.filter(arg=>arg!='-d'&&!arg.includes('daemon')),
-        };
-        yield etask.nfn_apply(pm2, '.connect', []);
-        yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
-        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
-        bus.on('log:out', data=>{
-            if (data.process.name!=lpm_config.daemon_name)
-                return;
-            process.stdout.write(data.data);
-            if (data.data.includes('Open admin browser') ||
-                data.data.includes('Shutdown'))
-            {
-                this.continue();
-            }
-        });
-        yield this.wait();
+            killTree: true,
+        }).on('spawn', ()=>logger.notice('Daemon spawned'));
+        if (!(yield mgr.log.ensure('out')))
+            return logger.error('Can not find daemon log file');
+        const last_line = yield wait_file_line(mgr.log.files.out,
+            mgr.log.is_continue_log, {stdout: true});
+        if (mgr.log.is_fail_log(last_line))
+            logger.error('Daemon failed to start');
     }); }
     stop_daemon(){
         const _this = this;
     return etask(function*stop_daemon(){
-        this.on('uncaught', e=>{
-            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        handle_daemon_errors(this);
+        check_deamon_supported();
+        const {index, pid} = yield _this._find_child(new Daemon_mgr().script);
+        if (!pid)
+            return logger.notice('There is no running PMGR daemons');
+        const stop_emitter = forever.stop(index);
+        stop_emitter.on('stop', ()=>{
+            logger.notice('Daemon process stopped');
+            this.continue();
         });
-        this.on('finally', ()=>pm2.disconnect());
-        yield etask.nfn_apply(pm2, '.connect', []);
-        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
-        if (!_this.is_daemon_running(pm2_list))
-            return logger.notice('There is no running Proxy Manager daemons');
-        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
-        let start_logging;
-        bus.on('log:out', data=>{
-            if (data.process.name!=lpm_config.daemon_name)
-                return;
-            start_logging = start_logging||data.data.includes('Shutdown');
-            if (!start_logging || !data.data.includes('NOTICE'))
-                return;
-            process.stdout.write(data.data);
+        stop_emitter.on('error', e=>{
+            logger.error('Daemon process stop error: %s', e.message);
+            this.continue();
         });
-        bus.on('process:event', data=>{
-            if (data.process.name==lpm_config.daemon_name &&
-                ['delete', 'stop'].includes(data.event))
-            {
-                this.continue();
-            }
-        });
-        yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
         yield this.wait();
     }); }
     restart_daemon(){
         const _this = this;
-        return etask(function*(){
-            const pm2_list = yield _this.pm2_cmd('list');
-            if (_this.is_daemon_running(pm2_list))
-            {
-                logger.notice('Restarting daemon...');
-                yield _this.pm2_cmd('restart', lpm_config.daemon_name);
-                logger.notice('Daemon restarted');
-            }
-        });
-    }
+    return etask(function*(){
+        handle_daemon_errors(this);
+        check_deamon_supported();
+        this.alarm(30*date.ms.SEC, {throw: new Error('timeout')});
+        const mgr = new Daemon_mgr();
+        const {index, pid} = yield _this._find_child(mgr.script);
+        if (!pid)
+            return logger.notice('There is no running PMGR daemons');
+        logger.notice('Restarting daemon...');
+        const on_error = e=>{
+            logger.error('Error: %s', e.message);
+            this.continue();
+        };
+        if (!(yield mgr.log.ensure('out')))
+        {
+            logger.error('Can not find daemon log file %s. Output ommited',
+                mgr.log.files.out);
+            forever.restart(index).on('restart', ()=>{
+                logger.notice('Daemon process (%s) restarted');
+                this.continue();
+            }).on('error', on_error);
+            return yield this.wait();
+        }
+        forever.restart(index).on('error', on_error);
+        yield wait_file_line(mgr.log.files.out, mgr.log.is_continue_log,
+            {stdout: true});
+    }); }
     show_status(){
         const _this = this;
         return etask(function*status(){
         this.on('uncaught', e=>{
-            logger.error('Status: Uncaught exception: '+zerr.e2s(e));
+            logger.error('Status: Uncaught exception: '+e2s(e));
         });
-        const pm2_list = yield _this.pm2_cmd('list');
-        const running_daemon = _this.is_daemon_running(pm2_list);
+        const running_daemon = yield _this.is_daemon_running();
         const tasks = yield util_lib.get_lpm_tasks({all_processes: true});
         if (!tasks.length && !running_daemon)
             return logger.notice('There is no Proxy Manager process running');
@@ -258,6 +363,8 @@ class Lum_node_index {
             return this.start_daemon();
         if (this.argv.daemon_opt.stop)
             return this.stop_daemon();
+        if (this.argv.daemon_opt.restart)
+            return this.restart_daemon();
         if (this.argv.status)
             return this.show_status();
         if (this.argv.genCert)

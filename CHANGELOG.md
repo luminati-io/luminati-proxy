@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.512.323 Stable
+- :star: Deamon mode using forever instead of pm2
+
 ## 1.510.674 Development Latest
 - :star: Remove deprecated request package dependency
 - :star: Check for ReDoS user input
