@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.512.980",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Bump dependencies versions"
+            },
+            {
+                "type": "star",
+                "text": "Remove check-node-version dependency"
+            }
+        ]
+    },
+    {
         "ver": "1.512.323",
         "type": "stable",
         "changes": [

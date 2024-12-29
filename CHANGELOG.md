@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.512.980 Stable
+- :star: Bump dependencies versions
+- :star: Remove check-node-version dependency
+
 ## 1.512.323 Stable
 - :star: Deamon mode using forever instead of pm2
 

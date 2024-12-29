@@ -138,11 +138,11 @@ perr()
 reset_luminati_symlink()
 {
     local force_log=$1 err2out=$2
-    if ! [ $(npm bin -g) -ef /usr/local/bin ]; then
+    if ! [ $(npm get prefix)/bin -ef /usr/local/bin ]; then
         if [ -f "/usr/local/bin/luminati" ]; then
             sudo_cmd "rm /usr/local/bin/luminati" $force_log $err2out
         fi
-        sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati" $force_log $err2out
+        sudo_cmd "ln -s $(npm get prefix)/bin/luminati /usr/local/bin/luminati" $force_log $err2out
         sudo_cmd "chmod a+x /usr/local/bin/luminati" $force_log $err2out
     fi
 }

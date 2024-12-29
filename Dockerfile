@@ -7,7 +7,7 @@
 # Pull base image.
 FROM node:20.12.1-bookworm
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 RUN apt-get update && apt-get install -y gconf-service libasound2 libatk1.0-0 \
     libcairo2 libcups2 libfontconfig1 libgdk-pixbuf2.0-0 libgtk-3-0 libnspr4 \
@@ -24,14 +24,14 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN rm google-chrome-stable_current_amd64.deb
 
 USER root
-RUN npm install -g npm@8.6.0
-RUN npm config set user root
+RUN npm install -g npm@10.5.0
+# RUN npm config set user root
 
 # Install Proxy Manager
 RUN npm install -g @luminati-io/luminati-proxy --legacy-peer-deps
 
 # Mark environment as Docker for CLI output
-ENV DOCKER 1
+ENV DOCKER=1
 
 # Define default command.
 CMD ["luminati", "--help"]

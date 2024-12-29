@@ -67,7 +67,6 @@
     "colors": "1.4.0",
     "snyk": "1.1100.0",
     "body-parser": "1.20.3",
-    "check-node-version": "4.0.1",
     "electron-updater": "6.3.9",
     "express": "4.21.0",
     "helmet": "8.0.0",
@@ -89,7 +88,7 @@
     "tasklist": "4.0.1",
     "yargs": "14.2.0",
     "open": "7.0.0",
-    "prismjs": "1.27.0",
+    "prismjs": "1.29.0",
     "classnames": "2.2.6",
     "netmask": "2.0.1",
     "uuid": "11.0.3",
@@ -519,7 +518,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "9e3850effd3c3ea24eb1afd5e2136d93"
+    "md5": "53cb2397aaf3d6d8358a4b4965b70d84"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -550,5 +549,28 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.512.323"
+  "version": "1.512.980",
+  "overrides": {
+    "forever": {
+      "chokidar": "3.6.0"
+    },
+    "@babel/cli": {
+      "make-dir": "^5.0.0"
+    },
+    "@babel/core": {
+      "semver": "7.5.2"
+    },
+    "@babel/helper-compilation-targets": {
+      "semver": "7.5.2"
+    },
+    "@babel/plugin-transform-runtime": {
+      "semver": "7.5.2"
+    },
+    "babel-plugin-polyfill-corejs2": {
+      "semver": "7.5.2"
+    },
+    "@babel/preset-env": {
+      "semver": "7.5.2"
+    }
+  }
 }
