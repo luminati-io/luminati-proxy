@@ -53,17 +53,11 @@
     "productName": "Proxy Manager"
   },
   "dependencies": {
-    "@babel/cli": "7.25.9",
     "@babel/core": "7.26.0",
-    "babel-loader": "9.2.1",
-    "@babel/preset-env": "7.26.0",
-    "@babel/preset-react": "7.25.9",
-    "@babel/plugin-transform-runtime": "7.25.9",
-    "@babel/plugin-transform-modules-amd": "7.24.6",
     "@babel/plugin-transform-export-namespace-from": "7.25.9",
     "@babel/plugin-transform-modules-commonjs": "7.25.9",
     "uikit": "npm:@luminati-io/uikit@6.3.19",
-    "user-agents": "~1.0.1056",
+    "user-agents": "~1.1.403",
     "colors": "1.4.0",
     "snyk": "1.1100.0",
     "body-parser": "1.20.3",
@@ -95,7 +89,7 @@
     "compression": "1.7.4",
     "ws": "8.17.1",
     "diacritic": "0.0.2",
-    "rimraf": "2.5.2",
+    "rimraf": "2.6.2",
     "prompt-sync": "4.1.7",
     "lum_lokijs": "1.5.11",
     "lum_socksv5": "0.0.13",
@@ -136,6 +130,13 @@
   },
   "description": "A configurable local proxy for brightdata.com",
   "devDependencies": {
+    "@babel/cli": "7.25.9",
+    "@babel/preset-env": "7.26.0",
+    "@babel/preset-react": "7.25.9",
+    "@babel/plugin-transform-runtime": "7.25.9",
+    "@babel/plugin-transform-modules-amd": "7.24.6",
+    "@babel/traverse": "7.25.9",
+    "babel-loader": "9.2.1",
     "core-js": "3.24.1",
     "animate.css": "3.5.2",
     "css-loader": "0.28.4",
@@ -155,8 +156,27 @@
     "webpack-cli": "5.1.4",
     "webpack-merge": "6.0.1",
     "prop-types": "15.8.1",
-    "react-table": "7.8.0",
-    "@babel/traverse": "7.25.9"
+    "react-table": "7.8.0"
+  },
+  "overrides": {
+    "forever": {
+      "chokidar": "3.6.0"
+    },
+    "@babel/cli": {
+      "make-dir": "^5.0.0"
+    },
+    "@babel/core": {
+      "semver": "7.5.2"
+    },
+    "@pm2/agent": {
+      "ws": "8.17.1"
+    },
+    "@pm2/js-api": {
+      "ws": "8.17.1"
+    },
+    "optimist": {
+      "minimist": "1.2.8"
+    }
   },
   "engines": {
     "node": ">=20.12.1"
@@ -518,7 +538,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "53cb2397aaf3d6d8358a4b4965b70d84"
+    "md5": "a4abd82f10adf083a2485b97148b1bef"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -531,7 +551,7 @@
   "optionalDependencies": {
     "heapdump": "0.3.12",
     "sinon": "14.0.0",
-    "puppeteer": "22.8.2",
+    "puppeteer": "23.11.1",
     "longjohn": "0.2.12"
   },
   "preferGlobal": true,
@@ -549,28 +569,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.512.980",
-  "overrides": {
-    "forever": {
-      "chokidar": "3.6.0"
-    },
-    "@babel/cli": {
-      "make-dir": "^5.0.0"
-    },
-    "@babel/core": {
-      "semver": "7.5.2"
-    },
-    "@babel/helper-compilation-targets": {
-      "semver": "7.5.2"
-    },
-    "@babel/plugin-transform-runtime": {
-      "semver": "7.5.2"
-    },
-    "babel-plugin-polyfill-corejs2": {
-      "semver": "7.5.2"
-    },
-    "@babel/preset-env": {
-      "semver": "7.5.2"
-    }
-  }
+  "version": "1.514.763"
 }

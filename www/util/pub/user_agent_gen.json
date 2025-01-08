@@ -20,8 +20,8 @@
         "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
     },
     {
-        "label": "Chrome 118 iOS 17.0",
-        "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.92 Mobile/15E148 Safari/604.1"
+        "label": "Chrome 119 iOS 17.2",
+        "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/119.0.6045.41 Mobile/15E148 Safari/604.1"
     },
     {
         "label": "Chrome 118 Chromium OS 14541.0.0",
@@ -72,7 +72,7 @@
         "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.5845.933 YaBrowser/23.9.3.933 Yowser/2.5 Safari/537.36"
     },
     {
-        "label": "GSA 287 iOS 17.0",
-        "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/287.0.575244645 Mobile/15E148 Safari/604.1"
+        "label": "GSA 287 iOS 16.7",
+        "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/287.0.575244645 Mobile/15E148 Safari/604.1"
     }
 ]

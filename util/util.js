@@ -691,4 +691,13 @@ E.stub_wrapper = fn=>{
     return wrapper;
 };
 
+E.with_stub_wrappers = obj=>{
+    if (!E.is_mocha())
+        return obj;
+    obj = Object.assign({}, obj);
+    for (const [k, fn] of Object.entries(obj))
+        obj[k] = E.stub_wrapper(fn);
+    return obj;
+};
+
 return E; }); }());

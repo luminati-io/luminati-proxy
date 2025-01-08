@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.514.763",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Bump dependencies versions"
+            },
+            {
+                "type": "bug",
+                "text": "Fix login fails with bad_token message if 2fa enabled"
+            },
+            {
+                "type": "bug",
+                "text": "Fix logout crashes the process"
+            }
+        ]
+    },
+    {
         "ver": "1.512.980",
         "type": "stable",
         "changes": [

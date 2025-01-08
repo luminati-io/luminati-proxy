@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.514.763 Stable
+- :star: Bump dependencies versions
+- :bug: Fix login fails with bad_token message if 2fa enabled
+- :bug: Fix logout crashes the process
+
 ## 1.512.980 Stable
 - :star: Bump dependencies versions
 - :star: Remove check-node-version dependency
