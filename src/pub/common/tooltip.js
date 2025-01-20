@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
+import bsm from '/www/util/pub/bootstrap_methods.js';
 import $ from 'jquery';
 import '../css/tooltip.less';
 
@@ -12,10 +13,10 @@ export default class Tooltip extends Pure_component {
         $(this.ref).tooltip();
     }
     componentWillUnmount(){
-        $(this.ref).tooltip('destroy');
+        $(this.ref).tooltip(bsm.destroy);
     }
     componentDidUpdate(){
-        $(this.ref).attr('title', this.props.title).tooltip('fixTitle');
+        $(this.ref).attr('title', this.props.title).tooltip(bsm.fix_title);
     }
     on_mouse_leave(){
         if (!this.ref)

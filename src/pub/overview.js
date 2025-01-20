@@ -207,7 +207,7 @@ const Nav_icon = withRouter(props=>{
 const Logs_off_btn = props=>
   <Tooltip title="Logs are disabled. Click here to turn it on again">
     <button className="enable_btn enable_btn_logs" onClick={props.turn_on}>
-      <i className="glyphicon glyphicon-chevron-up"/>
+      <i className="fa fa-chevron-up"/>
     </button>
   </Tooltip>;
 

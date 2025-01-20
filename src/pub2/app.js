@@ -276,6 +276,7 @@ const Global_styles_brd = createGlobalStyle`
 
     body {
         font-family: "Gibson";
+        font-size: 14px;
     }
   }
 `;

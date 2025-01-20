@@ -62,7 +62,7 @@
     "snyk": "1.1100.0",
     "body-parser": "1.20.3",
     "electron-updater": "6.3.9",
-    "express": "4.21.0",
+    "express": "^4.21.0",
     "helmet": "8.0.0",
     "express-rate-limit": "7.4.1",
     "express-session": "1.18.1",
@@ -102,7 +102,7 @@
     "winston-syslog": "2.7.1",
     "winston-logzio": "5.1.9",
     "s3-streamlogger": "1.10.1",
-    "bootstrap": "3.4.1",
+    "bootstrap": "4.6.2",
     "codemirror": "5.58.2",
     "es6-shim": "0.35.5",
     "event-target-shim": "5.0.1",
@@ -176,6 +176,9 @@
     },
     "optimist": {
       "minimist": "1.2.8"
+    },
+    "broadway": {
+      "nconf": "0.11.4"
     }
   },
   "engines": {
@@ -538,7 +541,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "a4abd82f10adf083a2485b97148b1bef"
+    "md5": "fdcb75b409305d8c2dffee71ab30a80f"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -549,7 +552,6 @@
     }
   ],
   "optionalDependencies": {
-    "heapdump": "0.3.12",
     "sinon": "14.0.0",
     "puppeteer": "23.11.1",
     "longjohn": "0.2.12"
@@ -569,5 +571,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.514.763"
+  "version": "1.517.182"
 }

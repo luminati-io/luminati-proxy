@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint react:true*/
+'use strict'; /*jslint react:true, es9:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_select from 'react-select/creatable';
@@ -207,12 +207,12 @@ class Pin extends Pure_component {
     get_label = ip=>ip==ANY_IP ? 'any' : ip;
     render(){
         const {children, edit, disabled, show_any} = this.props;
-        const input_classes = classnames({hidden: !edit});
+        const input_classes = classnames({'d-none': !edit});
         return <div className={classnames('pin', {active: edit, disabled})}
           onBlur={this.on_blur}>
           {!disabled &&
             <div className="x" onClick={this.remove}>
-            <div className="glyphicon glyphicon-remove"/>
+            <div className="fa fa-times"/>
           </div>}
           <div className="content" onClick={this.edit}>
             {!edit && this.get_label(children)}
@@ -227,7 +227,7 @@ class Pin extends Pure_component {
           }
           {edit &&
             <div className="v">
-              <div className="glyphicon glyphicon-ok"/>
+              <div className="fa fa-check"/>
             </div>
           }
         </div>;
@@ -239,7 +239,7 @@ export const Pin_btn = ({on_click, title, tooltip, disabled})=>
       <button className="btn btn_lpm btn_lpm_small add_pin"
         onClick={on_click} disabled={disabled}>
         {title}
-        <i className="glyphicon glyphicon-plus"/>
+        <i className="fa fa-plus"/>
       </button>
     </Tooltip>;
 
@@ -269,8 +269,8 @@ export class Select_number extends Pure_component {
         if (!this.props.data)
             return this.opt_from_range();
         if (this.props.data[0] && this.props.data[0].value!==undefined)
-            return this.props.data.map(d=>d.value);
-        return this.props.data;
+            return this.props.data.map(d=>d.value).filter(Boolean);
+        return this.props.data.filter(d=>d?.value);
     };
     value_to_option = value=>{
         if (value && value.label)
@@ -542,7 +542,6 @@ export const Typeahead_wrapper = props=>{
         options={translate(t, props.data)}
         maxResults={10}
         disabled={props.disabled}
-        selectHintOnEnter
         onChange={on_change_wrapper}
         selected={get_selected(t, props.val)}
         onInputChange={props.on_input_change}

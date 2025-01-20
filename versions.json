@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.517.182",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Bump bootstrap version"
+            },
+            {
+                "type": "bug",
+                "text": "Fix IPs not displayed in 'Select the IPs' modal"
+            }
+        ]
+    },
+    {
         "ver": "1.514.763",
         "type": "stable",
         "changes": [

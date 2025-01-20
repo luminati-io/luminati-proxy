@@ -1,7 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-define(['react', 'jquery', '/www/util/pub/pure_component.js'],
-    function(React, $, Pure_component)
+define(['react', 'jquery', '/www/util/pub/bootstrap_methods.js',
+    '/www/util/pub/pure_component.js'],
+    function(React, $, bsm, Pure_component)
 {
 return class Tooltip extends Pure_component {
     componentDidMount(){
@@ -10,10 +11,10 @@ return class Tooltip extends Pure_component {
         $(this.ref).tooltip();
     }
     componentWillUnmount(){
-        $(this.ref).tooltip('destroy');
+        $(this.ref).tooltip(bsm.destroy);
     }
     componentDidUpdate(){
-        $(this.ref).attr('title', this.props.title).tooltip('fixTitle');
+        $(this.ref).attr('title', this.props.title).tooltip(bsm.fix_title);
     }
     on_mouse_leave(){
         if (!this.ref)

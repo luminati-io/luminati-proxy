@@ -22,6 +22,7 @@ import {
     Icon,
     theme,
 } from 'uikit';
+import bsm from '/www/util/pub/bootstrap_methods.js';
 import conv from '../../util/conv.js';
 import date from '../../util/date.js';
 import presets from './common/presets.js';
@@ -219,7 +220,7 @@ export const Loader_small = props=>{
 export class Code extends Pure_component {
     componentDidMount(){
         $(this.ref).find('.btn_copy').tooltip('show')
-        .attr('title', t('Copy to clipboard')).tooltip('fixTitle');
+        .attr('title', t('Copy to clipboard')).tooltip(bsm.fix_title);
     }
     set_ref(e){ this.ref = e; }
     copy(){
@@ -232,9 +233,9 @@ export class Code extends Pure_component {
         try {
             document.execCommand('copy');
             $(this.ref).find('.btn_copy').attr('title', t('Copied!'))
-            .tooltip('fixTitle')
+            .tooltip(bsm.fix_title)
             .tooltip('show').attr('title', t('Copy to clipboard'))
-            .tooltip('fixTitle');
+            .tooltip(bsm.fix_title);
         } catch(e){
             this.etask(function*(){
                 yield report_exception(e, 'common.Code.copy');
@@ -376,7 +377,7 @@ export class Copy_btn extends Pure_component {
     btn = React.createRef();
     refreshTooltip(){
         $(this.btn.current)
-        .attr('title', t('Copy to clipboard')).tooltip('fixTitle');
+        .attr('title', t('Copy to clipboard')).tooltip(bsm.fix_title);
     }
     componentDidMount(){ this.refreshTooltip(); }
     componentDidUpdate(){ this.refreshTooltip(); }
@@ -388,9 +389,9 @@ export class Copy_btn extends Pure_component {
         try {
             document.execCommand('copy');
             $(this.btn.current).attr('title', t('Copied!'))
-            .tooltip('fixTitle')
+            .tooltip(bsm.fix_title)
             .tooltip('show').attr('title', t('Copy to clipboard'))
-            .tooltip('fixTitle');
+            .tooltip(bsm.fix_title);
         } catch(e){
             this.etask(function*(){
                 yield report_exception(e, 'common.Copy_btn.copy');
@@ -452,9 +453,7 @@ export const Faq_link = with_www_api(props=>{
         window.open(url, '_blank');
     };
     return <Tooltip title={t('Read more')}>
-      <span
-        onClick={click}
-        className="glyphicon glyphicon-question-sign faq_link"/>
+      <span onClick={click} className="fa fa-question faq_link"/>
     </Tooltip>;
 });
 
@@ -644,7 +643,7 @@ export const Link_icon = props=>{
     const icon = img
         ? <div className="img_icon"
             style={{backgroundImage: `url(${img})`}}></div>
-        : <i className={classnames('glyphicon', 'glyphicon-'+id)}/>;
+        : <i className={classnames('fa', 'fa-'+id)}/>;
     return <Tooltip title={t(tooltip)} key={id}>
       <span className={classnames('link', 'icon_link', classes)}
         onClick={on_click}>
@@ -656,14 +655,14 @@ export const Link_icon = props=>{
 export const Add_icon = ({click, tooltip})=>
     <Tooltip title={tooltip}>
       <span className="link icon_link top right add_header" onClick={click}>
-        <i className="glyphicon glyphicon-plus"/>
+        <i className="fa fa-plus"/>
       </span>
     </Tooltip>;
 
 export const Remove_icon = ({click, tooltip})=>
     <Tooltip title={tooltip}>
       <span className="link icon_link top" onClick={click}>
-        <i className="glyphicon glyphicon-trash"/>
+        <i className="fa fa-trash"/>
       </span>
     </Tooltip>;
 
@@ -780,8 +779,7 @@ export const Alert = props=>{
         set_close_tm(tm);
         return ()=>{ clearTimeout(tm); };
     }, []);
-    return <div className="alert_wrapper">
-      <RB_Alert
+    return <RB_Alert
         className="alert_wrapper"
         variant={props.variant}
         dismissible={props.dismissible}
@@ -790,8 +788,7 @@ export const Alert = props=>{
         onClose={()=>{ clearTimeout(close_tm); props.on_close(); }}>
         {props.heading && <RB_Alert.Heading>{props.heading}</RB_Alert.Heading>}
         {props.text && <div>{props.text}</div>}
-      </RB_Alert>
-    </div>;
+    </RB_Alert>;
 };
 
 const Context_menu_button = props=>{

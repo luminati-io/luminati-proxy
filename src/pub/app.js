@@ -3,7 +3,7 @@
 import _ from 'lodash4';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import classnames from 'classnames';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
 import {createGlobalStyle} from 'styled-components';
@@ -277,6 +277,7 @@ const Global_styles_brd = createGlobalStyle`
 
     body {
         font-family: "Gibson";
+        font-size: 14px;
     }
   }
 `;
@@ -421,4 +422,4 @@ class Root extends Pure_component {
     }
 }
 
-ReactDOM.render(<Root/>, document.getElementById('react_root'));
+createRoot(document.getElementById('react_root')).render(<Root/>);

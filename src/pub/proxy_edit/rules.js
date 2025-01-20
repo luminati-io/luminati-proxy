@@ -309,7 +309,7 @@ const New_rule_btn = ({on_click, disabled, children})=>{
     return <button className="btn btn_lpm btn_lpm_small rule_add_btn"
           onClick={on_click} disabled={disabled}>
           {children}
-          <i className="glyphicon glyphicon-plus"/>
+          <i className="fa fa-plus"/>
         </button>;
 };
 

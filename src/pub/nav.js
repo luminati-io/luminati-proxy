@@ -160,7 +160,7 @@ const Patent = with_www_api(props=>
 
 const Custom_certificate = ({custom})=>
   <Tooltip title="User certificate" placement="left" >
-    <span className={classnames('glyphicon', 'glyphicon-certificate', 'cert',
+    <span className={classnames('fa', 'fa-certificate', 'cert',
       custom ? 'custom' : '')}/>
   </Tooltip>;
 

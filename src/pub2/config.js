@@ -113,9 +113,9 @@ const Nav_buttons = props=>{
     {
         return <div className="nav_buttons">
               <Link_icon tooltip="Cancel" on_click={props.click_cancel}
-                id="remove"/>
+                id="times"/>
               <Link_icon tooltip="Save" on_click={props.click_save}
-                classes={save_class} id="ok"/>
+                classes={save_class} id="check"/>
             </div>;
     }
     const tooltip = props.read_only ? 'It is not possible to edit the config '

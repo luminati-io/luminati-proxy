@@ -73,7 +73,7 @@ const Stats_off_btn = props=>
     placement="left">
     <button className="enable_btn enable_btn_stats" disabled={props.disabled}
       onClick={props.turn_on_stats}>
-      <i className="glyphicon glyphicon-chevron-left"/>
+      <i className="fa fa-chevron-left"/>
     </button>
   </Tooltip>;
 

@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.517.182 Stable
+- :star: Bump bootstrap version
+- :bug: Fix IPs not displayed in 'Select the IPs' modal
+
 ## 1.514.763 Stable
 - :star: Bump dependencies versions
 - :bug: Fix login fails with bad_token message if 2fa enabled

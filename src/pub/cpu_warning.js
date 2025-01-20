@@ -28,7 +28,7 @@ class Cpu_warning extends React.Component {
         if (!level)
             return null;
         return <div className="cpu_warning">
-          <i className={classnames('glyphicon', `glyphicon-alert`)}/>
+          <i className={classnames('fa', `fa-bolt`)}/>
           <span><T>High CPU usage: </T>{usage}%</span>
         </div>;
     }

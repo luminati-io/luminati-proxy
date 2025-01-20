@@ -320,7 +320,7 @@ h4 { margin: 0; }
         .cpu_warning {
             white-space: nowrap;
             margin-right: 40px;
-            .glyphicon { margin-right: 5px; }
+            .fa { margin-right: 5px; }
         }
     }
     .dropdown {
@@ -332,10 +332,16 @@ h4 { margin: 0; }
         text-decoration: none;
     }
     .dropdown-menu li a {
+        display: block;
         color: @first_color;
         text-decoration: none;
         cursor: pointer;
         .fi { margin-right: 5px; }
+        padding: 3px 20px;
+        clear: both;
+        font-weight: 400;
+        line-height: 1.5;
+        white-space: nowrap;
     }
     .schema {
         width: 100%;
@@ -624,7 +630,7 @@ ul.bullets {
                     background-color: @first_color;
                     color: white;
                 }
-                .glyphicon-remove {
+                .fa-times {
                     position: relative;
                     top: 1px;
                 }
@@ -677,7 +683,7 @@ ul.bullets {
                     background-color: @first_color;
                     color: white;
                 }
-                .glyphicon-remove {
+                .fa-times {
                     position: relative;
                     top: 1px;
                 }
@@ -713,7 +719,7 @@ ul.bullets {
         margin-left: 0;
         cursor: pointer;
         height: 31px;
-        .glyphicon-plus {
+        .fa-plus {
             margin-left: 5px;
         }
     }
@@ -747,7 +753,7 @@ ul.bullets {
                     background-color: @first_color;
                     color: white;
                 }
-                .glyphicon-remove {
+                .fa-times {
                     position: relative;
                     top: 1px;
                 }
@@ -781,7 +787,7 @@ ul.bullets {
         margin-left: 0;
         cursor: pointer;
         height: 31px;
-        .glyphicon-plus {
+        .fa-plus {
             margin-left: 5px;
         }
     }
@@ -1095,6 +1101,7 @@ span.icon_link {
     .modal-header {
         padding: 15px 40px 15px 15px;
         border: 0;
+        display: block;
         h4.modal-title, h4 {
             font-size: 23px;
             font-weight: bold;
@@ -1112,16 +1119,21 @@ span.icon_link {
             top: 20px;
             right: 20px;
         }
+        .close {
+            padding: 0;
+        }
         &.no_header { padding: 0px; }
     }
     .modal-body {
         padding: 15px 20px 0;
+        display: block;
     }
     .modal-footer {
         padding: 15px 20px;
         border: 0;
         text-align: right;
         position: relative;
+        display: block;
         .default_footer {
             text-align: right;
             .btn.btn_lpm {
