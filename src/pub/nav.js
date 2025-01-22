@@ -176,7 +176,7 @@ class Upgrade_downgrade_modal extends Pure_component {
     confirm(){
         const loading_modal = this.props.action=='upgrade' ?
             '#upgrading' : '#downgrading';
-        window.setTimeout(()=>$(loading_modal).modal(), 500);
+        window.setTimeout(()=>$(loading_modal).modal('show'), 500);
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
@@ -184,7 +184,7 @@ class Upgrade_downgrade_modal extends Pure_component {
                 if (_this.props.action=='upgrade')
                 {
                     if (_this.missing_root_perm_err(e))
-                        $('#missing_root_perm').modal();
+                        $('#missing_root_perm').modal('show');
                     setdb.set('head.upgrade_error', e.message);
                     setdb.set('head.upgrading', false);
                 }
@@ -243,10 +243,10 @@ const Account = withRouter(class Account extends Pure_component {
         this.setdb_on('head.backup_exist', backup_exist=>
             this.setState({backup_exist}));
     }
-    open_report_bug = ()=>$('#report_bug_modal').modal();
-    upgrade = ()=>$('#upgrade_modal').modal();
-    downgrade = ()=>$('#downgrade_modal').modal();
-    shutdown = ()=>$('#shutdown_modal').modal();
+    open_report_bug = ()=>$('#report_bug_modal').modal('show');
+    upgrade = ()=>$('#upgrade_modal').modal('show');
+    downgrade = ()=>$('#downgrade_modal').modal('show');
+    shutdown = ()=>$('#shutdown_modal').modal('show');
     logout = ()=>{
         const _this = this;
         this.etask(function*(){
@@ -261,7 +261,8 @@ const Account = withRouter(class Account extends Pure_component {
         const is_downgradable = !zagent && this.state.backup_exist;
         const {customer_id, customer} = this.props.settings;
         return <T>{t=><div className="dropdown">
-              <a className="link dropdown-toggle" data-toggle="dropdown">
+              <a className="link dropdown-toggle" data-bs-toggle='dropdown'
+                data-toggle="dropdown">
                 <span>
                   {customer_id} ({customer})
                   <span style={{marginLeft: 5}} className="caret"/>

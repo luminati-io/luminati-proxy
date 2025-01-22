@@ -16,10 +16,7 @@ export class Modal_dialog extends Pure_component {
     componentDidUpdate(prev_props){
         if (this.props.open==prev_props.open)
             return;
-        if (this.props.open)
-            $(this.ref).modal();
-        else
-            $(this.ref).modal('hide');
+        $(this.ref).modal(this.props.open ? 'show': 'hide');
     }
     willUnmount(){
         $(this.ref).modal('hide');
@@ -104,7 +101,8 @@ export class Modal extends React.Component {
                   <div className={header_classes}>
                     {!this.props.no_close &&
                       <button className="close close_icon" data-dismiss="modal"
-                          aria-label="Close" onClick={this.on_dismiss}>
+                        data-bs-dismiss="modal" aria-label="Close"
+                        onClick={this.on_dismiss}>
                       </button>
                     }
                     {!this.props.no_header && !this.props.custom_header &&

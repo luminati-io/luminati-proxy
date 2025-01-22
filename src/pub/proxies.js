@@ -134,7 +134,7 @@ class Browser_cell extends Pure_component {
         this.etask(function*(){
             const res = yield Api.get(`browser/${_this.props.proxy.port}`);
             if ((res||'').includes('Fetching'))
-                $('#fetching_chrome_modal').modal();
+                $('#fetching_chrome_modal').modal('show');
         });
     };
     render(){

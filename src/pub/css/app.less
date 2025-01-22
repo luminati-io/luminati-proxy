@@ -82,6 +82,17 @@ body {
 html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
     height: 100%;
 }
+button{
+    &.close {
+        padding: 0;
+        cursor: pointer;
+        background: transparent;
+        border: 0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+}
 h4, .h4 {
     font-size: 18px;
 }
@@ -114,7 +125,8 @@ h4, .h4 {
 }
 .alert_wrapper {
     display: block;
-    .alert-dismissible .close {
+    &.alert-dismissible .close {
+        position: relative;
         color: inherit;
         opacity: 1;
         text-shadow: none;
@@ -122,4 +134,31 @@ h4, .h4 {
         right: 10px;
         top: 0px;
     }
+}
+.alert-dismissible {
+    padding-right: unset;
+    &.close {
+        position: relative;
+        top: -2px;
+        right: -21px;
+        color: inherit;
+    }
+}
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 1;
+    color: black;
+    text-shadow: 0 1px 0 white;
+    opacity: 0.2;
+}
+.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+    color: unset;
+    cursor: not-allowed;
+    opacity: 0.65;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-color: rgba(0, 77, 116, 0.2);
+    border-color: rgba(0, 59, 88, 0.2);
 }

@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.517.992 Development Latest
+- :star: Bump bootstrap to 5.x
+- :star: Bump docker npm to 10.9.2
+
 ## 1.517.182 Stable
 - :star: Bump bootstrap version
 - :bug: Fix IPs not displayed in 'Select the IPs' modal

@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
+import $ from 'jquery';
 import _ from 'lodash4';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
@@ -37,6 +38,8 @@ import i18n, {TranslationContext, is_except_path} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
 
+window.$ = window.$ || $;
+window.JQuery = window.JQuery || $;
 window.setdb = setdb;
 setdb.setMaxListeners(50);
 

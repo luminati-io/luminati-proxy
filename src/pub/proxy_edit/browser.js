@@ -99,7 +99,7 @@ export default class Browser extends Pure_component {
         this.etask(function*(){
             const res = yield Api.get(`browser/${_this.state.form.port}`);
             if ((res||'').includes('Fetching'))
-                $('#fetching_chrome_modal').modal();
+                $('#fetching_chrome_modal').modal('show');
         });
     };
     render(){

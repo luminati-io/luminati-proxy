@@ -22,8 +22,8 @@ export default function Settings(props){
     const [show_alert, set_show_alert] = useState(false);
     const [show_conf, set_show_conf] = useState(false);
     const back_func = ()=>props.history.push({pathname: '/overview'});
-    const btn_click = ()=>show_conf ? $('#settings_confirmation_modal').modal()
-        : back_func();
+    const btn_click = ()=>show_conf ? $('#settings_confirmation_modal')
+        .modal('show') : back_func();
     return <div className="settings vbox">
           <div className="cp_panel vbox">
             <div className="cp_panel_header">
@@ -406,7 +406,7 @@ class Form extends Pure_component {
           />}
           <Loader_small show={this.state.saving}/>
           <button className="btn btn_lpm btn_lpm_primary fit"
-            onClick={()=>$('#save_settings_confirmation_modal').modal()}
+            onClick={()=>$('#save_settings_confirmation_modal').modal('show')}
             disabled={!this.state.is_changed || this.state.saving}>
             <T>Save changes</T>
           </button>

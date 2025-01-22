@@ -1,11 +1,11 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
+import $ from 'jquery';
 import _ from 'lodash4';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import classnames from 'classnames';
-import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
+import {withRouter, Switch, Route} from 'react-router-dom';
 import {createGlobalStyle} from 'styled-components';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -36,6 +36,8 @@ import i18n, {TranslationContext, is_except_path} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
 
+window.$ = window.$ || $;
+window.JQuery = window.JQuery || $;
 window.setdb = setdb;
 setdb.setMaxListeners(50);
 

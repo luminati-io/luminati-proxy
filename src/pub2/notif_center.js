@@ -39,7 +39,7 @@ class Notif_center extends Pure_component {
     }
     open(){
         if (this.state.loaded)
-            $('#notif_modal').modal();
+            $('#notif_modal').modal('show');
     }
     message_clicked(message){
         if (message.code)

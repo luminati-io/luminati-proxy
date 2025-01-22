@@ -535,7 +535,7 @@ class Open_browser_btn extends Pure_component {
         this.etask(function*(){
             const res = yield Api.get(`browser/${_this.props.port}`);
             if ((res||'').includes('Fetching'))
-                $('#fetching_chrome_modal').modal();
+                $('#fetching_chrome_modal').modal('show');
         });
     };
     render(){

@@ -421,8 +421,8 @@ const Index = withRouter(class Index extends Pure_component {
     on_back_click = ()=>{
         ws.post_event('Back to Overview Click',
             {settings_changed: this.state.is_changed});
-        return this.state.is_changed ? $('#port_confirmation_modal').modal()
-            : this.back_func();
+        return this.state.is_changed ? $('#port_confirmation_modal')
+            .modal('show') : this.back_func();
     };
     render(){
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
@@ -453,7 +453,7 @@ const Index = withRouter(class Index extends Pure_component {
                 on_change_preset={this.apply_preset}
                 is_changed={this.state.is_changed}
                 saving={this.state.saving}
-                save={()=>$('#save_port_confirmation_modal').modal()}
+                save={()=>$('#save_port_confirmation_modal').modal('show')}
               />
               <Nav_tabs_wrapper zagent={gs.zagent} />
             </div>
@@ -587,7 +587,7 @@ class Open_browser_btn extends Pure_component {
         this.etask(function*(){
             const res = yield Api.get(`browser/${_this.props.port}`);
             if ((res||'').includes('Fetching'))
-                $('#fetching_chrome_modal').modal();
+                $('#fetching_chrome_modal').modal('show');
         });
     };
     render(){
@@ -672,7 +672,8 @@ class Nav extends Pure_component {
         let no_confirm = localStorage.getItem('no-confirm-zone-preset');
         if (no_confirm && JSON.parse(no_confirm))
             return cb();
-        this.setState({confirm_action: cb}, ()=>$('#confirm_modal').modal());
+        this.setState({confirm_action: cb},
+            ()=>$('#confirm_modal').modal('show'));
     }
     render(){
         const opts = presets.opts(this.is_unblocker(this.props.form.zone));

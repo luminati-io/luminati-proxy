@@ -25,7 +25,7 @@ class Index extends Pure_component {
     email_changed = e=>this.setState({email: e.target.value});
     click_cancel = ()=>this.setState({desc: '', no_upgrade: false});
     click_no_upgrade = ()=>this.setState({no_upgrade: true});
-    click_upgrade = ()=>$('#upgrade_modal').modal();
+    click_upgrade = ()=>$('#upgrade_modal').modal('show');
     click_report = ()=>{
         const desc = this.state.desc;
         const _this = this;
@@ -36,7 +36,7 @@ class Index extends Pure_component {
             const report = {desc, email: _this.state.email};
             const resp = yield Api.json.post('report_bug', report);
             _this.setState({sending: false, modal_msg: _this.success_msg});
-            window.setTimeout(()=>$('#finish_modal').modal(), 500);
+            window.setTimeout(()=>$('#finish_modal').modal('show'), 500);
         });
     };
     render(){

@@ -48,7 +48,7 @@ class Overview extends Pure_component {
                 request_stats: settings.request_stats,
               });
             if (settings.ask_sync_config&&!settings.zagent)
-                $('#sync_config_modal').modal();
+                $('#sync_config_modal').modal('show');
         });
         this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&
             this.setState({tls_warning}));
@@ -82,7 +82,7 @@ class Overview extends Pure_component {
         this.etask(function*(){
             this.finally(()=>$('#applying_config').modal('hide'));
             if (val)
-                $('#applying_config').modal();
+                $('#applying_config').modal('show');
             yield _this.save_settings({sync_config: val});
             if (!val)
                 return;
@@ -182,7 +182,7 @@ class Upgrade extends Pure_component {
         this.setdb_on('head.upgrade_error', upgrade_error=>
             this.setState({upgrade_error}));
     }
-    upgrade = ()=>{ $('#upgrade_modal').modal(); };
+    upgrade = ()=>{ $('#upgrade_modal').modal('show'); };
     render(){
         const {upgrading, upgrade_error, ver_last, ver_node,
             version} = this.state;
@@ -237,7 +237,7 @@ class Upgrade_warning extends Pure_component {
             this.setState({is_upgraded}));
     }
     on_click(){
-        $('#downgrade_modal').modal();
+        $('#downgrade_modal').modal('show');
     }
     render(){
         const {is_upgraded, ver} = this.state;

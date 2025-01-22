@@ -100,7 +100,8 @@ export const Language = props=>{
     if (!curr_lang || props.hidden)
         return null;
     return <div className="dropdown">
-              <a className="link dropdown-toggle" data-toggle="dropdown">
+              <a className="link dropdown-toggle" data-bs-toggle='dropdown'
+                data-toggle="dropdown">
                 <Lang_cell lang={curr_lang}/>
               </a>
               <ul className="dropdown-menu dropdown-menu-right">

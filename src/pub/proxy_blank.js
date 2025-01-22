@@ -9,7 +9,7 @@ import './css/proxy_blank.less';
 
 const open_modal = ()=>{
   ws.post_event('Start Click');
-  $('#add_new_proxy_modal').modal();
+  $('#add_new_proxy_modal').modal('show');
 };
 
 const Proxy_blank = ()=>

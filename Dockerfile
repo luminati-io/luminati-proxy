@@ -24,11 +24,15 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN rm google-chrome-stable_current_amd64.deb
 
 USER root
-RUN npm install -g npm@10.5.0
+RUN npm install -g npm@10.9.2
 # RUN npm config set user root
 
 # Install Proxy Manager
 RUN npm install -g @luminati-io/luminati-proxy --legacy-peer-deps
+
+# Reinstall Proxy Manager dependencies omit dev
+RUN cd /usr/local/lib/node_modules/@luminati-io/luminati-proxy && \
+rm -rf node_modules/ && NODE_ENV=production npm install --legacy-peer-deps
 
 # Mark environment as Docker for CLI output
 ENV DOCKER=1

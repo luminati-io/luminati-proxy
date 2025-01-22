@@ -129,7 +129,7 @@ class Request extends Pure_component {
             if (resp.error)
             {
                 _this.setState({warnings: [{msg: resp.error}]});
-                $('#warnings_modal').modal();
+                $('#warnings_modal').modal('show');
             }
             else
                 _this.props.update_response(resp);

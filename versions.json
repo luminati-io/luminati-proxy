@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.517.992",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Bump bootstrap to 5.x"
+            },
+            {
+                "type": "star",
+                "text": "Bump docker npm to 10.9.2"
+            }
+        ]
+    },
+    {
         "ver": "1.517.182",
         "type": "stable",
         "changes": [

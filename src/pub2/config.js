@@ -46,7 +46,7 @@ class Config extends Pure_component {
             return;
         try {
             JSON.parse(this.cm.doc.getValue());
-            $('#conf_confirmation_modal').modal();
+            $('#conf_confirmation_modal').modal('show');
         } catch(e){
             this.setState({warning: e.message});
         }

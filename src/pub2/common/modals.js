@@ -17,10 +17,7 @@ export class Modal_dialog extends Pure_component {
     componentDidUpdate(prev_props){
         if (this.props.open==prev_props.open)
             return;
-        if (this.props.open)
-            $(this.ref).modal();
-        else
-            $(this.ref).modal('hide');
+        $(this.ref).modal(this.props.open ? 'show' : 'hide');
     }
     willUnmount(){
         $(this.ref).modal('hide');
