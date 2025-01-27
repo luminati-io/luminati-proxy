@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.517.992-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.519.10-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 20.12.1版 (最好用x
@@ -255,6 +255,7 @@ Options:
       --start-upgrader             Install CRON process that checks upgrades
       --stop-upgrader              Removes CRON process that checks upgrades
       --insecure-http-parser       Disables the strict checks
+      --new_proxy_port                                          [default: 33335]
       --proxy_country                                              [default: ""]
       --resolve_proxies_interval                                [default: 10000]
       --info                                                    [default: false]

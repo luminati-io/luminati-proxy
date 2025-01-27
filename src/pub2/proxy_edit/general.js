@@ -255,6 +255,7 @@ export default class General extends Pure_component {
               note={!is_render_plan && <Limit_zone_note zones={render_zones}/>}
             />
             <Config type="yes_no" id="follow_redirect" />
+            <Config type="yes_no" id="new_proxy_port" />
           </Tab_context.Provider>
         </div>;
     }

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.519.10 Development Latest
+- :star: Add port settings option to use proxy port 33335
+
 ## 1.517.992 Development Latest
 - :star: Bump bootstrap to 5.x
 - :star: Bump docker npm to 10.9.2

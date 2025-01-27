@@ -67,6 +67,7 @@ conf.server_default = {
     test_url: 'http://geo.brdtest.com/mygeo.json',
     proxy: 'brd.superproxy.io',
     proxy_port: 22225,
+    new_proxy_port: 33335,
     proxy_retry: 2,
     proxy_country: '',
     socket_inactivity_timeout: 120000,

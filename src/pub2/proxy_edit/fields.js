@@ -363,7 +363,13 @@ export const tabs = {
             follow_redirect: {
                 label: 'Follow redirect',
                 tooltip: 'Auto redirect requests on status code 30x',
-            }
+            },
+            new_proxy_port: {
+                label: 'Use new proxy port',
+                tooltip: 'Use proxy port 33335 instead of 22225',
+                note: 'This option will be removed and port 33335 become'
+                    +' default in future releases',
+            },
         },
     },
 };

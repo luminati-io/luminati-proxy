@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.519.10",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add port settings option to use proxy port 33335"
+            }
+        ]
+    },
+    {
         "ver": "1.517.992",
         "type": "dev",
         "changes": [

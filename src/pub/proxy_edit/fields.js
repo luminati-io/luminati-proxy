@@ -364,10 +364,11 @@ export const tabs = {
                 label: 'Follow redirect',
                 tooltip: 'Auto redirect requests on status code 30x',
             },
-            socket_inactivity_timeout: {
-                label: 'Inactivity timeout',
-                tooltip: 'The amount of milliseconds a socket'
-                    +' can be inactive before it times out and closes',
+            new_proxy_port: {
+                label: 'Use new proxy port',
+                tooltip: 'Use proxy port 33335 instead of 22225',
+                note: 'This option will be removed and port 33335 become'
+                    +' default in future releases',
             },
         },
     },

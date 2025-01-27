@@ -32,6 +32,8 @@ E.is_mocha = function(){
 
 E.is_lxc = function(){ return is_node && +process.env.LXC; };
 
+E.is_prod = function(){ return !E.is_mocha() && !E.is_lxc(); };
+
 // refresh() was added in node 10, we need to support node 8 for webOS TV 5.0
 // https://webostv.developer.lge.com/develop/guides/js-service-basics
 E.is_timer_refresh = (()=>{

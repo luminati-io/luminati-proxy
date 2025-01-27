@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.517.992/luminati-proxy-manager-v1.517.992-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.519.10/luminati-proxy-manager-v1.519.10-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -307,6 +307,7 @@ Options:
       --start-upgrader             Install CRON process that checks upgrades
       --stop-upgrader              Removes CRON process that checks upgrades
       --insecure-http-parser       Disables the strict checks
+      --new_proxy_port                                          [default: 33335]
       --proxy_country                                              [default: ""]
       --resolve_proxies_interval                                [default: 10000]
       --info                                                    [default: false]

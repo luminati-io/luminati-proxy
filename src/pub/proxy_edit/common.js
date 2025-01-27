@@ -85,7 +85,7 @@ export const Config = withRouter(class Config extends Pure_component {
               val={this.state.val===undefined ? '' : this.state.val}
               disabled={disabled}
               disabled_ips={this.props.disabled_ips}
-              note={this.props.note}
+              note={this.props.note||tabs[tab_id].fields[id].note}
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}
               label={tabs[tab_id].fields[id].label}
