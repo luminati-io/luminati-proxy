@@ -1,14 +1,12 @@
 # Proxy manager
 
-[![dependencies Status](https://david-dm.org/luminati-io/luminati-proxy/status.svg)](https://david-dm.org/luminati-io/luminati-proxy)
-[![devDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/dev-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=dev)
-[![optionalDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/optional-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=optional)
+[![Promo](https://github.com/luminati-io/Rotating-Residential-Proxies/blob/main/50%25%20off%20promo.png)](https://brightdata.com/proxy-types/residential-proxies)
 
 A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribute/manage/monitor/report/log/debug traffic to your proxies around the world.
 
 With Proxy manager you can drive the Bright Data residential IPs or Bright Data static IPs.
 
-This tool requires a [Bright Data](https://brightdata.com/?cam=github-proxy) account.
+This tool requires a [Bright Data](https://brightdata.com/) account.
 Please report issues or bugs to your account manager or from our [help center](https://brightdata.com/faq#proxy)
 
 <em>Read this in [中文](https://lum-lpm.com/static/lpm/README-zh-CN.html).</em>
