@@ -248,14 +248,13 @@ describe('proxy', ()=>{
                 });
             };
             it('authentication passed brd', ()=>check_auth('brd'));
-            it('authentication passed lum', ()=>check_auth('lum'));
-            it('no zone auth if cust out of whitelist lum', ()=>
+            it('no zone auth if cust out of whitelist brd', ()=>
             etask(function*(){
                 let cust = customer_out_of_zone_auth_whitelist;
                 l = yield lum({proxy_type: 'persist'});
                 const res = yield l.test({no_usage: 1, headers: {
                     'proxy-authorization': 'Basic '+
-                        Buffer.from(`lum-customer-${cust}-zone-static:xyz`)
+                        Buffer.from(`brd-customer-${cust}-zone-static:xyz`)
                             .toString('base64'),
                 }});
                 assert.equal(res.statusCode, 407);
@@ -899,10 +898,10 @@ describe('proxy', ()=>{
                 assert.equal(r.statusCode, 200);
                 debug_headers.forEach(hdr=>assert.ok(r.headers[hdr]));
             }));
-            it('lum_user_hide_headers_lum', ()=>etask(function*(){
+            it('brd_user_hide_headers_brd', ()=>etask(function*(){
                 l = yield lum(opts);
                 const auth = 'Basic '+Buffer
-                    .from('lum-customer-abc-zone-static:t2')
+                    .from('brd-customer-abc-zone-static:t2')
                     .toString('base64');
                 let r = yield l.test({headers: {'proxy-authorization': auth}});
                 assert.equal(r.statusCode, 200);

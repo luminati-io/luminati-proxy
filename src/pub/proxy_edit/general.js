@@ -111,6 +111,11 @@ export default class General extends Pure_component {
             return;
         this.set_field('tls_lib', 'open_ssl');
         this.set_field('av_check', false);
+        this.set_field('flex_tls_reject_unauthorized', false);
+    };
+    tls_lib_changed = val=>{
+      if (val!='flex_tls')
+          this.set_field('flex_tls_reject_unauthorized', false);
     };
     open_static_modal = ()=>$('#allocated_ips').modal('show');
     open_users_modal = ()=>$('#users_modal').modal('show');
@@ -186,15 +191,22 @@ export default class General extends Pure_component {
               id="ssl"
               on_change={this.ssl_changed}
               faq={{url: 'https://docs.brightdata.com/general/account/'
-                +'ssl-certificate#how-does-ssl-analyzing-works'}}
+                +'ssl-certificate#bright-data-proxy-manager-ssl-analysis'}}
             />
             {form.ssl &&
               <Config
                 type="select"
                 id="tls_lib"
                 disabled={!zagent}
+                on_change={this.tls_lib_changed}
                 note={!zagent && <Limit_zagent_note prefix='Boring SSL'/>}
                 data={tls_lib_opt}
+              />
+            }
+            {zagent && form.tls_lib=='flex_tls' &&
+              <Config
+                type="yes_no"
+                id="flex_tls_reject_unauthorized"
               />
             }
             {form.ssl && av_server &&

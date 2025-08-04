@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # LICENSE_CODE ZON ISC
-PERR_URL="https://perr.lum-lpm.com/client_cgi/perr"
+PERR_URL="https://perr.brightdata.com/client_cgi/perr"
 ACTION="setup"
 IS_ROOT=0
 if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.519.10"
+VERSION="1.560.791"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi

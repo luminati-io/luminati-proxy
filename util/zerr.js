@@ -191,6 +191,8 @@ E.e2s = function(err){
     }
     else
         str = err_has_stack(err) ? ''+err.stack : ''+err;
+    if (err && err.cause)
+        str = '[cause='+err.cause+'] '+str;
     if (err && err.code)
         str = '[code='+err.code+'] '+str;
     return str;
@@ -507,7 +509,7 @@ E.zexit = function(args){
         E.flush();
     }
     /*jslint -W087*/
-    debugger;
+    debugger; /* eslint-disable-line no-debugger */
     process.exit(1);
 };
 

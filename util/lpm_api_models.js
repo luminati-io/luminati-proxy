@@ -144,8 +144,8 @@ E.manager_fields = {
     session_termination: {type: 'boolean', desc: 'Stop sending new requests '
         +'when the peer IP becomes unavailable and redirect to confimration '
         +'page before new IP is taken'},
-    api: {type: 'string', desc: 'Alternative url to luminati API'},
-    api_domain: {type: 'string', desc: 'Alternative domain url to luminati '
+    api: {type: 'string', desc: 'Alternative url to brightdata API'},
+    api_domain: {type: 'string', desc: 'Alternative domain url to brightdata '
         +'API'},
     pmgr_domain: {type: 'string', desc: 'Alternative domain url to Proxy '
         +'Manager'},

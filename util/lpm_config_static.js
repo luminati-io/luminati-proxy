@@ -5,6 +5,10 @@ const lpm_api_models = require('./lpm_api_models.js');
 const prop_by_type = (props, type)=>
     Object.keys(props).filter(k=>props[k].type==type);
 
+const cloud_default = {
+    request_stats: false,
+};
+
 const conf = {
     version: undefined,
     is_win: process.platform=='win32',
@@ -124,6 +128,7 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     api_parameter_limit: 10000,
 });
 delete conf.manager_default.port;
+
 conf.log_levels = {
     system: -1,
     error: 0,
@@ -133,5 +138,8 @@ conf.log_levels = {
     debug: 4,
 };
 conf.mgr_proxy_shared_fields = ['debug', 'lpm_auth'];
+
+if (process.env.AGENT_NUM)
+    Object.assign(conf.manager_default, cloud_default);
 
 Object.assign(module.exports, conf);

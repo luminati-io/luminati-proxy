@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true*/
-if (!module.parent)
+if (require.main===module)
     global.zon_config_fallback = {};
 require('../util/config.js');
 const lpm_config = require('./util/lpm_config_static'); 
@@ -31,5 +31,5 @@ const main = ()=>etask(function*(){
     console.log('Success');
 });
 
-if (!module.parent)
+if (require.main===module)
     main();

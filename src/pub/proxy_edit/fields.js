@@ -283,6 +283,11 @@ export const tabs = {
                     SSL analyzing and you are getting blocked`,
                 ext: true,
             },
+            flex_tls_reject_unauthorized: {
+                label: 'Ignore SSL errors',
+                tooltip: `Ignore certificate verification fails`,
+                ext: true,
+            },
             av_check: {
                 label: 'Antivirus check',
                 tooltip: `Checking traffic for malware`,

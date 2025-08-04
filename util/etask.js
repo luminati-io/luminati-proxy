@@ -1,5 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, browser:true, es6: true*/
+if (typeof module=='object' && module.exports && module.children &&
+    typeof __webpack_require__!='function' &&
+    process && process.env && +process.env.BRD_ETASK2)
+{
+    console.error('Loading etask2');
+    module.exports = require('./etask2');
+}
+else
+{
 (function(){
 var define, process, zerr, assert;
 var is_node = typeof module=='object' && module.exports && module.children &&
@@ -265,18 +274,22 @@ E.prototype._call_err = function(e){
     // XXX derry: add assert(0, 'etask err in signal: '+e);
 };
 E.prototype.emit_safe = function(){
-    try { this.emit.apply(this, arguments); }
+    try { return this.emit.apply(this, arguments); }
     catch(e){ this._call_err(e); }
 };
 E.prototype.emit_down = function(){
-    this.emit.apply(this, arguments);
+    if (this.emit_safe.apply(this, arguments))
+        return true;
     if (this.down)
-        this.down.emit_down.apply(this.down, arguments);
+        return this.down.emit_down.apply(this.down, arguments);
+    return false;
 };
 E.prototype.emit_up = function(){
-    this.emit.apply(this, arguments);
+    if (this.emit_safe.apply(this, arguments))
+        return true;
     if (this.up)
-        this.up.emit_up.apply(this.up, arguments);
+        return this.up.emit_up.apply(this.up, arguments);
+    return false;
 };
 E.prototype._call_safe = function(state_fn){
     try { return state_fn.call(this); }
@@ -1313,13 +1326,8 @@ E.for_each = function(obj, states){
 E.while = function(cond, states){ return E.for(cond, null, states); };
 
 // all([opt, ]a_or_o)
-E.all = function(a_or_o, ao2){
-    var i, j, opt = {};
-    if (ao2)
-    {
-        opt = a_or_o;
-        a_or_o = ao2;
-    }
+E.all = function(a_or_o){
+    var i, j;
     if (Array.isArray(a_or_o))
     {
         var a = Array.from(a_or_o);
@@ -1339,11 +1347,7 @@ E.all = function(a_or_o, ao2){
             return _a;
         }, function(res){
             if (this.error)
-            {
-                if (!opt.allow_fail)
-                    return this.throw(this.error);
-                res = E.err(this.error);
-            }
+                return this.throw(this.error);
             a[i] = res;
             i++;
             return this.goto('loop');
@@ -1368,11 +1372,7 @@ E.all = function(a_or_o, ao2){
             return _a;
         }, function(res){
             if (this.error)
-            {
-                if (!opt.allow_fail)
-                    return this.throw(this.error);
-                res = E.err(this.error);
-            }
+                return this.throw(this.error);
             o[keys[i]] = res;
             i++;
             return this.goto('loop');
@@ -1795,58 +1795,15 @@ E.race = function(ets){
     }]);
 };
 
-E.any = function(opt, ets){
-    if (!ets)
-    {
-        ets = opt;
-        opt = {};
-    }
-    opt=opt||{};
-    opt.rethrow = opt.rethrow==undefined ? 1 : opt.rethrow;
-    return new Etask({}, [function race(){
-        if (!Array.isArray(ets))
-            zerr.zexit('provided argument is not an array');
-        var length = ets.length;
-        if (!length)
-            return;
-        var race_et = E.wait();
-        var errors = [];
-        var _this = this;
-        function _child_error_handler(e){
-            errors.push(e);
-            if (errors.length!=length)
-                return;
-            var err = new Error('aggregation error');
-            err.errors = errors;
-            if (opt.rethrow)
-                race_et.throw(err);
-            else
-                race_et.continue();
-        }
-        var _race = new Etask({}, [
-            function(){
-                return E.for_each(ets, function(){
-                    var et = this.iter.val;
-                    var child = _this.spawn(new Etask({}, [
-                        function(){
-                            this.on('uncaught', _child_error_handler);
-                            return et;
-                        },
-                        function(res){ race_et.continue(res); },
-                    ]));
-                    if (opt.timeout)
-                        setTimeout(()=>child.throw('timeout'), opt.timeout);
-                });
-            },
-            function(){ return race_et; },
-        ]);
-        _race.finally(function(){ _this.return_child(); });
-        return _race;
-    }]);
-};
+E.try_catch = task=>new Etask({}, [function(){
+    return task;
+}, function catch$(){
+    return typeof this.error != 'object' ? new Error(this.error) : this.error;
+}]);
 
 Object.defineProperty(E.prototype, ETASK1_SYMBOL, {
     get(){ return true; }, // etask interop
 });
 
 return Etask; }); }());
+}

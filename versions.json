@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.560.791",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved request stats ingestion perfomance"
+            },
+            {
+                "type": "star",
+                "text": "Change default api domain to brightdata.com"
+            },
+            {
+                "type": "star",
+                "text": "Removed api fallback option"
+            }
+        ]
+    },
+    {
         "ver": "1.519.10",
         "type": "dev",
         "changes": [
@@ -395,7 +413,7 @@
             },
             {
                 "type": "bug",
-                "text": "fix wrong responce for CONNECT request errors"
+                "text": "fix wrong response for CONNECT request errors"
             },
             {
                 "type": "bug",

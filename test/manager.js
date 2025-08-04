@@ -182,12 +182,9 @@ describe('manager', function(){
         it('applies explicit mgr argv to defaults', etask._fn(function*(_this){
             _this.timeout(15000);
             app = yield app_with_args(['--port', '24000', '--har_limit',
-                '1337', '--api_domain', 'invalid_domain']);
+                '1337']);
             const {opt} = app.manager.proxy_ports[24000];
-            assert.equal(app.manager._defaults.api_domain,
-                pkg.api_domain_fallback);
             assert.equal(opt.har_limit, 1337);
-            assert.equal(opt.api_domain, pkg.api_domain_fallback);
         }));
     });
     describe('cloud config synchronization', ()=>{

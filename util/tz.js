@@ -134,7 +134,7 @@ E.timezone = {
     AF: 'Asia/Kabul',
     PK: 'Asia/Karachi',
     NP: 'Asia/Kathmandu',
-    MY: 'Asia/Kuala_Lumpur',
+    MY: 'Asia/Singapore',
     KW: 'Asia/Kuwait',
     MO: 'Asia/Macau',
     PH: 'Asia/Manila',

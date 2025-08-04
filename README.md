@@ -1,15 +1,17 @@
 # Proxy manager
 
-[![Promo](https://github.com/luminati-io/Rotating-Residential-Proxies/blob/main/50%25%20off%20promo.png)](https://brightdata.com/proxy-types/residential-proxies)
+[![dependencies Status](https://david-dm.org/luminati-io/luminati-proxy/status.svg)](https://david-dm.org/luminati-io/luminati-proxy)
+[![devDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/dev-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=dev)
+[![optionalDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/optional-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=optional)
 
 A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribute/manage/monitor/report/log/debug traffic to your proxies around the world.
 
 With Proxy manager you can drive the Bright Data residential IPs or Bright Data static IPs.
 
-This tool requires a [Bright Data](https://brightdata.com/) account.
+This tool requires a [Bright Data](https://brightdata.com/?cam=github-proxy) account.
 Please report issues or bugs to your account manager or from our [help center](https://brightdata.com/faq#proxy)
 
-<em>Read this in [中文](https://lum-lpm.com/static/lpm/README-zh-CN.html).</em>
+<em>Read this in [中文](https://brightdata.com/static/lpm/README-zh-CN.html).</em>
 
 ## Features
 - Highly scalable
@@ -34,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.519.10/luminati-proxy-manager-v1.519.10-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.560.791/luminati-proxy-manager-v1.560.791-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -264,9 +266,9 @@ Options:
                                    becomes unavailable and redirect to
                                    confimration page before new IP is taken
                                                       [boolean] [default: false]
-      --api                        Alternative url to luminati API      [string]
-      --api_domain                 Alternative domain url to luminati API
-                                               [string] [default: "lum-lpm.com"]
+      --api                        Alternative url to brightdata API    [string]
+      --api_domain                 Alternative domain url to brightdata API
+                                            [string] [default: "brightdata.com"]
       --pmgr_domain                Alternative domain url to Proxy Manager
                                                                         [string]
       --local_login                Requires each browser to authenticate against
@@ -311,7 +313,6 @@ Options:
       --info                                                    [default: false]
       --av_server                                               [default: false]
       --cn                                                      [default: false]
-      --api_domain_fallback                               [default: "l-lpm.com"]
 ```
 
 ### Docker

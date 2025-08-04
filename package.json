@@ -22,7 +22,7 @@
     "win": {
       "publish": {
         "provider": "generic",
-        "url": "http://lum-lpm.com/static/lpm"
+        "url": "http://brightdata.com/static/lpm"
       },
       "target": "nsis",
       "timeStampServer": "http://timestamp.digicert.com/?alg=sha1",
@@ -55,16 +55,16 @@
   "dependencies": {
     "@babel/core": "7.26.0",
     "@babel/plugin-transform-export-namespace-from": "7.25.9",
-    "@babel/plugin-transform-modules-commonjs": "7.25.9",
+    "@babel/plugin-transform-modules-commonjs": "7.26.3",
     "uikit": "npm:@luminati-io/uikit@6.3.19",
-    "user-agents": "~1.1.403",
+    "user-agents": "~1.1.496",
     "colors": "1.4.0",
     "snyk": "1.1100.0",
     "body-parser": "1.20.3",
     "electron-updater": "6.3.9",
     "express": "^4.21.0",
-    "helmet": "8.0.0",
-    "express-rate-limit": "7.4.1",
+    "helmet": "8.1.0",
+    "express-rate-limit": "7.5.0",
     "express-session": "1.18.1",
     "connect-loki": "1.2.0",
     "flag-icons": "6.4.4",
@@ -75,7 +75,6 @@
     "pac-resolver": "5.0.0",
     "forever": "4.0.3",
     "redos-detector": "5.1.0",
-    "lum_request-stats": "3.2.0",
     "semver": "7.5.2",
     "sudo-prompt": "9.0.0",
     "taskkill": "3.1.0",
@@ -100,8 +99,6 @@
     "winston-transport": "4.9.0",
     "winston-daily-rotate-file": "5.0.0",
     "winston-syslog": "2.7.1",
-    "winston-logzio": "5.1.9",
-    "s3-streamlogger": "1.10.1",
     "bootstrap": "5.3.3",
     "codemirror": "5.58.2",
     "es6-shim": "0.35.5",
@@ -123,8 +120,8 @@
     "js-cookie": "2.2.1",
     "styled-components": "6.1.13",
     "cli-progress": "3.12.0",
-    "lru-cache": "10.0.1",
-    "got": "14.4.5",
+    "lru-cache": "11.0.2",
+    "got": "14.4.7",
     "ioredis": "5.4.1",
     "tail": "2.2.6"
   },
@@ -152,11 +149,12 @@
     "style-loader": "0.18.2",
     "file-loader": "2.0.0",
     "url-loader": "1.1.2",
-    "webpack": "5.96.1",
+    "webpack": "5.97.1",
     "webpack-cli": "5.1.4",
     "webpack-merge": "6.0.1",
     "prop-types": "15.8.1",
-    "react-table": "7.8.0"
+    "react-table": "7.8.0",
+    "regenerator-runtime": "0.14.1"
   },
   "overrides": {
     "forever": {
@@ -185,8 +183,7 @@
     "node": ">=20.12.1"
   },
   "homepage": "https://brightdata.com",
-  "api_domain": "lum-lpm.com",
-  "api_domain_fallback": "l-lpm.com",
+  "api_domain": "brightdata.com",
   "api_domain_fallback_cn": "www.bright.cn",
   "mail_domain": "bright.cn",
   "keywords": [
@@ -337,6 +334,7 @@
       "lib/mixins/server_send.js",
       "lib/mixins/web_api.js",
       "lib/mixins/web_server.js",
+      "lib/perf_mgr.js",
       "lib/perr.js",
       "lib/proxy_port.js",
       "lib/puppeteer.js",
@@ -541,7 +539,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "a3626e0c3606937ea9f2ee8e479c318f"
+    "md5": "f78ea50d08c11f37062ac6a3d4e5fd41"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -571,5 +569,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.519.10"
+  "version": "1.560.791"
 }

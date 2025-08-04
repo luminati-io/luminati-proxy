@@ -308,6 +308,10 @@ E.today = function(now){
     return E.align(now, 'DAY');
 };
 
+E.tomorrow = function(now){
+    return E.add(E.today(now), {d: 1});
+};
+
 E.nth_of_month = function(now, n){
     if (n===undefined)
     {

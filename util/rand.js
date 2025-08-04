@@ -38,12 +38,50 @@ E.rand_int32 = function(s){
     return Math.floor(Math.random()*(MAX_INT-MIN_INT+1))-MAX_INT;
 };
 
+// return a random real number from [min, max)
+E.rand_range_f = function(min, max, s){
+    var ret;
+    if (is_jtest && (ret = jtest_pop(s))!==null)
+        return ret;
+    return Math.random()*(max-min)+min;
+};
+
 // return a rand number from "min" to "max-1"
 E.rand_range = function(min, max, s){
     var ret;
     if (is_jtest && (ret = jtest_pop(s))!==null)
         return ret;
     return Math.floor(Math.random()*(max-min))+min;
+};
+
+// return a rand point [x, y] from a quad
+// quad=[x0, y0, x1, y1, x2, y2, x3, y3]
+// assumes that area of 0-1-2 triangle is the same as 0-2-3
+E.rand_in_quad = function(quad, s){
+    var ret;
+    if (is_jtest && (ret = jtest_pop(s))!==null)
+        return ret;
+    // select triangle
+    var tri = Math.floor(Math.random()*2);
+    var i0 = 0;
+    var i1 = tri+1;
+    var i2 = tri+2;
+    var x0 = quad[2*i0], y0 = quad[2*i0+1];
+    var x1 = quad[2*i1], y1 = quad[2*i1+1];
+    var x2 = quad[2*i2], y2 = quad[2*i2+1];
+    // gen barycentric coords
+    var u = Math.random();
+    var v = Math.random();
+    if (u + v > 1)
+    {
+      u = 1-u;
+      v = 1-v;
+    }
+    var w = 1 - u - v;
+    return [
+      u*x0 + v*x1 + w*x2,
+      u*y0 + v*y1 + w*y2,
+    ];
 };
 
 E.rand_element = function(a, s){

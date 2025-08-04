@@ -78,6 +78,10 @@ E.action_types = [
         return a "null response" without proxying. It is useful when users do
         not want to make a request, but a browser expects 200 response.`,
         type: 'pre', only_url: true, url: true},
+    {key: 'Timeout response', value: 'timeout_response', tooltip: `Proxy`
+        +` Manager will return a "Timeout response" with status code 504`
+        +` and status message "Proxy manager tunnel timeout"`,
+        min_req_time: true},
     {key: 'Bypass proxy', value: 'bypass_proxy', tooltip: `Requests will be
         passed directly to target site without any proxy (super proxy or
         peer).`, type: 'pre', only_url: true, url: true},

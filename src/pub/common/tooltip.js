@@ -31,15 +31,17 @@ export default class Tooltip extends Pure_component {
             return this.props.children;
         const classes = `tooltip har_tooltip ${this.props.className||''}`;
         const props = {
-            'data-toggle': 'tooltip',
-            'data-placement': this.props.placement||'top',
-            'data-container': 'body',
-            'data-html': true,
-            'data-template': `<div class="${classes}"
-                role="tooltip">
-                <div class="tooltip-arrow"></div>
-                <div class="tooltip-inner"></div>
-            </div>`,
+            ...bsm.data_all_attrs({
+                toggle: 'tooltip',
+                placement: this.props.placement||'top',
+                container: 'body',
+                html: true,
+                template: `<div class="${classes}"
+                    role="tooltip">
+                    <div class="tooltip-arrow"></div>
+                    <div class="tooltip-inner"></div>
+                </div>`,
+            }),
             title: this.props.title,
             ref: this.set_ref.bind(this),
             onMouseLeave: this.on_mouse_leave.bind(this),

@@ -161,8 +161,22 @@ const Toolbar = ({request_stats, toggle_stats, zagent})=>{
     }
     <Nav_icon id='stats' filled={request_stats}
       tooltip={`Recent stats are ${request_stats ? 'enabled' : 'disabled'}`}
-      onClick={()=>toggle_stats(!request_stats)}/>
+      onClick={()=>{
+          if (!zagent || !!request_stats)
+              return toggle_stats(!request_stats);
+          $('#enable_request_stats_confirmation_modal').modal('show');
+      }}
+    />
     <Add_proxy_btn/>
+    <Modal
+      id="enable_request_stats_confirmation_modal"
+      title="Accept enable recent stats"
+      ok_btn_title="Confirm"
+      click_ok={()=>toggle_stats(true)}>
+      <span>
+        Enabling recent stats may cause performance issues on high load.
+      </span>
+    </Modal>
   </div>;
 };
 

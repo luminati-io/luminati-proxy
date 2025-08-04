@@ -140,6 +140,8 @@ export class Pins extends Pure_component {
               title={t('Add IP')}
               on_click={this.add_empty_pin}
               disabled={disabled||has_any}
+              tooltip={has_any&&t('Any IP already whitelisted, no need to add'
+                +' specific IPs.')}
             />
           }</T>
           {!!pending.length && !disabled &&

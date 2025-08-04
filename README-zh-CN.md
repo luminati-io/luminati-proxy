@@ -8,7 +8,7 @@
 
 用 代理管理器你可以使用Bright Data 住宅 IPs 或 Bright Data 数据心 IPs.
 
-这个工具需要一个 [Bright Data](https://lum-lpm.com/?cam=github-proxy) 账户.
+这个工具需要一个 [Bright Data](https://brightdata.com/?cam=github-proxy) 账户.
 
 ## 特征
 - 可扩展
@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.519.10-setup.exe">代理管理安装器</a>.
+下载 <a href="https://brightdata.com/static/lpm/luminati-proxy-manager-v1.560.791-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 20.12.1版 (最好用x
@@ -78,7 +78,7 @@ Bright Data 代理服务器所含的”Dropin 模式” 和现有的超级代理
 pmgr --no-dropin
 ```
 
-为了完整的API解说文件 （为了'dropin'代理请求），请从你的Bright Data账户关注 <a href="https://lum-lpm.com/cp/zones/proxy_examples?type=api&group=active">API例网页</a>.
+为了完整的API解说文件 （为了'dropin'代理请求），请从你的Bright Data账户关注 <a href="https://brightdata.com/cp/zones/proxy_examples?type=api&group=active">API例网页</a>.
 
 ### 完整的API命令名单:
 ```sh
@@ -214,9 +214,9 @@ Options:
                                    becomes unavailable and redirect to
                                    confimration page before new IP is taken
                                                       [boolean] [default: false]
-      --api                        Alternative url to luminati API      [string]
-      --api_domain                 Alternative domain url to luminati API
-                                               [string] [default: "lum-lpm.com"]
+      --api                        Alternative url to brightdata API    [string]
+      --api_domain                 Alternative domain url to brightdata API
+                                            [string] [default: "brightdata.com"]
       --pmgr_domain                Alternative domain url to Proxy Manager
                                                                         [string]
       --local_login                Requires each browser to authenticate against
@@ -261,7 +261,6 @@ Options:
       --info                                                    [default: false]
       --av_server                                               [default: false]
       --cn                                                      [default: false]
-      --api_domain_fallback                               [default: "l-lpm.com"]
 ```
 
 ### Docker
@@ -282,7 +281,7 @@ docker run luminati/luminati-proxy pmgr --version
 
 ## 帮助
 
-常见问题 [FAQ](https://help.lum-lpm.com/hc/en-us/sections/12571042542737-Proxy-Manager)
+常见问题 [FAQ](https://help.brightdata.com/hc/en-us/sections/12571042542737-Proxy-Manager)
 
 如果你在Bright Data 常见问题找不着解决方式，可以在 [github 上提问](https://github.com/luminati-io/luminati-proxy/issues).
 
@@ -292,7 +291,7 @@ docker run luminati/luminati-proxy pmgr --version
 
 API的解说文件能在APP里找着
 
-详细解释能在 [这里](https://help.lum-lpm.com/hc/en-us/articles/13595498290065-API) 找到
+详细解释能在 [这里](https://help.brightdata.com/hc/en-us/articles/13595498290065-API) 找到
 
 ## Node.js API
 

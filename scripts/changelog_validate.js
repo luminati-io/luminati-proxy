@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true*/
-if (!module.parent)
+if (require.main===module)
     global.zon_config_fallback = {};
 require('../util/config.js');
 const changelog = require('../versions.json');
@@ -27,7 +27,7 @@ const main = ()=>{
     }
 };
 
-if (!module.parent)
+if (require.main===module)
     main();
 
 module.exports = {t: {validate}};

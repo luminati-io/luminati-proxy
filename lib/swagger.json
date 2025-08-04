@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.519.10",
+        "version": "1.560.791",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -966,7 +966,7 @@
         "/refresh_sessions/{port}": {
             "get": {
                 "deprecated": true,
-                "description": "Switch luminati sessions to new sessions (get new IPs)",
+                "description": "Switch brightdata sessions to new sessions (get new IPs)",
                 "tags": ["Proxy"],
                 "parameters": [
                     {
@@ -984,7 +984,7 @@
                 }
             },
             "post": {
-                "description": "Switch luminati sessions to new sessions (get new IPs)",
+                "description": "Switch brightdata sessions to new sessions (get new IPs)",
                 "tags": ["Proxy"],
                 "parameters": [
                     {
@@ -1449,7 +1449,7 @@
                 },
                 "api": {
                     "type": "string",
-                    "description": "Alternative domain url to luminati API"
+                    "description": "Alternative domain url to brightdata API"
                 },
                 "logs": {
                     "type": "boolean",
@@ -1593,11 +1593,11 @@
                 },
                 "api": {
                     "type": "string",
-                    "description": "Alternative url to luminati API"
+                    "description": "Alternative url to brightdata API"
                 },
                 "api_domain": {
                     "type": "string",
-                    "description": "Alternative domain url to luminati API"
+                    "description": "Alternative domain url to brightdata API"
                 },
                 "local_login": {
                     "type": "boolean",

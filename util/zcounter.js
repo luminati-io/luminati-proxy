@@ -7,7 +7,6 @@ const conf = require('./conf.js');
 const date = require('./date.js');
 const etask = require('./etask.js');
 const file = require('./file.js');
-const zurl = require('./url.js');
 const queue = require('./queue.js');
 const zerr = require('./zerr.js');
 const zutil = require('./util.js');
@@ -374,8 +373,8 @@ let mas_get_counters = update_prev=>etask(function*zcounter_mas_get_counters(){
     update_prev = update_prev||false;
     let a = cluster_ipc.call_all_workers('get_zcounters', update_prev,
         worker_timeout).concat(yield loc_get_counters(update_prev));
-    let counters = yield etask.all({allow_fail: true}, a);
-    return mas_agg_counters(counters.filter(v=>v && !etask.is_err(v)));
+    let counters = yield etask.all(a.map(etask.try_catch));
+    return mas_agg_counters(counters.filter(v=>v && !(v instanceof Error)));
 });
 
 E.get_names = _type=>type[_type] instanceof Map ?
@@ -534,7 +533,7 @@ function ws_client(world, url){
     return ws;
 }
 
-const lazy_conns = {lum: [], stats: []};
+let lazy_conns = {lum: [], stats: []};
 class Lazy_ws_client {
     constructor(world, url){
         zerr.notice(`Opening lazy zcounter conn to ${url}`);
@@ -554,49 +553,68 @@ class Lazy_ws_client {
         });
     }
 }
+let lazy_ws_client = (world, url)=>{
+    let client = new Lazy_ws_client(world, url);
+    lazy_conns[world].push(client);
+};
+
+let parse_url_env = urls_env=>{
+    if (!urls_env)
+        return [null, null];
+    let parts = (urls_env || '').split(';');
+    return [parts[0], parts[1]];
+};
+let ws_clients_urls = (urls, lxc, port)=>{
+    let base, stats, log;
+    [base, log] = parse_url_env(urls.base_old || urls.base);
+    [stats, log] = parse_url_env(urls.stats);
+    if (!log)
+        log = urls.log;
+    if (!base || !stats)
+    {
+        base = `ws://zs-graphite.brdtnet.com:${port}`;
+        stats = `ws://zs-graphite-stats.brdtnet.com:${port}`;
+        log = `ws://zs-graphite-log.brdtnet.com:${port}`;
+    }
+    if (lxc)
+        log = null;
+    return [base, stats, log];
+};
+let create_ws_clients = ({production, port, lazy, lxc, urls})=>{
+    let create_client = lazy ? lazy_ws_client : ws_client;
+    if (!production)
+    {
+        create_client('lum', `ws://localhost:${port}`);
+        create_client('stats', `ws://localhost:${port}`);
+        return;
+    }
+    let [base, stats, log] = ws_clients_urls(urls, lxc, port);
+    create_client('lum', base);
+    create_client('stats', stats);
+    if (log)
+    {
+        create_client('lum', log);
+        create_client('stats', log);
+    }
+};
 
 function run(){
     init();
     if (cluster.isWorker)
         return;
-    let port = env.ZCOUNTER_PORT||3374;
-    let create_client = env.ZCOUNTER_LAZY_CONNECT
-        ? (world, url)=>{
-            let client = new Lazy_ws_client(world, url);
-            lazy_conns[world].push(client);
-        } : ws_client;
-    if (env.NODE_ENV!='production')
-    {
-        create_client('lum', `ws://localhost:${port}`);
-        create_client('stats', `ws://localhost:${port}`);
-    }
-    else if (env.ZCOUNTER_STATS_URL && env.ZCOUNTER_LUM_URL)
-    {
-        let allowed_hosts = [
-            'zs-graphite-log.luminati.io',
-            'zs-graphite-log.brdtnet.com',
-        ];
-        let [stats, lum] = [env.ZCOUNTER_STATS_URL, env.ZCOUNTER_LUM_URL]
-            .map(x=>x.split(';').filter(url=>{
-                let host = zurl.parse(url).hostname;
-                return allowed_hosts.includes(host) ? !+env.LXC : url;
-            }));
-        stats.forEach(u=>create_client('stats', u));
-        lum.forEach(u=>create_client('lum', u));
-    }
-    else
-    {
-        let lum = ['zs-graphite.brdtnet.com', 'zs-graphite-log.brdtnet.com'];
-        let stats = ['zs-graphite-stats.brdtnet.com',
-            'zs-graphite-log.brdtnet.com'];
-        if (+env.LXC)
-        {
-            lum = ['zs-graphite.brdtnet.com'];
-            stats = ['zs-graphite-stats.brdtnet.com'];
-        }
-        lum.forEach(h=>create_client('lum', `ws://${h}:${port}`));
-        stats.forEach(h=>create_client('stats', `ws://${h}:${port}`));
-    }
+    create_ws_clients({
+        production: env.NODE_ENV == 'production',
+        port: +env.ZCOUNTER_PORT||3374,
+        lazy: +env.ZCOUNTER_LAZY_CONNECT,
+        lxc: +env.LXC,
+        urls: {
+            base: env.ZCOUNTER_URL,
+            // XXX. Remove ZCOUNTER_LUM_URL
+            base_old: env.ZCOUNTER_LUM_URL,
+            stats: env.ZCOUNTER_STATS_URL,
+            log: env.ZCOUNTER_LOG_URL,
+        },
+    });
     if (env.ZCOUNTER_LUM_GLOB_ONLY)
         global_only_worlds.add('lum');
     if (env.ZCOUNTER_STATS_GLOB_ONLY)

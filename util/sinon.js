@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint node:true, browser:true, mocha:true*/
+'use strict'; /*jslint node:true, browser:true, mocha:true, es9:true*/
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
@@ -165,7 +165,24 @@ E.create_sandbox = function(opt){
     return sandbox;
 };
 E.is_fake_clock = function(){ return clock!==undefined; };
+
+E.setup_sandbox = ()=>{
+    let sb;
+    beforeEach(()=>sb = E.create_sandbox());
+    afterEach(()=>{
+        sb.verify();
+        sb.restore();
+    });
+    return new Proxy({}, {
+        get: (__, prop)=>{
+            const value = Reflect.get(sb, prop, sb);
+            return typeof value=='function' ? value.bind(sb) : value;
+        },
+    });
+};
+
 if (zutil.is_mocha() && typeof afterEach!='undefined')
     afterEach(function(){ return E.uninit(); });
+
 
 return E; }); }());

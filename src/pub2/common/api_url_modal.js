@@ -78,13 +78,9 @@ export default class Api_url_modal extends Pure_component {
                       id="whatsapp-square">
                       +972-54-353-6332
                     </Contact_btn>
-                    <Contact_btn href="skype:luminati.io?call" type="fab"
-                      id="skype">
-                      luminati.io
-                    </Contact_btn>
                     <Contact_btn href="//web.wechat.com" type="fab"
                       id="weixin">
-                      luminati_io
+                      brightdata
                     </Contact_btn>
                     <Contact_btn href={mail_link} type="fas" id="envelope">
                       support@{mail_domain}
@@ -92,9 +88,9 @@ export default class Api_url_modal extends Pure_component {
                     <Contact_btn href="http://w.qq.com" type="fab" id="qq">
                       3426730462
                     </Contact_btn>
-                    <Contact_btn href="https://twitter.com/luminati_io"
+                    <Contact_btn href="https://twitter.com/brightdata"
                       type="fab" id="twitter">
-                      luminati_io
+                      brightdata
                     </Contact_btn>
                     <Contact_btn href="" type="fas" id="home">
                       Head office

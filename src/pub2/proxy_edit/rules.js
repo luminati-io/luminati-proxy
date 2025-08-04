@@ -106,7 +106,7 @@ export const map_rule_to_form = rule=>{
     result.max_req_time = rule.max_req_time;
     result.action = rule.action_type;
     result.retry_port = rule.action.retry_port;
-    result.retry_number = rule.action.retry;
+    result.retry_number = rule.action.retries;
     if (rule.action.request_url)
     {
         result.request_url = rule.action.request_url.url;

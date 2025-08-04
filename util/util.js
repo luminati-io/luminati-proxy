@@ -2,10 +2,11 @@
 'use strict'; /*jslint node:true, browser:true, es6:true*/
 (function(){
 var define, node_util;
-var is_node = typeof module=='object' && module.exports && module.children &&
-    typeof __webpack_require__!='function';
-var is_rn = typeof global=='object' && !!global.nativeRequire ||
-    typeof navigator=='object' && navigator.product=='ReactNative';
+var is_node = // deliberate line break to fix faulty hutil_loader replacement
+    !!(typeof module=='object' && module.exports && module.children
+        && typeof __webpack_require__!='function');
+var is_rn = !!(typeof global=='object' && !!global.nativeRequire
+    || typeof navigator=='object' && navigator.product=='ReactNative');
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -26,13 +27,13 @@ E.is_mocha = function(){
     if (E._is_mocha!==undefined)
         return E._is_mocha;
     if (typeof process!='undefined' && typeof process.env!='undefined')
-        return E._is_mocha = process.env.IS_MOCHA||false;
+        return E._is_mocha = !!process.env.IS_MOCHA;
     return E._is_mocha = false;
 };
 
-E.is_lxc = function(){ return is_node && +process.env.LXC; };
-
+E.is_lxc = function(){ return is_node && !!+process.env.LXC; };
 E.is_prod = function(){ return !E.is_mocha() && !E.is_lxc(); };
+E.is_bat = function(zconf){ return !!zconf.CONFIG_BAT_CYCLE; };
 
 // refresh() was added in node 10, we need to support node 8 for webOS TV 5.0
 // https://webostv.developer.lge.com/develop/guides/js-service-basics
@@ -591,7 +592,7 @@ E.group_by = function(coll, key_cb, val_cb){
     return E.reduce_obj(coll, key_cb, val_cb, merge_cb);
 };
 
-E.flatten_obj = function(obj){
+E.flatten_obj = function(obj, sep='_'){
     if (!E.is_object(obj) && !Array.isArray(obj))
         return obj;
     var res = {}, k, keys = Object.keys(obj);
@@ -602,9 +603,9 @@ E.flatten_obj = function(obj){
             res[k] = obj[k];
         else
         {
-            var o = E.flatten_obj(obj[k]), _keys = Object.keys(o);
+            var o = E.flatten_obj(obj[k], sep), _keys = Object.keys(o);
             for (var j = 0; j < _keys.length; j++)
-                res[k+'_'+_keys[j]] = o[_keys[j]];
+                res[k+sep+_keys[j]] = o[_keys[j]];
         }
     }
     return res;

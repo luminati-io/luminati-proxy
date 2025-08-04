@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LICENSE_CODE ZON ISC
-PERR_URL="https://perr.lum-lpm.com/client_cgi/perr"
+PERR_URL="https://perr.brightdata.com/client_cgi/perr"
 OS=""
 OS_MAC=0
 OS_LINUX=0

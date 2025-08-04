@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.560.791 
+- :sparkles: Improved request stats ingestion perfomance
+- :star: Change default api domain to brightdata.com
+- :star: Removed api fallback option
+
 ## 1.519.10 Development Latest
 - :star: Add port settings option to use proxy port 33335
 
@@ -114,7 +119,7 @@ Proxy manager - Change Log
 
 ## 1.390.445 Stable
 - :bug: fix unable update port to number less then UI port
-- :bug: fix wrong responce for CONNECT request errors
+- :bug: fix wrong response for CONNECT request errors
 - :bug: fix unable to change boolean port settings via UI
 
 ## 1.388.252 Stable

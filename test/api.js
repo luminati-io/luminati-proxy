@@ -24,7 +24,7 @@ const {assert_has, app_with_args, init_app_with_config, api_json, json,
 const api_base = 'https://'+pkg.api_domain;
 
 describe('api', function(){
-    this.timeout(6000);
+    this.timeout(12000);
     let app, temp_files, sb, app_with_config, app_with_proxies;
     afterEach('after manager', etask._fn(function*(_this){
         nock.cleanAll();
@@ -294,7 +294,7 @@ describe('api', function(){
     });
     // XXX igors: remove after migration
     const har_log_tests = function(_this, prefix){
-        _this.timeout(6000);
+        _this.timeout(12000);
         beforeEach(()=>etask(function*(){
             app = yield app_with_args(['--customer', 'mock_user',
                 '--port', '24000']);

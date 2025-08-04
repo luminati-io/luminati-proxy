@@ -44,7 +44,7 @@ E.capitalize = function(s){
     return (s[0]||'').toUpperCase()+s.slice(1);
 };
 E.trunc = function(s, len){
-    if (s.length<=len)
+    if ((s||'').toString().length<=len)
         return s;
     return s.slice(0, len)+'...';
 };
@@ -243,6 +243,21 @@ E.dedent = function(space_amount){
 var SDK_UUID_REGEXP = /^sdk-[a-z]*-[0-9a-f]{32}$/;
 E.is_uuid = function(str){
     return SDK_UUID_REGEXP.test(str);
+};
+
+function logfmt_escape(str){ return str.replace(/"/g, '\\"'); }
+function logfmt_format(val){
+    if (typeof val=='number'||typeof val=='boolean'||val==null)
+        return val;
+    if (typeof val=='object')
+        return '"'+logfmt_escape(JSON.stringify(val))+'"';
+    var str = logfmt_escape(''+val);
+    return /[\s=]/.test(str) ? '"'+str+'"' : str;
+}
+E.logfmt = function logfmt(obj){
+    return Object.keys(obj).map(function(k){
+        return logfmt_format(k)+'='+logfmt_format(obj[k]);
+    }).join(' ');
 };
 
 return E;

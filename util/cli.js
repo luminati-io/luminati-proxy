@@ -44,7 +44,7 @@ function cmdpp(commands){
         return Math.max(n, cmd[0].length); }, 0);
     let dc = E.default_command ? `\n default: ${E.default_command}\n` : '';
     return commands.reduce((s, cmd)=>{
-        return sprintf(`${s} %-${maxlen}s  ${cmd[1]}\n`, cmd[0]);
+        return sprintf(`${s}  %-${maxlen}s  ${cmd[1]}\n`, cmd[0]);
     }, 'Commands:\n')+dc;
 }
 

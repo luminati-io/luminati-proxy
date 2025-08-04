@@ -23,15 +23,19 @@ let send = (to, msg, sock)=>{
         cluster.workers[to].send(msg, sock);
 };
 
+let set_incoming_pending = (sender, msg, sock)=>{
+    let queue = incoming_pending[msg.handler];
+    if (!queue)
+        queue = incoming_pending[msg.handler] = [];
+    queue.push([sender, msg, sock]);
+};
+
+if (+process.env.NO_PENDING_IPC)
+    set_incoming_pending = ()=>{};
+
 let on_call = (sender, msg, sock)=>etask(function*cluster_message_handler(){
     if (!handlers[msg.handler])
-    {
-        let queue = incoming_pending[msg.handler];
-        if (!queue)
-            queue = incoming_pending[msg.handler] = [];
-        queue.push([sender, msg, sock]);
-        return;
-    }
+        return set_incoming_pending(sender, msg, sock);
     if (VERBOSE_IPC)
     {
         zerr.notice(`cluster_ipc: received ${msg.type} `
@@ -123,7 +127,7 @@ let worker_fail_fn = (worker, ev)=>(...arg)=>{
             // it can be that the worker exits and we get an IPC result right
             // after. This ensures we will not zexit due to missing handler
             // when the worker exit was expected
-            if (ev=='exit' && worker.zexpected_exit)
+            if (ev=='exit' && worker.zexpected_exit || ev=='error')
                 waiting[worker.id][key] = etask.wait();
         }
     }

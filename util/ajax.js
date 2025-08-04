@@ -34,7 +34,8 @@ function def_timeout(){
 E.send = function(opt){
     var timeout = typeof opt.timeout=='number' ? opt.timeout : def_timeout();
     var slow = opt.slow||2*date.ms.SEC;
-    var retry = opt.retry, data = opt.data, qs = zescape.qs(opt.qs);
+    var retry = opt.retry, data = opt.data, qs = zescape.qs(opt.qs,
+        opt.qs_opt);
     var url = zescape.uri(opt.url, qs), perr = opt.perr;
     // opt.type is deprecated
     var method = opt.method||opt.type||'GET';

@@ -328,6 +328,18 @@ E.iface_list = ()=>{
     }).filter(i=>i);
 };
 
+E.ip_link_info = (name='')=>{
+    const cmd = `${BIN_IP} -j -d link show ${name}`.trim();
+    let res = null, links;
+    try {
+        links = cli.exec_get_lines(cmd);
+        res = JSON.parse(links);
+    } catch(e){
+        zerr(`ip_link_show '${cmd}' res:${links}, ${zerr.e2s(e)}`);
+    }
+    return res;
+};
+
 E.eth_dev = ()=>{
     let is_ether = ifname=>/^(bond|en|wl|eth)/.test(ifname);
     let ifaces = E.iface_list().filter(is_ether);
@@ -377,6 +389,26 @@ function set_net_dev(){
     }
 }
 
+let os_net_dev_stats = (net_dev, ifname, stats)=>{
+    let res = {};
+    for (var i in stats)
+    {
+        try {
+            res[stats[i]+ifname] = +file.read_e(
+                '/sys/class/net/'+net_dev+'/statistics/'+stats[i]);
+        } catch(e){}
+    }
+    return res;
+};
+let ena_net_dev_stats = net_dev=>{
+    return exec.get_lines(`ethtool -S ${net_dev} | grep allowance`)
+        .reduce((acc, r)=>{
+            let line = string.trim(r);
+            let vals = line.split(': ');
+            acc[`${vals[0]}`] = +vals[1];
+            return acc;
+        }, {});
+};
 E.net_dev_stats = function(net_dev, opt={}){
     var o = {};
     if (!E.net_dev)
@@ -386,19 +418,19 @@ E.net_dev_stats = function(net_dev, opt={}){
         return;
     net_dev.forEach((dev, index)=>{
         var ifname = index ? '_'+dev : '';
-        var stats = ['rx_bytes', 'tx_bytes'];
+        o = {...o, ...os_net_dev_stats(dev, ifname, ['rx_bytes', 'tx_bytes'])};
         if (opt.err_stat)
         {
-            stats.push('rx_packets', 'tx_packets', 'rx_errors', 'rx_dropped',
-                'rx_fifo_errors', 'rx_frame_errors', 'tx_errors', 'tx_dropped',
-                'tx_fifo_errors', 'tx_carrier_errors', 'collisions');
+            o = {...o, ...os_net_dev_stats(dev, ifname, qw`rx_packets
+                tx_packets rx_errors rx_dropped rx_fifo_errors rx_frame_errors
+                tx_errors tx_dropped tx_fifo_errors tx_carrier_errors
+                collisions`)};
         }
-        for (var i in stats)
+        if (opt.ena_stat)
         {
-            try {
-                o[stats[i]+ifname] = +file.read_e(
-                    '/sys/class/net/'+dev+'/statistics/'+stats[i]);
-            } catch(e){}
+            let ena = ena_net_dev_stats(dev);
+            if (Object.keys(ena).length)
+                o = {...o, ena};
         }
     });
     return o;
@@ -418,7 +450,7 @@ E.beancounters = function(){
                     maxheld: +line[2],
                     barrier: beancounter_value(line[3]),
                     limit: beancounter_value(line[4]),
-                    failcnt: +line[5]
+                    failcnt: +line[5],
             };
             data.total_failcnt += +line[5];
         });

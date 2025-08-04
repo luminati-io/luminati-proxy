@@ -173,6 +173,17 @@ const make_ipc_client_class = ws_opt=>{
         ws_opt.ipc_client_class = IPC_client_base.build(ws_opt);
 };
 
+let prepare_real_ip_mask = ()=>{};
+if (is_node)
+{
+    let netmask = require('netmask');
+    prepare_real_ip_mask = nets=>{
+        if (!nets)
+            return;
+        return nets.map(r=>new netmask.Netmask(r));
+    };
+}
+
 const counter_cache = {};
 const make_counter = opt=>{
     const zcounter_glob = opt && opt.zcounter_glob;
@@ -186,6 +197,38 @@ const make_counter = opt=>{
     });
     counter_cache[cache_key] = counter;
     return counter;
+};
+
+const handle_forwarded = (ip, headers)=>{
+    let real_ip = headers['x-real-ip'];
+    if (!real_ip)
+    {
+        let forwarded = headers['x-forwarded-for'];
+        if (forwarded)
+        {
+            let ips = forwarded.split(',');
+            // nginx format - real IP is last
+            real_ip = ips[ips.length-1];
+        }
+    }
+    return real_ip;
+};
+const handle_proxy_networks = (trusted_proxy_nets, ip, headers)=>{
+    if (trusted_proxy_nets.some(r=>r.contains(ip)))
+        return headers['x-real-ip'];
+};
+const prepare_forwarded_handler = (trusted_proxy_networks, trust_forwarded)=>{
+    if (!trusted_proxy_networks && !trust_forwarded)
+        return ()=>{};
+    if (trusted_proxy_networks && trust_forwarded)
+    {
+        throw new Error(string.nl2sp`Only one of trusted_proxy_networks or
+            trust_forwarded may be specified`);
+    }
+    if (trust_forwarded)
+        return handle_forwarded;
+    let proxy_nets = prepare_real_ip_mask(trusted_proxy_networks);
+    return handle_proxy_networks.bind(null, proxy_nets);
 };
 
 class WS extends EventEmitter {
@@ -210,6 +253,7 @@ class WS extends EventEmitter {
         this.zjson_opt_send = assign({}, zjson_opt, opt.zjson_opt_send);
         this.zjson_opt_receive = assign({}, zjson_opt, opt.zjson_opt_receive);
         this.label = opt.label;
+        this.compression = opt.compression;
         this.remote_label = undefined;
         this.local_addr = undefined;
         this.local_port = undefined;
@@ -239,8 +283,11 @@ class WS extends EventEmitter {
         this.bin_methods = opt.bin_methods || this.ipc && this.ipc.bin_methods;
         this.time_parse = opt.time_parse;
         this.mux = opt.mux ? new Mux(this) : undefined;
-        if ((this.zc || this.zc_mux) && !zcounter)
+        if ((this.zc || this.zc_mux) && !zcounter
+            && !process.env.WS_NO_ZCOUNTER)
+        {
             zcounter = require('./zcounter.js');
+        }
         if (zcounter)
             this._counter = make_counter(opt);
         this.max_backpressure = opt.max_backpressure;
@@ -264,8 +311,11 @@ class WS extends EventEmitter {
         this._buffers.push(msg);
         this._send_throttle_t = this._send_throttle_t || setTimeout(()=>{
             this._send_throttle_t = undefined;
-            this.ws.send(this._buffers.get_buffer(), this.uws2 ? true
-                : undefined);
+            const buf = this._buffers.get_buffer();
+            if (this.uws2)
+                this.ws.send(buf, true, this.compression);
+            else
+                this.ws.send(buf);
             this._buffers.clean();
         }, throttle_ts);
     }
@@ -293,8 +343,10 @@ class WS extends EventEmitter {
         this._update_idle();
         if (opt && opt.bin_throttle)
             this._send_throttle(msg, opt.bin_throttle);
+        else if (this.uws2)
+            this.ws.send(msg, typeof msg!='string', this.compression);
         else
-            this.ws.send(msg, this.uws2 ? typeof msg!='string' : opt);
+            this.ws.send(msg, opt);
         if (this.zc_tx)
         {
             this._counter.inc(`${this.zc}_tx_msg`);
@@ -751,16 +803,12 @@ class Client extends WS {
         this.headers = undefined;
         this.deflate = !!opt.deflate;
         this.agent = opt.agent;
-        if (opt.e1008_exit_reason)
-        {
-            this.e1008_exit_reason = opt.e1008_exit_reason;
-            this.e1008_ts_start = date.monotonic();
-        }
         this.reason = undefined;
         this.reconnect_timer = undefined;
         this.server_no_mask_support = false;
         this.handshake_timeout = opt.handshake_timeout===undefined
             ? 50000 : opt.handshake_timeout;
+        this.reject_unauthorized = opt.reject_unauthorized;
         this.handshake_timer = undefined;
         if (this.zc)
         {
@@ -858,6 +906,9 @@ class Client extends WS {
         }
         if (!is_rn)
         {
+
+            if (this.reject_unauthorized!=undefined)
+                opt.rejectUnauthorized = this.reject_unauthorized;
             // XXX vladislavl: it won't work for uws out of box
             opt.agent = this.agent;
             opt.perMessageDeflate = this.deflate;
@@ -916,17 +967,7 @@ class Client extends WS {
         this._retry_count = 0;
         super._on_open();
     }
-    _handle_e1008(event){
-        if (!this.e1008_exit_reason)
-            return;
-        if (event.code != 1008 || this.e1008_exit_reason != event.reason)
-            return;
-        if (!this.no_retry && date.monotonic()-this.e1008_ts_start < 60000)
-            return;
-        zerr.zexit(`Got '${event.reason}' from ${event.target.url}`);
-    }
     _on_close(event){
-        this._handle_e1008(event);
         this._reconnect();
         super._on_close(event);
     }
@@ -988,6 +1029,8 @@ class Server {
         this.ws_server = new impl.Server(ws_opt);
         this.server_no_mask_support = impl.server_no_mask_support;
         this.opt = opt;
+        this.handle_forwarded = prepare_forwarded_handler(
+            this.opt.trusted_proxy_networks, this.opt.trust_forwarded);
         this.label = opt.label;
         this.connections = new Set();
         this.zc = opt.zcounter!=false ? opt.label ? `${opt.label}_ws` : 'ws'
@@ -1008,7 +1051,9 @@ class Server {
             ws=>this.accept(ws, req));
     }
     accept(ws, req=ws.upgradeReq){
-        if (!ws._socket.remoteAddress)
+        // In old uws the ws._socket is getter, so read it one time here.
+        let remote_addr = ws._socket.remoteAddress;
+        if (!remote_addr)
         {
             ws.onerror = noop;
             return zerr.warn(`${this}: dead incoming connection`);
@@ -1030,23 +1075,11 @@ class Server {
         let zws = new WS(this.opt);
         if (this.opt.conn_max_event_listeners!==undefined)
             zws.setMaxListeners(this.opt.conn_max_event_listeners);
-        if (this.opt.trust_forwarded)
+        let real_ip = this.handle_forwarded(remote_addr, headers);
+        if (real_ip)
         {
-            let forwarded = headers['x-real-ip'];
-            if (!forwarded)
-            {
-                forwarded = headers['x-forwarded-for'];
-                if (forwarded)
-                {
-                    let ips = forwarded.split(',');
-                    forwarded = ips[ips.length-1];
-                }
-            }
-            if (forwarded)
-            {
-                zws.remote_addr = forwarded;
-                zws.remote_forwarded = true;
-            }
+            zws.remote_addr = real_ip;
+            zws.remote_forwarded = true;
         }
         let ua = headers['user-agent'];
         let m = /^Hola (.+)$/.exec(ua);
@@ -1122,6 +1155,7 @@ class Uws2_impl extends EventEmitter {
         super();
         this.lib = require('uws2');
         this.verifyClient = ws_opt.verifyClient;
+        const ws_path = ws_opt.ws_path||'/';
         this.handlers = handlers;
         this.listen_socket = null;
         const app_opt = {};
@@ -1129,8 +1163,11 @@ class Uws2_impl extends EventEmitter {
         {
             app_opt.key_file_name = ws_opt.ssl_conf.key;
             app_opt.cert_file_name = ws_opt.ssl_conf.cert;
+            app_opt.ssl_ciphers = ws_opt.ssl_conf.ssl_ciphers||
+                process.env.SSL_CIPHERS;
         }
         const ws_handler = {
+            compression: ws_opt.compression&&this.lib[ws_opt.compression],
             idleTimeout: Math.min(ws_opt.srv_timeout, 960),
             maxPayloadLength: ws_opt.maxPayloadLength||1024*1024*100,
             maxBackpressure: 0,
@@ -1154,6 +1191,9 @@ class Uws2_impl extends EventEmitter {
                     _socket: {
                         remoteAddress: Buffer.from(Buffer.from(
                             res.getRemoteAddressAsText())).toString(),
+                        // older versions of uws2 lack binding for remote port
+                        remotePort: res.getRemotePort&&res.getRemotePort()||
+                            Math.floor(Math.random()*4294967296),
                         localPort: ws_opt.port,
                     },
                     on: (event, handler)=>emitter.on(event, handler),
@@ -1203,7 +1243,7 @@ class Uws2_impl extends EventEmitter {
             this.handlers.onreq(req, res, req_aborted);
         };
         this.server = this.lib[ws_opt.ssl_conf ? 'SSLApp' : 'App'](app_opt)
-            .ws('/', ws_handler).any('/*', req_handler);
+            .ws(ws_path, ws_handler).any('/*', req_handler);
         if (ws_opt.ssl_conf && ws_opt.ssl_conf.sni)
         {
             for (let servername in ws_opt.ssl_conf.sni)
@@ -1212,7 +1252,7 @@ class Uws2_impl extends EventEmitter {
                     key_file_name: ws_opt.ssl_conf.sni[servername]+'.key',
                     cert_file_name: ws_opt.ssl_conf.sni[servername]+'.crt'
                 }).domain('*.'+servername)
-                    .ws('/', ws_handler).any('/*', req_handler);
+                    .ws(ws_path, ws_handler).any('/*', req_handler);
             }
         }
         this.server.listen(ws_opt.host||'0.0.0.0', ws_opt.port, token=>{
@@ -1286,11 +1326,15 @@ class Server_uws2 {
         let ws_opt = {
             host: opt.host,
             port: opt.port,
+            ws_path: opt.ws_path,
             ssl_conf: opt.ssl_conf,
             srv_timeout: opt.srv_timeout,
             on_timeout: opt.on_timeout,
             req_handler: opt.req_handler,
+            compression: opt.compression
         };
+        if (opt.compression)
+            opt.compression = opt.compression!='DISABLED';
         if (opt.max_payload)
             ws_opt.maxPayloadLength = opt.max_payload;
         if (opt.verify)
@@ -1304,6 +1348,8 @@ class Server_uws2 {
         opt.max_backpressure = this.ws_server.max_backpressure = (is_node
             ? process.env.MAX_BACKPRESSURE : null) || 50*1024;
         this.opt = opt;
+        this.handle_forwarded = prepare_forwarded_handler(
+            this.opt.trusted_proxy_networks, this.opt.trust_forwarded);
         this.label = opt.label;
         this.connections = new Set();
         this.zc = opt.zcounter!=false ? opt.label ? `${opt.label}_ws` : 'ws'
@@ -1409,23 +1455,11 @@ class Server_uws2 {
         let zws = new WS(this.opt, i);
         if (this.opt.conn_max_event_listeners!==undefined)
             zws.setMaxListeners(this.opt.conn_max_event_listeners);
-        if (this.opt.trust_forwarded)
+        let real_ip = this.handle_forwarded(ws._socket.remoteAddress, headers);
+        if (real_ip)
         {
-            let forwarded = headers['x-real-ip'];
-            if (!forwarded)
-            {
-                forwarded = headers['x-forwarded-for'];
-                if (forwarded)
-                {
-                    let ips = forwarded.split(',');
-                    forwarded = ips[ips.length-1];
-                }
-            }
-            if (forwarded)
-            {
-                zws.remote_addr = forwarded;
-                zws.remote_forwarded = true;
-            }
+            zws.remote_addr = real_ip;
+            zws.remote_forwarded = true;
         }
         let ua = headers['user-agent'];
         let m = /^Hola (.+)$/.exec(ua);

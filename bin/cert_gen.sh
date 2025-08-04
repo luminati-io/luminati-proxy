@@ -2,7 +2,7 @@
 # LICENSE_CODE ZON ISC
 openssl req -x509 -sha256 -newkey rsa:4096 -keyout $1 \
 -out $2 -days 365 -nodes \
--subj /C=IL/ST=IL/O=Luminati/CN=luminati.io \
+-subj /C=IL/ST=IL/O=BrightData/CN=brdtnet.com \
 -config <(cat /etc/ssl/openssl.cnf <(
 cat <<-EOF
 [req]

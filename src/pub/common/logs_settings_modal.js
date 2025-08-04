@@ -81,7 +81,7 @@ const Datadog_tab = ({set, settings, test, t})=>{
             </Tooltip>
         </div>
         <div className="inputs_container">
-            <Tooltip title={t('Optional host, "tcp-intake.logs.datadoghq.eu" '
+            <Tooltip title={t('Optional host, "http-intake.logs.datadoghq.eu"'
                 +' is for EU region host')}>
                 <div className="input_main_sub">
                     <Input val={host} type="string"
@@ -93,7 +93,7 @@ const Datadog_tab = ({set, settings, test, t})=>{
                 +' secure port')}>
                 <div className="input_second">
                     <Input placeholder={t('Port (optional)')} val={port}
-                    on_change_wrapper={set('Port')} type="string" />
+                    on_change_wrapper={set('port')} type="string" />
                 </div>
             </Tooltip>
         </div>
