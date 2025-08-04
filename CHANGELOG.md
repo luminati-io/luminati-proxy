@@ -1,6 +1,6 @@
 Proxy manager - Change Log
 
-## 1.560.791 
+## 1.560.909 Development Latest
 - :sparkles: Improved request stats ingestion perfomance
 - :star: Change default api domain to brightdata.com
 - :star: Removed api fallback option
