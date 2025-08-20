@@ -421,6 +421,7 @@ class Lpm_har_viewer extends Pure_component {
         this.loaded = {from: 0, to: 0};
         this.reqs_to_render = [];
         this.temp_total = 0;
+        this.def_status_codes = [2, 3, 4, 5].map(v=>`${v}**`);
         this.take_reqs_from_pool = _.throttle(this.take_reqs_from_pool, 100);
         this.set_new_params_debounced = _.debounce(this.set_new_params, 400);
     }
@@ -432,8 +433,12 @@ class Lpm_har_viewer extends Pure_component {
                 this.setState({proxies});
         });
         this.setdb_on('head.settings', settings=>{
-            if (settings)
-                this.setState({logs: settings.logs});
+            if (!settings)
+                return;
+            this.setState({
+                logs: settings.logs,
+                request_stats: settings.request_stats,
+            }, this.refresh_suggestions.bind(this));
         });
         this.setdb_on('head.har_viewer.reset_reqs', ()=>{
             this.loaded.to = 0;
@@ -450,11 +455,7 @@ class Lpm_har_viewer extends Pure_component {
             if (stats)
                 this.setState({stats});
         });
-        this.etask(function*(){
-            const suggestions = yield Api.json.get('logs_suggestions');
-            suggestions.status_codes.unshift(...[2, 3, 4, 5].map(v=>`${v}**`));
-            setdb.set('head.logs_suggestions', suggestions);
-        });
+        this.refresh_suggestions();
     }
     willUnmount(){
         ws.removeEventListener('har_viewer', this.on_request);
@@ -464,6 +465,22 @@ class Lpm_har_viewer extends Pure_component {
         setdb.set('har_viewer', null);
         loader.end();
         this.take_reqs_from_pool.cancel();
+    }
+    refresh_suggestions(){
+        if (!this.state.request_stats)
+        {
+            return void setdb.set('head.logs_suggestions', {
+                ports: [],
+                protocols: [],
+                status_codes: this.def_status_codes,
+            });
+        }
+        let _this = this;
+        this.etask(function*(){
+            const suggestions = yield Api.json.get('logs_suggestions');
+            suggestions.status_codes.unshift(..._this.def_status_codes);
+            setdb.set('head.logs_suggestions', suggestions);
+        });
     }
     on_request_started = event=>{
         event.data.req.pending = true;
@@ -703,6 +720,8 @@ class Lpm_har_viewer extends Pure_component {
           type_filter={this.state.type_filter}
           set_filter={this.set_filter}
           filters={this.state.filters}
+          filters_disabled={!this.state.request_stats &&
+            'Recent stats are disabled'}
           toolbar
           Waypoint={Waypoint}
         >

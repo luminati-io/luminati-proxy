@@ -530,6 +530,7 @@ class Har_viewer extends Pure_component {
                 clear={this.clear}
                 dock_mode={this.props.dock_mode}
                 filters={this.props.filters}
+                filters_disabled={this.props.filters_disabled}
                 set_filter={this.props.set_filter}
                 type_filter={this.props.type_filter}
                 set_type_filter={this.props.set_type_filter}
@@ -618,6 +619,7 @@ class Toolbar extends Pure_component {
               <Filters
                 set_filter={this.props.set_filter}
                 filters={this.props.filters}
+                disabled={this.props.filters_disabled}
               />
             </Toolbar_row>
           }
@@ -656,24 +658,26 @@ class Filters extends Pure_component {
               val={this.props.filters[f.name]}
               set={this.props.set_filter.bind(null, f.name)}
               default_value={f.default_value}
+              disabled={this.props.disabled}
             />
           )}
         </div>;
     }
 }
 
-const Filter = ({vals, val, set, default_value, format_text})=>
-   <div className="custom_filter">
-     <select value={val} onChange={set}>
-       <option value="">{default_value}</option>
-       {vals.map(p=>
-         <option key={p} value={p}>
-           {format_text ? format_text(p) : p}
-         </option>
-       )}
-     </select>
-     <span className="arrow"/>
-   </div>;
+const Filter = prop=>{
+    const {vals, val, set, default_value, disabled} = prop;
+    const disabled_reason = typeof disabled == 'string' && disabled; 
+    const select = <select disabled={!!disabled} value={val} onChange={set}>
+      <option value="">{default_value}</option>
+      {vals.map(p=><option key={p} value={p}>{p}</option>)}
+    </select>;
+    return <div className="custom_filter">
+      {disabled_reason ? <Tooltip title={disabled_reason}>{select}</Tooltip>
+        : select}
+      <span className="arrow"/>
+    </div>;
+};
 E.Filter = Filter;
 
 const type_filters = ['XHR', 'HTML', 'JS', 'CSS', 'Img', 'Media', 'Font',

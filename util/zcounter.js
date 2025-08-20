@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint node:true*/
+'use strict'; /*jslint node:true,es9:true*/
 require('./config.js');
 const cluster = require('cluster');
 const cluster_ipc = require('./cluster_ipc.js');
@@ -16,6 +16,89 @@ const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
 const worker_timeout = +env.ZCOUNTER_WORKER_TIMEOUT||5*ms.MIN;
 const global_only_worlds = new Set();
+
+let vcounter; // lazy loading to avoid circular require
+const zcounter_to_vcounter = new Map();
+const get_vcounter = metric_name=>{
+    if (!vcounter || !metric_name || typeof metric_name !== 'string')
+        return;
+    let vmetric;
+    if (vmetric = zcounter_to_vcounter.get(metric_name))
+        return vmetric;
+    const params = get_vcounter_params(metric_name);
+    if (!params)
+        return;
+    const [vname, labels, glob] = params;
+    // temp limit for initial testing, to be deleted later
+    if (labels.world !== 'stats' || labels.app !== 'svc'
+        || !vname.startsWith('unblocker:'))
+    {
+        return;
+    }
+    vmetric = glob
+        ? vcounter.glob(vname, labels)
+        : vcounter.metric(vname, labels);
+    zcounter_to_vcounter.set(metric_name, vmetric);
+    return vmetric;
+};
+const get_vcounter_params = metric_name=>{
+    let labels, ext, glob;
+    let world = 'stats', absolute = metric_name.startsWith('.');
+    if (absolute)
+    {
+        const parts = metric_name.slice(1).split('.');
+        if (['lum', 'stats', 'glob'].includes(parts[0]))
+        {
+            const first_after_dot = parts.shift();
+            if (first_after_dot === 'lum')
+                world = 'lum';
+            else if (first_after_dot === 'glob')
+                glob = true;
+        }
+        metric_name = parts.join('.');
+    }
+    if (metric_name.includes('/'))
+    {
+        const slash_parts = metric_name.split('/');
+        if (slash_parts.length !== 2)
+            return;
+        metric_name = slash_parts[1];
+        if (slash_parts[0] === 'glob')
+            glob = true;
+        else
+            ext = slash_parts[0];
+    }
+    const parts = metric_name.split('.');
+    if (['lum', 'stats'].includes(parts[0]))
+        world = parts.shift();
+    if (world === 'lum')
+    {
+        glob = true;
+        const [customer, zone, app] = parts.splice(0, 3);
+        labels = {
+            world,
+            customer,
+            zone,
+            app,
+        };
+    }
+    else
+    {
+        if (parts[0] === 'glob')
+        {
+            parts.shift();
+            glob = true;
+        }
+        labels = {
+            world,
+            instance: ext || conf.hostname,
+            app: absolute ? parts.shift() : conf.app,
+        };
+    }
+    const vname = parts.join(':') || 'default';
+    labels.job = 'zcounter';
+    return [vname, labels, glob];
+};
 
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
@@ -70,6 +153,7 @@ E.inc = (name, inc=1, agg_srv='sum', agg_tm='avg0')=>{
     if (!entry)
         _type.set(name, entry = {v: 0, agg_srv, agg_tm});
     entry.v += inc;
+    get_vcounter(name)?.inc(inc);
 };
 
 // monotonic counters read from elsewhere: pkt rx/tx on interface from kernel
@@ -83,6 +167,7 @@ E.minc = (name, value, agg_srv='sum')=>{
     if (value<entry.b)
         entry.b = value;
     entry.v = value-entry.b;
+    get_vcounter(name)?.inc(value);
 };
 
 // minc but starts sending after non-0 value and stops after 0-only for 1h
@@ -96,6 +181,7 @@ E.minc_eco = (name, value, agg_srv='sum')=>{
     if (value<entry.b)
         entry.b = value;
     entry.v = value-entry.b;
+    get_vcounter(name)?.inc(value);
 };
 
 // current in-progress counter: num of open tcp connections: +1 open, -1 close
@@ -106,6 +192,8 @@ E.inc_level = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v += inc;
+    const vmetric = get_vcounter(name);
+    vmetric?.set_level((vmetric.data.level || 0) + inc);
 };
 
 // inc_level but starts sending after non-0 value and stops after 0-only for 1h
@@ -116,6 +204,8 @@ E.inc_level_eco = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v += inc;
+    const vmetric = get_vcounter(name);
+    vmetric?.set_level((vmetric.data.level || 0) + inc);
 };
 
 // current in-progress counter read from elsewhere, or absolute value such
@@ -127,6 +217,7 @@ E.set_level = (name, value, agg_mas='avg', agg_srv='avg', agg_tm='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv, agg_tm};
     entry.v = value;
+    get_vcounter(name)?.set_level(value);
 };
 
 // set_level but starts sending after non-0 value and stops after 0-only for 1h
@@ -137,6 +228,7 @@ E.set_level_eco = (name, value, agg_mas='avg', agg_srv='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v = value;
+    get_vcounter(name)?.set_level(value);
 };
 
 E.avg = (name, value, agg_srv)=>E.avgw(name, value, 1, agg_srv);
@@ -151,6 +243,7 @@ E.avgw = (name, value, weight, agg_srv='avg')=>{
         entry = _type[name] = {v: 0, w: 0, agg_srv};
     entry.v += value;
     entry.w += weight;
+    get_vcounter(name)?.avg(value);
 };
 
 E.max = (name, value, agg_srv='max', agg_tm='max')=>{
@@ -161,6 +254,7 @@ E.max = (name, value, agg_srv='max', agg_tm='max')=>{
         entry = _type[name] = {v: value, agg_srv, agg_tm};
     if (entry.v<value)
         entry.v = value;
+    get_vcounter(name)?.max(value);
 };
 
 E.min = (name, value, agg_srv='min', agg_tm='min')=>{
@@ -171,6 +265,7 @@ E.min = (name, value, agg_srv='min', agg_tm='min')=>{
         entry = _type[name] = {v: value, agg_srv, agg_tm};
     if (entry.v>value)
         entry.v = value;
+    get_vcounter(name)?.min(value);
 };
 
 function _get(_type, n){
@@ -244,6 +339,7 @@ E.glob_set_level = (name, value, agg_mas, agg_srv, agg_tm)=>
     E.set_level('glob/'+name, value, agg_mas, agg_srv, agg_tm);
 
 E.del = name=>{
+    get_vcounter(name)?.reset();
     if (reported_names[name])
     {
         delete reported_names[name];
@@ -599,6 +695,13 @@ let create_ws_clients = ({production, port, lazy, lxc, urls})=>{
 };
 
 function run(){
+    if (!vcounter)
+    {
+        try {
+            vcounter = require('./vcounter.js');
+            vcounter.enable();
+        } catch{}
+    }
     init();
     if (cluster.isWorker)
         return;
@@ -702,4 +805,4 @@ function test_reset(){
 }
 
 E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client,
-    test_reset, all_conns, ws_conn};
+    test_reset, get_vcounter_params, all_conns, ws_conn};

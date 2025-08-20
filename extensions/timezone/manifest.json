@@ -1,13 +1,11 @@
 {
     "background": {
-        "scripts": [
-            "background.js"
-        ]
+        "service_worker": "background.js"
     },
     "content_scripts": [
         {
             "matches": [
-                "*://*/*"
+                "<all_urls>"
             ],
             "match_about_blank": true,
             "all_frames": true,
@@ -17,12 +15,14 @@
             ]
         }
     ],
-    "manifest_version": 2,
+    "host_permissions": [
+        ":///*"
+    ],
+    "manifest_version": 3,
     "name": "Proxy Manager Timezone",
     "permissions": [
         "storage",
-        "*://*/*",
         "webNavigation"
     ],
-    "version": "1.560.909"
+    "version": "1.564.78"
 }

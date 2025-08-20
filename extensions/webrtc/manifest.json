@@ -1,14 +1,14 @@
 {
-    "background": {
-        "persistent": false,
-        "scripts": [
-            "background.js"
-        ]
+    "action": {
+        "default_title": "Proxy Manager WebRTC"
     },
-    "manifest_version": 2,
+    "background": {
+        "service_worker": "background.js"
+    },
+    "manifest_version": 3,
     "name": "Proxy Manager WebRTC",
     "permissions": [
         "privacy"
     ],
-    "version": "1.560.909"
+    "version": "1.564.78"
 }

@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.564.78 Stable
+- :bug: Fix HAR viewer port/status/protocol filters
+- :bug: Fix 407 on HTTPS reqs with token auth
+
 ## 1.560.909 Development Latest
 - :sparkles: Improved request stats ingestion perfomance
 - :star: Change default api domain to brightdata.com

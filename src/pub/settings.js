@@ -226,10 +226,11 @@ class Form extends Pure_component {
                 }
             });
             const body = {..._this.state.pending_settings};
-            const save_res = yield _this.save_settings(body);
-            if (save_res.err)
+            let {err} = yield _this.save_settings(body);
+            if (err)
             {
-                return _this.setState({error: [{msg: save_res.err}]}, ()=>
+                err = Array.isArray(err) ? err : [err];
+                return _this.setState({error: err.map(msg=>({msg}))}, ()=>
                     $('#upd_settings_error').modal('show'));
             }
             _this.setState({is_changed: false, pending_settings: {},

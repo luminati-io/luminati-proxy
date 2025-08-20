@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.564.78",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix HAR viewer port/status/protocol filters"
+            },
+            {
+                "type": "bug",
+                "text": "Fix 407 on HTTPS reqs with token auth"
+            }
+        ]
+    },
+    {
         "ver": "1.560.909",
         "type": "dev",
         "changes": [

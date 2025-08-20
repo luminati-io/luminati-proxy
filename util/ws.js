@@ -84,6 +84,44 @@ const json_event = flag=>flag ? 'zjson' : 'json';
 
 function noop(){}
 
+class Buffer_store {
+    constructor(){
+        this._free = {};
+        this._step = 100e3;
+    }
+    _get_hash_info(size){
+        let index = Math.max(Math.ceil(size/this._step), 1);
+        return {index, window_size: this._step*index};
+    }
+    alloc_static_buffer(len){
+        let buffer = this.buffer;
+        if (!buffer || buffer.byteLength<len)
+        {
+            let chunk_size = 10e6;
+            let trunc_len = Math.max(Math.ceil(len/chunk_size), 1)*chunk_size;
+            buffer = this.buffer = Buffer.alloc(trunc_len);
+        }
+        return buffer.slice(0, len);
+    }
+    alloc(size){
+        let {index, window_size} = this._get_hash_info(size);
+        let arr = this._free[index] = this._free[index]||[];
+        let res = arr.pop();
+        if (!res)
+            res = Buffer.allocUnsafe(window_size);
+        let buff = res.slice(0, size);
+        // without 'unuse' GC will remove buffer without reference
+        buff.unuse_store_buffer = ()=>{
+            if (!res)
+                return;
+            this._free[index].push(res);
+            res = null;
+        };
+        return buff;
+    }
+}
+const buffer_store = new Buffer_store();
+
 const BUFFER_MESSAGES_CONTENT = 20;
 const BUFFER_MESSAGES_TYPE_BIN = 0;
 const BUFFER_MESSAGES_TYPE_STRING = 1;
@@ -254,6 +292,9 @@ class WS extends EventEmitter {
         this.zjson_opt_receive = assign({}, zjson_opt, opt.zjson_opt_receive);
         this.label = opt.label;
         this.compression = opt.compression;
+        // XXX igors: reuse the same buffers currently is on test for uws2
+        // servers only
+        this.reusable_buffers = !!opt.reusable_buffers;
         this.remote_label = undefined;
         this.local_addr = undefined;
         this.local_port = undefined;
@@ -1371,14 +1412,14 @@ class Server_uws2 {
     add_handler(opt, pattern, handler){
         let def_res = {
             json(obj){
-                this.writeStatus('200').writeHeader('Content-Type',
-                    'application/json');
-                this.end(JSON.stringify(obj));
+                this.cork(()=>this.writeStatus('200')
+                    .writeHeader('Content-Type', 'application/json')
+                    .end(JSON.stringify(obj)));
             },
             uncaught(url, e){
                 let err = zerr.e2s(e);
                 zerr.notice(`${url} uncaught ${err}`);
-                this.writeStatus('502').end(err);
+                this.cork(()=>this.writeStatus('502').end(err));
             },
         };
         let param_count = 0;
@@ -2126,6 +2167,7 @@ class Mux {
         const _this = this;
         const bin_throttle_opt = opt && opt.bin_throttle ?
             {bin_throttle: opt.bin_throttle} : null;
+        const reusable_buffers = !bin_throttle_opt && this.ws.reusable_buffers;
         opt.fin_timeout = opt.fin_timeout||10*SEC;
         const zasync = opt.zasync && is_node || false;
         const w_log = (e, str)=>
@@ -2229,14 +2271,28 @@ class Mux {
                 data.length);
             if (bytes<=0)
                 return {buf_pending: data};
-            const buf = Buffer.allocUnsafe(bytes+VFD_SZ);
+            let buf;
+            if (reusable_buffers)
+                buf = buffer_store.alloc_static_buffer(bytes+VFD_SZ);
+            else
+                buf = Buffer.allocUnsafe(bytes+VFD_SZ);
             buf.writeUInt32BE(vfd, 0);
             buf.writeUInt32BE(0, 4);
             data.copy(buf, VFD_SZ, 0, bytes);
             if (bytes==data.length)
+            {
+                if (reusable_buffers && data.unuse_store_buffer)
+                    data.unuse_store_buffer();
                 return {buf};
-            const buf_pending = Buffer.allocUnsafe(data.length-bytes);
+            }
+            let buf_pending;
+            if (reusable_buffers)
+                buf_pending = buffer_store.alloc(data.length-bytes);
+            else
+                buf_pending = Buffer.allocUnsafe(data.length-bytes);
             data.copy(buf_pending, 0, bytes);
+            if (reusable_buffers && data.unuse_store_buffer)
+                data.unuse_store_buffer();
             return {buf, buf_pending};
         };
         const zfinish = (wait_rmt, err)=>etask(function*_zfinish(){

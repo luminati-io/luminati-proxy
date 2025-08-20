@@ -227,8 +227,10 @@ const App = withRouter(class App extends Pure_component {
     save_settings = settings=>{
         return this.etask(function*(){
             this.on('uncaught', e=>{
-                console.error('Settings save error', e);
-                this.return({err: new_settings || e.message});
+                const err = [e.message, e.xhr_info?.response_text]
+                    .filter(Boolean);
+                console.error('Settings save error', err, e);
+                this.return({err});
             });
             const new_settings = yield Api.json.put('settings', settings);
             setdb.set('head.settings', new_settings);

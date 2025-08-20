@@ -484,7 +484,8 @@ E.file_changed = (file_path, scope)=>{
 
 if (E.is_win)
 {
-    E.cygwin_root = E.is_dir('C:/cygwin') ? 'C:/cygwin' :
+    E.cygwin_root = E.is_dir('C:/cygwin64') ? 'C:/cygwin64' :
+	E.is_dir('C:/cygwin') ? 'C:/cygwin' :
         E.is_dir('D:/cygwin') ? 'D:/cygwin' : null;
 }
 E.cyg2unix = src=>{
