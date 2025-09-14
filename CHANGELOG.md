@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.570.247 Stable
+- :star: Bump puppeteer to 24.8.2
+- :star: Default pmgr lunch browser viewport to match screen
+
 ## 1.564.78 Stable
 - :bug: Fix HAR viewer port/status/protocol filters
 - :bug: Fix 407 on HTTPS reqs with token auth

@@ -17,29 +17,33 @@ const max_age = 30*ms.SEC, level_eco_dispose = ms.HOUR;
 const worker_timeout = +env.ZCOUNTER_WORKER_TIMEOUT||5*ms.MIN;
 const global_only_worlds = new Set();
 
-let vcounter; // lazy loading to avoid circular require
-const zcounter_to_vcounter = new Map();
+// lazy loading to ensure modules are installed
+let vcounter, zcounter_to_vcounter;
 const get_vcounter = metric_name=>{
     if (!vcounter || !metric_name || typeof metric_name !== 'string')
         return;
-    let vmetric;
-    if (vmetric = zcounter_to_vcounter.get(metric_name))
+    let vmetric = zcounter_to_vcounter.get(metric_name);
+    if (vmetric !== undefined)
         return vmetric;
-    const params = get_vcounter_params(metric_name);
+    const params = get_vcounter_params(metric_name.replaceAll('-', '_'));
     if (!params)
         return;
     const [vname, labels, glob] = params;
     // temp limit for initial testing, to be deleted later
-    if (labels.world !== 'stats' || labels.app !== 'svc'
-        || !vname.startsWith('unblocker:'))
+    if (labels.world !== 'stats' || labels.app !== 'svc')
     {
+        zcounter_to_vcounter.set(metric_name, null);
         return;
     }
-    vmetric = glob
-        ? vcounter.glob(vname, labels)
-        : vcounter.metric(vname, labels);
-    zcounter_to_vcounter.set(metric_name, vmetric);
-    return vmetric;
+    try {
+        vmetric = glob
+            ? vcounter.glob(vname, labels)
+            : vcounter.metric(vname, labels);
+        zcounter_to_vcounter.set(metric_name, vmetric);
+        return vmetric;
+    } catch{
+        zcounter_to_vcounter.set(metric_name, null);
+    }
 };
 const get_vcounter_params = metric_name=>{
     let labels, ext, glob;
@@ -193,7 +197,7 @@ E.inc_level = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
         entry = _type[name] = {v: 0, agg_srv};
     entry.v += inc;
     const vmetric = get_vcounter(name);
-    vmetric?.set_level((vmetric.data.level || 0) + inc);
+    vmetric?.set_level((vmetric.value || 0) + inc);
 };
 
 // inc_level but starts sending after non-0 value and stops after 0-only for 1h
@@ -205,7 +209,7 @@ E.inc_level_eco = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
         entry = _type[name] = {v: 0, agg_srv};
     entry.v += inc;
     const vmetric = get_vcounter(name);
-    vmetric?.set_level((vmetric.data.level || 0) + inc);
+    vmetric?.set_level((vmetric.value || 0) + inc);
 };
 
 // current in-progress counter read from elsewhere, or absolute value such
@@ -243,7 +247,8 @@ E.avgw = (name, value, weight, agg_srv='avg')=>{
         entry = _type[name] = {v: 0, w: 0, agg_srv};
     entry.v += value;
     entry.w += weight;
-    get_vcounter(name)?.avg(value);
+    get_vcounter(name + '_total')?.inc(value);
+    get_vcounter(name + '_count')?.inc(weight);
 };
 
 E.max = (name, value, agg_srv='max', agg_tm='max')=>{
@@ -698,6 +703,8 @@ function run(){
     if (!vcounter)
     {
         try {
+            const {LRUCache} = require('lru-cache');
+            zcounter_to_vcounter = new LRUCache({max: 10000});
             vcounter = require('./vcounter.js');
             vcounter.enable();
         } catch{}

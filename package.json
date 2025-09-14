@@ -177,6 +177,9 @@
     },
     "broadway": {
       "nconf": "0.11.4"
+    },
+    "color-string": {
+      "simple-swizzle": "0.2.1"
     }
   },
   "engines": {
@@ -539,7 +542,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "dd70a742891b83aa4aaa96b5a702a0c5"
+    "md5": "10ecb2660a0e38cd7b7c9765f79028fe"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -551,7 +554,7 @@
   ],
   "optionalDependencies": {
     "sinon": "14.0.0",
-    "puppeteer": "23.11.1",
+    "puppeteer": "24.8.2",
     "longjohn": "0.2.12"
   },
   "preferGlobal": true,
@@ -569,5 +572,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.564.78"
+  "version": "1.570.247"
 }

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.570.247",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Bump puppeteer to 24.8.2"
+            },
+            {
+                "type": "star",
+                "text": "Default pmgr lunch browser viewport to match screen"
+            }
+        ]
+    },
+    {
         "ver": "1.564.78",
         "type": "stable",
         "changes": [
