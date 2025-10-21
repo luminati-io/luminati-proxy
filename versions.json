@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.578.351",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Bump puppeteer to 24.23.1"
+            }
+        ]
+    },
+    {
         "ver": "1.570.247",
         "type": "stable",
         "changes": [

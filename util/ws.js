@@ -121,6 +121,7 @@ class Buffer_store {
     }
 }
 const buffer_store = new Buffer_store();
+E.Buffer_store = Buffer_store;
 
 const BUFFER_MESSAGES_CONTENT = 20;
 const BUFFER_MESSAGES_TYPE_BIN = 0;
@@ -833,6 +834,8 @@ class Client extends WS {
         this.retry_interval = opt.retry_interval||10000;
         this.retry_max = opt.retry_max||this.retry_interval;
         this.retry_random = opt.retry_random;
+        // to fix "closed by remote" 1006 sporadic
+        this.ignore_tls_eof_while_reading = !!opt.ignore_tls_eof_while_reading;
         this.next_retry = this.retry_interval;
         this.no_retry = opt.no_retry;
         this.retry_chances = opt.retry_chances;
@@ -851,6 +854,12 @@ class Client extends WS {
             ? 50000 : opt.handshake_timeout;
         this.reject_unauthorized = opt.reject_unauthorized;
         this.handshake_timer = undefined;
+        if (this.agent && this.ignore_tls_eof_while_reading)
+        {
+            throw new Error('options agent && ignore_tls_eof are not '
+                +'compatible');
+        }
+        // XXX: this should only be called in one worker, or in master
         if (this.zc)
         {
             this._counter.inc_level(`level_${this.zc}_online`, 0, 'sum',
@@ -869,6 +878,42 @@ class Client extends WS {
                 {'client-no-mask-support': 1});
         }
         this._connect();
+    }
+    _prepare_https_agent(url, lookup){
+        let is_wss = (zurl.parse(url)||{}).protocol=='wss:';
+        if (!is_wss)
+            return;
+        let https = require('https');
+        let tls = require('tls');
+        let eof_metric = `${this.zc||this.label||'unknown'}.`
+            +'ignore_tls_eof_while_reading';
+        this.agent = new https.Agent({keepAlive: true, maxSockets: 1});
+        this.agent.createConnection = (_opt, cb)=>{
+            const socket = tls.connect(assign({host: _opt.host,
+                port: _opt.port}, _opt, {lookup}), ()=>{ cb(null, socket); });
+            let base_on = socket.on;
+            socket.on = function(cb_name, _cb){
+                let ov_cb = _cb;
+                if (cb_name=='error')
+                {
+                    ov_cb = function(e){
+                        if (e&&e.code=='ERR_SSL_UNEXPECTED_EOF_WHILE_READING')
+                        {
+                            if (zcounter)
+                            {
+                                zcounter.inc(eof_metric);
+                                zcounter.glob_inc(eof_metric);
+                            }
+                            return void zerr.notice(`${eof_metric} skip`);
+                        }
+                        return _cb.call(this, e);
+                    };
+                }
+                return base_on.call(this, cb_name, ov_cb);
+            };
+            return socket;
+        };
+        return this.agent;
     }
     _monitor_disconnected(){
         let disconnected_metric = `${this.zc}_disconnected_ms`;
@@ -917,14 +962,19 @@ class Client extends WS {
         return super._on_message(ev);
     }
     _assign(ws){
+        let was_offline = !this.ws;
         super._assign(ws);
         if (this.zc)
+            this._counter.inc(`${this.zc}_open`);
+        if (this.zc && was_offline)
         {
             this._counter.inc_level(`level_${this.zc}_online`, 1, 'sum',
                 'sum');
         }
     }
     _close(close, code, reason){
+        if (this.zc)
+            this._counter.inc(`${this.zc}_close`);
         if (this.zc && this.ws)
         {
             this._counter.inc_level(`level_${this.zc}_online`, -1, 'sum',
@@ -963,6 +1013,11 @@ class Client extends WS {
                         [{address: lookup_ip, family: v}] : lookup_ip, v));
                 };
             }
+        }
+        if (this.ignore_tls_eof_while_reading)
+        {
+            opt.agent = this._prepare_https_agent(url,
+                opt.lookup||this.lookup);
         }
         if (this.zc)
             this._counter.inc(`${this.zc}_fallback`, url==this.url ? 0 : 1);
@@ -2178,8 +2233,8 @@ class Mux {
             write(data, encoding, cb, ignore_backpressure){
                 let ws_channel = _this.ws.ws;
                 let buf, buf_pending, continue_on_drain;
-                if (_this.ws.uws2 && ws_channel && ws_channel
-                    .getBufferedAmount()>_this.ws.max_backpressure
+                if (_this.ws.uws2 && ws_channel
+                    && ws_channel.getBufferedAmount()>_this.ws.max_backpressure
                     && !ignore_backpressure)
                 {
                     buf_pending = data;

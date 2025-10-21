@@ -10,7 +10,7 @@ import {main as Api} from '../api.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import {Modal} from './modals.js';
 import Tooltip from './tooltip.js';
-import {Input, Yes_no} from './controls.js';
+import {Input, Yes_no, Select} from './controls.js';
 import {T} from './i18n.js';
 const {entries, assign} = Object;
 const remote_field = 'logs_settings';
@@ -161,14 +161,18 @@ const build_s3_file_path = (target, compress, group_by_day)=>{
     const slash = !tgt.endsWith('/') ? '/' : '';
     const file = group_by_day ? '%H:%M' : '%Y-%m-%d_%H:%M';
     const group = group_by_day ? '%Y-%m-%d/' : '';
-    return date.strftime(`${tgt}${slash}${group}brd_test_${file}`
+    return date.strftime(`${tgt}${slash}${group}brd_m_test_${file}`
         +`.log${ext}`, date());
 };
 
+const storage_classes = ['STANDARD_IA', 'STANDARD', 'REDUCED_REDUNDANCY',
+    'ONEZONE_IA', 'INTELLIGENT_TIERING', 'GLACIER', 'GLACIER_IR', 'SNOW',
+    'DEEP_ARCHIVE', 'OUTPOSTS', 'EXPRESS_ONEZONE', 'FSX_OPENZFS'];
+
 const S3_tab = ({set, settings, test, t})=>{
-    const {bucket, access_key, secret_key, target, tag_type,
-        tag_project, compress, encryption, group_by_day,
-        rotation_hour} = settings;
+    const {bucket, access_key, secret_key, target, tag_type, region,
+        tag_project, compress, encryption, group_by_day, rotation_hour,
+        storage_class} = settings;
     const test_msg = `Pleace check your bucket ${bucket} for file`
         +` ${build_s3_file_path(target, compress, group_by_day)}`;
     return <React.Fragment>
@@ -205,10 +209,17 @@ const S3_tab = ({set, settings, test, t})=>{
         </div>
         <div className="inputs_container">
             <Tooltip title={t('The bucket path in which the log is uploaded')}>
-                <div className="input_full">
+                <div className="input_half">
                     <Input val={target||S3_DEF_TARGET} type="string"
                     placeholder={t('Target path')}
                     on_change_wrapper={set('target')} />
+                </div>
+            </Tooltip>
+            <Tooltip title={t('AWS data center where your bucket resides '
+                +'(default: us-east-1)')}>
+                <div className="input_half_sub">
+                    <Input val={region} placeholder={t('Region')}
+                    on_change_wrapper={set('region')} type="string" />
                 </div>
             </Tooltip>
         </div>
@@ -223,6 +234,15 @@ const S3_tab = ({set, settings, test, t})=>{
                 <div className="input_half_sub">
                     <Input val={tag_project} placeholder={t('Tag project')}
                     on_change_wrapper={set('tag_project')} type="string" />
+                </div>
+            </Tooltip>
+        </div>
+        <div className="inputs_container">
+            <Tooltip title={t('S3 storage class (default: STANDARD_IA)')}>
+                <div className="input_half">
+                    <Select val={storage_class||'STANDARD_IA'} type="select"
+                    on_change_wrapper={set('storage_class')}
+                    data={storage_classes} />
                 </div>
             </Tooltip>
         </div>
@@ -331,8 +351,8 @@ export default class Logs_settings_modal extends Pure_component {
     set = field=>val=>this.setState({[field]: val, error: '', info: '',
         is_submit_disabled: this.state.use_limit});
     set_remote = type=>field=>val=>this.setState({is_submit_disabled: true,
-        remote: assign({}, this.state.remote, {[field]: val, type}),
-        error: '', info: ''});
+        remote: assign({}, this.state.remote, {[field]: val?.trim?.() || val,
+        type}), error: '', info: ''});
     ch_use_limit = val=>this.setState({use_limit: val,
         is_submit_disabled: val, error: '', info: '', logs_num: val ?
         this.props.logs_disabled_num : this.props.logs_enabled_num});

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.578.351 Stable
+- :star: Bump puppeteer to 24.23.1
+
 ## 1.570.247 Stable
 - :star: Bump puppeteer to 24.8.2
 - :star: Default pmgr lunch browser viewport to match screen

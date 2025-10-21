@@ -67,6 +67,8 @@ for (var k in L)
     E[l] = function(){ return _zerr(level, arguments); };
 });
 
+E.error = function(){ return _zerr(L.ERR, arguments); };
+
 E.assert = function(exp, msg){
     if (!exp)
         zerr.crit(msg);

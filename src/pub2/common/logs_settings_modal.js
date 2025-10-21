@@ -16,7 +16,7 @@ import {
 } from '../common.js';
 import {get_form_toggle_transform} from '../util.js';
 import {main as Api} from '../api.js';
-import {Input} from './controls.js';
+import {Input, Select} from './controls.js';
 import {T} from './i18n.js';
 import Tab_group from './tab_group.js';
 const {assign} = Object;
@@ -142,14 +142,18 @@ const build_s3_file_path = (target, compress, group_by_day)=>{
     const slash = !tgt.endsWith('/') ? '/' : '';
     const file = group_by_day ? '%H:%M' : '%Y-%m-%d_%H:%M';
     const group = group_by_day ? '%Y-%m-%d/' : '';
-    return date.strftime(`${tgt}${slash}${group}brd_test_${file}`
+    return date.strftime(`${tgt}${slash}${group}brd_m_test_${file}`
         +`.log${ext}`, date());
 };
 
+const storage_classes = ['STANDARD_IA', 'STANDARD', 'REDUCED_REDUNDANCY',
+    'ONEZONE_IA', 'INTELLIGENT_TIERING', 'GLACIER', 'GLACIER_IR', 'SNOW',
+    'DEEP_ARCHIVE', 'OUTPOSTS', 'EXPRESS_ONEZONE', 'FSX_OPENZFS'];
+
 const S3_tab = ({set, settings, test, t})=>{
     const {bucket, access_key, secret_key, target, tag_type,
-        tag_project, compress, encryption, group_by_day,
-        rotation_hour} = settings;
+        tag_project, compress, encryption, group_by_day, storage_class,
+        rotation_hour, region} = settings;
     const test_msg = `Pleace check your bucket ${bucket} for file`
         +` ${build_s3_file_path(target, compress, group_by_day)}`;
     const target_tt = t('Target path in which the log is uploaded')
@@ -173,10 +177,13 @@ const S3_tab = ({set, settings, test, t})=>{
             </div>
         </div>
         <div className="inputs_container">
-            <div className="input_full">
-                <Input val={target} type="string"
-                placeholder={target_tt}
+            <div className="input_half">
+                <Input val={target} type="string" placeholder={target_tt}
                 on_change_wrapper={set('target')} />
+            </div>
+            <div className="input_half_sub">
+                <Input val={region} placeholder={t('Region')}
+                on_change_wrapper={set('region')} type="string" />
             </div>
         </div>
         <div className="inputs_container">
@@ -187,6 +194,13 @@ const S3_tab = ({set, settings, test, t})=>{
             <div className="input_half_sub">
                 <Input val={tag_project} placeholder={t('Tag project')}
                 on_change_wrapper={set('tag_project')} type="string" />
+            </div>
+        </div>
+        <div className="inputs_container">
+            <div className="input_half">
+                <Select val={storage_class||'STANDARD_IA'} type="select"
+                on_change_wrapper={set('storage_class')}
+                data={storage_classes} />
             </div>
         </div>
         <div className="use_limit">
@@ -312,8 +326,8 @@ export default class Logs_settings_modal extends Pure_component {
     set_const = (field, val)=>this.set(field)(val);
     set = field=>val=>this.setState({[field]: val, ...this.set_def_state});
     set_remote = type=>field=>val=>this.setState({is_submit_disabled: true,
-        remote: assign({}, this.state.remote, {[field]: val, type}),
-        error: '', info: ''});
+        remote: assign({}, this.state.remote, {[field]: val?.trim?.() || val,
+        type}), error: '', info: ''});
     ch_use_limit = val=>this.setState({use_limit: val,
         is_submit_disabled: val, error: '', info: '', logs_num: val ?
         this.props.logs_disabled_num : this.props.logs_enabled_num});

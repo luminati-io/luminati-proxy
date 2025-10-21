@@ -9,7 +9,7 @@ const tls = require('tls');
 const request = require('request');
 const socks = require('lum_socksv5');
 const {Netmask} = require('netmask');
-const lolex = require('lolex');
+const fake_timers = require('@sinonjs/fake-timers');
 const sinon = require('sinon');
 const ssl = require('../lib/ssl.js');
 const etask = require('../util/etask.js');
@@ -403,7 +403,7 @@ describe('proxy', ()=>{
         });
         describe('history aggregation', ()=>{
             let clock;
-            before(()=>clock = lolex.install({
+            before(()=>clock = fake_timers.install({
                 shouldAdvanceTime: true,
                 advanceTimeDelta: 10,
                 toFake: qw`setTimeout clearTimeout setInterval clearInterval
