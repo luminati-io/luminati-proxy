@@ -328,12 +328,20 @@ docker run luminati/luminati-proxy proxy-manager --version
 ```
 Make sure to forward appropriate ports. Proxy manager uses by default 22999
 for the web console and the api, 22225 for dropin and 24000 for first
-configurable proxy.
+configurable proxy. docker run  -p 22999:22999 -p 22225:22225 -p 24000:24000
 
 - To run docker with cli option see the below example:
 ```sh
 docker run luminati/luminati-proxy proxy-manager --www_whitelist_ips "172.17.0.1" --ssl true
 ```
+
+With port forwarding
+```sh
+docker run -p 22999:22999 -p 22225:22225 -p 24000:24000 luminati/luminati-proxy proxy-manager --www_whitelist_ips "172.17.0.1" --ssl true
+```
+
+
+
 You can add many more options to this run.
 
 #### Docker with predefined config file
