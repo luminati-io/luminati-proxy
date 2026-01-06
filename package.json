@@ -54,22 +54,21 @@
   },
   "dependencies": {
     "@babel/core": "7.26.0",
-    "@babel/plugin-transform-export-namespace-from": "7.25.9",
-    "@babel/plugin-transform-modules-commonjs": "7.26.3",
+    "@babel/plugin-transform-export-namespace-from": "7.27.1",
+    "@babel/plugin-transform-modules-commonjs": "7.27.1",
     "uikit": "npm:@luminati-io/uikit@6.3.19",
     "user-agents": "~1.1.496",
     "colors": "1.4.0",
-    "snyk": "1.1100.0",
     "body-parser": "1.20.3",
     "electron-updater": "6.3.9",
     "express": "^4.21.0",
     "helmet": "8.1.0",
-    "express-rate-limit": "7.5.0",
+    "express-rate-limit": "8.2.1",
     "express-session": "1.18.1",
     "connect-loki": "1.2.0",
     "flag-icons": "6.4.4",
     "http-shutdown": "1.2.1",
-    "json-stable-stringify": "1.0.1",
+    "fast-safe-stringify": "2.1.1",
     "lodash4": "npm:@luminati-io/lodash4@4.17.21",
     "node-forge": "1.3.0",
     "pac-resolver": "5.0.0",
@@ -80,7 +79,6 @@
     "taskkill": "3.1.0",
     "tasklist": "4.0.1",
     "yargs": "14.2.0",
-    "open": "7.0.0",
     "prismjs": "1.29.0",
     "classnames": "2.2.6",
     "netmask": "2.0.1",
@@ -121,7 +119,7 @@
     "styled-components": "6.1.13",
     "cli-progress": "3.12.0",
     "lru-cache": "11.0.2",
-    "got": "14.4.7",
+    "got": "14.6.6",
     "ioredis": "5.4.1",
     "tail": "2.2.6"
   },
@@ -143,7 +141,7 @@
     "html-webpack-plugin": "5.5.3",
     "less": "4.2.0",
     "less-loader": "12.2.0",
-    "@sinonjs/fake-timers": "14.0.0",
+    "@sinonjs/fake-timers": "15.0.0",
     "mocha": "8.2.0",
     "nock": "13.3.3",
     "style-loader": "0.18.2",
@@ -154,7 +152,8 @@
     "webpack-merge": "6.0.1",
     "prop-types": "15.8.1",
     "react-table": "7.8.0",
-    "regenerator-runtime": "0.14.1"
+    "regenerator-runtime": "0.14.1",
+    "snyk": "1.1100.0"
   },
   "overrides": {
     "forever": {
@@ -177,9 +176,6 @@
     },
     "broadway": {
       "nconf": "0.11.4"
-    },
-    "color-string": {
-      "simple-swizzle": "0.2.1"
     }
   },
   "engines": {
@@ -542,7 +538,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "5f3cb9fcb0275694e408df84375df2f1"
+    "md5": "a9e3f05161c990b0aa8420a73bc66d3d"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -572,5 +568,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.578.351"
+  "version": "1.597.450"
 }

@@ -312,6 +312,10 @@ E.tomorrow = function(now){
     return E.add(E.today(now), {d: 1});
 };
 
+E.yesterday = function(now){
+    return E.add(E.today(now), {d: -1});
+};
+
 E.nth_of_month = function(now, n){
     if (n===undefined)
     {

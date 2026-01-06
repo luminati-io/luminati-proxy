@@ -274,6 +274,45 @@ E.cpu_threads_usage = function(){
     return res;
 };
 
+E.get_cpu_procs_stats = ()=>{
+    let res = {};
+    let read_proc_stat = pid=>{
+        let stat_str;
+        if (!(stat_str = file.read(`${PROC_DIR}/${pid}/stat`)))
+            return;
+        let cmdline;
+        if (!(cmdline = file.read(`${PROC_DIR}/${pid}/cmdline`)))
+            return;
+        let st_parts = stat_str.split(' ');
+        res[pid] = {
+            time: +st_parts[13]+(+st_parts[14]), // utime+stime
+            cmdline,
+        };
+    };
+    E.ps().forEach(pid=>read_proc_stat(pid));
+    return res;
+};
+
+E.cpu_procs_prev = {};
+E.calc_cpu_procs_usage = total_per_cpu=>{
+    const cur = E.get_cpu_procs_stats();
+    let res = [];
+    for (let pid in cur)
+    {
+        let time_diff = cur[pid].time-E.cpu_procs_prev[pid]?.time||0;
+        let usage = time_diff / total_per_cpu;
+        res.push({
+            pid,
+            /* eslint-disable-next-line no-control-regex */
+            cmdline: cur[pid].cmdline.replace(/\x00/g, ' '),
+            usage,
+            time_diff,
+        });
+    }
+    E.cpu_procs_prev = cur;
+    return res;
+};
+
 E.cpus_prev = [null, null];
 let calc_cpu_usage = function(cpus_curr, cpus_prev){
     var p = cpus_prev||E.cpus_prev;
@@ -309,7 +348,8 @@ E.cpu_usage = function(cpus_curr, cpus_prev){
     let threads = E.cpu_threads_usage();
     let total_per_cpu = ret.diff.all.total/ret.diff.length;
     let thread_single = Math.max.apply(null, threads.map(x=>x/total_per_cpu));
-    return Object.assign(ret, {thread_single});
+    let procs = E.calc_cpu_procs_usage(total_per_cpu);
+    return Object.assign(ret, {thread_single, procs});
 };
 E.cpu_usage_all = function(cpus_curr, cpus_prev){
     return calc_cpu_usage(cpus_curr, cpus_prev).all;
@@ -699,6 +739,11 @@ E.fd_use = opt=>etask(function*(){
         if (m = /Max open files\s+([0-9]+)/g.exec(ln_re))
             nmax = +m[1];
         if (!nmax)
+            continue;
+        // Unclear state. /proc/<pid>/limits show 1 for max open files instead
+        // of default 1024. The problem process always 'sshd' and opened ssh
+        // session exists.
+        if (nmax==1 && nopen>nmax)
             continue;
         let use = calc(nopen, nmax);
         if (res.use<use)

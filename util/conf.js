@@ -1,10 +1,10 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true*/
 require('./config.js');
+const os = require('os');
+const path = require('path');
 const zerr = require('./zerr.js');
 const file = require('./file.js');
-const path = require('path');
-const os = require('os');
 const env = process.env;
 
 // XXX: embedded Node now has a regular command line, revisit
@@ -46,7 +46,11 @@ function init(){
             filename = file.readlink(filename);
         let text = file.read(`${filename}.conf`);
         if (text)
-            Object.assign(env, parse(text));
+        {
+            let parsed = parse(text);
+            for (let k in parsed)
+                env[k] = parsed[k];
+        }
     }
     if (env.ZERR)
         zerr.set_level();

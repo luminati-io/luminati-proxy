@@ -203,7 +203,7 @@ class Lum_node_index {
     return etask(function*(){
         handle_daemon_errors(this);
         check_deamon_supported();
-        this.alarm(30*date.ms.SEC, {throw: new Error('timeout')});
+        this.alarm_throw(30*date.ms.SEC);
         const mgr = new Daemon_mgr();
         const {index, pid} = yield _this._find_child(mgr.script);
         if (!pid)

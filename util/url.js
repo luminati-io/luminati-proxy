@@ -308,7 +308,7 @@ E.host_lookup = function(lookup, host){
     var pos, res;
     while (1)
     {
-        if (res = lookup[host])
+        if (res = lookup.hasOwnProperty(host) && lookup[host])
             return res;
         if ((pos = host.indexOf('.'))<0)
             return;

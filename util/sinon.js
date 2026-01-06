@@ -156,6 +156,7 @@ E.create_sandbox = function(opt){
         _restore.call(sandbox);
     };
     sandbox.clock_set = E.clock_set;
+    sandbox.clock_restore = E.clock_restore;
     sandbox.stub_et = function(obj, meth, fn){
         return sandbox.stub(obj, meth, function(){
             var args = arguments;

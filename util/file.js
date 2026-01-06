@@ -451,7 +451,7 @@ E.is_socket = src=>{
     return stat.isSocket();
 };
 E.is_exec = src=>{
-    try { fs.accessSync(src, fs.X_OK); }
+    try { fs.accessSync(src, fs.constants.X_OK); }
     catch(e){ return false; }
     return true;
 };

@@ -16,12 +16,12 @@
         "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
     },
     {
-        "label": "Chrome 134 Linux",
-        "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+        "label": "Chrome 129 Linux",
+        "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
     },
     {
-        "label": "Chrome 134 iOS 18.3.2",
-        "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/134.0.6998.99 Mobile/15E148 Safari/604.1"
+        "label": "Chrome 135 iOS 16.6.1",
+        "value": "Mozilla/5.0 (iPad; CPU OS 16_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/135.0.7049.35 Mobile/15E148 Safari/604.1"
     },
     {
         "label": "Chrome 134 Chromium OS 14541.0.0",
@@ -40,8 +40,8 @@
         "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
     },
     {
-        "label": "Firefox 125 Linux",
-        "value": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0"
+        "label": "Firefox 136 Linux",
+        "value": "Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"
     },
     {
         "label": "Firefox 136 OSX 10.15",
@@ -68,7 +68,7 @@
         "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"
     },
     {
-        "label": "GSA 362 iOS 18.3.2",
-        "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/362.0.741018905 Mobile/15E148 Safari/604.1"
+        "label": "GSA 361 iOS 18.3.2",
+        "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"
     }
 ]

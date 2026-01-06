@@ -18,7 +18,7 @@ const ZEXIT_ON_CLUSTER_IPC_NO_HANDLER =
 
 let send = (to, msg, sock)=>{
     if (to=='master')
-        process.send(msg);
+        process.send(msg, sock);
     else if (cluster.workers[to])
         cluster.workers[to].send(msg, sock);
 };

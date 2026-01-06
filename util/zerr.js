@@ -44,6 +44,7 @@ var E, _zerr;
 var env = process.env;
 var zerr = function(msg){ _zerr(L.ERR, arguments); };
 E = zerr;
+E.t = {};
 // XXX amir: why do we need both E and E.zerr to point to the same function?
 E.zerr = zerr;
 var L = E.L = {
@@ -94,6 +95,14 @@ E.perr = function(id, info, opt){
 };
 var perr_hooks = [];
 E.add_perr_hook = perr_hooks.push.bind(perr_hooks);
+E.t.test_perr_hook = function(hook){
+    perr_hooks.push(hook);
+    return function(){
+        perr_hooks = perr_hooks.filter(function(v){
+            return v!=hook;
+        });
+    };
+};
 var perr_dropped = {};
 var perr_orig = E.perr;
 function wrap_perr(perr_fn){

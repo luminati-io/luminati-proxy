@@ -26,6 +26,15 @@ RID=$(head -80 /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | \
 SUDO_CMD="sudo -E env \"SHELL=/bin/bash\""
 PRINT_ZERR=0
 
+# Ensure log file
+if [[ -z "$LOGFILE" ]]; then
+    if command -v mktemp >/dev/null 2>&1; then
+        LOGFILE=$(mktemp 2>/dev/null || mktemp -t lpm_log)
+    else
+        LOGFILE="/tmp/lpm_log.$$"
+    fi
+fi
+
 is_cmd_defined()
 {
     local cmd=$1
@@ -138,11 +147,18 @@ perr()
 reset_luminati_symlink()
 {
     local force_log=$1 err2out=$2
-    if ! [ $(npm get prefix)/bin -ef /usr/local/bin ]; then
-        if [ -f "/usr/local/bin/luminati" ]; then
-            sudo_cmd "rm /usr/local/bin/luminati" $force_log $err2out
+    local npm_prefix
+    npm_prefix=$($SUDO_CMD bash -lc 'npm get prefix' 2>/dev/null)
+    if [[ -z "$npm_prefix" ]]; then
+        npm_prefix=$(npm get prefix 2>/dev/null)
+    fi
+    local bin_dir="$npm_prefix/bin"
+    # If the resolved bin_dir is not the same as /usr/local/bin, recreate symlink
+    if ! [ "$bin_dir" -ef /usr/local/bin ]; then
+        if [ -f "/usr/local/bin/luminati" ] || [ -L "/usr/local/bin/luminati" ]; then
+            sudo_cmd "rm -f /usr/local/bin/luminati" $force_log $err2out
         fi
-        sudo_cmd "ln -s $(npm get prefix)/bin/luminati /usr/local/bin/luminati" $force_log $err2out
+        sudo_cmd "ln -s \"$bin_dir/luminati\" /usr/local/bin/luminati" $force_log $err2out
         sudo_cmd "chmod a+x /usr/local/bin/luminati" $force_log $err2out
     fi
 }

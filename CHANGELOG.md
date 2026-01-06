@@ -1,5 +1,12 @@
 Proxy manager - Change Log
 
+## 1.597.450 Stable
+- :bug: Fix upgrade script not changing symlink to new verion
+- :star: Remove 'open' dependency
+- :star: replace json-stringify-safe with fast-safe-stringify
+- :star: Bump got to 14.6.6
+- :star: Bump babel plugins
+
 ## 1.578.351 Stable
 - :star: Bump puppeteer to 24.23.1
 

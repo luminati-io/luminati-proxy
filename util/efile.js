@@ -440,7 +440,7 @@ E.exists = path=>etask(function*exists(){
 });
 
 E.is_exec = path=>etask(function*is_exec(){
-    try { yield etask.nfn_apply(fs.access, [path, fs.X_OK]); }
+    try { yield etask.nfn_apply(fs.access, [path, fs.constants.X_OK]); }
     catch(e){ ef(e, this); return false; }
     return true;
 });

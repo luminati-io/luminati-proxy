@@ -225,7 +225,7 @@ E.timezone = {
     MU: 'Indian/Mauritius',
     YT: 'Indian/Mayotte',
     IO: 'Indian/Chagos',
-    IL: 'Israel',
+    IL: 'Asia/Jerusalem',
     WS: 'Pacific/Apia',
     NZ: 'Pacific/Auckland',
     FM: 'Pacific/Chuuk',

@@ -180,7 +180,7 @@ E.http_proxy = port=>etask(function*(){
             {
                 proxy.https = https.createServer(
                     Object.assign({requestCert: false}, ssl(E.keys),
-                    {secureOptions: consts.SSL_OP_NO_TLSv1_1}),
+                    {minVersion: consts.MIN_TLS}),
                     (_req, _res, _head)=>{
                         zutil.defaults(_req.headers,
                             headers[_req.socket.remotePort]||{});

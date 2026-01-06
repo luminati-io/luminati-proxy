@@ -1,5 +1,31 @@
 [
     {
+        "ver": "1.597.450",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix upgrade script not changing symlink to new verion"
+            },
+            {
+                "type": "star",
+                "text": "Remove 'open' dependency"
+            },
+            {
+                "type": "star",
+                "text": "replace json-stringify-safe with fast-safe-stringify"
+            },
+            {
+                "type": "star",
+                "text": "Bump got to 14.6.6"
+            },
+            {
+                "type": "star",
+                "text": "Bump babel plugins"
+            }
+        ]
+    },
+    {
         "ver": "1.578.351",
         "type": "stable",
         "changes": [

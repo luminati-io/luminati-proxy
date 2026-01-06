@@ -1,24 +1,18 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
-const electron = require('electron');
 const child_process = require('child_process');
+const {app, dialog, shell} = require('electron');
 const semver = require('semver');
-const app = electron.app;
-const dialog = electron.dialog;
-const open = require('open');
-let _info_bkp = console.info;
-console.info = function(){};
+const tasklist = require('tasklist');
+const taskkill = require('taskkill');
 const auto_updater = require('electron-updater').autoUpdater;
-console.info = _info_bkp;
 const config = require('../util/lpm_config.js');
 const lpm_config_static = require('../util/lpm_config_static');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 const perr = require('../lib/perr.js');
 const Manager = require('../lib/manager.js');
-const tasklist = require('tasklist');
-const taskkill = require('taskkill');
 const pkg = require('../package.json');
 const logger = require('../lib/logger.js');
 const get_cache = require('../lib/cache.js');
@@ -190,13 +184,10 @@ const _run = argv=>etask(function*(){
     manager = new Manager(argv);
     auto_updater.logger = manager.log;
     setTimeout(()=>check_for_updates(), 15000);
-    manager.on('www_ready', url=>{
-        try {
-            open(url, {url: true});
-        } catch(e){
-            logger.error('Failed to auto open UI: '+zerr.e2s(e));
-        }
-    })
+    manager.on('www_ready', url=>etask(function*(){
+        this.on('uncaught', e=>logger.error('UI open error: '+zerr.e2s(e)));
+        yield shell.openExternal(url);
+	}))
     .on('upgrade', cb=>{
         upgrade_cb = cb;
         can_upgrade = true;

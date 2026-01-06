@@ -61,8 +61,6 @@ const E = {}, E_t = {};
 
 // for security reasons 'func' is disabled by default
 const zjson_opt_default = {func: false, date: true, re: true};
-const is_win = /^win/.test((is_node||is_rn) && process.platform);
-const is_darwin = is_node && process.platform=='darwin';
 const is_k8s = is_node && !!process.env.CLUSTER_NAME;
 const default_user_agent = is_node ? (()=>{
     const zconf = require('./config.js');
@@ -74,7 +72,6 @@ const DEBUG_STR_LEN = 4096, DEFAULT_WIN_SIZE = 1048576;
 const SEC = 1000, MIN = 60*SEC, VFD_SZ = 8, VFD_BIN_SZ = 12;
 let zcounter; // has to be lazy because zcounter.js itself uses this module
 const net = is_node ? require('net') : null;
-const SERVER_NO_MASK_SUPPORT = 'server_no_mask_support';
 const BUFFER_CONTENT = 10;
 const BUFFER_IPC_CALL = 11;
 let SnappyStream, UnsnappyStream;
@@ -122,86 +119,6 @@ class Buffer_store {
 }
 const buffer_store = new Buffer_store();
 E.Buffer_store = Buffer_store;
-
-const BUFFER_MESSAGES_CONTENT = 20;
-const BUFFER_MESSAGES_TYPE_BIN = 0;
-const BUFFER_MESSAGES_TYPE_STRING = 1;
-const BUFFER_MESSAGES_TYPE_JSON = 2;
-const BUFFER_MESSAGES_BIN_SZ = 4;
-const BUFFER_MESSAGES_MAX_LENGTH = Math.pow(2, 32)-1;
-
-class Buffers_array {
-    static is_buffer(buf){
-        if (!(buf instanceof Buffer) || buf.length<3*BUFFER_MESSAGES_BIN_SZ)
-            return false;
-        let prefix = buf.readUInt32BE(0);
-        let msg_type = buf.readUInt32BE(BUFFER_MESSAGES_BIN_SZ);
-        let length = buf.readUInt32BE(BUFFER_MESSAGES_BIN_SZ*2);
-        return prefix===0 && length==buf.length
-            && msg_type==BUFFER_MESSAGES_CONTENT;
-    }
-    static parse(buf){
-        let offset = 3*BUFFER_MESSAGES_BIN_SZ, messages = [];
-        while (offset<buf.length)
-        {
-            let msg_type = buf.readUInt8(offset);
-            let msg_len = buf.readUInt32BE(offset+1);
-            let msg_value = buf.slice(offset+1+BUFFER_MESSAGES_BIN_SZ,
-                offset+1+BUFFER_MESSAGES_BIN_SZ+msg_len);
-            if (msg_type==BUFFER_MESSAGES_TYPE_STRING
-                || msg_type==BUFFER_MESSAGES_TYPE_JSON)
-            {
-                msg_value = msg_value.toString();
-            }
-            messages.push(msg_value);
-            offset = offset+1+BUFFER_MESSAGES_BIN_SZ+msg_len;
-        }
-        return messages;
-    }
-    constructor(){
-        this.clean();
-    }
-    push(value){
-        let type;
-        if (value instanceof Buffer)
-            type = BUFFER_MESSAGES_TYPE_BIN;
-        else if (typeof value=='string')
-        {
-            type = BUFFER_MESSAGES_TYPE_STRING;
-            value = Buffer.from(value);
-        }
-        else
-        {
-            type = BUFFER_MESSAGES_TYPE_JSON;
-            value = Buffer.from(JSON.stringify(value));
-        }
-        let new_bytes_size = this._bytes_size+1+BUFFER_MESSAGES_BIN_SZ
-            +value.length;
-        if (new_bytes_size>BUFFER_MESSAGES_MAX_LENGTH)
-            throw new Error(`Buffers_array overflow ${new_bytes_size}`);
-        this._bytes_size += 1+BUFFER_MESSAGES_BIN_SZ+value.length;
-        this._buffer.push({type, value});
-    }
-    clean(){
-        this._buffer = [];
-        this._bytes_size = 3*BUFFER_MESSAGES_BIN_SZ;
-    }
-    get_buffer(){
-        let buf = Buffer.allocUnsafe(this._bytes_size);
-        buf.writeUInt32BE(0, 0);
-        buf.writeUInt32BE(BUFFER_MESSAGES_CONTENT, BUFFER_MESSAGES_BIN_SZ);
-        buf.writeUInt32BE(this._bytes_size, BUFFER_MESSAGES_BIN_SZ*2);
-        let offset = 3*BUFFER_MESSAGES_BIN_SZ;
-        for (let {type, value} of this._buffer)
-        {
-            buf.writeUInt8(type, offset);
-            buf.writeUInt32BE(value.length, offset+1);
-            value.copy(buf, offset = offset+1+BUFFER_MESSAGES_BIN_SZ);
-            offset += value.length;
-        }
-        return buf;
-    }
-}
 
 const make_ipc_server_class = ws_opt=>{
     if (ws_opt.ipc_server && !ws_opt.ipc_server_class)
@@ -279,7 +196,6 @@ class WS extends EventEmitter {
         this.data = opt.data;
         this.connected = false;
         this.reason = undefined;
-        this.listen_bin_throttle = opt.listen_bin_throttle;
         this.zc_rx = opt.zcounter=='rx' || opt.zcounter=='all';
         this.zc_tx = opt.zcounter=='tx' || opt.zcounter=='all';
         this.zc_tx_per_cmd = this.zc_tx && opt.zcounter_tx_per_cmd;
@@ -333,33 +249,10 @@ class WS extends EventEmitter {
         if (zcounter)
             this._counter = make_counter(opt);
         this.max_backpressure = opt.max_backpressure;
-        this._send_throttle_t = undefined;
-        this._buffers = undefined;
     }
     get_bin_prefix(msg){
         return this.bin_methods && msg instanceof Buffer &&
             msg.readUInt32BE(0)===0 ? msg.readUInt32BE(4) : undefined;
-    }
-    _clean_throttle(){
-        if (this._send_throttle_t)
-        {
-            clearTimeout(this._send_throttle_t);
-            this._send_throttle_t = undefined;
-        }
-        this._buffers = undefined;
-    }
-    _send_throttle(msg, throttle_ts){
-        this._buffers = this._buffers || new Buffers_array();
-        this._buffers.push(msg);
-        this._send_throttle_t = this._send_throttle_t || setTimeout(()=>{
-            this._send_throttle_t = undefined;
-            const buf = this._buffers.get_buffer();
-            if (this.uws2)
-                this.ws.send(buf, true, this.compression);
-            else
-                this.ws.send(buf);
-            this._buffers.clean();
-        }, throttle_ts);
     }
     send(msg, opt){
         if (zerr.is.debug())
@@ -383,9 +276,7 @@ class WS extends EventEmitter {
             return false;
         }
         this._update_idle();
-        if (opt && opt.bin_throttle)
-            this._send_throttle(msg, opt.bin_throttle);
-        else if (this.uws2)
+        if (this.uws2)
             this.ws.send(msg, typeof msg!='string', this.compression);
         else
             this.ws.send(msg, opt);
@@ -507,7 +398,6 @@ class WS extends EventEmitter {
         }
         this.ws = undefined;
         this.connected = false;
-        this._clean_throttle();
     }
     toString(){
         let res = this.label ? `${this.label} WS` : 'WS';
@@ -557,9 +447,6 @@ class WS extends EventEmitter {
             return;
         this.connected = true;
         let sock = this.ws._socket||{};
-        // XXX pavlo: uws lib doesn't have these properties in _socket:
-        // https://github.com/hola/uWebSockets-bindings/blob/master/nodejs/src/uws.js#L276
-        // get them from upgrade request
         this.local_addr = internalize(sock.localAddress);
         this.local_port = sock.localPort;
         if (this.remote_addr==sock.remoteAddress)
@@ -607,10 +494,7 @@ class WS extends EventEmitter {
         let msg = event.data;
         if (msg instanceof ArrayBuffer)
             msg = Buffer.from(Buffer.from(msg)); // make a copy
-        if (!this.listen_bin_throttle || !Buffers_array.is_buffer(msg))
-            return this._on_message_base(msg);
-        for (const data of Buffers_array.parse(msg))
-            this._on_message_base(data);
+        return this._on_message_base(msg);
     }
     _on_message_base(msg){
         if (zerr.is.debug())
@@ -828,9 +712,10 @@ class Client extends WS {
         // XXX bruno: enable also for opt.zcounter=='all' after prd validations
         if (opt.zcounter=='disconnected')
             this._monitor_disconnected();
-        this.impl = client_impl(opt);
+        this.impl = client_impl({is_rn, is_node});
         this.url = url;
         this.servername = opt.servername;
+        this.ca = opt.ca;
         this.retry_interval = opt.retry_interval||10000;
         this.retry_max = opt.retry_max||this.retry_interval;
         this.retry_random = opt.retry_random;
@@ -849,7 +734,6 @@ class Client extends WS {
         this.agent = opt.agent;
         this.reason = undefined;
         this.reconnect_timer = undefined;
-        this.server_no_mask_support = false;
         this.handshake_timeout = opt.handshake_timeout===undefined
             ? 50000 : opt.handshake_timeout;
         this.reject_unauthorized = opt.reject_unauthorized;
@@ -874,8 +758,7 @@ class Client extends WS {
         {
             this.headers = assign(
                 {'User-Agent': opt.user_agent||default_user_agent},
-                opt.headers,
-                {'client-no-mask-support': 1});
+                opt.headers);
         }
         this._connect();
     }
@@ -950,15 +833,9 @@ class Client extends WS {
     // because it supports reconnects
     _on_disconnected(){}
     send(msg){
-        return super.send(msg,
-            this.server_no_mask_support ? {mask: false} : undefined);
+        return super.send(msg);
     }
     _on_message(ev){
-        if (!this.server_no_mask_support && ev.data===SERVER_NO_MASK_SUPPORT)
-        {
-            this.server_no_mask_support = true;
-            return void this.emit(SERVER_NO_MASK_SUPPORT);
-        }
         return super._on_message(ev);
     }
     _assign(ws){
@@ -987,7 +864,6 @@ class Client extends WS {
     _connect(){
         this.reason = undefined;
         this.reconnect_timer = undefined;
-        this.server_no_mask_support = false;
         let opt = {headers: this.headers};
         let url = this.url, lookup_ip = this.lookup_ip, fb = this.fallback, v;
         if (fb && fb.url && this._retry_count%fb.retry_mod>fb.retry_threshold)
@@ -1004,6 +880,7 @@ class Client extends WS {
             opt.agent = this.agent;
             opt.perMessageDeflate = this.deflate;
             opt.servername = this.servername;
+            opt.ca = this.ca;
             opt.lookup = this.lookup;
             if (lookup_ip && net && (v = net.isIP(lookup_ip)))
             {
@@ -1121,9 +998,10 @@ class Server {
             ws_opt.maxPayload = opt.max_payload;
         if (opt.verify)
             ws_opt.verifyClient = opt.verify;
-        const impl = server_impl(opt);
+        if (opt.impl == 'uws2')
+            throw new Error('For uws2 use Server_uws2');
+        const impl = require('ws');
         this.ws_server = new impl.Server(ws_opt);
-        this.server_no_mask_support = impl.server_no_mask_support;
         this.opt = opt;
         this.handle_forwarded = prepare_forwarded_handler(
             this.opt.trusted_proxy_networks, this.opt.trust_forwarded);
@@ -1147,7 +1025,7 @@ class Server {
             ws=>this.accept(ws, req));
     }
     accept(ws, req=ws.upgradeReq){
-        // In old uws the ws._socket is getter, so read it one time here.
+        // The ws._socket can be a getter, so read it one time here.
         let remote_addr = ws._socket.remoteAddress;
         if (!remote_addr)
         {
@@ -1182,8 +1060,6 @@ class Server {
         zws.remote_label = m ? m[1] : ua ? 'web' : undefined;
         zws._assign(ws);
         zws._on_open();
-        if (this.server_no_mask_support && headers['client-no-mask-support'])
-            zws.send(SERVER_NO_MASK_SUPPORT);
         this.connections.add(zws);
         if (this.zc)
         {
@@ -1354,8 +1230,9 @@ class Uws2_impl extends EventEmitter {
         this.server.listen(ws_opt.host||'0.0.0.0', ws_opt.port, token=>{
             if (token)
             {
-                this.emit('listening');
                 this.listen_socket = token;
+                this.listen_port = this.lib.us_socket_local_port(token);
+                this.emit('listening');
             }
         });
     }
@@ -1427,7 +1304,7 @@ class Server_uws2 {
             srv_timeout: opt.srv_timeout,
             on_timeout: opt.on_timeout,
             req_handler: opt.req_handler,
-            compression: opt.compression
+            compression: opt.compression,
         };
         if (opt.compression)
             opt.compression = opt.compression!='DISABLED';
@@ -1440,7 +1317,6 @@ class Server_uws2 {
             ontimeout: opt.on_timeout,
             onreq: opt.req_handler,
         });
-        this.server_no_mask_support = false;
         opt.max_backpressure = this.ws_server.max_backpressure = (is_node
             ? process.env.MAX_BACKPRESSURE : null) || 50*1024;
         this.opt = opt;
@@ -1481,21 +1357,23 @@ class Server_uws2 {
         // XXX igors: find the better way to find parameters amount
         if (typeof pattern=='string')
             param_count = pattern.split(':').length-1;
-        this.ws_server.server[opt](pattern, (res, req)=>{
+        const uws_handler = (res, req)=>{
             let active_et;
             res.onAborted(()=>{
                 zerr.notice(`${opt.toUpperCase()} ${pattern} aborted`);
                 if (active_et)
                     active_et.return();
             });
-            let url = `${opt.toUpperCase()} ${req.getUrl()}${req.getQuery()}`;
+            const url = `${opt.toUpperCase()} ${req.getUrl()}${
+                req.getQuery()||''}`;
             return active_et = etask(function*(){
                 try {
                     assign(res, def_res);
-                    let len = req.getHeader('content-length');
-                    let ctype = req.getHeader('content-type');
-                    // need to clone parameters, otherwise they will be
+                    const ctype = req.getHeader('content-type');
+                    // need to clone request properties, otherwise they will be
                     // unaccessible
+                    req.headers = {};
+                    req.forEach((k, v)=>req.headers[k] = v);
                     req.query = zurl.qs_parse(req.getQuery()||'');
                     if (param_count)
                     {
@@ -1503,28 +1381,38 @@ class Server_uws2 {
                         for (let p = 0; p<param_count; p++)
                             req.params[p] = req.getParameter(p);
                     }
-                    if (len)
+                    const chunks = [];
+                    const wait_body = etask.wait(20*SEC);
+                    res.onData((ch, is_last)=>{
+                        if (ch.byteLength)
+                            chunks.push(Buffer.from(Buffer.from(ch)));
+                        if (is_last)
+                            wait_body.return();
+                    });
+                    yield wait_body;
+                    if (chunks.length)
                     {
-                        let body = [], wait_body = etask.wait(20*SEC);
-                        res.onData((ch, is_last)=>{
-                            body.push(Buffer.from(Buffer.from(ch)));
-                            if (is_last)
-                                wait_body.return(Buffer.concat(body));
-                        });
-                        let obj_body = yield wait_body;
+                        const body = Buffer.concat(chunks);
                         if (ctype=='application/json')
-                            req.body = JSON.parse(String(obj_body));
+                            req.body = JSON.parse(String(body));
                         else if (ctype=='text/html')
-                            req.body = String(obj_body);
+                            req.body = String(body);
                         else
-                            req.body = obj_body;
+                            req.body = body;
                     }
                     yield handler(res, req);
                 } catch(e){
                     res.uncaught(url, e);
                 }
             });
-        });
+        };
+        this.ws_server.server[opt](pattern, uws_handler);
+        const sni_servers = this.opt.ssl_conf&&this.opt.ssl_conf.sni||{};
+        for (let servername in sni_servers)
+        {
+            const server = this.ws_server.server.domain('*.'+servername);
+            server[opt](pattern, uws_handler);
+        }
         return this;
     }
     toString(){ return this.label ? `${this.label} WS server` : 'WS server'; }
@@ -1562,8 +1450,6 @@ class Server_uws2 {
         zws.remote_label = m ? m[1] : ua ? 'web' : undefined;
         zws._assign(ws, true);
         zws._on_open();
-        if (this.server_no_mask_support && headers['client-no-mask-support'])
-            zws.send(SERVER_NO_MASK_SUPPORT);
         this.connections.add(zws);
         if (this.zc)
         {
@@ -2118,7 +2004,6 @@ class Mux {
         this.ws.on('disconnected', this._on_disconnected.bind(this));
     }
     open(vfd, bytes_allowed=Infinity, opt={}){
-        this.ignore_unexpected_acks = opt.ignore_unexpected_acks;
         return this.streams.get(vfd) || (opt.use_ack ?
             this.open_ack(vfd, opt) : this.open_bp(vfd, bytes_allowed, opt));
     }
@@ -2220,9 +2105,7 @@ class Mux {
     open_ack(vfd, opt={}){
         const _lib = require('stream');
         const _this = this;
-        const bin_throttle_opt = opt && opt.bin_throttle ?
-            {bin_throttle: opt.bin_throttle} : null;
-        const reusable_buffers = !bin_throttle_opt && this.ws.reusable_buffers;
+        const reusable_buffers = !!this.ws.reusable_buffers;
         opt.fin_timeout = opt.fin_timeout||10*SEC;
         const zasync = opt.zasync && is_node || false;
         const w_log = (e, str)=>
@@ -2230,12 +2113,11 @@ class Mux {
         let pending, zfin_pending, send_ack_timeout, send_ack_ts = 0;
         const stream = new _lib.Duplex(assign({
             read(size){},
-            write(data, encoding, cb, ignore_backpressure){
+            write(data, encoding, cb){
                 let ws_channel = _this.ws.ws;
                 let buf, buf_pending, continue_on_drain;
-                if (_this.ws.uws2 && ws_channel
-                    && ws_channel.getBufferedAmount()>_this.ws.max_backpressure
-                    && !ignore_backpressure)
+                if (_this.ws.uws2 && ws_channel &&
+                    ws_channel.getBufferedAmount()>_this.ws.max_backpressure)
                 {
                     buf_pending = data;
                     continue_on_drain = true;
@@ -2244,7 +2126,7 @@ class Mux {
                     ({buf, buf_pending} = stream.process_data(data));
                 if (buf)
                 {
-                    if (!_this.ws.send(buf, bin_throttle_opt))
+                    if (!_this.ws.send(buf))
                         return cb(new Error(_this.ws.reason||_this.ws.status));
                     stream.sent += buf.length-VFD_SZ;
                     stream.last_use_ts = date.monotonic();
@@ -2257,24 +2139,13 @@ class Mux {
                 if (!buf_pending || !buf_pending.length)
                     return void (zasync ? setImmediate(cb) : cb());
                 pending = etask(function*_mux_stream_pending(){
-                    let force_continue, this_et = this;
-                    if (continue_on_drain)
-                    {
-                        force_continue = etask(function*(){
-                            yield etask.sleep(100);
-                            this_et.continue(1, true);
-                        });
-                    }
                     this.on('finally', ()=>{
-                        if (force_continue && !etask.is_final(force_continue))
-                            force_continue.return();
                         if (ws_channel && ws_channel.pending_mux_et)
                             ws_channel.pending_mux_et.delete(this);
                     });
-                    let _ignore_backpressure = yield this.wait();
+                    yield this.wait();
                     pending = null;
-                    stream._write(buf_pending, encoding, cb,
-                        _ignore_backpressure);
+                    stream._write(buf_pending, encoding, cb);
                 });
                 pending.buf_size = buf_pending.length;
                 if (continue_on_drain)
@@ -2430,8 +2301,7 @@ class Mux {
         });
         const throttle_ack = +opt.throttle_ack;
         const _send_ack = ()=>{
-            _this.ws.send(`{"vfd":${vfd},"ack":${stream.zread}}`,
-                bin_throttle_opt);
+            _this.ws.send(`{"vfd":${vfd},"ack":${stream.zread}}`);
             send_ack_ts = date.monotonic();
         };
         stream.send_ack = !throttle_ack ? _send_ack : ()=>{
@@ -2459,8 +2329,7 @@ class Mux {
             if (stream.win_size_sent)
                 return;
             _this.ws.send(
-                `{"vfd":${vfd},"win_size":${opt.win_size||DEFAULT_WIN_SIZE}}`,
-                bin_throttle_opt);
+                `{"vfd":${vfd},"win_size":${opt.win_size||DEFAULT_WIN_SIZE}}`);
             stream.win_size_sent = true;
         };
         stream.on_win_size = size=>{
@@ -2475,12 +2344,7 @@ class Mux {
                 clearTimeout(send_ack_timeout);
                 _send_ack();
             }
-            if (bin_throttle_opt)
-            {
-                _this.ws.send(error ? {vfd, fin: 1, error}
-                    : `{"vfd":${vfd},"fin":1}`, bin_throttle_opt);
-            }
-            else if (error)
+            if (error)
                 _this.ws.json({vfd, fin: 1, error});
             else
                 _this.ws.send(`{"vfd":${vfd},"fin":1}`);
@@ -2579,8 +2443,6 @@ class Mux {
     _on_bin(buf){
         if (this.ws.get_bin_prefix(buf)==BUFFER_CONTENT)
             return;
-        if (this.listen_bin_throttle && Buffers_array.is_buffer(buf))
-            return zerr(`${this.ws}: unexpected Buffers_array on bin event`);
         if (buf.length<VFD_SZ)
             return zerr(`${this.ws}: malformed binary message`);
         let vfd = buf.readUInt32BE(0);
@@ -2588,7 +2450,12 @@ class Mux {
             zerr.debug(`${this.ws}< vfd ${vfd}`);
         let stream = this.streams.get(vfd);
         if (!stream)
-            return zerr(`${this.ws}: unexpected stream vfd ${vfd}`);
+        {
+            this.ws.emit('unexpected_vfd');
+            if (zerr.is.info())
+                zerr.info(`${this.ws}: unexpected stream vfd ${vfd}`);
+            return;
+        }
         if (!stream.on_ack)
             return stream.push(buf.slice(VFD_SZ));
         try {
@@ -2611,10 +2478,9 @@ class Mux {
             return void stream.on_win_size(msg.win_size);
         if (msg.fin && stream.on_fin)
             return void stream.on_fin(msg);
-        stream.emit('unexpected_ack', msg);
-        zerr(`${this.ws}: unexpected json_ack %O`, msg);
-        if (this.ws.zc)
-            this.ws._counter.inc('mux_unexpected_ack');
+        this.ws.emit('unexpected_ack');
+        if (zerr.is.info())
+            zerr.info(`${this.ws}: unexpected json_ack %O`, msg);
     }
     _on_disconnected(){
         let err = new Error(this.ws.reason || 'disconnected');
@@ -2632,36 +2498,13 @@ class Mux {
     }
 }
 
-function lib(impl){
-    if (impl=='ws')
-        return require('ws');
-    if ((impl=='uws' || impl=='uws2') && !is_win)
-        return require(/* brd-build-deps ignore */'uws');
-    zerr.zexit(`WS library ${impl} is not available`);
-}
-
 function client_impl(opt){
     // WebSocket is global in react native
-    if (is_rn)
+    if (opt.is_rn)
         return WebSocket;
-    if (!is_node && !opt.impl)
+    if (!opt.is_node)
         return self.WebSocket;
-    return lib(opt.impl || 'ws');
-}
-
-function server_impl(opt){
-    if (!is_node)
-        throw new Error(`WS server is not available`);
-    const impl = opt.impl || (is_win||is_darwin||is_k8s ? 'ws' : 'uws');
-    if (is_k8s && impl=='uws')
-    {
-        throw new Error('uws is not supported in base Node20 image, '
-            + 'please migrate to uws2');
-    }
-    const l = lib(impl);
-    // XXX mikhailpo: disabled due to SIGSEGV err
-    l.server_no_mask_support = false; // l.server_no_mask_support||impl=='ws';
-    return l;
+    return require('ws');
 }
 
 function is_error_event_silent(event){
