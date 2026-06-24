@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.601.281/luminati-proxy-manager-v1.601.281-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.643.828/luminati-proxy-manager-v1.643.828-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -289,6 +289,13 @@ Options:
       --socket_inactivity_timeout  The amount of time a socket can be inactive
                                    before it times out and closes
                                                                [default: 120000]
+      --zone_auth_passthru         Allow passthrough proxy authentication using
+                                   zone-based usernames in the format
+                                   brd-customer-...-zone-...:password
+                                                      [boolean] [default: false]
+      --sanitize_rules             Validate rules trigger_code against the JS
+                                   sanitizer and reject unsafe code before it
+                                   runs.              [boolean] [default: false]
       --no-www                     Disable local web
       --no-config                  Working without a config file
   -d, --daemon, --start-daemon     Start as a daemon

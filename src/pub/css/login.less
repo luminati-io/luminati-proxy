@@ -1,8 +1,9 @@
 @import (reference) 'common.less';
+
 .lum_login {
     padding-top: 70px;
     .nav_top {
-        background-color: white;
+        background-color: var(--bg-primary);
         .logo_big {
             background-image: @login_logo;
             width: @login_logo_width;
@@ -23,7 +24,9 @@
         position: relative;
         max-width: 800px;
         margin: auto;
-        .col { padding: 15px 55px; }
+        .col {
+            padding: 15px 55px;
+        }
         .col_google {
             text-align: center;
             .btn_google_wrapper, .btn_google_wrapper:hover,
@@ -35,8 +38,8 @@
                     padding: 4px 0;
                     width: 240px;
                     height: 40px;
-                    color: white;
-                    background-color: #df4a32;
+                    color: var(--color-white);
+                    background-color: var(--bg-google-btn);
                     border: none;
                     .img {
                         background-image: url(/img/google.svg);
@@ -50,24 +53,26 @@
                 }
             }
         }
-        .col_pass { border-left: 1px solid #dde1e2; }
+        .col_pass {
+            border-left: 1px solid var(--border-login);
+        }
         .or_circle {
             width: 32px;
             height: 32px;
             border-radius: 16px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-login-circle);
             text-align: center;
             line-height: 30px;
             margin-left: -15px;
             margin-top: -42px;
-            background-color: #fff;
+            background-color: var(--bg-login-circle);
             position: absolute;
             top: 50%;
             left: 50%;
         }
         .signup {
             margin-top: 25px;
-            color: #818c93;
+            color: var(--text-login-muted);
             letter-spacing: 1px;
             text-align: center;
             font-size: 1.1em;
@@ -75,28 +80,38 @@
         .form-group {
             display: flex;
             align-items: center;
-            label { width: 80px; }
-            input { flex: 1; }
+            label {
+                width: 80px;
+            }
+            input {
+                flex: 1;
+            }
         }
     }
     .customers_form {
         width: 500px;
         margin: auto;
-        input { flex: 1; }
+        input {
+            flex: 1;
+        }
         display: block;
     }
     .warning {
         max-width: 800px;
         margin: 20px auto !important;
-        a { margin: 0 6px; }
-        &.choose_customer { margin: 0 0 20px !important; }
+        a {
+            margin: 0 6px;
+        }
+        &.choose_customer {
+            margin: 0 0 20px !important;
+        }
     }
     .two_step_input {
         height: 34px;
         width: 100%;
         padding-left: 5px;
         margin-top: 15px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--border-light);
         border-radius: 4px;
     }
     .btn.btn_resend_email {
@@ -119,7 +134,9 @@
         margin-bottom: 3px;
     }
     .login_header {
-        h3 { font-size: 30px; }
+        h3 {
+            font-size: 30px;
+        }
         margin-bottom: 30px;
         margin-top: 30px;
         text-align: center;

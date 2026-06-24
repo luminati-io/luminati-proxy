@@ -735,7 +735,7 @@ const Status_code_cell = maybe_pending(props=>{
     const {status, status_text, uuid, req} = props;
     const get_desc = ()=>{
         const err_header = req.response.headers.find(
-            r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
+            r=>r.name=='x-brd-error'||r.name=='x-lpm-error');
         if (status==502 && err_header)
             return err_header.value;
         return status=='canceled' ? '' : status_text;
@@ -755,7 +755,7 @@ const Status_code_cell = maybe_pending(props=>{
 
 const Time_cell = maybe_pending(props=>{
     const {port, time, url, uuid} = props;
-    if (!url.endsWith(':443') || !time)
+    if (!url?.endsWith(':443') || !time)
         return <Tooltip_and_value val={time && time+' ms'}/>;
     return <Encrypted_cell name="Timing" id={uuid} port={port}/>;
 });

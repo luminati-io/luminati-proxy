@@ -27,6 +27,7 @@
       "target": "nsis",
       "timeStampServer": "http://timestamp.digicert.com/?alg=sha1",
       "rfc3161TimeStampServer": "http://timestamp.digicert.com/?alg=sha256",
+      "certificateSubjectName": "Bright Data Ltd",
       "signingHashAlgorithms": [
         "sha1",
         "sha256"
@@ -62,7 +63,7 @@
     "electron-updater": "6.3.9",
     "express": "^4.21.0",
     "helmet": "8.1.0",
-    "express-rate-limit": "8.2.1",
+    "express-rate-limit": "8.5.2",
     "express-session": "1.18.1",
     "connect-loki": "1.2.0",
     "flag-icons": "6.4.4",
@@ -80,7 +81,6 @@
     "yargs": "14.2.0",
     "prismjs": "1.29.0",
     "classnames": "2.2.6",
-    "netmask": "2.0.1",
     "compression": "1.7.4",
     "ws": "8.17.1",
     "transliteration": "2.6.0",
@@ -125,7 +125,7 @@
     "@codemirror/lang-html": "6.4.11",
     "@codemirror/lint": "6.9.2",
     "jsonc-parser": "3.3.1",
-    "ajv": "8.17.1",
+    "ajv": "8.20.0",
     "acorn": "8.15.0"
   },
   "description": "A configurable local proxy for brightdata.com",
@@ -139,9 +139,6 @@
     "babel-loader": "9.2.1",
     "animate.css": "3.5.2",
     "css-loader": "0.28.4",
-    "electron": "33.3.0",
-    "electron-builder": "16.6.1",
-    "@electron/rebuild": "3.7.1",
     "html-webpack-plugin": "5.5.3",
     "less": "4.2.0",
     "less-loader": "12.2.0",
@@ -156,7 +153,10 @@
     "webpack-merge": "6.0.1",
     "prop-types": "15.8.1",
     "react-table": "7.8.0",
-    "snyk": "1.1100.0"
+    "snyk": "1.1100.0",
+    "electron": "40.0.0",
+    "electron-builder": "22.0.0",
+    "@electron/rebuild": "3.7.1"
   },
   "overrides": {
     "forever": {
@@ -404,6 +404,7 @@
       "src/pub/css/chrome_widgets.less",
       "src/pub/css/common.less",
       "src/pub/css/config.less",
+      "src/pub/css/har_theme_override.less",
       "src/pub/css/login.less",
       "src/pub/css/logs.less",
       "src/pub/css/nav.less",
@@ -417,7 +418,9 @@
       "src/pub/css/proxy_tester.less",
       "src/pub/css/report_bug.less",
       "src/pub/css/settings.less",
+      "src/pub/css/theme.less",
       "src/pub/css/tooltip.less",
+      "src/pub/css/variables.less",
       "src/pub/css/whitelist_ips.less",
       "src/pub/css/zone_desc.less",
       "src/pub/har_viewer.js",
@@ -449,6 +452,7 @@
       "src/pub/schema.js",
       "src/pub/settings.js",
       "src/pub/stats.js",
+      "src/pub/theme.js",
       "src/pub/util.js",
       "src/pub/whitelist_ips.js",
       "src/pub/ws.js",
@@ -466,6 +470,7 @@
       "test/ws.js",
       "util/cert_util.js",
       "util/config.js",
+      "util/js_sanitizer.js",
       "util/lpm_api_models.js",
       "util/lpm_config.js",
       "util/lpm_config_schema.json",
@@ -481,7 +486,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "fd9b99947173d4fdbfd84a8828e385fc"
+    "md5": "4412b85c3700a7e08a7a2ba305872323"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -511,5 +516,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.601.281"
+  "version": "1.643.828"
 }

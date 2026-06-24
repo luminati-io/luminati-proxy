@@ -32,6 +32,7 @@ import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
 import {report_exception, in_cp, with_zagent_fn} from './util.js';
+import {Theme_provider, Theme_context, init_theme} from './theme.js';
 import i18n, {TranslationContext, is_except_path} from './common/i18n.js';
 import './css/app.less';
 import '../../www/util/pub/css/har.less';
@@ -40,6 +41,7 @@ window.$ = window.$ || $;
 window.JQuery = window.JQuery || $;
 window.setdb = setdb;
 setdb.setMaxListeners(50);
+init_theme();
 
 const history_listener = _.debounce(
     ({pathname})=>CP_ipc.post('route_change', {pathname}),
@@ -47,6 +49,7 @@ const history_listener = _.debounce(
 );
 
 const App = withRouter(class App extends Pure_component {
+    static contextType = Theme_context;
     constructor(props){
         super(props);
         this.state = {i18n_loaded: false};
@@ -82,6 +85,8 @@ const App = withRouter(class App extends Pure_component {
             }
             if (qs_o.lang)
                 i18n.set_curr_lang(qs_o.lang);
+            if (qs_o.theme)
+                _this.context.set_theme(qs_o.theme);
             const mode = yield Api.json.get('mode', {safe: true,
                 exp_hdr: ['x-lpm-block-ip', 'x-lpm-local-login']});
             let block_ip;
@@ -240,18 +245,18 @@ const App = withRouter(class App extends Pure_component {
       if (!i18n_loaded && !is_except_path(this.props.location.pathname))
           return null;
       return <TranslationContext.Provider value={curr_lang}>
-        <div className="page_wrapper">
-          <Global_styles_brd/>
-          <Enable_ssl_modal/>
-          <Api_url_modal/>
-          <Old_modals/>
-          <Switch>
-            <Route path="/login" exact component={Login}/>
-            <Route path="/whitelist_ips" exact component={Whitelist_ips}/>
-            <Route path="/dock_logs" exact component={Dock_logs}/>
-            <Route path="/" component={Page}/>
-          </Switch>
-        </div>
+            <div className="page_wrapper">
+            <Global_styles_brd/>
+            <Enable_ssl_modal/>
+            <Api_url_modal/>
+            <Old_modals/>
+            <Switch>
+                <Route path="/login" exact component={Login}/>
+                <Route path="/whitelist_ips" exact component={Whitelist_ips}/>
+                <Route path="/dock_logs" exact component={Dock_logs}/>
+                <Route path="/" component={Page}/>
+            </Switch>
+            </div>
       </TranslationContext.Provider>;
     }
 });
@@ -383,10 +388,12 @@ const Validator = ({zagent})=>{
 };
 
 const Root = ()=>
-    <BrowserRouter>
-      <Switch>
-        <Route path="/" component={App}/>
-      </Switch>
-    </BrowserRouter>;
+    <Theme_provider>
+        <BrowserRouter>
+            <Switch>
+                <Route path="/" component={App}/>
+            </Switch>
+        </BrowserRouter>
+    </Theme_provider>;
 
 createRoot(document.getElementById('react_root')).render(<Root/>);

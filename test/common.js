@@ -7,12 +7,11 @@ const path = require('path');
 const http = require('http');
 const https = require('https');
 const net = require('net');
-const url = require('url');
 const zlib = require('zlib');
 const request = require('request');
 const http_shutdown = require('http-shutdown');
-const {Netmask} = require('netmask');
 const forge = require('node-forge');
+const {Netmask} = require('../util/netmask.js');
 const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
 const Server = require('../lib/server.js');
@@ -21,6 +20,7 @@ const Manager = require('../lib/manager.js');
 const consts = require('../lib/consts.js');
 const etask = require('../util/etask.js');
 const date = require('../util/date.js');
+const zurl = require('../util/url.js');
 const zutil = require('../util/util.js');
 const lpm_util = require('../util/lpm_util.js');
 const restore_case = require('../util/takeup_util.js').restore_case;
@@ -155,11 +155,11 @@ E.http_proxy = port=>etask(function*(){
             host: req.headers.host,
             uri: req.url,
             method: req.method,
-            path: url.parse(req.url).path,
+            path: zurl.parse(req.url).path,
             headers: zutil.omit(req.headers, 'proxy-authorization'),
         }).on('response', _res=>{
             res.writeHead(_res.statusCode, _res.statusMessage,
-                Object.assign({'x-luminati-ip': E.get_random_ip()},
+                Object.assign({'x-brd-ip': E.get_random_ip()},
                     _res.headers));
             _res.pipe(res);
         }).on('error', this.throw_fn()));
@@ -193,7 +193,7 @@ E.http_proxy = port=>etask(function*(){
             _url = '127.0.0.1:'+proxy.https.address().port;
         }
         let req_port;
-        res.write(`HTTP/1.1 200 OK\r\nx-luminati-ip: ${to_body(req).ip}`
+        res.write(`HTTP/1.1 200 OK\r\nx-brd-ip: ${to_body(req).ip}`
             +'\r\n\r\n');
         if (req.method=='CONNECT')
             proxy.full_history.push(to_body(req));

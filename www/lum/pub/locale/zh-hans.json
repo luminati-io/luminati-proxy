@@ -5270,7 +5270,7 @@
   "Regular request":"正常的请求",
   "Queue request":"队列请求",
   "Replace request":"替换原始请求",
-  "Trigger a real-time collection job for the input you provide. You'll immediately receive a response with the created job's ID":"为您提供的输入触发实时收集作业。 您将立即收到包含创建的作业ID的回复",
+  "Trigger a batch collection job for the input you provide. You'll immediately receive a response with the created job's ID, which you can use to track progress and retrieve results once the job is complete.":"为您提供的输入触发批量收集作业。 您将立即收到包含创建的作业ID的回复，您可以使用该ID跟踪进度并在作业完成后检索结果。",
   "We will continue automatically once you send your first request":"一旦您发送第一个请求，我们将自动继续",
   "Waiting for your request":"等待您的要求",
   "You should submit all your inputs in 1 batch so the collector can run faster in parallel":"您应该分批提交所有输入，以便收集器可以并行运行得更快",

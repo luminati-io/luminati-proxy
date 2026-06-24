@@ -525,7 +525,7 @@ class Nav_tabs_wrapper extends Pure_component {
             'target',
             'rotation',
             'rules',
-            ...!this.props.zagent?['browser']:[],
+            ...this.props.zagent?['headers']:['browser'],
             'general',
         ];
     }
@@ -611,6 +611,7 @@ const Main_window = withRouter(({match})=>
         <Route path={`${match.path}/rules`} component={Rules}/>
         <Route path={`${match.path}/rotation`} component={Rotation}/>
         <Route path={`${match.path}/browser`} component={Browser}/>
+        <Route path={`${match.path}/headers`} component={Browser}/>
         <Route path={`${match.path}/general`} component={General}/>
         <Route path={`${match.path}/logs`} component={Logs}/>
         <Route exact path={match.path} component={({location})=>

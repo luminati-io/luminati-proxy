@@ -34,6 +34,32 @@ E.is_mocha = function(){
 E.is_lxc = function(){ return is_node && !!+process.env.LXC; };
 E.is_prod = function(){ return !E.is_mocha() && !E.is_lxc(); };
 E.is_bat = function(zconf){ return !!zconf.CONFIG_BAT_CYCLE; };
+E.is_selenium = function(zconf){ return !!zconf.CONFIG_SELENIUM; };
+E.is_k8s = function(){
+    return is_node && !!process.env.KUBERNETES_SERVICE_HOST; };
+
+E._is_devenv = undefined;
+E.is_devenv = function(){
+    if (E._is_devenv!==undefined)
+        return E._is_devenv;
+    return E._is_devenv = E.is_mocha()
+        || +process.env.LXC || +process.env.ZLXC
+        || process.env.NODE_ENV!='production';
+};
+
+var _is_local_standalone_run;
+E.is_local_standalone_run = function(){
+    if (_is_local_standalone_run!==undefined)
+        return _is_local_standalone_run;
+    // env.LXC = '1' in zlxc, env.LXC = '0' in prod, no env.LXC in local run
+    if (!is_node || E.is_mocha() || E.is_k8s() || process.env.LXC)
+        return _is_local_standalone_run = false;
+    var os = require('os');
+    var host = os.hostname().toLowerCase();
+    // is_host doesn't work in standalone run, so here's a simplified check
+    var is_server = host.startsWith('zs-') || host.startsWith('zagent');
+    return _is_local_standalone_run = !is_server;
+};
 
 // refresh() was added in node 10, we need to support node 8 for webOS TV 5.0
 // https://webostv.developer.lge.com/develop/guides/js-service-basics
@@ -83,7 +109,8 @@ E.union_with = function(fn /* [o1, [o2, [...]]]*/){
         for (var key in args[i])
         {
             var arg = args[i];
-            res[key] = res.hasOwnProperty(key) ? fn(res[key], arg[key])
+            res[key] = Object.hasOwn(res, key)
+                ? fn(res[key], arg[key])
                 : arg[key];
         }
     }
@@ -270,7 +297,7 @@ E.freeze_deep = function(obj){
     {
         for (var prop in obj)
         {
-            if (obj.hasOwnProperty(prop))
+            if (Object.hasOwn(obj, prop))
                 E.freeze_deep(obj[prop]);
         }
     }
@@ -701,6 +728,27 @@ E.with_stub_wrappers = obj=>{
     for (const [k, fn] of Object.entries(obj))
         obj[k] = E.stub_wrapper(fn);
     return obj;
+};
+
+E.is_hola_user = user=>{
+    if (Object.hasOwn(user, 'aliases'))
+    {
+        let aliases = user.aliases;
+        if (!Array.isArray(aliases))
+        {
+            aliases = aliases.toString().split(' ')
+                .filter(Boolean).map(s=>s.trim());
+        }
+        if (aliases.includes('all_hola'))
+            return true;
+    }
+    const teams = [
+        'prinfra_cv', 'prinfra_websites', 'prinfra_apps',
+        'prinfra_devops', 'hola',
+    ];
+    if (Object.hasOwn(user, 'team') && teams.includes(user.team))
+        return true;
+    return false;
 };
 
 return E; }); }());

@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://brightdata.com/static/lpm/luminati-proxy-manager-v1.601.281-setup.exe">代理管理安装器</a>.
+下载 <a href="https://brightdata.com/static/lpm/luminati-proxy-manager-v1.643.828-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 20.12.1版 (最好用x
@@ -237,6 +237,13 @@ Options:
       --socket_inactivity_timeout  The amount of time a socket can be inactive
                                    before it times out and closes
                                                                [default: 120000]
+      --zone_auth_passthru         Allow passthrough proxy authentication using
+                                   zone-based usernames in the format
+                                   brd-customer-...-zone-...:password
+                                                      [boolean] [default: false]
+      --sanitize_rules             Validate rules trigger_code against the JS
+                                   sanitizer and reject unsafe code before it
+                                   runs.              [boolean] [default: false]
       --no-www                     Disable local web
       --no-config                  Working without a config file
   -d, --daemon, --start-daemon     Start as a daemon

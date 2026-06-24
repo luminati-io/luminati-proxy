@@ -297,70 +297,6 @@ E.ipv6_oct_to_canon = function(arr){
     return res;
 };
 
-function flags_to_str_once(flags, conv){
-    var f = 'var s = "";\n';
-    f += 'if (!flags) return "";\n';
-    for (var i in conv)
-    {
-        if (!conv.hasOwnProperty(i))
-            continue;
-        f += 'if (flags & '+conv[i]+') '
-            +'{ s += '+JSON.stringify(i.toLowerCase())+'+" "; '
-            +'flags &= ~'+conv[i]+'; }\n';
-    }
-    f += 'if (flags && conv.__conv_to_str.err) '
-        +'conv.__conv_to_str.err(flags, conv);\n';
-    f += 'return s.slice(0, -1);\n';
-    var func = new Function(['flags', 'conv'], f);
-    Object.defineProperty(conv, '__conv_to_str',
-        {enumerable: false, writable: true});
-    conv.__conv_to_str = func;
-    func.err = function(_flags, _conv){
-        zerr.perr('flags_str_invalid', 'flags '+_flags+' '
-            +JSON.stringify(_conv).slice(0, 30));
-    };
-    return conv.__conv_to_str(flags, conv);
-}
-
-E.flags_to_str = function(flags, conv){
-    if (conv.__conv_to_str)
-        return conv.__conv_to_str(flags, conv);
-    return flags_to_str_once(flags, conv);
-};
-
-function flags_from_str_once(s, conv){
-    var f = 'var flags = 0, a, i;\n';
-    f += 'if (!s) return 0;\n';
-    f += 's = s.toUpperCase();\n';
-    f += 'a = s.split(",");\n';
-    f += 'for (i=0; i<a.length; i++)\n';
-    f += '{\n';
-    f += '    if (!conv[a[i]])\n';
-    f += '    {\n';
-    f += '        if (flags && conv.__conv_from_str.err) '
-        +'conv.__conv_from_str.err(flags, conv);\n';
-    f += '        return -1;\n';
-    f += '    }\n';
-    f += '    flags |= conv[a[i]];\n';
-    f += '}\n';
-    f += 'return flags;\n';
-    var func = new Function(['s', 'conv'], f);
-    Object.defineProperty(conv, '__conv_from_str',
-        {enumerable: false, writable: true});
-    conv.__conv_from_str = func;
-    func.err = function(_s, _conv){
-        zerr.perr('flags_str_invalid', 'flags '+_s+' '
-            +JSON.stringify(_conv).slice(0, 30));
-    };
-    return conv.__conv_from_str(s, conv);
-}
-
-E.flags_from_str = function(s, conv){
-    if (conv.__conv_from_str)
-        return conv.__conv_from_str(s, conv);
-    return flags_from_str_once(s, conv);
-};
-
 E.scale_vals = {
     si: [
         {s: '', n: 1},
@@ -659,7 +595,11 @@ E.JSON_stringify = function(obj, opt){
             vm.runInContext('Function', opt.vm_context) : Function;
         prev_func = func_class.prototype.toJSON;
         func_class.prototype.toJSON = function(){
-            return {__Function__: this.toString()}; };
+            var f_s = this.toString();
+            if (f_s.startsWith('*'))
+                f_s = 'function'+f_s;
+            return {__Function__: f_s};
+        };
     }
     if (opt.re)
     {
@@ -757,17 +697,23 @@ E.JSON_stringify = function(obj, opt){
     return s;
 };
 
+function default_dangerous_func_reviver(fn){
+    return is_node ? vm.runInThisContext('"use strict";('+fn+')')
+        // fallback for browser environment
+        : new Function('', '"use strict";return ('+fn+');')();
+}
+
 var leaf_type = {
     __ISODate__: [
         function(opt){ return opt.date; },
         function(v, opt){ return new Date(v.__ISODate__); },
     ],
     __Function__: [
-        function(opt){ return opt.func; },
-        function(v, opt){ return vm
-            ? vm.runInThisContext('"use strict";('+v.__Function__+')')
-            // fallback for browser environment
-            : new Function('', '"use strict";return ('+v.__Function__+');')();
+        function(opt){ return opt.dangerous_func; },
+        function(v, opt){
+            return (opt.dangerous_func===true
+                ? default_dangerous_func_reviver
+                : opt.dangerous_func)(v.__Function__);
         },
     ],
     __RegExp__: [
@@ -850,9 +796,15 @@ function deref_obj(obj){
     });
 }
 
+// Note about opt.dangerous_func
+// DO NOT TURN THIS ON if you are dealing with any code path which might
+// process untrusted data (e.g. user input).
+// Only enable this if you're absolutely sure you know what you're doing.
+// If you're not sure, consult with someone with security experience and get
+// a second opinion.
 E.JSON_parse = function(s, opt){
-    opt = Object.assign({date: true, re: true, bigint: true, func: true,
-        inf: true, circular: true}, opt);
+    opt = Object.assign({date: true, re: true, bigint: true,
+        dangerous_func: false, inf: true, circular: true}, opt);
     var has_circular;
     var ret = JSON.parse(s, function(k, v){
         v = parse_leaf(v, opt);
@@ -865,9 +817,15 @@ E.JSON_parse = function(s, opt){
     return ret;
 };
 
+// Note about opt.dangerous_func
+// DO NOT TURN THIS ON if you are dealing with any code path which might
+// process untrusted data (e.g. user input).
+// Only enable this if you're absolutely sure you know what you're doing.
+// If you're not sure, consult with someone with security experience and get
+// a second opinion.
 E.JSON_parse_obj = function(v, opt){
-    opt = Object.assign({date: true, re: true, bigint: true, func: true,
-        inf: true}, opt);
+    opt = Object.assign({date: true, re: true, bigint: true,
+        dangerous_func: false, inf: true}, opt);
     return parse_obj(v, opt);
 };
 

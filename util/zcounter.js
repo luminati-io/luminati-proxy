@@ -19,32 +19,22 @@ const global_only_worlds = new Set();
 
 // lazy loading to ensure modules are installed
 let vcounter, zcounter_to_vcounter;
-const get_vcounter = (metric_name, agg_srv, agg_tm, group = '')=>{
+const get_vcounter = (metric_name, extra_labels)=>{
     if (!vcounter || !metric_name || typeof metric_name !== 'string')
         return;
-    const metric_key = metric_name + group;
+    const metric_key = extra_labels
+        ? metric_name + JSON.stringify(extra_labels)
+        : metric_name;
     let vmetric = zcounter_to_vcounter.get(metric_key);
     if (vmetric !== undefined)
         return vmetric;
-    const extra_labels = {
-        dashboard_agg_srv: agg_srv,
-        dashboard_agg_tm: agg_tm,
-    };
-    if (group)
-        extra_labels.dashboard_group = group;
     const params = E.get_vcounter_params(
-        metric_name.replaceAll('-', '_'),
+        metric_name,
         extra_labels
     );
     if (!params)
         return;
     const [vname, labels, glob] = params;
-    // temp limit for initial testing, to be deleted later
-    if (labels.world !== 'stats')
-    {
-        zcounter_to_vcounter.set(metric_key, null);
-        return;
-    }
     try {
         vmetric = glob
             ? vcounter.glob(vname, labels)
@@ -58,7 +48,7 @@ const get_vcounter = (metric_name, agg_srv, agg_tm, group = '')=>{
 
 E.get_vcounter_params = (metric_name, extra_labels = {})=>{
     metric_name = get_absolute_path(metric_name);
-    let labels, glob = false;
+    let labels = {}, glob = false;
     const parts = metric_name.split('.');
     const world = parts.shift();
     if (world === 'lum')
@@ -66,11 +56,12 @@ E.get_vcounter_params = (metric_name, extra_labels = {})=>{
         glob = true;
         const [customer, zone, app] = parts.splice(0, 3);
         labels = {
+            ...labels,
             world,
             customer,
             zone,
             app,
-            dashboard_name: [world, customer, zone, app, ...parts].join('.'),
+            zname: metric_name,
         };
     }
     else
@@ -78,14 +69,19 @@ E.get_vcounter_params = (metric_name, extra_labels = {})=>{
         const [instance, app] = parts.splice(0, 2);
         if (instance === 'glob')
             glob = true;
+        else if (instance !== conf.hostname)
+        {
+            glob = true;
+            labels.ext = instance;
+        }
         labels = {
+            ...labels,
             world,
-            instance: glob ? conf.hostname : instance,
             app,
-            dashboard_name: metric_name,
+            zname: metric_name,
         };
     }
-    const vname = parts.join(':') || 'default';
+    const vname = parts.join('.') || 'zcounter';
     labels = {...extra_labels, ...labels};
     labels.job = 'zcounter';
     return [vname, labels, glob];
@@ -144,7 +140,6 @@ E.inc = (name, inc=1, agg_srv='sum', agg_tm='avg0')=>{
     if (!entry)
         _type.set(name, entry = {v: 0, agg_srv, agg_tm});
     entry.v += inc;
-    get_vcounter(name, agg_srv, agg_tm)?.inc(inc);
 };
 
 // monotonic counters read from elsewhere: pkt rx/tx on interface from kernel
@@ -158,12 +153,6 @@ E.minc = (name, value, agg_srv='sum')=>{
     if (value<entry.b)
         entry.b = value;
     entry.v = value-entry.b;
-    const vmetric = get_vcounter(name, agg_srv, 'avg0');
-    if (vmetric)
-    {
-        vmetric.value = entry.v;
-        vmetric.update('inc', 'sum', 'sum');
-    }
 };
 
 // minc but starts sending after non-0 value and stops after 0-only for 1h
@@ -177,12 +166,6 @@ E.minc_eco = (name, value, agg_srv='sum')=>{
     if (value<entry.b)
         entry.b = value;
     entry.v = value-entry.b;
-    const vmetric = get_vcounter(name, agg_srv, 'avg0');
-    if (vmetric)
-    {
-        vmetric.value = entry.v;
-        vmetric.update('inc', 'sum', 'sum');
-    }
 };
 
 // current in-progress counter: num of open tcp connections: +1 open, -1 close
@@ -193,8 +176,6 @@ E.inc_level = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v += inc;
-    const vmetric = get_vcounter(name, agg_srv, 'avg');
-    vmetric?.set_level((vmetric.value || 0) + inc);
 };
 
 // inc_level but starts sending after non-0 value and stops after 0-only for 1h
@@ -205,8 +186,6 @@ E.inc_level_eco = (name, inc=1, agg_mas='avg', agg_srv='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v += inc;
-    const vmetric = get_vcounter(name, agg_srv, 'avg');
-    vmetric?.set_level((vmetric.value || 0) + inc);
 };
 
 // current in-progress counter read from elsewhere, or absolute value such
@@ -218,7 +197,6 @@ E.set_level = (name, value, agg_mas='avg', agg_srv='avg', agg_tm='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv, agg_tm};
     entry.v = value;
-    get_vcounter(name, agg_srv, agg_tm)?.set_level(value);
 };
 
 // set_level but starts sending after non-0 value and stops after 0-only for 1h
@@ -229,7 +207,6 @@ E.set_level_eco = (name, value, agg_mas='avg', agg_srv='avg')=>{
     if (!entry)
         entry = _type[name] = {v: 0, agg_srv};
     entry.v = value;
-    get_vcounter(name, agg_srv, 'avg')?.set_level(value);
 };
 
 E.avg = (name, value, agg_srv)=>E.avgw(name, value, 1, agg_srv);
@@ -244,8 +221,6 @@ E.avgw = (name, value, weight, agg_srv='avg')=>{
         entry = _type[name] = {v: 0, w: 0, agg_srv};
     entry.v += value;
     entry.w += weight;
-    get_vcounter(name, 'sum', 'avg0', 'total')?.inc(value);
-    get_vcounter(name, 'sum', 'avg0', 'count')?.inc(weight);
 };
 
 E.max = (name, value, agg_srv='max', agg_tm='max')=>{
@@ -256,7 +231,6 @@ E.max = (name, value, agg_srv='max', agg_tm='max')=>{
         entry = _type[name] = {v: value, agg_srv, agg_tm};
     if (entry.v<value)
         entry.v = value;
-    get_vcounter(name, agg_srv, agg_tm)?.max(value);
 };
 
 E.min = (name, value, agg_srv='min', agg_tm='min')=>{
@@ -267,7 +241,6 @@ E.min = (name, value, agg_srv='min', agg_tm='min')=>{
         entry = _type[name] = {v: value, agg_srv, agg_tm};
     if (entry.v>value)
         entry.v = value;
-    get_vcounter(name, agg_srv, agg_tm)?.min(value);
 };
 
 function _get(_type, n){
@@ -504,17 +477,6 @@ function ws_format(metrics){
     return res;
 }
 
-function agg_mas_sum_fn(id, c){ return {v: c.v*counter_factor, w: undefined}; }
-function agg_mas_avg_fn(id, c){ return c; }
-function agg_mas_level_fn(id, c){
-    return {v: c.w!==undefined ? c.v/c.w : c.v, w: undefined}; }
-
-const agg_mas_fn = {sum: agg_mas_sum_fn, sum_mono: agg_mas_sum_fn,
-    avg: agg_mas_avg_fn, avg_level: agg_mas_level_fn,
-    sum_level: agg_mas_level_fn, max_level: agg_mas_level_fn,
-    min_level: agg_mas_level_fn, avg_level_eco: agg_mas_level_fn,
-    sum_level_eco: agg_mas_level_fn, sum_mono_eco: agg_mas_sum_fn};
-
 const get_absolute_path = metric_key=>{
     const prefix = `stats.${conf.hostname}.${conf.app}.`;
     let path;
@@ -531,8 +493,19 @@ const get_absolute_path = metric_key=>{
     return path;
 };
 
-const prepare = ()=>etask(function*zcounter_prepare(){
-    const get_counters_fn = Object.keys(cluster.workers).length
+function agg_mas_sum_fn(id, c){ return {v: c.v*counter_factor, w: undefined}; }
+function agg_mas_avg_fn(id, c){ return c; }
+function agg_mas_level_fn(id, c){
+    return {v: c.w!==undefined ? c.v/c.w : c.v, w: undefined}; }
+
+const agg_mas_fn = {sum: agg_mas_sum_fn, sum_mono: agg_mas_sum_fn,
+    avg: agg_mas_avg_fn, avg_level: agg_mas_level_fn,
+    sum_level: agg_mas_level_fn, max_level: agg_mas_level_fn,
+    min_level: agg_mas_level_fn, avg_level_eco: agg_mas_level_fn,
+    sum_level_eco: agg_mas_level_fn, sum_mono_eco: agg_mas_sum_fn};
+
+const prepare = ()=>etask(function*(){
+    const get_counters_fn = cluster.isMaster
         ? mas_get_counters : loc_get_counters;
     const counters = yield get_counters_fn(true);
     const res = {lum: [], stats: []};
@@ -549,6 +522,49 @@ const prepare = ()=>etask(function*zcounter_prepare(){
             {
                 res[world].push({path, v: agg.v, w: agg.w,
                     agg_srv: c.agg_srv, agg_tm: c.agg_tm});
+            }
+            if (!cluster.isMaster)
+                continue;
+            // temporary band-aid fix for faulty metrics from chrome
+            if (
+                conf.app === 'browser-chrome' &&
+                (
+                    path.startsWith('stats.browser') ||
+                    path.endsWith('ws_conn') ||
+                    path.includes('cdp_perf')
+                )
+            )
+            {
+                continue;
+            }
+            switch (agg_fn)
+            {
+            case agg_mas_sum_fn:
+                get_vcounter(key)?.inc(c.v);
+                break;
+            case agg_mas_level_fn: {
+                const vmetric = get_vcounter(key);
+                const vtype = {min_level: 'min', max_level: 'max'}[agg_type]
+                    || 'level';
+                if (vmetric)
+                {
+                    vmetric.value = agg.v;
+                    vmetric.update(vtype, 'none', c.agg_srv);
+                }
+                break;
+            }
+            case agg_mas_avg_fn: {
+                const total = get_vcounter(key, {type: 'ztotal'});
+                const count = get_vcounter(key, {type: 'zcount'});
+                if (total && count)
+                {
+                    total.value = (total.value || 0) + c.v;
+                    count.value = (count.value || 0) + c.w;
+                    total.update('ztotal', 'none', 'sum');
+                    count.update('zcount', 'none', 'sum');
+                }
+                break;
+            }
             }
         }
     }
@@ -808,11 +824,14 @@ E.is_debug = title=>{
     return !!v;
 };
 
-function test_reset(){
+/**
+ * Deletes all current metrics
+ */
+E.reset = ()=>{
     type = {sum: new Map(), avg: {}, sum_mono: {}, avg_level: {},
         sum_level: {}, max_level: {}, min_level: {}, avg_level_eco: {},
         sum_level_eco: {}, sum_mono_eco: {}};
-}
+};
 
 E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client,
-    test_reset, all_conns, ws_conn};
+    test_reset: E.reset, all_conns, ws_conn};

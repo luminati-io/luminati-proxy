@@ -31,6 +31,15 @@ describe('username', ()=>{
             const res = username.calculate_username(opt);
             assert.equal(res.username, un('country-us-session-sess123'));
         });
+        it('should skip session if preset is rotating', ()=>{
+            const opt = {
+                country: 'us',
+                session: 'sess123',
+                preset: 'rotating',
+            };
+            const res = username.calculate_username(opt);
+            assert.equal(res.username, un('country-us'));
+        });
         it('should skip session if ip is passed', ()=>{
             const opt = {country: 'us', ip: '1.1.1.1', session: 'sess123'};
             const res = username.calculate_username(opt);

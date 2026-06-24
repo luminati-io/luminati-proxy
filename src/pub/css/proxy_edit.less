@@ -1,4 +1,5 @@
 @import (reference) 'common.less';
+
 .proxy_edit {
     height: 100%;
     font-size: 14px;
@@ -37,8 +38,14 @@
             flex-grow: 3;
             display: flex;
             direction: rtl;
-            .btn_save { margin-right: 0; order: 1; }
-            .btn_cancel { margin-left: 0; order: 2; }
+            .btn_save {
+                margin-right: 0;
+                order: 1;
+            }
+            .btn_cancel {
+                margin-left: 0;
+                order: 2;
+            }
         }
         .btn_browse {
             display: flex;
@@ -52,31 +59,53 @@
                 margin-left: 3px;
             }
             &:hover {
-               .browse_icon {
-                   filter: grayscale(100%) brightness(3);
-               }
+                background-color: @bg-tertiary;
+                color: @first_color;
+                .browse_icon {
+                    filter: grayscale(100%) var(--icon-brightness-hover);
+                }
             }
         }
     }
-    .note { font-size: 13px; margin-bottom: 15px; }
+    .note {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
     .main_window {
         flex: 1;
         margin-top: 10px;
         .in_logs {
-            .nav_tabs { margin-bottom: 15px; }
+            .nav_tabs {
+                margin-bottom: 15px;
+            }
             .logs {
                 width: 100%;
-                .logs_panel { margin: 0; }
+                .logs_panel {
+                    margin: 0;
+                }
             }
         }
-        .target .desc { width: 110px; }
-        .rotation .desc { width: 135px; }
-        .browser .desc { width: 145px; }
-        .general .desc { width: 195px; }
-        .general .bw_limit_str { font-weight: 500; }
+        .target .desc {
+            width: 110px;
+        }
+        .rotation .desc {
+            width: 135px;
+        }
+        .browser .desc {
+            width: 145px;
+        }
+        .general .desc {
+            width: 195px;
+        }
+        .general .bw_limit_str {
+            font-weight: 500;
+        }
         .rules {
             max-width: 100%;
-            .desc { width: 200px; min-width: 200px; }
+            .desc {
+                width: 200px;
+                min-width: 200px;
+            }
             .rule_wrapper {
                 &.collapsed {
                     cursor: pointer;
@@ -90,12 +119,14 @@
                 display: grid;
                 grid-template-columns: auto 1fr;
                 grid-template-rows: auto auto;
-                .action, .trigger, .ui, .code { padding: 8px; }
+                .action, .trigger, .ui, .code {
+                    padding: 8px;
+                }
                 .trigger.ui {
                     position: relative;
                     .mask {
                         position: absolute;
-                        background-color: rgba(0, 0, 0, 0.05);
+                        background-color: var(--overlay-rule-mask);
                         border-top-left-radius: 2px;
                         width: 100%;
                         height: 100%;
@@ -103,7 +134,9 @@
                         left: 0;
                         z-index: 5;
                         display: none;
-                        &.active { display: block; }
+                        &.active {
+                            display: block;
+                        }
                         .reset_btn {
                             position: absolute;
                             right: 9px;
@@ -117,7 +150,9 @@
                     grid-row-start: 1;
                     grid-row-end: -1;
                 }
-                .action { border-top: 1px solid @grey; }
+                .action {
+                    border-top: 1px solid @grey;
+                }
                 .code {
                     border-left: 1px solid @grey;
                     overflow: hidden;
@@ -140,8 +175,8 @@
                             border: none;
                             height: 3px;
                             width: 100%;
-                            background-color: #004D74;
-                            opacity: 0.4;
+                            background-color: var(--toggle-button-bg);
+                            opacity: var(--toggle-button-opacity);
                             position: relative;
                             top: -5px;
                         }
@@ -151,7 +186,9 @@
             .rule_add_btn {
                 margin-left: 0;
                 padding: 0px 15px;
-                i { left: 4px; }
+                i {
+                    left: 4px;
+                }
             }
             .btn.toggle_on_off:not(.rule_toggle) {
                 position: absolute;
@@ -159,7 +196,9 @@
                 top: 8px;
             }
             .proxy_tester {
-                .panel { padding: 0; }
+                .panel {
+                    padding: 0;
+                }
             }
         }
         .browser {
@@ -188,7 +227,9 @@
                         }
                     }
                 }
-                .note { margin-bottom: 10px; }
+                .note {
+                    margin-bottom: 10px;
+                }
             }
             .warning_container {
                 width: 100%;
@@ -196,7 +237,9 @@
                 justify-content: space-between;
                 align-items: center;
             }
-            .desc { padding-right: 0; }
+            .desc {
+                padding-right: 0;
+            }
             .action_icons {
                 width: 45px;
                 flex-shrink: 0;
@@ -207,17 +250,27 @@
             font-weight: bold;
             height: 40px;
         }
-        .note { margin-bottom: 0; }
+        .note {
+            margin-bottom: 0;
+        }
         .desc {
             line-height: 1.07;
             padding-right: 10px;
         }
         align-items: center;
-        .prefix { margin-right: 10px; }
-        .sufix { margin-left: 10px; }
+        .prefix {
+            margin-right: 10px;
+        }
+        .sufix {
+            margin-left: 10px;
+        }
         .double_field {
-            input { width: 109px; }
-            .devider { margin: 0 5px; }
+            input {
+                width: 109px;
+            }
+            .devider {
+                margin: 0 5px;
+            }
         }
     }
     .allocated_ips_modal {
@@ -235,12 +288,16 @@
     .bw_limit_modal {
         .inputs_container {
             display: flex;
-            input { width: 100%; }
+            input {
+                width: 100%;
+            }
             .bytes_input {
                 flex: 1;
                 margin-right: 10px;
             }
-            .days_input { flex: 1; }
+            .days_input {
+                flex: 1;
+            }
         }
         .field_container {
             align-items: center;
@@ -251,16 +308,20 @@
                 font-size: 15px;
             }
         }
-        input[type=number].error { border-color: #eb3a28; }
+        input[type=number].error {
+            border-color: var(--text-error);
+        }
     }
     .regex_field {
         width: 100%;
         display: flex;
         outline: none;
         position: relative;
-        &:hover .tip_box { visibility: visible; }
+        &:hover .tip_box {
+            visibility: visible;
+        }
         .tip_box {
-            color: #8e8e8e;
+            color: var(--text-regex-tip);
             height: 32px;
             border-bottom: none;
             border: solid 1px @grey;
@@ -269,34 +330,40 @@
             border-top-right-radius: 4px;
             padding: 3px 5px;
             visibility: hidden;
-            &.active { visibility: visible; }
-            .checks { display: flex; }
+            &.active {
+                visibility: visible;
+            }
+            .checks {
+                display: flex;
+            }
             .check {
                 margin: auto 2px;
                 line-height: 1.3;
                 padding: 3px;
-                background: transparent;
-                text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;
+                background: var(--color-transparent);
+                text-shadow: var(--text-shadow-light);
                 border: none;
                 border-radius: 6px;
                 overflow: hidden;
                 &:hover:not([disabled]) {
-                    color: white;
-                    text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
+                    color: var(--color-white);
+                    text-shadow: var(--text-shadow-dark);
                 }
                 &.active {
-                    color: white;
-                    text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
-                    background: rgba(0, 0, 0, 0.3);
+                    color: var(--color-white);
+                    text-shadow: var(--text-shadow-dark);
+                    background: var(--state-active-bg);
                 }
                 &:hover:not(.active):not([disabled]) {
-                    background: rgba(0, 0, 0, 0.2);
+                    background: var(--state-hover-bg);
                 }
-                &[disabled] { opacity: 0.5; }
+                &[disabled] {
+                    opacity: 0.5;
+                }
             }
         }
         .regex_error {
-            color: @error_dark;
+            color: var(--text-regex-error);
             display: block;
             visibility: hidden;
             padding-bottom: 1em;
@@ -306,34 +373,46 @@
             }
         }
     }
-    &.vbox { overflow-y: hidden; }
+    &.vbox {
+        overflow-y: hidden;
+    }
 }
+
 .banned_ips_panel {
-    // XXX krzysztof: banned ips panel should be redesigned and not follow
-    // chrome styling
     .tables_container, .header_container {
         table td, table th, div.chrome_table div.chrome_td,
         div.chrome_table div.chrome_th {
-            &:nth-child(2) { border-left: none; }
-            label { margin: 0; }
-            .form-check { text-align: center; }
+            &:nth-child(2) {
+                border-left: none;
+            }
+            label {
+                margin: 0;
+            }
+            .form-check {
+                text-align: center;
+            }
             input[type=checkbox] {
                 margin: 0;
                 top: 2px;
             }
         }
         table th, div.chrome_table div.chrome_th {
-            &:first-child { text-align: center };
+            &:first-child {
+                text-align: center
+            };
         }
     }
 }
+
 .btn_unban {
     border: none;
     background: none;
     display: block;
     margin: auto;
     padding: 0;
-    .chrome_icon { width: 20px; }
+    .chrome_icon {
+        width: 20px;
+    }
     .chrome_icon.unban_all {
         width: 28px;
         margin-left: -4px;

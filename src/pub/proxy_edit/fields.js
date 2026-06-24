@@ -250,6 +250,17 @@ export const tabs = {
             },
         },
     },
+    headers: {
+        label: 'Headers',
+        tooltip: 'Configure request headers',
+        fields: {
+            ua: {
+                label: 'Unblocker Mobile UA',
+                tooltip: `Let Unblocker set a random User-Agent from a mobile
+                    browser automatically`,
+            },
+        },
+    },
     general: {
         label: 'General',
         tooltip: `General configuration such as 'port number'`,

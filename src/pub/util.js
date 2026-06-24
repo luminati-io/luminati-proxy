@@ -169,15 +169,6 @@ const error_desc = [
     }
 ];
 
-const undescribed_error = (()=>{
-    let executed;
-    return message=>{
-        if (executed)
-            return;
-        executed = true;
-    };
-})();
-
 export const Clipboard = ()=><textarea className="copy_area"/>;
 Clipboard.copy = text=>{
     if (!text)
@@ -210,17 +201,11 @@ export const get_troubleshoot = (body, status_code, headers)=>{
             +' canceled by the sender (your browser or scraper).'};
     }
     title = (headers.find(h=>
-        h.name=='x-luminati-error'||h.name=='x-lpm-error')||{}).value||'';
+        h.name=='x-brd-error'||h.name=='x-lpm-error')||{}).value||'';
     for (let {regex, description} of error_desc)
     {
         if (regex.test(title))
             return {title, info: description};
-    }
-    if (title)
-    {
-        let lpm = (headers.find(h=>h.name=='x-lpm-error')||{}).value||'';
-        let lum = (headers.find(h=>h.name=='x-luminati-error')||{}).value||'';
-        undescribed_error({status_code, title, lpm, lum});
     }
     return {title, info: ''};
 };

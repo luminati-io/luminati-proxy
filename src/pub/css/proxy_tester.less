@@ -1,18 +1,25 @@
 @import (reference) 'common.less';
+
 .proxy_tester {
     flex: 1;
-    select, input { width: 100% !important; }
+    select, input {
+        width: 100% !important;
+    }
     .title_value_pairs {
         font-size: 14px;
         .pair {
             display: flex;
-            .title { flex: 1; }
-            .value { flex: 1; }
+            .title {
+                flex: 1;
+            }
+            .value {
+                flex: 1;
+            }
         }
     }
     .har_preview {
         margin-bottom: 10px;
-        border: 1px solid #cdcdcd;
+        border: 1px solid var(--border-har);
         min-height: 300px;
         z-index: 2000;
     }
@@ -23,24 +30,36 @@
                 margin-bottom: 10px;
             }
             .field {
-                &:first-child { margin-left: 0; }
-                &:last-child { margin-right: 0; }
+                &:first-child {
+                    margin-left: 0;
+                }
+                &:last-child {
+                    margin-right: 0;
+                }
                 margin: 0 5px;
                 .title {
                     font-size: 14px;
                     margin-bottom: 3px;
                     margin-left: 2px;
                 }
-                &.url { flex: 1; }
+                &.url {
+                    flex: 1;
+                }
             }
             .headers {
                 .header_line {
                     display: flex;
                     align-items: center;
                     margin: 5px 0;
-                    &:first-child { margin-top: 0; }
-                    &:last-child { margin-bottom: 10px; }
-                    button { min-width: 140px; }
+                    &:first-child {
+                        margin-top: 0;
+                    }
+                    &:last-child {
+                        margin-bottom: 10px;
+                    }
+                    button {
+                        min-width: 140px;
+                    }
                     .header_input {
                         margin-right: 10px;
                         flex: 1;
@@ -51,13 +70,17 @@
                     }
                     .action_icons {
                         width: 45px;
-                        .add_header { margin-left: 5px; }
+                        .add_header {
+                            margin-left: 5px;
+                        }
                     }
                 }
             }
             .footer_buttons {
                 margin-top: 10px;
-                .btn { margin: 0; }
+                .btn {
+                    margin: 0;
+                }
             }
         }
         &.body {
@@ -68,17 +91,25 @@
                     overflow: auto;
                     max-height: 400px;
                     padding: 5px;
-                    span { word-wrap: break-word; }
+                    span {
+                        word-wrap: break-word;
+                    }
                 }
             }
         }
         &.info {
-            .title_value_pairs .pair .value { text-align: right; }
+            .title_value_pairs .pair .value {
+                text-align: right;
+            }
         }
         &.response {
             .title_value_pairs .pair {
-                .key { min-width: 160px; }
-                .value { word-break: break-all; }
+                .key {
+                    min-width: 160px;
+                }
+                .value {
+                    word-break: break-all;
+                }
             }
         }
     }

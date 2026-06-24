@@ -1,11 +1,11 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true*/
 require('./config.js');
+const path = require('path');
 const file = require('./file.js');
 const exec = require('./exec.js');
 const etask = require('./etask.js');
 const string = require('./string.js');
-const path = require('path');
 const E = exports;
 const env = process.env, assign = Object.assign;
 
@@ -14,6 +14,15 @@ function local_jdir_one(top){
     let root, inbin, rel = '', _rel, ret = {};
     top = file.normalize(top||process.cwd());
     let t = file.cyg2unix('/');
+    if (file.is_win && !top.startsWith(t))
+    {
+        let m = top.match(/^([a-zA-Z]:)/);
+        if (m)
+            t = m[1];
+        // support UNC paths: //server/share
+        else if (m = top.match(/^(\/\/[^/]+\/[^/]+)/))
+            t = m[1];
+    }
     let re = new RegExp(`^(${t}.*)/([^/]*)$`);
     for (let i=0; i<24 && top!==t; i++)
     {
@@ -37,16 +46,24 @@ function local_jdir_one(top){
         top = up_top;
         rel = up_rel;
     }
+    // check if the path terminator itself is the zon root
+    if (!root && file.read_line(top+repo)==='zon')
+        root = top;
     if (!root)
         return null;
+    // strip trailing slashes so paths join cleanly:
+    // happens when root is a bare drive like
+    // 'z:/' or UNC share like '//server/share/'
+    root = root.replace(/\/+$/, '');
     _rel = rel[0]==='/' ? rel.substr(1) : rel;
     if (env.BUILD)
     {
-        let bin = `${root}/build.${env.BUILD}`;
-        assign(ret, {bin: bin+rel, binroot: bin,
-            flip: inbin ? root+rel : bin+rel});
+        let bin = file.normalize(`${root}/build.${env.BUILD}`);
+        assign(ret, {bin: file.normalize(bin+rel), binroot: bin,
+            flip: file.normalize(inbin ? root+rel : bin+rel)});
     }
-    assign(ret, {root: root, src: root+rel, rel: _rel||'.'});
+    assign(ret, {root: root, src: file.normalize(root+rel),
+        rel: _rel||'.'});
     return ret;
 }
 

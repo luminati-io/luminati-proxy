@@ -70,8 +70,16 @@ const default_user_agent = is_node ? (()=>{
 const internalize = string.internalize_pool();
 const DEBUG_STR_LEN = 4096, DEFAULT_WIN_SIZE = 1048576;
 const SEC = 1000, MIN = 60*SEC, VFD_SZ = 8, VFD_BIN_SZ = 12;
+const RETRY_INSTANT_JITTER = 100;
+const WIN_SIZE_MIN =
+    (is_node && +process.env.WIN_SIZE_MIN || 1) * 1024 * 1024;
+const WIN_SIZE_MAX =
+    (is_node && +process.env.WIN_SIZE_MAX || 10) * 1024 * 1024;
+const IS_DYNAMIC_WIN_SIZE =
+    is_node && process.env.IS_DYNAMIC_WIN_SIZE === 'true';
 let zcounter; // has to be lazy because zcounter.js itself uses this module
 const net = is_node ? require('net') : null;
+const crypto = is_node ? require('crypto') : null;
 const BUFFER_CONTENT = 10;
 const BUFFER_IPC_CALL = 11;
 let SnappyStream, UnsnappyStream;
@@ -80,6 +88,70 @@ const EventEmitter = is_node ? require('events').EventEmitter
 const json_event = flag=>flag ? 'zjson' : 'json';
 
 function noop(){}
+
+class Bin_buffer {
+    get_buffer(){ throw new Error('get_buffer is not implemented'); }
+}
+
+const [comma, left_bracket, right_bracket] = [',', '[', ']'].map(v=>v
+    .charCodeAt(0));
+// do not use concurrently the same instance
+class Buffer_builder extends Bin_buffer {
+    constructor(opt = {}){
+        super();
+        this._head_size = opt.head_size||500;
+        this._inc = opt.inc||10e6;
+        this._clean();
+    }
+    _clean(){
+        this._offset = this._head_size;
+        this._empty = 1;
+        let buf = this._get_buffer(this._offset+1);
+        buf.writeUint8(left_bracket, this._offset);
+        this._offset++;
+    }
+    _get_buffer(next_offset){
+        let buf = this.buf;
+        if (!buf || buf.length<next_offset)
+        {
+            let size = Math.ceil(next_offset/this._inc)*this._inc;
+            let new_buf = new Buffer(size);
+            if (buf)
+                buf.copy(new_buf, 0);
+            buf = this.buf = new_buf;
+        }
+        return buf;
+    }
+    check_empty(){
+        if (this._empty)
+            return;
+        zerr.notice('Buffer_builder is not empty');
+        this._clean();
+    }
+    push(v){
+        let buf = this._get_buffer(this._offset+v.length+2);
+        if (!this._empty)
+        {
+            buf.writeUint8(comma, this._offset);
+            this._offset++;
+        }
+        v.copy(buf, this._offset);
+        this._offset += v.length;
+        this._empty = 0;
+    }
+    get_buffer(ws_head){
+        if (ws_head.length>this._head_size)
+            throw new Error(`Header should be $lte ${this._head_size}`);
+        let buf = this._get_buffer(this._offset+1);
+        let offset = this._head_size-ws_head.length;
+        ws_head.copy(buf, offset);
+        buf.writeUint8(right_bracket, this._offset);
+        this._offset++;
+        let res = buf.slice(offset, this._offset);
+        this._clean();
+        return res;
+    }
+}
 
 class Buffer_store {
     constructor(){
@@ -212,6 +284,7 @@ class WS extends EventEmitter {
         // XXX igors: reuse the same buffers currently is on test for uws2
         // servers only
         this.reusable_buffers = !!opt.reusable_buffers;
+        this.use_cork = !!opt.use_cork && !this.reusable_buffers;
         this.remote_label = undefined;
         this.local_addr = undefined;
         this.local_port = undefined;
@@ -249,6 +322,23 @@ class WS extends EventEmitter {
         if (zcounter)
             this._counter = make_counter(opt);
         this.max_backpressure = opt.max_backpressure;
+        this._send_accum = [];
+        this._cork_f = this._cork.bind(this);
+        this._send_accum_flush = ()=>{
+            if (!this.ws)
+            {
+                zerr.warn(`${this}: closed before send_accum flushed, lost`
+                    +` ${this._send_accum.length} messages`);
+                return this._reset_send_accum();
+            }
+            this.ws.cork(this._cork_f);
+        };
+    }
+    _reset_send_accum(){ this._send_accum.length = 0; }
+    _cork(){
+        for (const msg of this._send_accum)
+            this.ws.send(msg, typeof msg!='string', this.compression);
+        this._reset_send_accum();
     }
     get_bin_prefix(msg){
         return this.bin_methods && msg instanceof Buffer &&
@@ -277,7 +367,16 @@ class WS extends EventEmitter {
         }
         this._update_idle();
         if (this.uws2)
-            this.ws.send(msg, typeof msg!='string', this.compression);
+        {
+            if (this.use_cork)
+            {
+                this._send_accum.push(msg);
+                if (this._send_accum.length===1)
+                    setImmediate(this._send_accum_flush);
+            }
+            else
+                this.ws.send(msg, typeof msg!='string', this.compression);
+        }
         else
             this.ws.send(msg, opt);
         if (this.zc_tx)
@@ -295,17 +394,29 @@ class WS extends EventEmitter {
         }
         return true;
     }
-    bin(data){
-        data.msg = data.msg||Buffer.alloc(0);
-        let cmd = data.cmd;
-        let buf = Buffer.alloc(16 + cmd.length + data.msg.length);
-        // [0|BUFFER_IPC_CALL|cookie|cmd length|...cmd bin|...cmd result bin]
+    _bin_head(buf, data, cmd){
+        // [0|BUFFER_IPC_CALL|cookie|cmd length|...cmd bin|...cmd res bin]
         buf.writeUInt32BE(0, 0);
         buf.writeUInt32BE(BUFFER_IPC_CALL, 4);
         buf.writeUInt32BE(data.cookie, 8);
         buf.writeUInt32BE(cmd.length, 12);
         buf.write(cmd, 16);
-        data.msg.copy(buf, 16+cmd.length);
+    }
+    bin(data){
+        data.msg = data.msg||Buffer.alloc(0);
+        let cmd = data.cmd, buf;
+        if (data.msg instanceof Bin_buffer)
+        {
+            let head = Buffer.alloc(16+cmd.length);
+            this._bin_head(head, data, cmd);
+            buf = data.msg.get_buffer(head);
+        }
+        else
+        {
+            buf = Buffer.alloc(16+cmd.length+data.msg.length);
+            this._bin_head(buf, data, cmd);
+            data.msg.copy(buf, 16+cmd.length);
+        }
         return this.send(buf, {cmd: data.cmd});
     }
     json(data){ return this.send(JSON.stringify(data), {cmd: data.cmd}); }
@@ -452,10 +563,10 @@ class WS extends EventEmitter {
         if (this.remote_addr==sock.remoteAddress)
             this.remote_forwarded = false;
         if (!this.remote_forwarded)
-        {
             this.remote_addr = sock.remoteAddress;
-            this.remote_port = sock.remotePort;
-        }
+        // XXX vladislavl: behind the proxy this port is not real,
+        // but port info almost never important
+        this.remote_port = sock.remotePort;
         zerr.notice(`${this}: connected`);
         if (this.ping)
         {
@@ -716,8 +827,13 @@ class Client extends WS {
         this.url = url;
         this.servername = opt.servername;
         this.ca = opt.ca;
+        this.cert = opt.cert;
+        this.key = opt.key;
+        this.get_tls_context = opt.get_tls_context;
         this.retry_interval = opt.retry_interval||10000;
         this.retry_max = opt.retry_max||this.retry_interval;
+        this.retry_instant = !!opt.retry_instant;
+        this._retry_instant_used = false;
         this.retry_random = opt.retry_random;
         // to fix "closed by remote" 1006 sporadic
         this.ignore_tls_eof_while_reading = !!opt.ignore_tls_eof_while_reading;
@@ -880,7 +996,18 @@ class Client extends WS {
             opt.agent = this.agent;
             opt.perMessageDeflate = this.deflate;
             opt.servername = this.servername;
-            opt.ca = this.ca;
+            if (this.get_tls_context)
+            {
+                const {cert, key} = this.get_tls_context();
+                opt.cert = cert;
+                opt.key = key;
+            }
+            else
+            {
+                opt.ca = this.ca;
+                opt.cert = this.cert;
+                opt.key = this.key;
+            }
             opt.lookup = this.lookup;
             if (lookup_ip && net && (v = net.isIP(lookup_ip)))
             {
@@ -918,15 +1045,24 @@ class Client extends WS {
             return false;
         }
         this.emit('reconnecting');
-        let delay = this.next_retry;
-        if (typeof delay=='function')
-            delay = delay();
+        let delay;
+        if (this.retry_instant && !this._retry_instant_used)
+        {
+            this._retry_instant_used = true;
+            delay = Math.round(Math.random()*RETRY_INSTANT_JITTER);
+        }
         else
         {
-            let coeff = this.retry_random ? 1+Math.random() : 2;
-            this.next_retry = Math.min(Math.round(delay*coeff),
-                typeof this.retry_max=='function'
-                    ? this.retry_max() : this.retry_max);
+            delay = this.next_retry;
+            if (typeof delay=='function')
+                delay = delay();
+            else
+            {
+                let coeff = this.retry_random ? 1+Math.random() : 2;
+                this.next_retry = Math.min(Math.round(delay*coeff),
+                    typeof this.retry_max=='function'
+                        ? this.retry_max() : this.retry_max);
+            }
         }
         if (zerr.is.info())
             zerr.info(`${this}: will retry in ${delay}ms`);
@@ -938,6 +1074,7 @@ class Client extends WS {
             this.handshake_timer = clearTimeout(this.handshake_timer);
         this.next_retry = this.retry_interval;
         this._retry_count = 0;
+        this._retry_instant_used = false;
         super._on_open();
     }
     _on_close(event){
@@ -1127,12 +1264,15 @@ class Uws2_impl extends EventEmitter {
         super();
         this.lib = require('uws2');
         this.verifyClient = ws_opt.verifyClient;
+        this.request_cert = ws_opt.request_cert;
         const ws_path = ws_opt.ws_path||'/';
         this.handlers = handlers;
         this.listen_socket = null;
         const app_opt = {};
         if (ws_opt.ssl_conf)
         {
+            if (ws_opt.ssl_conf.ca)
+                app_opt.ca_file_name = ws_opt.ssl_conf.ca;
             app_opt.key_file_name = ws_opt.ssl_conf.key;
             app_opt.cert_file_name = ws_opt.ssl_conf.cert;
             app_opt.ssl_ciphers = ws_opt.ssl_conf.ssl_ciphers||
@@ -1153,16 +1293,21 @@ class Uws2_impl extends EventEmitter {
                 const headers = {};
                 // XXX igors: do we need to filter by allowed headers ?
                 req.forEach((key, value)=>headers[key] = value);
-                if (!this.verify(res, headers))
+                const remote_addr = Buffer.from(Buffer.from(
+                    res.getRemoteAddressAsText())).toString();
+                const user_data = {};
+                if (!this.verify(res, headers, remote_addr, user_data))
+                {
+                    zerr.warn(`verify failed: remote_addr=${remote_addr}`);
                     return;
-                const user_data = {
+                }
+                Object.assign(user_data, {
                     headers,
                     handlers: _handlers,
                     emitter,
                     uws2: true,
                     _socket: {
-                        remoteAddress: Buffer.from(Buffer.from(
-                            res.getRemoteAddressAsText())).toString(),
+                        remoteAddress: remote_addr,
                         // older versions of uws2 lack binding for remote port
                         remotePort: res.getRemotePort&&res.getRemotePort()||
                             Math.floor(Math.random()*4294967296),
@@ -1171,7 +1316,7 @@ class Uws2_impl extends EventEmitter {
                     on: (event, handler)=>emitter.on(event, handler),
                     emit: (event, msg)=>emitter.emit(event, msg),
                     removeAllListeners: ev=>emitter.removeAllListeners(ev),
-                };
+                });
                 res.upgrade(user_data, req.getHeader('sec-websocket-key'),
                     req.getHeader('sec-websocket-protocol'),
                     req.getHeader('sec-websocket-extensions'), context);
@@ -1221,6 +1366,7 @@ class Uws2_impl extends EventEmitter {
             for (let servername in ws_opt.ssl_conf.sni)
             {
                 this.server.addServerName('*.'+servername, {
+                    ca_file_name: app_opt.ca_file_name,
                     key_file_name: ws_opt.ssl_conf.sni[servername]+'.key',
                     cert_file_name: ws_opt.ssl_conf.sni[servername]+'.crt'
                 }).domain('*.'+servername)
@@ -1257,7 +1403,29 @@ class Uws2_impl extends EventEmitter {
         this.listen_socket = null;
         this.emit('close');
     }
-    verify(res, headers){
+    verify(res, headers, remote_addr, user_data){
+        if (this.request_cert)
+        {
+            try {
+                const client_cert = res.getX509Certificate();
+                const x509 = new crypto.X509Certificate(client_cert);
+                if (typeof this.request_cert == 'function')
+                {
+                    if (!this.request_cert(x509, {headers, remote_addr}))
+                    {
+                        res.writeStatus('403');
+                        res.end('Unauthorized');
+                        return false;
+                    }
+                    user_data.request_cert_verified = true;
+                }
+            } catch(e){
+                zerr.error(zerr.e2s(e));
+                res.writeStatus('403');
+                res.end('Unauthorized');
+                return false;
+            }
+        }
         if (!this.verifyClient)
             return true;
         let verify_res, arg = {
@@ -1312,6 +1480,8 @@ class Server_uws2 {
             ws_opt.maxPayloadLength = opt.max_payload;
         if (opt.verify)
             ws_opt.verifyClient = opt.verify;
+        if (opt.request_cert)
+            ws_opt.request_cert = opt.request_cert;
         this.ws_server = new Uws2_impl(ws_opt, {
             onconnection: this.accept.bind(this),
             ontimeout: opt.on_timeout,
@@ -1455,6 +1625,11 @@ class Server_uws2 {
         {
             this._counter.inc(`${this.zc}_conn`);
             this._counter.inc_level(`level_${this.zc}_conn`, 1, 'sum', 'sum');
+            if (ws.request_cert_verified)
+            {
+                this._counter.inc_level(`level_${this.zc}_conn_cert_verified`,
+                    1, 'sum', 'sum');
+            }
         }
         zws.addListener('disconnected', ()=>{
             this.connections.delete(zws);
@@ -1462,6 +1637,12 @@ class Server_uws2 {
             {
                 this._counter.inc_level(`level_${this.zc}_conn`, -1, 'sum',
                     'sum');
+                if (ws.request_cert_verified)
+                {
+                    this._counter.inc_level(
+                        `level_${this.zc}_conn_cert_verified`,
+                        -1, 'sum', 'sum');
+                }
             }
         });
         if (this.handler)
@@ -1760,67 +1941,6 @@ class IPC_server_base {
             task.return();
     }
 }
-const [comma, left_bracket, right_bracket] = [',', '[', ']'].map(v=>v
-    .charCodeAt(0));
-// do not use concurrently the same instance
-class Buffer_builder {
-    constructor(opt = {}){
-        this._head_size = opt.head_size||500;
-        this._inc = opt.inc||10e6;
-        this._clean();
-    }
-    _clean(){
-        this._offset = this._head_size+VFD_BIN_SZ;
-        this._empty = 1;
-        let buf = this._get_buffer(this._offset+1);
-        buf.writeUint8(left_bracket, this._offset);
-        this._offset++;
-    }
-    _get_buffer(next_offset){
-        let buf = this.buf;
-        if (!buf || buf.length<next_offset)
-        {
-            let size = Math.ceil(next_offset/this._inc)*this._inc;
-            let new_buf = new Buffer(size);
-            if (buf)
-                buf.copy(new_buf, 0);
-            buf = this.buf = new_buf;
-        }
-        return buf;
-    }
-    check_empty(){
-        if (this._empty)
-            return;
-        zerr.notice('Buffer_builder is not empty');
-        this._clean();
-    }
-    push(v){
-        let buf = this._get_buffer(this._offset+v.length+2);
-        if (!this._empty)
-        {
-            buf.writeUint8(comma, this._offset);
-            this._offset++;
-        }
-        v.copy(buf, this._offset);
-        this._offset += v.length;
-        this._empty = 0;
-    }
-    get_buffer(res_buf){
-        if (res_buf.length>this._head_size)
-            throw new Error(`Header should be $lte ${this._head_size}`);
-        let buf = this._get_buffer(this._offset+1);
-        let offset = this._head_size-res_buf.length;
-        buf.writeUInt32BE(0, offset);
-        buf.writeUInt32BE(BUFFER_CONTENT, offset+4);
-        buf.writeUInt32BE(res_buf.length, offset+VFD_SZ);
-        res_buf.copy(buf, offset+VFD_BIN_SZ);
-        buf.writeUint8(right_bracket, this._offset);
-        this._offset++;
-        let res = buf.slice(offset, this._offset);
-        this._clean();
-        return res;
-    }
-}
 class IPC_server_resp {
     constructor(ipc, msg){
         this.ipc = ipc;
@@ -1863,7 +1983,7 @@ class IPC_server_resp {
     }
     call_response(rv){
         if (this.msg.bin && (rv instanceof Buffer ||
-            rv instanceof Buffer_builder))
+            rv instanceof Bin_buffer))
         {
             return void this.call_response_buf(rv);
         }
@@ -1874,24 +1994,29 @@ class IPC_server_resp {
             msg: rv,
         });
     }
+    _bin_resp_head(buf, head){
+        // [0|BUFFER_CONTENT|cmd length|...cmd bin|...cmd result bin]
+        buf.writeUInt32BE(0, 0);
+        buf.writeUInt32BE(BUFFER_CONTENT, 4);
+        buf.writeUInt32BE(head.length, VFD_SZ);
+        buf.write(head, VFD_BIN_SZ);
+        return buf;
+    }
     call_response_buf(rv){
-        const res_buf = Buffer.from(JSON.stringify({
-            type: 'ipc_result',
-            cmd: this.msg.cmd,
-            cookie: this.msg.cookie,
-        }));
+        const res_head = JSON.stringify({type: 'ipc_result',
+            cmd: this.msg.cmd, cookie: this.msg.cookie});
         // [0|BUFFER_CONTENT|cmd length|...cmd bin|...cmd result bin]
         let buf;
-        if (rv instanceof Buffer_builder)
-            buf = rv.get_buffer(res_buf);
+        if (rv instanceof Bin_buffer)
+        {
+            buf = rv.get_buffer(this._bin_resp_head(Buffer
+                .allocUnsafe(VFD_BIN_SZ+res_head.length), res_head));
+        }
         else
         {
-            buf = Buffer.allocUnsafe(rv.length+VFD_BIN_SZ+res_buf.length);
-            buf.writeUInt32BE(0, 0);
-            buf.writeUInt32BE(BUFFER_CONTENT, 4);
-            buf.writeUInt32BE(res_buf.length, VFD_SZ);
-            res_buf.copy(buf, VFD_BIN_SZ);
-            rv.copy(buf, VFD_BIN_SZ+res_buf.length);
+            buf = Buffer.allocUnsafe(rv.length+VFD_BIN_SZ+res_head.length);
+            this._bin_resp_head(buf, res_head);
+            rv.copy(buf, VFD_BIN_SZ+res_head.length);
         }
         this.ipc.ws.send(buf);
     }
@@ -2318,8 +2443,35 @@ class Mux {
                 _send_ack();
             }, throttle_ack-delta);
         };
-        stream.on_ack = ack=>{
+        stream.on_ack = ack=>
+        {
+            const prev_ack = stream.ack;
             stream.ack = ack;
+            const diff = ack - prev_ack;
+            if (diff > 0 && IS_DYNAMIC_WIN_SIZE)
+            {
+                const ratio = diff / stream.win_size;
+                let new_win_size = stream.win_size;
+                if (ratio >= 0.85)
+                {
+                    new_win_size = Math.ceil(
+                        (stream.win_size + WIN_SIZE_MAX) / 2);
+                }
+                else if (ratio < 0.50)
+                {
+                    new_win_size = Math.floor(
+                        (WIN_SIZE_MIN + stream.win_size) / 2);
+                }
+                new_win_size = Math.max(WIN_SIZE_MIN,
+                    Math.min(WIN_SIZE_MAX, new_win_size));
+                if (new_win_size !== stream.win_size)
+                {
+                    zerr.info(`${_this.ws}: vfd ${vfd} win_size `
+                        + `${stream.win_size} -> ${new_win_size} `
+                        + `(diff=${diff}, ratio=${ratio.toFixed(2)})`);
+                    stream.win_size = new_win_size;
+                }
+            }
             if (pending)
                 pending.continue(null, true);
             if (_this.ws.zc_mux)
@@ -2539,8 +2691,10 @@ if (zutil.is_mocha())
     };
 }
 
-assign(E, {Client, Server, Server_uws2, Mux, ERROR_CODES, Buffer_builder});
-E.t = assign(E_t, {WS, IPC_server_base, BUFFER_CONTENT});
+assign(E, {Client, Server, Server_uws2, Mux, ERROR_CODES, Buffer_builder,
+    Bin_buffer});
+E.t = assign(E_t, {WS, IPC_server_base, BUFFER_CONTENT,
+    BUFFER_IPC_CALL, VFD_SZ, VFD_BIN_SZ});
 return E;
 
 }); }());

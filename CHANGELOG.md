@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.643.828 Stable
+- :sparkles: Added --sanitize_rules flag to statically sanitize rule trigger code
+- :sparkles: Added dark theme support in UI
+- :star: Added --zone_auth_passthru flag to allow passthrough proxy authentication using zone-based usernames
+
 ## 1.601.281 Stable
 - :bug: Fix config file prettify
 - :star: Remove 'uuid' dependency

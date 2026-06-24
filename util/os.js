@@ -511,6 +511,13 @@ E.TCP = { // net/tcp_states.h
     10: 'LISTEN',
     11: 'CLOSING',
 };
+E.UNIX = { // include/linux/net.h enum socket_state
+    1: 'UNCONNECTED',
+    2: 'CONNECTING',
+    3: 'CONNECTED',
+    4: 'DISCONNECTING',
+};
+E.UNIX_LISTEN_FLAG = 0x10000; // include/linux/net.h __SO_ACCEPTCON
 E.sockets_count = proto=>etask(function*(){
     let line_idx = -1, v = {total: 0, lo: 0, ext: 0, err: 0};
     zutil.forEach(E.TCP, id=>v[id] = 0);
@@ -535,6 +542,19 @@ E.sockets_count = proto=>etask(function*(){
 
 E.snmp_stat = ()=>parse_stat(`${PROC_DIR}/net/snmp`);
 E.netstat = ()=>parse_stat(`${PROC_DIR}/net/netstat`);
+E.softirq = ()=>{
+    const ll = file.read_lines_e(`${PROC_DIR}/net/softnet_stat`);
+    const cols = ['processed', 'dropped', 'time_squeeze', 'cpu_collision',
+        'received_rps', 'flow_limit_count'];
+    const res = {};
+    ll.forEach(line=>{
+        const arr = line.split(' ');
+        const len = Math.min(arr.length, cols.length);
+        for (let i = 0; i < len; i++)
+            res[cols[i]] = (res[cols[i]]||0)+parseInt(arr[i], 16);
+    });
+    return res;
+};
 
 let last_snmp_tcp_stat;
 E.tcp_retrans_percent = curr_snmp_stat=>{

@@ -1,0 +1,76 @@
+@import 'variables.less';
+
+.har_preview {
+    border-left-color: var(--bs-border-color) !important;
+    border-top-color: @chrome_border !important;
+    
+    .tabbed_pane_header {
+        border-bottom-color: var(--bs-border-color) !important;
+        background-color: @chrome-bg-toolbar !important;
+        
+        .right_panes {
+            .pane {
+                color: @chrome-text-disabled !important;
+                
+                &:hover {
+                    color: @chrome-text-primary !important;
+                    background-color: @chrome-bg-header-hover !important;
+                }
+                
+                &.active {
+                    color: @chrome-text-primary !important;
+                }
+            }
+            
+            .pane_slider {
+                background-color: @first_color !important;
+            }
+        }
+    }
+    
+    .tabbed_pane_content {
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        
+        .tree_outline {
+            ol.children {
+                border-bottom-color: var(--bs-border-color) !important;
+                
+                li.treeitem {
+                    .header_name {
+                        color: var(--bs-emphasis-color) !important;
+                    }
+                    
+                    .header_value {
+                        color: var(--bs-body-color) !important;
+                    }
+                }
+            }
+            
+            .parent_title {
+                color: var(--bs-secondary-color) !important;
+            }
+        }
+        
+        .empty_view {
+            color: var(--bs-secondary-color) !important;
+        }
+        
+        .rules_view_wrapper,
+        .timing_view_wrapper {
+            color: var(--bs-body-color) !important;
+            
+            table .timing_row .timing_bar_title {
+                color: var(--bs-body-color) !important;
+            }
+        }
+    }
+}
+
+.json_viewer {
+    color: var(--bs-body-color) !important;
+    
+    li.tree_item:before {
+        background-color: var(--bs-secondary-color) !important;
+    }
+}

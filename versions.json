@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.643.828",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added --sanitize_rules flag to statically sanitize rule trigger code"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added dark theme support in UI"
+            },
+            {
+                "type": "star",
+                "text": "Added --zone_auth_passthru flag to allow passthrough proxy authentication using zone-based usernames"
+            }
+        ]
+    },
+    {
         "ver": "1.601.281",
         "type": "stable",
         "changes": [

@@ -234,7 +234,10 @@ export default with_www_api(class Targeting extends Pure_component {
                   disabled={is_static}/>
                 <Note>
                   Read more about Targeting here
-                  <Faq_link anchor="targeting"/>
+                  <Faq_link
+                    url={'https://docs.brightdata.com/api-reference/'
+                      +'proxy/geolocation-targeting'}
+                  />
                 </Note>
               </Tab_context.Provider>
             </div>;

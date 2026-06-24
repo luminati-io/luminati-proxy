@@ -1,12 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const assert = require('assert');
-const {Netmask} = require('netmask');
 const sinon = require('sinon');
+const {Netmask} = require('../util/netmask.js');
 const ssl = require('../lib/ssl.js');
 const etask = require('../util/etask.js');
 const {ms} = require('../util/date.js');
 const lpm_request = require('../util/lpm_request.js');
+const rules_util = require('../util/rules_util.js');
+const {Js_sanitizer_error} = require('../util/js_sanitizer.js');
 const Server = require('../lib/server.js');
 const Manager = require('../lib/manager.js');
 const {Timeline} = require('../lib/util.js');
@@ -15,6 +17,473 @@ const {http_proxy, smtp_test_server, http_ping, init_lum} = common;
 const test_url = {http: 'http://lumtest.com/test',
     https: 'https://lumtest.com/test'};
 const TEST_SMTP_PORT = 10025;
+
+describe('rules trigger_code sanitizer', ()=>{
+    const normalize = code=>code.replace(/\r\n/g, '\n').trim();
+    const preview = code=>normalize(code).replace(/\s+/g, ' ').slice(0, 200);
+    const sanitizer = ()=>rules_util.get_sanitizer();
+    const accept = (name, code)=>{
+        assert.doesNotThrow(()=>sanitizer().sanitize(normalize(code)),
+            `${name}: ${preview(code)}`);
+    };
+    const reject = (name, code, msg)=>{
+        assert.throws(()=>sanitizer().sanitize(normalize(code)), e=>{
+            assert.ok(e instanceof Js_sanitizer_error,
+                `${name}: expected Js_sanitizer_error, got ${e && e.name}`);
+            if (msg)
+            {
+                assert.ok(e.message.includes(msg),
+                    `${name}: "${e.message}" should include "${msg}"`);
+            }
+            return true;
+        }, `${name}: ${preview(code)}`);
+    };
+    describe('trigger function shape', ()=>{
+        it('requires exactly one top-level trigger function', ()=>{
+            accept('one trigger', `
+                function trigger(opt){
+                    return true;
+                }
+            `);
+            reject('no trigger', `
+                function check(opt){
+                    return true;
+                }
+            `);
+            reject('duplicate trigger', `
+                function trigger(opt){
+                    return true;
+                }
+                function trigger(opt){
+                    return false;
+                }
+            `);
+        });
+        it('requires trigger(opt)', ()=>{
+            reject('no params', `
+                function trigger(){
+                    return true;
+                }
+            `);
+            reject('wrong param name', `
+                function trigger(req){
+                    return true;
+                }
+            `);
+            reject('too many params', `
+                function trigger(opt, req){
+                    return true;
+                }
+            `);
+            accept('correct param', `
+                function trigger(opt){
+                    return !!opt;
+                }
+            `);
+        });
+        it('rejects async and generator trigger functions', ()=>{
+            reject('async trigger', `
+                async function trigger(opt){
+                    return true;
+                }
+            `);
+            reject('generator trigger', `
+                function* trigger(opt){
+                    yield true;
+                }
+            `);
+        });
+    });
+    describe('safe language features needed by real trigger_code', ()=>{
+        const valid_cases = [
+            {
+                name: 'simple boolean trigger bodies',
+                code: `
+                    function trigger(opt){
+                        return true;
+                    }
+                `,
+            },
+            {
+                name: 'conditions over opt fields',
+                code: `
+                    function trigger(opt){
+                        if (opt.status == 200)
+                            return false;
+                        if (opt.time_passed > 1000)
+                            return true;
+                        if (opt.domain === 'example.test')
+                            return true;
+                        if (opt.url && opt.body)
+                            return true;
+                        return false;
+                    }
+                `,
+            },
+            {
+                name: 'RegExp usage',
+                code: `function trigger(opt){
+                    if (!new RegExp(String.raw\`(4|5)..\`).test(opt.status))
+                        return false;
+                    if (new RegExp(String.raw\`captcha\`, 'i').test(opt.body))
+                        return true;
+                    return /example/i.test(opt.url);
+                }`,
+            },
+            {
+                name: 'string methods',
+                code: `
+                    function trigger(opt){
+                        const url = opt.url || '';
+                        return url.includes('x')
+                            || url.startsWith('http')
+                            || url.endsWith('.js')
+                            || url.toLowerCase().includes('asset');
+                    }
+                `,
+            },
+            {
+                name: 'optional chaining',
+                code: `
+                    function trigger(opt){
+                        if (opt.url?.includes('asset'))
+                            return true;
+                        if (opt._res?.headers?.location)
+                            return true;
+                        return false;
+                    }
+                `,
+            },
+            {
+                name: 'nested and computed member access',
+                code: `
+                    function trigger(opt){
+                        if (opt._res.headers.location)
+                            return true;
+                        if (opt._res.headers['content-type'])
+                            return true;
+                        return false;
+                    }
+                `,
+            },
+            {
+                name: 'local variables',
+                code: `
+                    function trigger(opt){
+                        const is_status = opt.status == 403;
+                        const is_asset = /\\.(png|jpg|css|js)$/.test(opt.url);
+                        return is_status || is_asset;
+                    }
+                `,
+            },
+            {
+                name: 'array callbacks',
+                code: `
+                    function trigger(opt){
+                        const domains = ['a.test', 'b.test'];
+                        return domains.some(d=>opt.url.includes(d));
+                    }
+                `,
+            },
+            {
+                name: 'helper function',
+                code: `
+                    function is_asset(url){
+                        return /\\.(png|jpg|css|js)$/.test(url);
+                    }
+
+                    function trigger(opt){
+                        return is_asset(opt.url);
+                    }
+                `,
+            },
+            {
+                name: 'helper function with default parameter',
+                code: `
+                    function is_asset(url, include_js = true){
+                        if (include_js)
+                            return /\\.(png|jpg|css|js)$/.test(url);
+                        return /\\.(png|jpg|css)$/.test(url);
+                    }
+
+                    function trigger(opt){
+                        return is_asset(opt.url);
+                    }
+                `,
+            },
+            {
+                name: 'top-level const',
+                code: `
+                    const DOMAINS = ['a.test', 'b.test'];
+
+                    function trigger(opt){
+                        return DOMAINS.some(d=>opt.url.includes(d));
+                    }
+                `,
+            },
+            {
+                name: 'for loop',
+                code: `
+                    function trigger(opt){
+                        for (let i = 0; i < 3; i++) {
+                            if (i === opt.retry)
+                                return true;
+                        }
+                        return false;
+                    }
+                `,
+            },
+            {
+                name: 'assignment to opt fields',
+                code: `
+                    function trigger(opt){
+                        opt.timeout = 5000;
+                        opt.url = 'http://example.test/';
+                        return true;
+                    }
+                `,
+            },
+            {
+                name: 'JSON and builtins',
+                code: `
+                    function trigger(opt){
+                        const data = JSON.parse(opt.body);
+                        return !!data.result
+                            || String(opt.status) === '200'
+                            || Number('200') === opt.status
+                            || Boolean(opt.status)
+                            || Object.keys(opt).length >= 0
+                            || Math.max(opt.status, 100) >= 100
+                            || Array.isArray([1, 2, 3]);
+                    }
+                `,
+            },
+            {
+                name: 'console diagnostics',
+                code: `
+                    function trigger(opt){
+                        console.log('trigger opt', opt);
+                        return opt.status == 403;
+                    }
+                `,
+            },
+        ];
+        it('accepts all allowed trigger language features', ()=>{
+            const failures = [];
+            for (const {name, code} of valid_cases)
+            {
+                try {
+                    sanitizer().sanitize(normalize(code));
+                } catch(e){
+                    failures.push(`${name}: ${e.message}\n${preview(code)}`);
+                }
+            }
+            assert.equal(failures.length, 0,
+                'Sanitizer rejected valid trigger_code feature classes:\n\n'
+                +failures.join('\n\n'));
+        });
+    });
+    describe('unsafe code must be rejected by sanitizer policy', ()=>{
+        it('rejects dynamic code execution', ()=>{
+            reject('eval', `
+                function trigger(opt){ return eval('1 + 1'); }
+            `, 'identifiers eval');
+            reject('Function identifier', `
+                function trigger(opt){ return Function('return true')(); }
+            `, 'identifiers Function');
+            reject('new Function', `
+                function trigger(opt){
+                    return new Function('return true')();
+                }
+            `, 'new_expr Function');
+        });
+        it('rejects prototype/constructor escape paths', ()=>{
+            reject('constructor property', `
+                function trigger(opt){ return opt.constructor; }
+            `, 'props constructor');
+            reject('computed constructor property', `
+                function trigger(opt){ return opt['constructor']; }
+            `, 'props constructor');
+            reject('opaque computed property', `
+                function trigger(opt){ return opt['con'+'structor']; }
+            `, 'props');
+            reject('__proto__ property', `
+                function trigger(opt){ return opt.__proto__; }
+            `, 'props __proto__');
+            reject('prototype property', `
+                function trigger(opt){ return opt.prototype; }
+            `, 'props prototype');
+            reject('constructor constructor escape', `
+                function trigger(opt){
+                    return opt.constructor.constructor('return process')();
+                }
+            `, 'props constructor');
+        });
+        it('rejects browser/network escape APIs', ()=>{
+            reject('fetch', `
+                function trigger(opt){ return fetch('http://x.test/'); }
+            `, 'identifiers fetch');
+            reject('XMLHttpRequest', `
+                function trigger(opt){ return new XMLHttpRequest(); }
+            `, 'new_expr XMLHttpRequest');
+        });
+        it('rejects unsupported module syntax and malformed code', ()=>{
+            reject('dynamic import', `
+                function trigger(opt){ return import('fs'); }
+            `);
+            reject('static import', `
+                import fs from 'fs';
+                function trigger(opt){ return true; }
+            `);
+            reject('syntax error', `
+                function trigger(opt){
+                    if (opt.url && || opt.status) return true;
+                    return false;
+                }
+            `, 'syntax error');
+        });
+        it('rejects object literals (no action objects)', ()=>{
+            reject('return action object', `
+                function trigger(opt){
+                    if (opt.status == 502)
+                        return {schedule: 'beforeSend', retries: 3};
+                    return false;
+                }
+            `, 'nodes ObjectExpression');
+        });
+
+    });
+    describe('external globals cannot be mutated or aliased', ()=>{
+        it('rejects host globals as references', ()=>{
+            reject('require', `
+                function trigger(opt){ return require('fs'); }
+            `, 'identifiers require');
+            reject('process', `
+                function trigger(opt){ return process.env; }
+            `, 'global_alias process');
+            reject('global', `
+                function trigger(opt){ return global.process; }
+            `, 'global_alias global');
+            reject('globalThis', `
+                function trigger(opt){ return globalThis.process; }
+            `, 'global_alias globalThis');
+            reject('module', `
+                function trigger(opt){ return module.exports; }
+            `, 'global_alias module');
+            reject('exports', `
+                function trigger(opt){ return exports; }
+            `, 'global_alias exports');
+        });
+        it('blocks mutating host globals', ()=>{
+            reject('mutate Object', `
+                function trigger(opt){ Object.keys = ()=>[]; return true; }
+            `, 'global_mutation Object');
+            reject('delete global member', `
+                function trigger(opt){ delete Math.max; return true; }
+            `, 'global_mutation Math');
+            reject('assign to global member', `
+                function trigger(opt){ Math.max = 0; return true; }
+            `, 'global_mutation Math');
+        });
+        it('blocks aliasing host globals', ()=>{
+            reject('alias to var', `
+                var O = Object;
+                function trigger(opt){ return true; }
+            `, 'global_alias Object');
+            reject('alias via return', `
+                function trigger(opt){ return Object; }
+            `, 'global_alias Object');
+            reject('alias via arrow', `
+                function trigger(opt){ var f = ()=>Object; return !!f; }
+            `, 'global_alias Object');
+            reject('alias a global method', `
+                function trigger(opt){ var k = Object.keys; return !!k; }
+            `, 'global_alias Object');
+        });
+        it('allows mutating opt and code-declared locals', ()=>{
+            accept('mutate opt + locals', `
+                function trigger(opt){
+                    opt.timeout = 200;
+                    let hit = opt.status === 200;
+                    hit = hit || opt.status === 302;
+                    return hit;
+                }
+            `);
+        });
+    });
+    describe('Object static methods are narrowed', ()=>{
+        it('allows keys/values/entries', ()=>{
+            accept('Object.keys', `
+                function trigger(opt){ return Object.keys(opt).length>0; }
+            `);
+            accept('Object.values', `
+                function trigger(opt){ return Object.values(opt).length>0; }
+            `);
+            accept('Object.entries', `
+                function trigger(opt){
+                    return Object.entries(opt).length>0;
+                }
+            `);
+        });
+        it('blocks prototype/descriptor escape statics', ()=>{
+            reject('getPrototypeOf', `
+                function trigger(opt){ return Object.getPrototypeOf(opt); }
+            `, 'Object.getPrototypeOf is not allowed');
+            reject('defineProperty', `
+                function trigger(opt){
+                    Object.defineProperty(opt, 'x', {value: 1});
+                    return true;
+                }
+            `, 'Object.defineProperty is not allowed');
+            reject('setPrototypeOf', `
+                function trigger(opt){
+                    Object.setPrototypeOf(opt, {});
+                    return true;
+                }
+            `, 'Object.setPrototypeOf is not allowed');
+            reject('create', `
+                function trigger(opt){ return Object.create(null); }
+            `, 'Object.create is not allowed');
+            reject('assign', `
+                function trigger(opt){ return Object.assign({}, opt); }
+            `, 'Object.assign is not allowed');
+            reject('getOwnPropertyDescriptor', `
+                function trigger(opt){
+                    return Object.getOwnPropertyDescriptor(opt, 'x');
+                }
+            `, 'Object.getOwnPropertyDescriptor is not allowed');
+        });
+        it('blocks opaque computed Object access', ()=>{
+            reject('Object opaque computed', `
+                function trigger(opt){
+                    return Object['ge'+'tPrototypeOf'](opt);
+                }
+            `, 'props <computed>');
+        });
+
+    });
+    describe('only whitelisted globals are referenceable', ()=>{
+        const blocked = ['process', 'require', 'global', 'globalThis',
+            'Function', 'eval', 'fetch', 'Reflect', 'Proxy', 'setTimeout',
+            'Buffer', 'Promise'];
+        it('rejects unknown globals', ()=>{
+            for (const g of blocked)
+            {
+                reject(g, `function trigger(opt){ `
+                    +`return typeof ${g} === 'undefined'; }`,
+                    `identifiers ${g} is not allowed`);
+            }
+        });
+        it('allows whitelisted globals as references', ()=>{
+            accept('RegExp/String/console', `
+                function trigger(opt){
+                    return new RegExp('x').test(String(opt.status))
+                        || Boolean(console.log('x'));
+                }
+            `);
+        });
+    });
+});
 
 describe('rules', ()=>{
     let proxy, ping, smtp, sandbox, lum, l;
@@ -71,7 +540,7 @@ describe('rules', ()=>{
         return sinon.stub(li, 'handle_proxy_resp').callsFake((...args)=>
         _res=>{
             const ip_inj = ip_alt && call_count++%2 ? ip_alt : ip;
-            _res.headers['x-luminati-ip'] = ip_inj;
+            _res.headers['x-brd-ip'] = ip_inj;
             return handle_proxy_resp_org(...args)(_res);
         });
     };
@@ -186,7 +655,7 @@ describe('rules', ()=>{
             sinon.stub(l.rules, 'retry');
             const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
             const req = {ctx: {}};
-            const opt = {_res: {hola_headers: {'x-luminati-ip': 'ip'}}};
+            const opt = {_res: {hola_headers: {'x-brd-ip': 'ip'}}};
             const r = yield l.rules.action(req, {}, {},
                 {action: {refresh_ip: true}}, opt);
             assert.ok(r);
@@ -200,7 +669,7 @@ describe('rules', ()=>{
                 const add_stub = sinon.stub(l, 'banip');
                 const req = {ctx: {}};
                 const opt = {_res: {
-                    hola_headers: {'x-luminati-ip': '1.2.3.4'}}};
+                    hola_headers: {'x-brd-ip': '1.2.3.4'}}};
                 const retried = yield l.rules.action(req, {}, {},
                     {action: {ban_ip: 1000}}, opt);
                 assert.ok(!retried);
@@ -314,7 +783,7 @@ describe('rules', ()=>{
                 const rule = {url, method: 'POST', payload};
                 const r = yield l.rules.action(req, {}, {},
                     {action: {request_url: rule}},
-                    {_res: {headers: {'x-luminati-ip': ip}}});
+                    {_res: {headers: {'x-brd-ip': ip}}});
                 assert.ok(!r);
                 const headers = {
                     'Content-Type': 'application/json',
@@ -537,7 +1006,7 @@ describe('rules', ()=>{
                 const session = {session: 'sess1'};
                 const req = {ctx: {url, skip_rule: ()=>false, session}};
                 yield l.rules.post(req, {}, {}, {status_code: 200,
-                    headers: {'x-luminati-ip': ip}});
+                    headers: {'x-brd-ip': ip}});
                 sinon.assert.callCount(ban_spy, ban_count);
                 if (ban_count)
                 {
@@ -599,14 +1068,12 @@ describe('rules', ()=>{
         }));
         it('connection timeout', ()=>etask(function*(){
             l = yield lum({rules: [
-                {action_type: 'retry', min_conn_time: 1,
+                {action_type: 'retry', min_conn_time: 0.1,
                 trigger_type: 'min_conn_time', action: {}}
             ]});
             l.on('retry', opt=>{
-                // XXX: this.continue is not working here
                 this.return();
             });
-            // host which is unabled to connect
             yield l.test('http://127.0.0.1:3000');
             yield this.wait();
         }));
@@ -669,10 +1136,7 @@ describe('rules', ()=>{
             assert.equal(ban_stub.called, +ban);
         }));
         t_pre('null_response', false);
-        // XXX krzysztof: broken test t_pre('bypass_proxy', false);
         t_pre('direct', true);
-        // XXX krzysztof: this test is not relevant here
-        // it tests multiple servers, should be moved to manager
         it('retry_port', ()=>etask(function*(){
             l = yield lum({rules: [
                 {action: {retry_port: 24001}},

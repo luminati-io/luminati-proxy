@@ -484,12 +484,17 @@ E.file_changed = (file_path, scope)=>{
 
 if (E.is_win)
 {
+    var _up = (process.env.USERPROFILE||'').replace(/\\/g, '/');
     E.cygwin_root = E.is_dir('C:/cygwin64') ? 'C:/cygwin64' :
 	E.is_dir('C:/cygwin') ? 'C:/cygwin' :
-        E.is_dir('D:/cygwin') ? 'D:/cygwin' : null;
+        E.is_dir('D:/cygwin') ? 'D:/cygwin' :
+        _up && E.is_dir(_up+'/cygwin64') ? _up+'/cygwin64' : null;
 }
 E.cyg2unix = src=>{
     if (!E.is_win || !E.cygwin_root)
+        return src;
+    // UNC paths (//server/share) should not be Cygwin-translated
+    if (src.match(/^\/\//))
         return src;
     // /cygdrive/X/yyy --> X:/yyy
     src = src.replace(/^\/cygdrive\/(.)(\/(.*))?$/, '$1:/$3');
@@ -553,7 +558,13 @@ E.absolutize = (p, d1, d2)=>{
         return d2+'/'+p;
     return d1+'/'+p;
 };
-E.normalize = p=>E.cyg2unix(E.win2unix(path.normalize(p)));
+E.normalize = p=>{
+    let n = E.cyg2unix(E.win2unix(path.normalize(p)));
+    // path.normalize('z:') returns 'z:.' — fix to 'z:/'
+    if (/^[a-zA-Z]:\.$/.test(n))
+        n = n[0]+':/';
+    return n;
+};
 E.is_subdir = (root, sub)=>{
     let nroot = root && root.length ? root.length : 0;
     return !root || sub.startsWith(root) && (root[nroot-1]=='/' ||

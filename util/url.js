@@ -3,8 +3,8 @@
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 var qs;
@@ -60,20 +60,20 @@ E.get_root_domain = function(domain){
     if (E.is_ip(domain))
         return domain;
     var s = domain.split('.'), root = s, len = s.length;
-    if (len>2) // www.abc.com abc.com.tw www.abc.com.tw,...
+    if (len<=2) // abc abc.com
+        return domain;
+    // www.abc.com abc.com.tw www.abc.com.tw,...
+    var hd = 0;
+    if (s[len-1]=='hola')
     {
-        var hd = 0;
-        if (s[len-1]=='hola')
-        {
-            hd = 2; // domain.us.hola
-            if (s[len-2].match(/^\d+$/))
-                hd = 3; // domain.us.23456.hola
-        }
-        if (generic_2ld[s[len-2-hd]])
-            root = s.slice(-3-hd, len-hd); // abc.com.tw
-        else
-            root = s.slice(-2-hd, len-hd); // abc.com
+        hd = 2; // domain.us.hola
+        if (s[len-2].match(/^\d+$/))
+            hd = 3; // domain.us.23456.hola
     }
+    if (generic_2ld[s[len-2-hd]])
+        root = s.slice(-3-hd, len-hd); // abc.com.tw
+    else
+        root = s.slice(-2-hd, len-hd); // abc.com
     return root.join('.');
 };
 
@@ -144,6 +144,30 @@ E.is_ip = function(host){
     return true;
 };
 
+// IPv6 regex coppied from node js src
+// https://github.com/nodejs/node/blob/9e201e61fd8e/lib/internal/net.js#L16-L31
+var v4_seg = '(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])';
+var v4_str = '(?:'+v4_seg+'\\.){3}'+v4_seg;
+var v6_seg = '(?:[0-9a-fA-F]{1,4})';
+var ipv6_reg = new RegExp('^(?:'
+    +'(?:'+v6_seg+':){7}(?:'+v6_seg+'|:)|'
+    +'(?:'+v6_seg+':){6}(?:'+v4_str+'|:'+v6_seg+'|:)|'
+    +'(?:'+v6_seg+':){5}(?::'+v4_str+'|(?::'+v6_seg+'){1,2}|:)|'
+    +'(?:'+v6_seg+':){4}(?:(?::'+v6_seg+'){0,1}:'+v4_str+'|(?::'+v6_seg
+    +'){1,3}|:)|'
+    +'(?:'+v6_seg+':){3}(?:(?::'+v6_seg+'){0,2}:'+v4_str+'|(?::'+v6_seg
+    +'){1,4}|:)|'
+    +'(?:'+v6_seg+':){2}(?:(?::'+v6_seg+'){0,3}:'+v4_str+'|(?::'+v6_seg
+    +'){1,5}|:)|'
+    +'(?:'+v6_seg+':){1}(?:(?::'+v6_seg+'){0,4}:'+v4_str+'|(?::'+v6_seg
+    +'){1,6}|:)|'
+    +'(?::(?:(?::'+v6_seg+'){0,5}:'+v4_str+'|(?::'+v6_seg+'){1,7}|:))'
+    +')(?:%[0-9a-zA-Z-.:]{1,})?$');
+
+E.is_ip_v6 = function(host){
+    return ipv6_reg.test(host);
+};
+
 E.is_ip_mask = function(host){
     var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
     if (!m)
@@ -176,6 +200,23 @@ E.is_ip_mask = function(host){
         }
     }
     return !!final;
+};
+
+function to_single_cidr(u32_from, u32_to){
+    if (u32_from==0 && u32_to==0xffffffff)
+        return '0.0.0.0/0';
+    var subnet_size = u32_to - u32_from + 1 >>> 0;
+    if (subnet_size & subnet_size-1)
+        return;
+    if (u32_from & subnet_size-1)
+        return;
+    var prefix = Math.clz32(subnet_size) + 1;
+    return E.num2ip(u32_from) + '/' + prefix;
+}
+
+E.fmt_ip_range = function(u32_from, u32_to){
+    return to_single_cidr(u32_from, u32_to) ||
+        E.num2ip(u32_from) + '-' + E.num2ip(u32_to);
 };
 
 E.ip2num = function(ip){
@@ -511,33 +552,34 @@ E.root_url_cmp = function(a, b){
 E.qs_strip = function(url){ return /^[^?#]*/.exec(url)[0]; };
 
 // mini-implementation of zescape.qs to avoid dependency of escape.js
-E.qs_str = function(qs){
+E.qs_str = function(_qs){
     var q = [];
-    for (var k in qs)
+    for (var k in _qs)
     {
-        (Array.isArray(qs[k]) ? qs[k] : [qs[k]]).forEach(function(v){
+        (Array.isArray(_qs[k]) ? _qs[k] : [_qs[k]]).forEach(function(v){
             q.push(encodeURIComponent(k)+'='+encodeURIComponent(v)); });
     }
     return q.join('&');
 };
 
-E.qs_add = function(url, qs){
-    var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {}, qs);
+E.qs_add = function(url, _qs){
+    var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {}, _qs);
     var query = E.qs_str(q);
     u.path = u.pathname+(query ? '?'+query : '');
     return E.uri_obj_href(u);
 };
 
-E.qs_remove = function(url, qs){
+E.qs_remove = function(url, _qs){
     var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {});
-    qs.forEach(function(query){ delete q[query]; });
+    _qs.forEach(function(query){ delete q[query]; });
     var query = E.qs_str(q);
     u.path = u.pathname+(query ? '?'+query : '');
     return E.uri_obj_href(u);
 };
 
 E.qs_parse_url = function(url){
-    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, '').replace(/#.*$/,''));
+    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, '').replace(/#.*$/,
+        ''));
 };
 
 var INVALID_PATH_REGEX = /[^\u0021-\u00ff]/;
@@ -577,6 +619,47 @@ E.is_same_domain = function(domain, urls){
             return false;
     }
     return true;
+};
+
+E.get_proxy_link = function(original_url, proxy_host, proxy_server){
+    var url = E.parse(original_url);
+    if (!url)
+        return original_url;
+    var protocol = url.protocol;
+    var result = '';
+    if (['http:', 'ws:'].includes(protocol))
+    {
+        result += url.protocol + '//';
+        result += url.hostname;
+        if (url.port)
+            result += ':' + url.port;
+    }
+    else if (url.hostname == proxy_host &&
+        (!url.port || [80, 443].includes(+url.port)))
+    {
+        result += (url.protocol || '') + '//';
+        result += url.hostname;
+    }
+    else
+    {
+        var middle_path = '_proxy';
+        if (url.protocol)
+        {
+            result += url.protocol;
+            if (/^wss?:/.test(url.protocol))
+                middle_path = '_socket';
+        }
+        result += '//' + proxy_host + '/' + middle_path + '/' + proxy_server;
+        if (url.port)
+            result += '-' + url.port;
+    }
+    if (url.pathname != '/')
+        result += url.pathname;
+    if (url.search)
+        result += url.search;
+    if (url.hash)
+        result += url.hash;
+    return result;
 };
 
 return E; }); }());

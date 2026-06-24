@@ -1,4 +1,5 @@
 @import (reference) 'common.less';
+
 .settings {
     padding: 0 15px;
     .settings_form {
@@ -15,8 +16,11 @@
         height: 100%;
         overflow: auto;
     }
-    &.vbox { overflow-y: hidden; }
+    &.vbox {
+        overflow-y: hidden;
+    }
 }
+
 .logs_settings_modal {
     &_tabs{
         margin-top: 10px;
@@ -28,9 +32,9 @@
             }
             select {
                 width: 99%;
-                border-color: gray;
+                border-color: var(--settings-select-border);
                 &:active {
-                    border-color: black;
+                    border-color: var(--settings-select-border-active);
                     border-width: 2px;
                 }
             }
@@ -76,5 +80,3 @@
         }
     }
 }
-
-

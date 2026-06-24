@@ -9,10 +9,11 @@
             height: 40px;
             position: relative;
             cursor: pointer;
+            color: @first_color;
             &.active {
-                background-color: @cp_dark;
+                background-color: @text-tertiary;
                 cursor: default;
-                .text { color: @first_color; }
+                .text { color: @border-medium; }
             }
             &.active, &:hover { opacity: 1; }
         }
@@ -44,7 +45,7 @@
     }
     .menu_filler {
         border-right: 1px solid @cp_border_dark;
-        background-color: white;
+        background-color: var(--bg-primary);
         height: 100%;
         position: fixed;
         width: 50px;

@@ -1,0 +1,238 @@
+
+:root, [data-bs-theme="light"] {
+
+    --first-color: #004D74;
+    --first-odd: #006699;
+    --dark-accent: #526373;
+
+    --login-logo: url('/img/brd_logo_large.svg');
+    --login-logo-width: 158px;
+    --login-logo-version-top: 30px;
+    --login-logo-version-left: -46px;
+    --logo-icon: url('/img/brd_logo_letter.svg');
+    --logo-bg-size: 33px;
+
+    --btn-lpm-border-radius: 16px;
+    --border-radius-round: 16px;
+    --btn-lpm-font-weight: 500;
+
+    --cp-border: var(--bs-border-color);
+    --cp-border-dark: #d0d0d0;
+    --cp-dark: var(--bs-secondary-bg);
+    --cp-white: var(--bs-body-bg);
+    --cp-second: var(--bs-secondary-color);
+    --cp-third: var(--bs-tertiary-color);
+    
+    --chrome-bg-toolbar: #f3f3f3;
+    --chrome-bg-odd: var(--bs-body-bg);
+    --chrome-bg-even: rgb(245, 245, 245);
+    --chrome-bg-hover: rgb(241, 246, 253);
+    --chrome-bg-selected: rgb(212, 212, 212);
+    --chrome-bg-focused: #2196f3;
+    --chrome-bg-header: #f3f3f3;
+    --chrome-bg-header-hover: hsla(0, 0%, 90%, 1);
+    --chrome-bg-header-active: rgba(0, 0, 0, 0.15);
+    --chrome-text-primary: rgb(48, 57, 66);
+    --chrome-text-disabled: #5a5a5a;
+    --chrome-text-icon: rgb(110, 110, 110);
+    --chrome-text-error: rgb(230, 0, 0);
+    --chrome-text-pending: #7a8c9f;
+    --chrome-border: rgb(205, 205, 205);
+    --chrome-border-cell: #e1e1e1;
+    --chrome-divider: #ccc;
+    --chrome-filter-active: rgba(0, 0, 0, 0.3);
+    --chrome-filter-hover: rgba(0, 0, 0, 0.2);
+    --chrome-devtools-link: rgb(17, 85, 204);
+    --chrome-icon-hover: #333;
+    --chrome-input-hover-border: #e0e0e0;
+
+    --nav-left-bg: var(--bs-body-bg);
+    --nav-left-border: var(--bs-border-color);
+    --nav-left-item-bg-active: var(--bs-secondary-bg);
+    --nav-left-item-text-active: var(--first-color);
+    --nav-left-item-opacity-active: 1;
+
+    --toggle-bg-off: rgba(0, 77, 116, 0.2);
+    --toggle-bg-on: var(--first-color);
+    --toggle-handle: var(--bs-body-bg);
+    --toggle-label-off: rgba(0, 77, 116, 0.7);
+    --toggle-label-on: var(--bs-body-bg);
+    
+    --notif-circle-bg: var(--first-color);
+    --notif-circle-text: var(--bs-body-bg);
+    
+    --icon-link-text: var(--first-color);
+    --icon-link-bg-hover: var(--first-color);
+    --icon-link-text-hover: var(--bs-body-bg);
+    --icon-link-disabled: var(--bs-tertiary-color);
+    
+    --tooltip-bg: var(--bs-body-bg);
+    --tooltip-text: var(--first-color);
+    --tooltip-border: #154055;
+    --tooltip-har-bg: hsl(0, 0%, 95%);
+    --tooltip-har-text: hsl(0, 0%, 20%);
+    
+    --info-box-bg: #F3FBFC;
+    --info-box-border: var(--bs-border-color);
+    --info-box-close-opacity: 0.5;
+    --info-box-close-opacity-hover: 1;
+    
+    --warning-bg: #fff5d7;
+    --warning-text: #003d5b;
+    --warning-error-bg: #ffebeb;
+    --warning-error-text: #eb3a28;
+    
+    --pin-bg: var(--bs-tertiary-bg);
+    --pin-border: var(--bs-border-color);
+    --pin-bg-disabled: #d7d7d7;
+    
+    --loader-bg: var(--bs-body-bg);
+    --loader-mask-bg: var(--first-color);
+    --loader-mask-opacity: 0.1;
+    --loader-filter: none;
+    
+    --nav-tab-bg: var(--bs-body-bg);
+    --nav-tab-border: var(--bs-border-color);
+    --nav-tab-icon-opacity: 0.6;
+    --nav-tab-icon-opacity-active: 1;
+    --nav-tab-title-opacity: 0.8;
+    --nav-tab-title-opacity-active: 1;
+    
+    --code-mirror-border-error: #eb3a28;
+    --regex-error-text: #eb3a28;
+    
+    --google-btn-bg: #df4a32;
+    
+    --zone-lit-bg: #e1e9ed;
+    
+    --settings-select-border: gray;
+    --settings-select-border-active: black;
+    --select-arrow-filter: none;
+    --rs-bg: var(--bs-body-bg);
+    --rs-text: var(--bs-body-color);
+    --rs-border: var(--bs-border-color);
+    --rs-hover-bg: var(--bs-secondary-bg);
+    --rs-selected-bg: var(--first-color);
+    --rs-selected-text: #ffffff;
+    --icon-brightness-hover: brightness(0.3);
+    --icon-script-filter: none;
+}
+
+// ============================================
+// DARK THEME
+// ============================================
+[data-bs-theme="dark"] {
+
+    --first-color: #e8eaed;
+    --first-odd: #6BB0FF;
+    --dark-accent: #274664;
+  
+    --cp-border: var(--bs-border-color);
+    --cp-border-dark: #4a4d50;
+    --cp-dark: var(--bs-secondary-bg);
+    --cp-white: var(--bs-body-bg);
+    --cp-second: var(--bs-secondary-color);
+    --cp-third: var(--bs-tertiary-color);
+
+    --chrome-bg-toolbar: #25282e;
+    --chrome-bg-odd: var(--bs-body-bg);
+    --chrome-bg-even: #1f2227;
+    --chrome-bg-hover: #2d2f33;
+    --chrome-bg-selected: #3c4043;
+    --chrome-bg-focused: #4a9eff;
+    --chrome-bg-header: #25282e;
+    --chrome-bg-header-hover: #2d2f33;
+    --chrome-bg-header-active: rgba(255, 255, 255, 0.1);
+    --chrome-text-primary: var(--bs-body-color);
+    --chrome-text-disabled: #9aa0a6;
+    --chrome-text-icon: #9aa0a6;
+    --chrome-text-error: #f28b82;
+    --chrome-text-pending: #8ab4f8;
+    --chrome-border: #5f6368;
+    --chrome-border-cell: #3c4043;
+    --chrome-divider: #5f6368;
+    --chrome-filter-active: rgba(255, 255, 255, 0.2);
+    --chrome-filter-hover: rgba(255, 255, 255, 0.1);
+    --chrome-devtools-link: #8ab4f8;
+    --chrome-icon-hover: #e8eaed;
+    --chrome-input-hover-border: #5f6368;
+    
+    --nav-left-bg: var(--bs-body-bg);
+    --nav-left-border: var(--bs-border-color);
+    --nav-left-item-bg-active: var(--bs-secondary-bg);
+    --nav-left-item-text-active: var(--first-color);
+    --nav-left-item-opacity-active: 1;
+    
+    --toggle-bg-off: rgba(74, 158, 255, 0.2);
+    --toggle-bg-on: var(--first-color);
+    --toggle-handle: var(--bs-body-bg);
+    --toggle-label-off: rgba(74, 158, 255, 0.7);
+    --toggle-label-on: var(--bs-body-bg);
+    
+    --notif-circle-bg: var(--first-color);
+    --notif-circle-text: var(--bs-body-bg);
+    
+    --icon-link-text: var(--bs-link-color);
+    --icon-link-bg-hover: var(--first-color);
+    --icon-link-text-hover: var(--bs-body-bg);
+    --icon-link-disabled: var(--bs-tertiary-color);
+    
+    --tooltip-bg: var(--bs-secondary-bg);
+    --tooltip-text: var(--bs-body-color);
+    --tooltip-border: var(--first-color);
+    --tooltip-har-bg: #2d2f33;
+    --tooltip-har-text: var(--bs-body-color);
+    
+    --info-box-bg: var(--bs-secondary-bg);
+    --info-box-border: var(--bs-border-color);
+    --info-box-close-opacity: 0.7;
+    --info-box-close-opacity-hover: 1;
+    
+    --warning-bg: #3d3617;
+    --warning-text: var(--bs-body-color);
+    --warning-error-bg: #3c1f1f;
+    --warning-error-text: #f28b82;
+    
+    --pin-bg: var(--bs-tertiary-bg);
+    --pin-border: var(--bs-border-color);
+    --pin-bg-disabled: #1f2227;
+    
+    --loader-bg: black;
+    --loader-mask-bg: var(--first-color);
+    --loader-mask-opacity: 0.2;
+    --loader-filter: invert(1) hue-rotate(180deg);
+    
+    --nav-tab-bg: var(--bs-body-bg);
+    --nav-tab-border: var(--bs-border-color);
+    
+    --code-mirror-border-error: #f28b82;
+    --regex-error-text: #f28b82;
+    
+    --zone-lit-bg: #2d3e47;
+    
+    --settings-select-border: var(--bs-border-color);
+    --settings-select-border-active: var(--bs-link-color);
+    --warning-bg: #3d3617;
+    --warning-text: #ffd89b;
+    --warning-error-bg: #3c1f1f;
+    --warning-error-text: #f28b82;
+
+    --info-box-bg: #1f2227;
+    --info-box-border: var(--bs-border-color);
+    --info-box-text: var(--bs-body-color);
+
+    --bs-body-bg: #1a1d23;
+    --bs-body-color: #e8eaed;
+    --bs-border-color: #5f6368;
+
+    --select-arrow-filter: brightness(0) invert(1);
+    --rs-bg: var(--bs-body-bg);
+    --rs-text: var(--bs-body-color);
+    --rs-border: var(--bs-border-color);
+    --rs-hover-bg: var(--bs-secondary-bg);
+    --rs-selected-bg: var(--first-color);
+    --rs-selected-text: var(--bs-body-bg);
+    --icon-brightness-hover: brightness(3);
+    --bs-body-bg: #151718;
+    --icon-script-filter: grayscale(100%) brightness(0.6);
+}

@@ -1,7 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
+const path = require('path');
 const webpack = require('webpack');
 const html_webpack_plugin = require('html-webpack-plugin');
+const netmask_path = path.resolve(__dirname, '../util/netmask.js');
+const config_path = path.resolve(__dirname, './util/config.js');
 const mk_url_loader = mimetype=>[{
     loader: 'url-loader',
     options: {limit: '100000', fallback: 'file-loader', mimetype},
@@ -30,6 +33,11 @@ module.exports = {
             jQuery: 'jquery',
         }),
         new html_webpack_plugin({inject: true, template: './pub/index.html'}),
+        new webpack.NormalModuleReplacementPlugin(/^\.\/config\.js$/, res=>{
+            const issuer = res.contextInfo && res.contextInfo.issuer;
+            if (issuer && path.resolve(issuer)==netmask_path)
+                res.request = config_path;
+        }),
     ],
     optimization: {
         runtimeChunk: 'single',
@@ -54,7 +62,7 @@ module.exports = {
             {
                 test: /util[\\/].+\.js$/,
                 parser: {node: false, commonjs: false},
-                exclude: [/www[\\/].+\.js$/, /node_modules/],
+                exclude: [/www[\\/].+\.js$/, /node_modules/, /util[\\/](netmask|config)\.js$/],
                 use: ['hutil-loader'],
             },
             {test: /\.css$/, use: ['style-loader', 'css-loader']},
@@ -78,6 +86,8 @@ module.exports = {
             jquery: 'jquery/src/jquery.js',
             virt_jquery_all: 'jquery/src/jquery.js',
             '/www': 'www/',
+            './netmask.js': path.resolve(__dirname, '../util/netmask.js'),
+            // './config.js': path.resolve(__dirname, './util/config.js'),
         },
     },
     resolveLoader: {

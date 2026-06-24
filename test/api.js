@@ -251,7 +251,23 @@ describe('api', function(){
             }));
             t('no ip', {}, 400);
             t('ip', {ip: '1.1.1.1'}, 204);
-            t('no ip', {ip: 'r0123456789abcdef0123456789ABCDEF'}, 204);
+            t('eip', {ip: 'r0123456789abcdef0123456789ABCDEF'}, 204);
+        });
+        describe('global banip', ()=>{
+            let t = (name, body, status_code)=>it(name, etask._fn(
+                function*(_this){
+                    app = yield app_with_config({config: {}});
+                    let res = yield api_json('api/banip',
+                        {method: 'post', body});
+                    assert.equal(res.statusCode, status_code);
+                }));
+            t('no ip', {}, 400);
+            t('ip', {ip: '1.1.1.1'}, 204);
+            t('eip', {ip: 'r0123456789abcdef0123456789ABCDEF'}, 204);
+            t('ips', {ips: ['1.1.1.1']}, 204);
+            t('eips', {ips: ['r0123456789abcdef0123456789ABCDEF']}, 204);
+            t('invalid ip', {ip: 'abc'}, 400);
+            t('invalid ips', {ips: ['a', 'b', 'c']}, 400);
         });
         describe('duplicate port', ()=>{
             it('works after updating port', etask._fn(function*(_this){
@@ -446,6 +462,125 @@ describe('api', function(){
             });
             assert.equal(res.statusCode, 200);
             assert(res.headers.deprecation);
+        }));
+    });
+    describe('whitelist ip', ()=>{
+        const add_endpoints = [
+            {url: 'api/whitelist_ip', method: 'PUT',},
+            {url: 'api/add_whitelist_ip', method: 'POST',},
+        ];
+        add_endpoints.forEach(({url, method})=>{
+            it('bad request if no IP is passed',
+            etask._fn(function*(_this){
+                app = yield app_with_config({});
+                const res = yield api_json(url, {
+                    method,
+                    body: {},
+                });
+                assert.equal(res.statusCode, 400);
+            }));
+            it('unprocessable content if IP is not valid',
+            etask._fn(function*(_this){
+                app = yield app_with_config({});
+                const res = yield api_json(url, {
+                    method,
+                    body: {ip: 'abc'},
+                });
+                assert.equal(res.statusCode, 422);
+            }));
+            it('adds IP without a mask',
+            etask._fn(function*(_this){
+                app = yield app_with_config({});
+                const res = yield api_json(url, {
+                    method,
+                    body: {ip: '1.1.1.1'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert.equal(app.manager._defaults.www_whitelist_ips.length,
+                    1);
+                assert.equal(app.manager._defaults.www_whitelist_ips[0],
+                    '1.1.1.1');
+            }));
+            it('adds IP with a mask',
+            etask._fn(function*(_this){
+                app = yield app_with_config({});
+                const res = yield api_json(url, {
+                    method,
+                    body: {ip: '1.1.1.1/20'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert.equal(app.manager._defaults.www_whitelist_ips.length,
+                    1);
+                assert.equal(app.manager._defaults.www_whitelist_ips[0],
+                    '1.1.0.0/20');
+            }));
+            it('ok if IP already whitelisted',
+            etask._fn(function*(_this){
+                const config = {_defaults:
+                    {www_whitelist_ips: ['1.1.0.0/20']}};
+                app = yield app_with_config({config});
+                const res = yield api_json(url, {
+                    method,
+                    body: {ip: '1.1.1.1/20'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert.equal(app.manager._defaults.www_whitelist_ips.length,
+                    1);
+                assert.equal(app.manager._defaults.www_whitelist_ips[0],
+                    '1.1.0.0/20');
+            }));
+        });
+        it('bad request on remove if no IP is passed',
+        etask._fn(function*(_this){
+            app = yield app_with_config({});
+            const res = yield api_json('api/whitelist_ip', {
+                method: 'DELETE',
+                body: {},
+            });
+            assert.equal(res.statusCode, 400);
+        }));
+        it('unprocessable content on remove if IP is not valid',
+        etask._fn(function*(_this){
+            app = yield app_with_config({});
+            const res = yield api_json('api/whitelist_ip', {
+                method: 'DELETE',
+                body: {ip: 'abc'},
+            });
+            assert.equal(res.statusCode, 422);
+        }));
+        it('not found on remove if IP is not whitelisted',
+        etask._fn(function*(_this){
+            const config = {_defaults: {www_whitelist_ips: ['1.1.1.2']}};
+            app = yield app_with_config({config});
+            const res = yield api_json('api/whitelist_ip', {
+                method: 'DELETE',
+                body: {ip: '1.1.1.1'},
+            });
+            assert.equal(res.statusCode, 404);
+        }));
+        it('removes IP without a mask',
+        etask._fn(function*(_this){
+            const config = {_defaults: {
+                www_whitelist_ips: ['1.1.1.2', '1.1.1.1']}};
+            app = yield app_with_config({config});
+            const res = yield api_json('api/whitelist_ip', {
+                method: 'DELETE',
+                body: {ip: '1.1.1.1'},
+            });
+            assert.equal(res.statusCode, 200);
+            assert.equal(app.manager._defaults.www_whitelist_ips.length, 1);
+        }));
+        it('removes IP with a mask',
+        etask._fn(function*(_this){
+            const config = {_defaults: {
+                www_whitelist_ips: ['1.1.0.0/20', '1.2.0.0/20']}};
+            app = yield app_with_config({config});
+            const res = yield api_json('api/whitelist_ip', {
+                method: 'DELETE',
+                body: {ip: '1.1.1.1/20'},
+            });
+            assert.equal(res.statusCode, 200);
+            assert.equal(app.manager._defaults.www_whitelist_ips.length, 1);
         }));
     });
     describe('open browser with custom opts', ()=>{

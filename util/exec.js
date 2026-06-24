@@ -147,6 +147,8 @@ function close_fds(child, fds){
     child.stdio.forEach(stdio=>stdio && stdio.destroy());
 }
 
+let cmd_log = (log_str, ...args)=>log_str ? [log_str] : args;
+
 // XXX vladimir: check about platforms other than x86/arm from signal(7)
 const sigstring_int = {
     // posix.1-1990
@@ -188,6 +190,13 @@ const sigstring_int = {
     SIGWINCH: 28,
     SIGUNUSED: 31,
 };
+E.to_unix_status = (code, signal, error)=>{
+    if (error)
+        return -257;
+    return signal
+        ? -(sigstring_int[signal]||258)
+        : code&0xff;
+};
 E.sys = (cmd, opt)=>etask(function*exec(){
     opt = E.process_opt(opt||{});
     // XXX vladimir: rm process.zon from hutil
@@ -201,7 +210,10 @@ E.sys = (cmd, opt)=>etask(function*exec(){
     let redir_str = opt.redir||'';
     this.info.cmd = ()=>cmd.cmd+' '+cmd.argv.join(' ')+redir_str;
     if (opt.verbose)
-        console.log(cmd.cmd, cmd.argv.join(' '), redir_str);
+    {
+        console.log(
+            ...cmd_log(opt.cmd_log, cmd.cmd, cmd.argv.join(' '), redir_str));
+    }
     let redir = E.get_redir(redir_str, opt.piped, opt.fork);
     let opts = assign({stdio: redir.stdio, cwd: opt.cwd}, opt.opt);
     this.finally(()=>{
@@ -261,9 +273,8 @@ E.sys = (cmd, opt)=>etask(function*exec(){
     let rv = error ? -1 : status.code;
     let ret = {stdout: log.stdout, stderr: log.stderr, stdall: log.stdall,
         signal: status.signal, retval: rv&0xff, error: error,
-        status_code: status.code};
-    ret.unix = error ? -257 :
-        ret.signal ? -(sigstring_int[ret.signal]||258) : ret.retval;
+        status_code: status.code,
+        unix: E.to_unix_status(status.code, status.signal, error)};
     return opt.out=='retval' ? ret.retval :
         opt.out=='unix' ? ret.unix :
         opt.out=='stdout' ? ret.stdout :
@@ -276,7 +287,7 @@ E.sys_sync = (cmd, opt)=>{
     opt = E.process_opt(opt||{});
     cmd = E.get_cmd(cmd, opt);
     if (opt.verbose)
-        console.log(cmd.cmd, cmd.argv.join(' '));
+        console.log(...cmd_log(opt.cmd_log, cmd.cmd, cmd.argv.join(' ')));
     let redir = E.get_redir_sync(opt.redir, opt.stdio);
     let opts = assign({stdio: redir.stdio, cwd: opt.cwd}, opt.opt);
     opts.env = E.get_env(opt);
@@ -288,9 +299,8 @@ E.sys_sync = (cmd, opt)=>{
     let stderr = (child.stderr||'').toString();
     let ret = {stdout: stdout, stderr: stderr, stdall: stdout+stderr,
         signal: child.signal, retval: rv&0xff, error: child.error,
-        status_code: child.status};
-    ret.unix = ret.error ? -257 :
-        ret.signal ? -(sigstring_int[ret.signal]||258) : ret.retval;
+        status_code: child.status,
+        unix: E.to_unix_status(child.status, child.signal, child.error)};
     return opt.out=='retval' ? ret.retval :
         opt.out=='unix' ? ret.unix :
         opt.out=='stdout' ? stdout :
@@ -320,7 +330,10 @@ E.get = (cmd, opt)=>{
     if (opt.dry_run)
     {
         if (opt.verbose)
-            console.log(array.to_array(cmd).join(' '));
+        {
+            console.log(
+                ...cmd_log(opt.cmd_log, array.to_array(cmd).join(' ')));
+        }
         return;
     }
     return E.sys_sync(cmd, opt);

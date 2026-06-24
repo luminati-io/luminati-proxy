@@ -8,9 +8,9 @@ const http = require('http');
 const tls = require('tls');
 const request = require('request');
 const socks = require('lum_socksv5');
-const {Netmask} = require('netmask');
 const fake_timers = require('@sinonjs/fake-timers');
 const sinon = require('sinon');
+const {Netmask} = require('../util/netmask.js');
 const ssl = require('../lib/ssl.js');
 const etask = require('../util/etask.js');
 const {ms} = require('../util/date.js');
@@ -21,6 +21,7 @@ const Server = require('../lib/server.js');
 const Manager = require('../lib/manager.js');
 const requester = require('../lib/requester.js');
 const consts = require('../lib/consts.js');
+const {proxy_v2_encode} = require('../util/proxy_v2.js');
 const common = require('./common.js');
 const {assert_has, http_proxy, smtp_test_server, http_ping, init_lum} = common;
 const test_url = {http: 'http://lumtest.com/test',
@@ -469,7 +470,9 @@ describe('proxy', ()=>{
                 l = yield lum({whitelist_ips: ['1.1.1.1'],
                     lb_ips: ['127.0.0.1']});
                 let res = yield l.test({url: test_url.http, no_usage: true,
-                    lb_data: 'PROXY TCP4 1.1.1.1\r\n'});
+                    lb_data: proxy_v2_encode({src_addr: '1.1.1.1',
+                    dst_addr: '127.0.0.1', src_port: 1234, dst_port: 24000,
+                    family: 'ipv4'})});
                 assert.equal(res.statusCode, 200);
             }));
             it('http reject', etask._fn(function*(){
@@ -483,9 +486,27 @@ describe('proxy', ()=>{
                 l = yield lum({whitelist_ips: ['1.1.1.1'],
                     lb_ips: ['127.0.0.1']});
                 let res = yield l.test({url: test_url.http, no_usage: true,
-                    lb_data: 'PROXY TCP4 1.1.1.2\r\n'});
+                    lb_data: proxy_v2_encode({src_addr: '1.1.1.2',
+                    dst_addr: '127.0.0.1', src_port: 1234, dst_port: 24000,
+                    family: 'ipv4'})});
                 assert.equal(res.statusCode, 407);
                 assert.equal(res.body, undefined);
+            }));
+            it('http through lb v2 local', etask._fn(function*(){
+                l = yield lum({whitelist_ips: ['1.1.1.1'],
+                    lb_ips: ['127.0.0.1']});
+                // LOCAL command: ver=2, cmd=0, family=0, payload_len=0
+                const local_hdr = Buffer.from([
+                    0x0D, 0x0A, 0x0D, 0x0A, 0x00, 0x0D, 0x0A,
+                    0x51, 0x55, 0x49, 0x54, 0x0A, 0x20, 0x00, 0x00, 0x00,
+                ]);
+                let socket = net.connect(24000, '127.0.0.1');
+                socket.on('error', e=>this.throw(e));
+                socket.on('connect', ()=>this.continue());
+                yield this.wait();
+                socket.write(local_hdr);
+                socket.once('close', ()=>this.continue());
+                yield this.wait();
             }));
             it('https', etask._fn(function*(){
                 l = yield lum();
@@ -500,7 +521,9 @@ describe('proxy', ()=>{
                 socket.on('timeout', e=>this.throw(new Error('timeout')));
                 socket.on('connect', ()=>this.continue());
                 yield this.wait();
-                socket.write('PROXY TCP4 1.1.1.1\r\n');
+                socket.write(proxy_v2_encode({src_addr: '1.1.1.1',
+                    dst_addr: '127.0.0.1', src_port: 1234, dst_port: 24000,
+                    family: 'ipv4'}));
                 let r = http.request({method: 'CONNECT', path: 'lumtest.com',
                     createConnection: ()=>socket}).end();
                 r.on('error', e=>this.throw(e));
@@ -536,7 +559,9 @@ describe('proxy', ()=>{
                 socket.on('timeout', e=>this.throw(new Error('timeout')));
                 socket.on('connect', ()=>this.continue());
                 yield this.wait();
-                socket.write('PROXY TCP4 1.1.1.2\r\n');
+                socket.write(proxy_v2_encode({src_addr: '1.1.1.2',
+                    dst_addr: '127.0.0.1', src_port: 1234, dst_port: 24000,
+                    family: 'ipv4'}));
                 let r = http.request({method: 'CONNECT', path: 'lumtest.com',
                     createConnection: ()=>socket}).end();
                 r.on('error', e=>this.throw(e));
@@ -567,7 +592,9 @@ describe('proxy', ()=>{
                     sandbox.stub(socks.Client.prototype, '_onConnect')
                     .callsFake(function(){
                         l.update_lb_ips({lb_ips: []});
-                        this._sock.write('PROXY TCP4 1.1.1.1\r\n');
+                        this._sock.write(proxy_v2_encode({src_addr: '1.1.1.1',
+                        dst_addr: '127.0.0.1', src_port: 1234, dst_port: 25000,
+                        family: 'ipv4'}));
                         _on_connect.apply(this, arguments);
                     });
                     let w = etask.wait();
@@ -608,7 +635,9 @@ describe('proxy', ()=>{
                     sandbox.stub(socks.Client.prototype, '_onConnect')
                     .callsFake(function(){
                         l.update_lb_ips({lb_ips: []});
-                        this._sock.write('PROXY TCP4 1.1.1.1\r\n');
+                        this._sock.write(proxy_v2_encode({src_addr: '1.1.1.1',
+                        dst_addr: '127.0.0.1', src_port: 1234,
+                        dst_port: l.port, family: 'ipv4'}));
                         _on_connect.apply(this, arguments);
                     });
                     let w = etask.wait();
@@ -650,7 +679,9 @@ describe('proxy', ()=>{
                     sandbox.stub(socks.Client.prototype, '_onConnect')
                     .callsFake(function(){
                         l.update_lb_ips({lb_ips: []});
-                        this._sock.write('PROXY TCP4 1.1.1.2\r\n');
+                        this._sock.write(proxy_v2_encode({src_addr: '1.1.1.2',
+                        dst_addr: '127.0.0.1', src_port: 1234,
+                        dst_port: l.port, family: 'ipv4'}));
                         _on_connect.apply(this, arguments);
                     });
                     let error = '';
@@ -689,7 +720,9 @@ describe('proxy', ()=>{
                     sandbox.stub(socks.Client.prototype, '_onConnect')
                     .callsFake(function(){
                         l.update_lb_ips({lb_ips: []});
-                        this._sock.write('PROXY TCP4 1.1.1.1\r\n');
+                        this._sock.write(proxy_v2_encode({src_addr: '1.1.1.1',
+                        dst_addr: '127.0.0.1', src_port: 1234,
+                        dst_port: l.port, family: 'ipv4'}));
                         _on_connect.apply(this, arguments);
                     });
                     let res = yield etask.nfn_apply(request, [{
@@ -731,7 +764,9 @@ describe('proxy', ()=>{
                     sandbox.stub(socks.Client.prototype, '_onConnect')
                     .callsFake(function(){
                         l.update_lb_ips({lb_ips: []});
-                        this._sock.write('PROXY TCP4 1.1.1.2\r\n');
+                        this._sock.write(proxy_v2_encode({src_addr: '1.1.1.2',
+                        dst_addr: '127.0.0.1', src_port: 1234,
+                        dst_port: l.port, family: 'ipv4'}));
                         _on_connect.apply(this, arguments);
                     });
                     let error;
@@ -1018,7 +1053,7 @@ describe('proxy', ()=>{
                 l = yield lum({pool_size: 1, session_termination: true});
                 const r = yield l.test({fake: {
                     status: 502,
-                    headers: {'x-luminati-error': consts.NO_PEERS_ERROR},
+                    headers: {'x-brd-error': consts.NO_PEERS_ERROR},
                 }});
                 assert.equal(r.body, consts.SESSION_TERMINATED_BODY);
                 assert.equal(r.statusCode, 400);
@@ -1029,7 +1064,7 @@ describe('proxy', ()=>{
                     session_termination: true});
                 yield l.test({fake: {
                     status: 502,
-                    headers: {'x-luminati-error': consts.NO_PEERS_ERROR},
+                    headers: {'x-brd-error': consts.NO_PEERS_ERROR},
                 }});
                 const r = yield l.test({fake: 1});
                 assert.equal(r.statusCode, 200);
@@ -1103,10 +1138,14 @@ describe('proxy', ()=>{
             Object.assign({}, config, {rules}), 200, 1, {smtp_close: true});
         t('rules is triggered regular req through lb',
             Object.assign({}, config, {rules, lb_ips: ['127.0.0.1']}),
-            200, 1, {close: true, lb_data: 'PROXY TCP4 127.0.0.1\r\n'});
+            200, 1, {close: true, lb_data: proxy_v2_encode({
+            src_addr: '127.0.0.1', dst_addr: '127.0.0.1',
+            src_port: 1234, dst_port: 24000, family: 'ipv4'})});
         t('rules is triggered when server ends connection through lb',
             Object.assign({}, config, {rules, lb_ips: ['127.0.0.1']}),
-            200, 1, {smtp_close: true, lb_data: 'PROXY TCP4 127.0.0.1\r\n'});
+            200, 1, {smtp_close: true, lb_data: proxy_v2_encode({
+            src_addr: '127.0.0.1', dst_addr: '127.0.0.1',
+            src_port: 1234, dst_port: 24000, family: 'ipv4'})});
     });
     describe('multiple super proxy ports', ()=>{
         const default_super_proxy_port = 20001;

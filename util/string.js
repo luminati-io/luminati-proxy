@@ -207,7 +207,8 @@ E.wrap = function wrap(str, width, nbsp_to_space){
         var possible_line = cur_line ? cur_line+' '+word : word;
         if (possible_line[width])
         {
-            output += cur_line+'\n';
+            if (cur_line)
+                output += cur_line+'\n';
             cur_line = word;
         }
         else

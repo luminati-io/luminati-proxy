@@ -45,11 +45,12 @@ E.to_arr = function(data, opt){
         {
             c = data[++i];
         }
-        var value = '';
+        var value = '', has_quote;
         if (c==quote)
         {
             // value enclosed by quote
             c = data[++i];
+            has_quote = true;
             do {
                 if (c!=quote)
                 {
@@ -109,7 +110,8 @@ E.to_arr = function(data, opt){
         // add the value to the array
         if (array.length<=row)
             array.push([]);
-        array[row].push(value);
+        if (has_quote || !opt.strict_quote)
+            array[row].push(value);
         // go to the next row or column
         if (c==field);
         else if (c==line)
@@ -125,7 +127,7 @@ E.to_arr = function(data, opt){
             throw make_csv_error('Delimiter expected after character '+i);
         c = data[++i];
     }
-    if (i && data[i-1]==field)
+    if (i && data[i-1]==field && !opt.strict_quote)
         array[row].push('');
     if (!stopped_because_of_fail)
         check_strict();

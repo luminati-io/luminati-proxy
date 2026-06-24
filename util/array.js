@@ -143,6 +143,14 @@ E.rm_elm_tail = function(a, elm){
     return elm;
 };
 
+E.trim_tail_p = function(arr, p){
+    var _arr = Array.isArray(arr) ? arr : [];
+    var _p = Number.isFinite(p) ? Math.max(0, Math.min(100, p)) : 0;
+    if (!_arr.length || _p === 0)
+        return _arr.slice();
+    return _arr.slice(0, -Math.max(1, Math.floor(_arr.length * _p / 100)));
+};
+
 E.add_elm = function(a, elm){
     if (a.includes(elm))
         return;
@@ -228,4 +236,5 @@ E.prototype_uninstall = function(){
     for (var i in proto)
         delete Array.prototype[i];
 };
+
 return E; }); }());

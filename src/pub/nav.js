@@ -3,7 +3,6 @@
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Route, withRouter, Link} from 'react-router-dom';
 import React from 'react';
-import _ from 'lodash4';
 import $ from 'jquery';
 import classnames from 'classnames';
 import etask from '../../util/etask.js';
@@ -18,6 +17,7 @@ import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {Language} from './common/i18n.js';
 import {with_www_api} from './common.js';
+import {Theme_nav} from './theme.js';
 import ws from './ws.js';
 import {main as Api} from './api.js';
 import './css/nav.less';
@@ -80,7 +80,7 @@ const Nav_link_inner = ({label, to, name, match, ext, on_click})=>{
     if (ext)
     {
         return <a href={to} target="_blank" rel="noopener noreferrer"
-            onClick={on_click||_.noop}>
+            onClick={on_click||Function.prototype}>
             <div className="menu_item">
                 <T>{t=><Tooltip title={t(label)} placement="right">
                     <div className={classnames('icon', name)}/>
@@ -88,7 +88,7 @@ const Nav_link_inner = ({label, to, name, match, ext, on_click})=>{
             </div>
         </a>;
     }
-    return <Link to={{pathname: to}} onClick={on_click||_.noop}>
+    return <Link to={{pathname: to}} onClick={on_click||Function.prototype}>
         <div className={classnames('menu_item', {active: match})}>
             <T>{t=><Tooltip title={t(label)} placement="right">
                 <div className={classnames('icon', name)}/>
@@ -142,6 +142,7 @@ const Nav_right = props=>
         <React.Fragment>
           <Cpu_warning/>
           <Patent/>
+          <Theme_nav/>
           <Language/>
           <Account settings={props.settings}/>
         </React.Fragment>

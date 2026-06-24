@@ -6,10 +6,11 @@ import React_select from 'react-select/creatable';
 import React_tooltip from 'react-tooltip';
 import {withRouter} from 'react-router-dom';
 import classnames from 'classnames';
-import {Netmask} from 'netmask';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import zurl from '../../../util/url.js';
 import {Ext_tooltip} from '../common.js';
+import {Theme_context} from '../theme.js';
+import {Netmask} from './netmask.js';
 import {Json_editor} from './editor/';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
@@ -316,6 +317,7 @@ export class Select_number extends Pure_component {
 }
 
 export class Select_multiple extends Pure_component {
+    static contextType = Theme_context;
     styles = {
         clearIndicator: base=>({
             ...base,
@@ -325,11 +327,9 @@ export class Select_multiple extends Pure_component {
             ...base,
             padding: '1px',
         }),
-        option: (base, state)=>({
+        option: base=>({
             ...base,
             padding: '2px 12px',
-            backgroundColor: state.isFocused ? '#f5f5f5' : 'white',
-            color: '#004d74',
         }),
         control: (_, state)=>({
             alignItems: 'center',
@@ -337,17 +337,32 @@ export class Select_multiple extends Pure_component {
             height: 32,
             borderRadius: 3,
             border: 'solid 1px',
-            borderColor: state.isFocused ? '#004d74' :
-                state.isDisabled ? '#e0e9ee' : '#ccdbe3',
-            backgroundColor: state.isDisabled ? '#f5f5f5;' : 'white',
-        }),
-        singleValue: (base, state)=>({
-            ...base,
-            color: state.isDisabled ? '#8e8e8e' : '#004d74',
+            borderColor: state.isFocused ? 'var(--bs-secondary-color)' :
+                state.isDisabled ? 'var(--bs-secondary-bg)'
+                : 'var(--cp-border)',
         }),
     };
     render(){
         return <React_select
+          theme={this.context.theme=='dark' ? theme=>({
+                ...theme,
+                colors: {
+                     primary: 'var(--cp-border)',
+                    primary25: 'var(--cp-dark)',
+                    primary50: 'var(--cp-dark)',
+                    neutral0: 'var(--bs-body-bg)',
+                    neutral5: 'var(--bs-secondary-bg)',
+                    neutral10: 'var(--bs-tertiary-bg)',
+                    neutral20: 'var(--cp-border)',
+                    neutral30: 'var(--bs-border-color)',
+                    neutral40: 'var(--bs-secondary-color)',
+                    neutral50: 'var(--bs-secondary-color)',
+                    neutral60: 'var(--bs-secondary-color)',
+                    neutral70: 'var(--bs-secondary-color)',
+                    neutral80: 'var(--bs-body-color)',
+                    neutral90: 'var(--bs-body-color)',
+                },
+          }) : theme=>({...theme})}
           styles={this.styles}
           className={classnames('select_multiple', this.props.class_name)}
           isClearable

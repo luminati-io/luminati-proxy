@@ -165,5 +165,10 @@ E.manager_fields = {
         +' of parameters that are allowed in the URL-encoded data'},
     socket_inactivity_timeout: {type: 'integer', desc: 'The amount of time a'
         +' socket can be inactive before it times out and closes'},
+    zone_auth_passthru: {type: 'boolean', desc: 'Allow passthrough proxy'
+        +' authentication using zone-based usernames in the format'
+        +' brd-customer-...-zone-...:password'},
+    sanitize_rules: {type: 'boolean', desc: 'Validate rules trigger_code '
+        +'against the JS sanitizer and reject unsafe code before it runs.'},
 };
 return E; }); // eslint-disable-line

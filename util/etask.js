@@ -1360,7 +1360,7 @@ E.all = function(a_or_o){
         return new Etask({name: 'all_o', cancel: true}, [function(){
             for (j=0; j<keys.length; j++)
                 this.spawn(a_or_o[keys[j]]);
-        }, /* javascript-obfuscator:diable */ function try_catch$loop(){
+        }, /* javascript-obfuscator:disable */ function try_catch$loop(){
             '@jsdefender { localDeclarations: false }';
             /* javascript-obfuscator:enable */
             if (i>=keys.length)

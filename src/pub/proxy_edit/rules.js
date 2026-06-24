@@ -6,8 +6,8 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import setdb from '../../../util/setdb.js';
 import conv from '../../../util/conv.js';
-import {migrate_trigger, no_ssl_trigger_types, trigger_types,
-    action_types, default_action, WWW_API} from '../../../util/rules_util.js';
+import {migrate_trigger, no_ssl_trigger_types, trigger_types, action_types,
+    default_action, WWW_API, get_sanitizer} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
 import zutil from '../../../util/util.js';
 import {Labeled_controller, with_proxy_ports, Cm_wrapper,
@@ -738,13 +738,22 @@ class Trigger extends Pure_component {
 }
 
 class Trigger_code extends Pure_component {
-    type_opt = [
-        {key: 'Before send', value: 'before_send'},
-        {key: 'After headers', value: 'after_hdr'},
-        {key: 'After body', value: 'after_body'},
-        {key: 'Timeout', value: 'timeout'},
-    ];
-    state = {};
+    constructor(props){
+        super(props);
+        this.state = {should_sanitize: false};
+        this.type_opt = [
+            {key: 'Before send', value: 'before_send'},
+            {key: 'After headers', value: 'after_hdr'},
+            {key: 'After body', value: 'after_body'},
+            {key: 'Timeout', value: 'timeout'},
+        ];
+    }
+    componentDidMount(){
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({should_sanitize: settings.should_sanitize});
+        });
+    }
     static getDerivedStateFromProps(props, state){
         const rule = props.rule;
         let prepared = rule_prepare(rule);
@@ -757,11 +766,21 @@ class Trigger_code extends Pure_component {
             trigger_code = rule.trigger_code;
         return {trigger_code, type};
     }
+    get_sanitize_error(code){
+        if (!this.state.should_sanitize)
+            return;
+        try {
+            get_sanitizer().sanitize(code);
+        } catch(e){
+            return e.message.replace('JS sanitize error:', '');
+        }
+    }
     render(){
         const {rule, type_changed, trigger_code_changed,
             disabled} = this.props;
         if (!this.state.trigger_code)
             return null;
+        let sanitize_error = this.get_sanitize_error(this.state.trigger_code);
         return <div className="trigger code">
           <Rule_config
             id="type"
@@ -778,6 +797,8 @@ class Trigger_code extends Pure_component {
             val={this.state.trigger_code}
             readonly={disabled}
           />
+          {sanitize_error && <Rule_warning
+            text={`This rule will not be applied:\n${sanitize_error}`} />}
         </div>;
     }
 }

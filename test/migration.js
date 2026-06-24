@@ -348,12 +348,10 @@ describe('migration', ()=>{
             +`  return true;\n}`, 'before_send');
         t('min_req_time / retry', {min_req_time: 200, action_type: 'retry',
             trigger_type: 'min_req_time'}, `function trigger(opt){\n`
-            +`  opt.timeout = 200;\n`
             +`  return true;\n}`, 'timeout');
         t('min_req_time / retry_port + url', {trigger_type: 'min_req_time',
             min_req_time: 200, action_type: 'retry_port', url: 'facebook'},
             `function trigger(opt){\n`
-            +`  opt.timeout = 200;\n`
             +`  if (!new RegExp(String.raw\`facebook\`).test(opt.url))\n`
             +`    return false;\n`
             +`  return true;\n}`, 'timeout');

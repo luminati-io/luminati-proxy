@@ -33,11 +33,12 @@
                 overflow: auto;
                 background-color: @light_grey;
                 padding: 5px;
-                textarea,
-                pre {
-                    font-family: "Fira code", "Fira Mono", Consolas, monospace !important;
+                textarea, pre {
+                    font-family: "Fira code", "Fira Mono", Consolas,
+                        monospace !important;
                     font-size: 14px !important;
-                    background-color: transparent !important;
+                    background-color: var(--color-transparent) 
+                        !important;
                 }
                 .cm-lpm-tooltip {
                     padding: 5px;
@@ -51,9 +52,9 @@
     .code_panel.editable {
         border-color: @first_color;
         .panel_body {
-            background-color: transparent;
+            background-color: var(--color-transparent);
             .editor_container {
-                background-color: white;
+                background-color: var(--bg-primary);
             }
         }
     }

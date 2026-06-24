@@ -4,7 +4,6 @@
 const child_process = require('child_process');
 const path = require('path');
 const semver = require('semver');
-const _ = require('lodash4');
 const etask = require('../util/etask.js');
 const {e2s} = require('../util/zerr.js');
 const date = require('../util/date.js');
@@ -83,7 +82,8 @@ const watch_file = (filename, opt={}, watcher_opt={})=>{
     if (!tail)
         return;
     const handle_line = typeof opt == 'function' ? opt
-        : typeof opt.handle_line == 'function' ? opt.handle_line : _.noop;
+        : typeof opt.handle_line == 'function' ? opt.handle_line
+        : Function.prototype;
     const watcher = new tail(filename, watcher_opt);
     watcher.on('line', line=>{
         if (opt.stdout)

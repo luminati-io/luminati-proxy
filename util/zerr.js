@@ -359,7 +359,7 @@ var Log_buffer = function(){
 };
 
 var node_init = function(){
-    if (zutil.is_mocha())
+    if (zutil.is_mocha() && !env.ZMOCHA_DEBUG)
     {
         E.level = L.WARN;
         return;
@@ -457,6 +457,26 @@ E.set_logger = function(logger){
         logger(level, msg);
         log_tail_push(E.prefix+date.to_sql_ms()+': '+msg);
     };
+};
+
+E.wrap_time_logger = function(){
+    E.set_logger(function(level, msg){
+        var log_fn;
+        if (level <= L.ERR)
+            log_fn = console.error;
+        else if (level <= L.WARN)
+            log_fn = console.warn;
+        else if (level <= L.NOTICE)
+            log_fn = console.info;
+        else if (level <= L.INFO)
+            log_fn = console.log;
+        else
+            log_fn = console.debug;
+        log_fn.call(log_fn,
+            date.to_sql_ms().toString() + ' ' + LINV[level].toString() + ': '
+                + msg.toString()
+        );
+    });
 };
 
 E.add_logger = function(logger){
@@ -585,9 +605,9 @@ _zerr = function(l, args){
                 logger_fn(l, zerr_format(args));
         }
         log_tail_push(prefix+s);
-    } catch(err){
-        try { console.error('ERROR in zerr '+(err.stack||err), arguments); }
-        catch(e){}
+    } catch(e){
+        try { console.error('ERROR in zerr '+(e.stack||e), arguments); }
+        catch(_e){}
     }
     if (l<=L.CRIT)
         throw new Error(s);

@@ -12,8 +12,10 @@ if (is_node)
 }
 else
     define = self.define;
-define([], ()=>{
+define(['/util/js_sanitizer.js'], sanitizer_util=>{
 const E = {};
+
+const Js_sanitizer = sanitizer_util.default || sanitizer_util;
 
 E.WWW_API = 'https://brightdata.com';
 
@@ -115,15 +117,9 @@ E.migrate_trigger = rule=>{
     let body = '';
     let type = 'before_send';
     if (t=='pre' && rule.min_req_time)
-    {
-        body = `opt.timeout = ${rule.min_req_time};\n`;
         type = 'timeout';
-    }
     else if (t=='pre' && rule.min_conn_time)
-    {
-        body = `opt.timeout = ${rule.min_conn_time};\n`;
         type = 'timeout';
-    }
     else if (t=='post' && rule.status)
     {
         body += `if (!new RegExp(String.raw\`${rule.status}\`)`
@@ -157,6 +153,123 @@ E.migrate_trigger = rule=>{
     body += `return true;`;
     return Object.assign({}, rule, {type,
         trigger_code: gen_function('trigger', body)});
+};
+
+E.get_timeout_value = rule=>rule.min_req_time || rule.min_conn_time
+    || rule.max_req_time || 0;
+
+const TRIGGER_NODES = [
+    'Program', 'FunctionDeclaration', 'ArrowFunctionExpression',
+    'BlockStatement', 'VariableDeclaration', 'VariableDeclarator',
+    'Identifier', 'IfStatement', 'ReturnStatement', 'ExpressionStatement',
+    'CallExpression', 'NewExpression', 'MemberExpression',
+    'UnaryExpression', 'BinaryExpression', 'LogicalExpression',
+    'AssignmentExpression', 'Literal', 'TemplateLiteral',
+    'TemplateElement', 'TaggedTemplateExpression', 'ArrayExpression',
+    'ChainExpression', 'ForStatement', 'UpdateExpression', 'AssignmentPattern',
+];
+const DANGEROUS_PROPS = [
+    'constructor', '__proto__', 'prototype',
+    '__defineGetter__', '__defineSetter__',
+    '__lookupGetter__', '__lookupSetter__',
+    'caller', 'callee', 'arguments',
+];
+const SAFE_GLOBAL_IDS = [
+    'RegExp',
+    'String',
+    'Number',
+    'Boolean',
+    'JSON',
+    'Math',
+    'Object',
+    'Array',
+    'console',
+    'undefined',
+    'NaN',
+    'Infinity',
+];
+
+const SAFE_OBJECT_PROPS = new Set([
+    'keys',
+    'values',
+    'entries',
+]);
+
+const validate_global_identifiers = (node, parent, gp, fail, ctx)=>{
+    if (!ctx.is_global_identifier_reference())
+        return;
+    if (SAFE_GLOBAL_IDS.includes(node.name))
+        return;
+    fail(`identifiers ${node.name} is not allowed`, node);
+};
+
+const validate_trigger_shape = (ast, fail)=>{
+    const triggers = ast.body.filter(stmt=>
+        stmt.type=='FunctionDeclaration'
+        && stmt.id
+        && stmt.id.name=='trigger');
+    if (triggers.length!=1)
+        fail('code must contain exactly one top-level trigger function', ast);
+    const fn = triggers[0];
+    if (fn.async || fn.generator)
+        fail('async/generator functions are not allowed', fn);
+    if (fn.params.length!=1 || fn.params[0].type!='Identifier'
+        || fn.params[0].name!='opt')
+    {
+        fail('trigger must have exactly one parameter: opt', fn);
+    }
+};
+
+const validate_object_props = (node, parent, gp, fail, ctx)=>{
+    if (node.type!='MemberExpression')
+        return;
+    if (node.object.type!='Identifier' || node.object.name!='Object')
+        return;
+    if (!ctx.is_global_identifier_reference(node.object, node, parent))
+        return;
+    const prop = node.computed
+        ? node.property.type=='Literal' && String(node.property.value)
+        : ctx.prop_name(node.property);
+    if (!prop || !SAFE_OBJECT_PROPS.has(prop))
+        fail(`Object.${prop || '<computed>'} is not allowed`, node);
+};
+
+let rules_sanitizer;
+E.get_sanitizer = ()=>{
+    if (rules_sanitizer)
+        return rules_sanitizer;
+    rules_sanitizer = new Js_sanitizer({
+        validate_shape: validate_trigger_shape,
+        node_validators: [
+            validate_global_identifiers,
+            validate_object_props,
+        ],
+    })
+    .only(TRIGGER_NODES)
+    .forbid({
+        global_mutation: true,
+        global_alias: true,
+        props: DANGEROUS_PROPS,
+        new_expr: true,
+    })
+    .allow({new_expr: ['RegExp']});
+    return rules_sanitizer;
+};
+
+E.sanitize = (rules=[])=>{
+    let errs = [];
+    for (let i = 0; i < rules.length; i++)
+    {
+        let rule = rules[i];
+        if (!rule.trigger_code)
+            continue;
+        try {
+            E.get_sanitizer().sanitize(rule.trigger_code);
+        } catch(e){
+            errs.push([i, e]);
+        }
+    }
+    return errs;
 };
 
 return E; }); // eslint-disable-line

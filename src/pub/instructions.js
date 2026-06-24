@@ -9,12 +9,14 @@ import {is_local} from './util.js';
 const E = {};
 
 E.code = (proxy=22225, lpm_token, hostname=document.location.hostname)=>{
-  const auth = text=>!is_local() && lpm_token ?
-    text.replace(/\[LT\]/g, lpm_token).replace(/\[BAT\]/g, 'brd-auth-token')
-    : '';
+    const auth = text=>!is_local() && lpm_token ?
+        text.replace(/\[LT\]/g, lpm_token)
+        .replace(/\[BAT\]/g, 'brd-auth-token')
+        : '';
+    const shell_auth = auth('--proxy-user [BAT]:[LT]');
     return {
         shell: `curl --proxy ${hostname}:${proxy} `
-            +`${auth('--proxy-user [BAT]:[LT]')}`
+            +`${shell_auth ? `${shell_auth} ` : ''}`
             +`"http://geo.brdtest.com/mygeo.json"`,
         node: `#!/usr/bin/env node
 const axios = require('axios');

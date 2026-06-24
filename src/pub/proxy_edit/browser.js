@@ -107,13 +107,14 @@ export default class Browser extends Pure_component {
             return null;
         const {ssl} = this.state.form;
         const {zagent} = this.state.settings;
+        const tab = zagent ? 'headers' : 'browser';
         const def_ssl = this.state.defaults.ssl;
         const ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
         const is_unblocker = this.get_curr_plan().type=='unblocker';
         const headers_are_set = this.state.headers.some(h=>
             !_.isEqual(h, this.first_header));
         return <div className="browser">
-          <Warning text={
+          {!zagent && <Warning text={
             <div className="warning_container">
               <span>
                 These options are applied <strong>ONLY</strong> when using a
@@ -137,8 +138,8 @@ export default class Browser extends Pure_component {
                 }</T>
               }
             </div>
-          }/>
-          <Tab_context.Provider value="browser">
+          }/>}
+          <Tab_context.Provider value={tab}>
             <Field_row_raw inner_class_name="headers">
               <div className="desc">
                 <T>{t=><Tooltip title={t('Custom headers')}>
@@ -166,12 +167,12 @@ export default class Browser extends Pure_component {
                 }
               </div>
             </Field_row_raw>
-            <Config type="select" id="timezone" data={timezone_opt}
-              disabled={zagent}/>
-            <Config type="select" id="resolution" data={resolution_opt}
-              disabled={zagent}/>
-            <Config type="select" id="webrtc" data={webrtc_opt}
-              disabled={zagent}/>
+            {!zagent && <Config type="select" id="timezone" data={timezone_opt}
+              disabled={zagent}/>}
+            {!zagent && <Config type="select" id="resolution"
+              data={resolution_opt} disabled={zagent}/>}
+            {!zagent && <Config type="select" id="webrtc" data={webrtc_opt}
+              disabled={zagent}/>}
             {is_unblocker && <Config id="ua" type="yes_no"/>}
           </Tab_context.Provider>
         </div>;
