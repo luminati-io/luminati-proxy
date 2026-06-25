@@ -196,7 +196,7 @@
     ]
   },
   "engines": {
-    "node": ">=20.12.1"
+    "node": ">=24.13.0"
   },
   "homepage": "https://brightdata.com",
   "api_domain": "brightdata.com",
@@ -486,7 +486,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "4412b85c3700a7e08a7a2ba305872323"
+    "md5": "5139ca3cf2f14abb4f542142a3ac8ae0"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -502,7 +502,7 @@
     "puppeteer": "24.23.1"
   },
   "preferGlobal": true,
-  "recommendedNode": ">=20.12.1",
+  "recommendedNode": ">=24.13.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/luminati-io/luminati-proxy.git"
@@ -516,5 +516,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.643.828"
+  "version": "1.644.172"
 }

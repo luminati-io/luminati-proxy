@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.644.172 Stable
+- :star: NodeJS installation version updated to 24.13.0
+- :bug: Fix port crash on startup if rules enabled 
+
 ## 1.643.828 Stable
 - :sparkles: Added --sanitize_rules flag to statically sanitize rule trigger code
 - :sparkles: Added dark theme support in UI

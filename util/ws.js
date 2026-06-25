@@ -75,8 +75,8 @@ const WIN_SIZE_MIN =
     (is_node && +process.env.WIN_SIZE_MIN || 1) * 1024 * 1024;
 const WIN_SIZE_MAX =
     (is_node && +process.env.WIN_SIZE_MAX || 10) * 1024 * 1024;
-const IS_DYNAMIC_WIN_SIZE =
-    is_node && process.env.IS_DYNAMIC_WIN_SIZE === 'true';
+let IS_DYNAMIC_WIN_SIZE = is_node &&
+    process.env.IS_DYNAMIC_WIN_SIZE === 'true';
 let zcounter; // has to be lazy because zcounter.js itself uses this module
 const net = is_node ? require('net') : null;
 const crypto = is_node ? require('crypto') : null;
@@ -2694,7 +2694,11 @@ if (zutil.is_mocha())
 assign(E, {Client, Server, Server_uws2, Mux, ERROR_CODES, Buffer_builder,
     Bin_buffer});
 E.t = assign(E_t, {WS, IPC_server_base, BUFFER_CONTENT,
-    BUFFER_IPC_CALL, VFD_SZ, VFD_BIN_SZ});
+    BUFFER_IPC_CALL, VFD_SZ, VFD_BIN_SZ,
+    reinit_win_size: ()=>{
+        IS_DYNAMIC_WIN_SIZE = is_node &&
+            process.env.IS_DYNAMIC_WIN_SIZE === 'true';
+    }});
 return E;
 
 }); }());

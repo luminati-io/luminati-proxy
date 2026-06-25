@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.644.172",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "NodeJS installation version updated to 24.13.0"
+            },
+            {
+                "type": "bug",
+                "text": "Fix port crash on startup if rules enabled "
+            }
+        ]
+    },
+    {
         "ver": "1.643.828",
         "type": "stable",
         "changes": [
