@@ -294,8 +294,11 @@ E.ask_approval = (prompt, opt)=>{
     opt.limit = opt.limit||/^(?:y|n|yes|no)$/i;
     if (E.opt.quiet)
         return true;
+    let attempts = 0;
     while (!opt.limit.test(res))
     {
+        if (++attempts>5)
+            return false;
         if (!(res = E.get_input(prompt, opt)) && opt.default_input)
         {
             res = opt.default_input;

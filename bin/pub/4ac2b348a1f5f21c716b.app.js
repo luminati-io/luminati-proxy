@@ -1428,8 +1428,15 @@ E.send = function(opt){
     var ajopt, xhr, xhr_data;
     zerr.debug('ajax('+data_type+') url '+url+' retry '+retry);
     return etask([function(){
-        ajopt = {type: method, url: url, headers: assign({}, opt.headers),
-            dataType: data_type, data: data, timeout: timeout, xhrFields: {}};
+        ajopt = {
+            type: method,
+            url: url,
+            headers: assign({}, opt.headers),
+            dataType: data_type,
+            data: data,
+            timeout: timeout,
+            xhrFields: {},
+        };
         if (opt.content_type)
             ajopt.contentType = opt.content_type;
         if (opt.with_credentials)
@@ -1512,11 +1519,13 @@ E.send = function(opt){
                 data: xhr_data,
                 xhr: xhr,
                 // legacy
-                error: xhr.statusText||'no_status', message: xhr.responseText,
+                error: xhr.statusText||'no_status',
+                message: xhr.responseText,
             };
         }
-        err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
-            xhr.getResponseHeader('X-Hola-Error');
+        err.x_error = xhr.getResponseHeader ?
+            xhr.getResponseHeader('X-Luminati-Error') ||
+            xhr.getResponseHeader('X-Hola-Error') : undefined;
         throw err;
     }, function(_data){
         var res, t = Date.now()-t0;
@@ -1549,8 +1558,8 @@ E.send = function(opt){
 
 E.abort = function(aj){ aj.goto('abort'); };
 
-['GET', 'POST', 'PUT', 'DELETE'].forEach(function(m){
-    E[m.toLowerCase()] = function(url, params, opt){
+function build_method(m){
+    return function(url, params, opt){
         url = typeof url=='string' ? {url: url} : url;
         var send_opt = assign({method: m, json: 1}, url, params, opt);
         if (!{get: 1, delete: 1}[send_opt.method.toLowerCase()]
@@ -1562,7 +1571,12 @@ E.abort = function(aj){ aj.goto('abort'); };
         }
         return E.send(send_opt);
     };
-});
+}
+
+E.get = build_method('GET');
+E.post = build_method('POST');
+E.put = build_method('PUT');
+E.delete = build_method('DELETE');
 
 E.json = function(opt){ return E.send(assign({}, opt, {json: 1})); };
 
@@ -2852,25 +2866,30 @@ var base_list = {
     AF: {name: 'Afghanistan', cn_name: '阿富汗', alpha_3: 'AFG',
         adj: 'Afghan'},
     AL: {name: 'Albania', cn_name: '阿爾巴尼亞', alpha_3: 'ALB',
-        adj: 'Albanian'},
+        adj: 'Albanian', cn_name_alias: ['阿尔巴尼亚']},
     DZ: {name: 'Algeria', cn_name: '阿尔及利亚', alpha_3: 'DZA',
         adj: 'Algerian'},
     AX: {name: 'Aland Islands', cn_name: '奧蘭群島', alpha_3: 'ALA',
-        adj_name: 'Åland Islands', adj: 'Åland Island'},
+        adj_name: 'Åland Islands', adj: 'Åland Island',
+        cn_name_alias: ['奥兰群岛']},
     AS: {name: 'American Samoa', cn_name: '美屬薩摩亞', alpha_3: 'ASM',
-        adj: 'American Samoan'},
-    AD: {name: 'Andorra', cn_name: '安道爾', alpha_3: 'AND', adj: 'Andorran'},
+        adj: 'American Samoan', cn_name_alias: ['美属萨摩亚']},
+    AD: {name: 'Andorra', cn_name: '安道爾', alpha_3: 'AND', adj: 'Andorran',
+        cn_name_alias: ['安道尔']},
     AO: {name: 'Angola', cn_name: '安哥拉', alpha_3: 'AGO', adj: 'Angolan'},
     AI: {name: 'Anguilla', cn_name: '安圭拉島', alpha_3: 'AIA',
-        adj: 'Anguillan'},
-    AQ: {name: 'Antarctica', cn_name: '南極洲', alpha_3: 'ATA'},
+        adj: 'Anguillan', cn_name_alias: ['安圭拉岛']},
+    AQ: {name: 'Antarctica', cn_name: '南極洲', alpha_3: 'ATA',
+        cn_name_alias: ['南极洲']},
     AG: {name: 'Antigua And Barbuda', cn_name: '安提瓜和巴布達',
-        alpha_3: 'ATG', adj_name: 'Antigua and Barbuda', adj: 'Antiguan'},
+        alpha_3: 'ATG', adj_name: 'Antigua and Barbuda', adj: 'Antiguan',
+        cn_name_alias: ['安提瓜和巴布达']},
     AR: {name: 'Argentina', cn_name: '阿根廷', alpha_3: 'ARG',
         adj: 'Argentinian'},
     AM: {name: 'Armenia', cn_name: '亚美尼亚', alpha_3: 'ARM',
         adj: 'Armenian'},
-    AW: {name: 'Aruba', cn_name: '阿魯巴島', alpha_3: 'ABW', adj: 'Aruban'},
+    AW: {name: 'Aruba', cn_name: '阿魯巴島', alpha_3: 'ABW', adj: 'Aruban',
+        cn_name_alias: ['阿鲁巴岛']},
     AU: {name: 'Australia', cn_name: '澳大利亚', alpha_3: 'AUS',
         adj: 'Australian'},
     AT: {name: 'Austria', cn_name: '奥地利', alpha_3: 'AUT', adj: 'Austrian'},
@@ -2880,163 +2899,181 @@ var base_list = {
     BH: {name: 'Bahrain', cn_name: '巴林', alpha_3: 'BHR', adj: 'Bahraini'},
     JE: {name: 'Bailiwick of Jersey', cn_name: '泽西岛', alpha_3: 'JEY',
         adj_name: 'Jersey', adj: 'Channel Island'},
-    BD: {name: 'Bangladesh', cn_name: '孟加拉國', alpha_3: 'BGD',
-        adj: 'Bengali'},
+    BD: {name: 'Bangladesh', cn_name: '孟加拉', alpha_3: 'BGD',
+        adj: 'Bengali', cn_name_alias: ['孟加拉国', '孟加拉國']},
     BB: {name: 'Barbados', cn_name: '巴巴多斯', alpha_3: 'BRB',
         adj: 'Barbadian'},
     BY: {name: 'Belarus', cn_name: '白俄羅斯', alpha_3: 'BLR',
-        adj: 'Belarusian'},
-    BE: {name: 'Belgium', cn_name: '比利時', alpha_3: 'BEL', adj: 'Belgian'},
-    BZ: {name: 'Belize', cn_name: '伯利茲', alpha_3: 'BLZ', adj: 'Belizean'},
+        adj: 'Belarusian', cn_name_alias: ['白俄罗斯']},
+    BE: {name: 'Belgium', cn_name: '比利時', alpha_3: 'BEL', adj: 'Belgian',
+        cn_name_alias: ['比利时']},
+    BZ: {name: 'Belize', cn_name: '伯利茲', alpha_3: 'BLZ', adj: 'Belizean',
+        cn_name_alias: ['伯利兹']},
     BJ: {name: 'Benin', cn_name: '贝宁', alpha_3: 'BEN', adj: 'Beninese'},
     BM: {name: 'Bermuda', cn_name: '百慕大', alpha_3: 'BMU', adj: 'Bermudan'},
     BT: {name: 'Bhutan', cn_name: '不丹', alpha_3: 'BTN', adj: 'Bhutanese'},
-    BO: {name: 'Bolivia', cn_name: '玻利維亞', alpha_3: 'BOL',
-        adj: 'Bolivian'},
+    BO: {name: 'Bolivia', cn_name: '玻利維亞', alpha_3: 'BOL', adj: 'Bolivian',
+        cn_name_alias: ['玻利维亚']},
     BQ: {name: 'Bonaire (Caribbean Netherlands)',
-        cn_name: '博奈爾島（加勒比荷蘭）', alpha_3: 'BES'},
+        cn_name: '博奈爾島（加勒比荷蘭）', alpha_3: 'BES',
+        cn_name_alias: ['博奈尔岛（加勒比荷兰）']},
     BA: {name: 'Bosnia And Herzegovina', cn_name: '波斯尼亚和黑塞哥维那',
-        alpha_3: 'BIH', adj_name: 'Bosnia and Herzegovina',
-        adj: 'Bosnian'},
+        alpha_3: 'BIH', adj_name: 'Bosnia and Herzegovina', adj: 'Bosnian'},
     BW: {name: 'Botswana', cn_name: '博茨瓦納', alpha_3: 'BWA',
-        adj: 'Botswanan'},
+        adj: 'Botswanan', cn_name_alias: ['博茨瓦纳']},
     BR: {name: 'Brazil', cn_name: '巴西', alpha_3: 'BRA', adj: 'Brazilian'},
-    BN: {name: 'Brunei', cn_name: '文萊', alpha_3: 'BRN', adj: 'Bruneian'},
+    BN: {name: 'Brunei', cn_name: '文萊', alpha_3: 'BRN', adj: 'Bruneian',
+        cn_name_alias: ['文莱']},
     BG: {name: 'Bulgaria', cn_name: '保加利亚', alpha_3: 'BGR',
         adj: 'Bulgarian'},
     BF: {name: 'Burkina Faso', cn_name: '布基纳法索', alpha_3: 'BFA',
         adj: 'Burkinabé'},
-    BI: {name: 'Burundi', cn_name: '布隆迪', alpha_3: 'BDI',
-        adj: 'Burundian'},
+    BI: {name: 'Burundi', cn_name: '布隆迪', alpha_3: 'BDI', adj: 'Burundian'},
     KH: {name: 'Cambodia', cn_name: '柬埔寨', alpha_3: 'KHM',
         adj: 'Cambodian'},
     CM: {name: 'Cameroon', cn_name: '喀麦隆', alpha_3: 'CMR',
         adj: 'Cameroonian'},
     CA: {name: 'Canada', cn_name: '加拿大', alpha_3: 'CAN', adj: 'Canadian'},
     CV: {name: 'Cape Verde', cn_name: '佛得角', alpha_3: 'CPV',
-        adj_name: 'Cabo Verde', adj: 'Cabo Verdean'},
+        adj_name: 'Cabo Verde', adj: 'Cabo Verdean',
+        cn_name_alias: ['佛得角共和国']},
     KY: {name: 'Cayman Islands', cn_name: '开曼群岛', alpha_3: 'CYM',
         adj: 'Caymanian'},
     CF: {name: 'Central African Republic', cn_name: '中非共和國',
-        alpha_3: 'CAF'},
+        alpha_3: 'CAF', cn_name_alias: ['中非共和国']},
     TD: {name: 'Chad', cn_name: '乍得', alpha_3: 'TCD', adj: 'Chadian'},
     CL: {name: 'Chile', cn_name: '智利', alpha_3: 'CHL', adj: 'Chilean'},
     CN: {name: 'China', cn_name: '中国', alpha_3: 'CHN', adj: 'Chinese'},
     CX: {name: 'Christmas Island', cn_name: '聖誕島', alpha_3: 'CXR',
-        adj: 'Christmas Island'},
+        adj: 'Christmas Island', cn_name_alias: ['圣诞岛']},
     CC: {name: 'Cocos (Keeling) Islands', cn_name: '科科斯（基林）群島',
-        alpha_3: 'CCK'},
+        alpha_3: 'CCK', cn_name_alias: ['科科斯（基林）群岛']},
     CO: {name: 'Colombia', cn_name: '哥倫比亞', alpha_3: 'COL',
-        adj: 'Colombian'},
+        adj: 'Colombian', cn_name_alias: ['哥伦比亚']},
     KM: {name: 'Comoros', cn_name: '科摩罗', alpha_3: 'COM', adj: 'Comoran'},
     CG: {name: 'Congo', cn_name: '刚果（布）', alpha_3: 'COG',
-        adj: 'Congolese'},
+        adj: 'Congolese', cn_name_alias: ['刚果', '刚果共和国']},
     CK: {name: 'Cook Islands', cn_name: '庫克群島', alpha_3: 'COK',
-        adj: 'Cook Island'},
+        adj: 'Cook Island', cn_name_alias: ['库克群岛']},
     CR: {name: 'Costa Rica', cn_name: '哥斯达黎加', alpha_3: 'CRI',
         adj: 'Costa Rican'},
     CI: {name: 'Cote D\'Ivoire (Ivory Coast)', cn_name: '科特迪瓦',
-        alpha_3: 'CIV', adj_name: 'Côte d\'Ivoire', adj: 'Ivorian'},
+        alpha_3: 'CIV', adj_name: 'Côte d\'Ivoire', adj: 'Ivorian',
+        cn_name_alias: ['象牙海岸']},
     HR: {name: 'Croatia (Hrvatska)', cn_name: '克羅地亞（Hrvatska）',
-        alpha_3: 'HRV', adj_name: 'Croatia', adj: 'Croatian'},
+        alpha_3: 'HRV', adj_name: 'Croatia', adj: 'Croatian',
+        cn_name_alias: ['克罗地亚', '克羅地亞', '克罗地亚（Hrvatska）']},
     CU: {name: 'Cuba', cn_name: '古巴', alpha_3: 'CUB', adj: 'Cuban'},
     CW: {name: 'Curacao', cn_name: '库拉索', alpha_3: 'CUW',
         adj_name: 'Curaçao', adj: 'Curaçaoan'},
     CY: {name: 'Cyprus', cn_name: '塞浦路斯', alpha_3: 'CYP', adj: 'Cypriot'},
-    CZ: {name: 'Czech Republic', cn_name: '捷克', alpha_3: 'CZE',
-        adj: 'Czech'},
+    CZ: {name: 'Czech Republic', cn_name: '捷克', alpha_3: 'CZE', adj: 'Czech',
+        cn_name_alias: ['捷克共和国']},
     CD: {name: 'Democratic Republic Of Congo (Zaire)',
-        cn_name: '剛果民主共和國（扎伊爾）', alpha_3: 'COD'},
+        cn_name: '剛果民主共和國（扎伊爾）', alpha_3: 'COD',
+        cn_name_alias: ['刚果民主共和国', '刚果（金）']},
     DK: {name: 'Denmark', cn_name: '丹麦', alpha_3: 'DNK', adj: 'Danish'},
     DJ: {name: 'Djibouti', cn_name: '吉布提', alpha_3: 'DJI',
         adj: 'Djiboutian'},
-    DM: {name: 'Dominica', cn_name: '多米尼加', alpha_3: 'DMA',
+    DM: {name: 'Dominica', cn_name: '多米尼克', alpha_3: 'DMA',
         adj: 'Dominican'},
     DO: {name: 'Dominican Republic', cn_name: '多明尼加共和國', alpha_3: 'DOM',
-        adj: 'Dominican'},
+        adj: 'Dominican', cn_name_alias: ['多米尼加共和国']},
     EC: {name: 'Ecuador', cn_name: '厄瓜多尔', alpha_3: 'ECU',
         adj: 'Ecuadorian'},
     EG: {name: 'Egypt', cn_name: '埃及', alpha_3: 'EGY', adj: 'Egyptian'},
     SV: {name: 'El Salvador', cn_name: '萨尔瓦多', alpha_3: 'SLV',
         adj: 'Salvadoran'},
     GQ: {name: 'Equatorial Guinea', cn_name: '赤道幾內亞', alpha_3: 'GNQ',
-        adj: 'Equatorial Guinean'},
-    ER: {name: 'Eritrea', cn_name: '厄立特里亞', alpha_3: 'ERI'},
-    EU: {name: 'European Union', cn_name: '歐洲聯盟'},
-    EE: {name: 'Estonia', cn_name: '愛沙尼亞', alpha_3: 'EST',
-        adj: 'Estonian'},
+        adj: 'Equatorial Guinean', cn_name_alias: ['赤道几内亚']},
+    ER: {name: 'Eritrea', cn_name: '厄立特里亞', alpha_3: 'ERI',
+        cn_name_alias: ['厄立特里亚']},
+    EU: {name: 'European Union', cn_name: '歐洲聯盟',
+        cn_name_alias: ['欧洲联盟', '欧盟']},
+    EE: {name: 'Estonia', cn_name: '愛沙尼亞', alpha_3: 'EST', adj: 'Estonian',
+        cn_name_alias: ['爱沙尼亚']},
     ET: {name: 'Ethiopia', cn_name: '埃塞俄比亞', alpha_3: 'ETH',
-        adj: 'Ethiopian'},
+        adj: 'Ethiopian', cn_name_alias: ['埃塞俄比亚']},
     FK: {name: 'Falkland Islands (Malvinas)',
-        cn_name: '福克蘭群島（馬爾維納斯）', alpha_3: 'FLK'},
+        cn_name: '福克蘭群島（馬爾維納斯）', alpha_3: 'FLK',
+        cn_name_alias: ['福克兰群岛（马尔维纳斯）']},
     FO: {name: 'Faroe Islands', cn_name: '法羅群島', alpha_3: 'FRO',
-        adj: 'Faroese'},
-    FJ: {name: 'Fiji', cn_name: '斐濟', alpha_3: 'FJI', adj: 'Fijian'},
+        adj: 'Faroese', cn_name_alias: ['法罗群岛']},
+    FJ: {name: 'Fiji', cn_name: '斐濟', alpha_3: 'FJI', adj: 'Fijian',
+        cn_name_alias: ['斐济']},
     FI: {name: 'Finland', cn_name: '芬兰', alpha_3: 'FIN', adj: 'Finnish'},
     FR: {name: 'France', cn_name: '法国', alpha_3: 'FRA', adj: 'French'},
-    GF: {name: 'French Guiana', cn_name: '法屬圭亞那', alpha_3: 'GUF'},
+    GF: {name: 'French Guiana', cn_name: '法屬圭亞那', alpha_3: 'GUF',
+        cn_name_alias: ['法属圭亚那']},
     PF: {name: 'French Polynesia', cn_name: '法属波利尼西亚', alpha_3: 'PYF',
         adj: 'French Polynesian'},
     TF: {name: 'French Southern Territories', cn_name: '法屬南部領地',
-        alpha_3: 'ATF'},
+        alpha_3: 'ATF', cn_name_alias: ['法属南部领地']},
     GA: {name: 'Gabon', cn_name: '加蓬', alpha_3: 'GAB', adj: 'Gabonese'},
     GM: {name: 'Gambia', cn_name: '冈比亚', alpha_3: 'GMB', adj: 'Gambian'},
-    GE: {name: 'Georgia', cn_name: '佐治亞州', alpha_3: 'GEO',
-        adj: 'Georgian'},
+    GE: {name: 'Georgia', cn_name: '格鲁吉亚', alpha_3: 'GEO', adj: 'Georgian',
+        cn_name_alias: ['乔治亚']},
     DE: {name: 'Germany', cn_name: '德国', alpha_3: 'DEU', adj: 'German'},
-    GH: {name: 'Ghana', cn_name: '加納', alpha_3: 'GHA', adj: 'Ghanaian'},
+    GH: {name: 'Ghana', cn_name: '加納', alpha_3: 'GHA', adj: 'Ghanaian',
+        cn_name_alias: ['加纳']},
     GI: {name: 'Gibraltar', cn_name: '直布罗陀', alpha_3: 'GIB',
         adj: 'Gibraltar'},
     GB: {name: 'Great Britain', cn_name: '大不列顛', alpha_3: 'GBR',
-        adj_name: 'United Kingdom', adj: 'British'},
+        adj_name: 'United Kingdom', adj: 'British',
+        cn_name_alias: ['大不列颠', '大不列颠及北爱尔兰联合王国']},
     GR: {name: 'Greece', cn_name: '希腊', alpha_3: 'GRC', adj: 'Greek'},
     GL: {name: 'Greenland', cn_name: '格陵蘭', alpha_3: 'GRL',
-        adj: 'Greenlandic'},
+        adj: 'Greenlandic', cn_name_alias: ['格陵兰']},
     GD: {name: 'Grenada', cn_name: '格林納達', alpha_3: 'GRD',
-        adj: 'Grenadian'},
+        adj: 'Grenadian', cn_name_alias: ['格林纳达']},
     GU: {name: 'Guam', cn_name: '关岛', alpha_3: 'GUM', adj: 'Guamanian'},
     GP: {name: 'Guadeloupe', cn_name: '瓜德罗普', alpha_3: 'GLP'},
     GT: {name: 'Guatemala', cn_name: '危地马拉', alpha_3: 'GTM',
         adj: 'Guatemalan'},
     GG: {name: 'Guernsey', cn_name: '根西島', alpha_3: 'GGY',
-        adj: 'Channel Island'},
+        adj: 'Channel Island', cn_name_alias: ['根西岛']},
     GN: {name: 'Guinea', cn_name: '几内亚', alpha_3: 'GIN', adj: 'Guinean'},
     GW: {name: 'Guinea-Bissau', cn_name: '幾內亞比紹', alpha_3: 'GNB',
-        adj: 'Bissau-Guinean'},
-    GY: {name: 'Guyana', cn_name: '圭亞那', alpha_3: 'GUY', adj: 'Guyanese'},
+        adj: 'Bissau-Guinean', cn_name_alias: ['几内亚比绍']},
+    GY: {name: 'Guyana', cn_name: '圭亞那', alpha_3: 'GUY', adj: 'Guyanese',
+        cn_name_alias: ['圭亚那']},
     HT: {name: 'Haiti', cn_name: '海地', alpha_3: 'HTI', adj: 'Haitian'},
     HN: {name: 'Honduras', cn_name: '洪都拉斯', alpha_3: 'HND',
         adj: 'Honduran'},
-    HK: {name: 'Hong Kong', cn_name: '香港', alpha_3: 'HKG',
-        adj: 'Hong Kong'},
-    HU: {name: 'Hungary', cn_name: '匈牙利', alpha_3: 'HUN',
-        adj: 'Hungarian'},
+    HK: {name: 'Hong Kong', cn_name: '香港', alpha_3: 'HKG', adj: 'Hong Kong'},
+    HU: {name: 'Hungary', cn_name: '匈牙利', alpha_3: 'HUN', adj: 'Hungarian'},
     IS: {name: 'Iceland', cn_name: '冰岛', alpha_3: 'ISL', adj: 'Icelandic'},
     IN: {name: 'India', cn_name: '印度', alpha_3: 'IND', adj: 'Indian'},
     ID: {name: 'Indonesia', cn_name: '印度尼西亞', alpha_3: 'IDN',
-        adj: 'Indonesian'},
+        adj: 'Indonesian', cn_name_alias: ['印度尼西亚']},
     IO: {name: 'British Indian Ocean Territory', alpha_3: 'IOT',
         adj: 'Indian'},
     IR: {name: 'Iran', cn_name: '伊朗', alpha_3: 'IRN', adj: 'Iranian'},
     IQ: {name: 'Iraq', cn_name: '伊拉克', alpha_3: 'IRQ', adj: 'Iraqi'},
-    IE: {name: 'Ireland', cn_name: '愛爾蘭', alpha_3: 'IRL', adj: 'Irish'},
+    IE: {name: 'Ireland', cn_name: '愛爾蘭', alpha_3: 'IRL', adj: 'Irish',
+        cn_name_alias: ['爱尔兰']},
     IM: {name: 'Isle of Man', cn_name: '马恩岛', alpha_3: 'IMN', adj: 'Manx'},
     IL: {name: 'Israel', cn_name: '以色列', alpha_3: 'ISR', adj: 'Israeli'},
     IT: {name: 'Italy', cn_name: '意大利', alpha_3: 'ITA', adj: 'Italian'},
-    JM: {name: 'Jamaica', cn_name: '牙買加', alpha_3: 'JAM', adj: 'Jamaican'},
+    JM: {name: 'Jamaica', cn_name: '牙買加', alpha_3: 'JAM', adj: 'Jamaican',
+        cn_name_alias: ['牙买加']},
     JP: {name: 'Japan', cn_name: '日本', alpha_3: 'JPN', adj: 'Japanese'},
-    JO: {name: 'Jordan', cn_name: '約旦', alpha_3: 'JOR', adj: 'Jordanian'},
+    JO: {name: 'Jordan', cn_name: '約旦', alpha_3: 'JOR', adj: 'Jordanian',
+        cn_name_alias: ['约旦']},
     KZ: {name: 'Kazakhstan', cn_name: '哈薩克斯坦', alpha_3: 'KAZ',
-        adj: 'Kazakhstani'},
-    KE: {name: 'Kenya', cn_name: '肯尼亞', alpha_3: 'KEN', adj: 'Kenyan'},
+        adj: 'Kazakhstani', cn_name_alias: ['哈萨克斯坦']},
+    KE: {name: 'Kenya', cn_name: '肯尼亞', alpha_3: 'KEN', adj: 'Kenyan',
+        cn_name_alias: ['肯尼亚']},
     KI: {name: 'Kiribati', cn_name: '基里巴斯', alpha_3: 'KIR',
         adj: 'I-Kiribati'},
     XK: {name: 'Kosovo', cn_name: '科索沃'},
     KW: {name: 'Kuwait', cn_name: '科威特', alpha_3: 'KWT', adj: 'Kuwaiti'},
     KG: {name: 'Kyrgyzstan', cn_name: '吉尔吉斯斯坦', alpha_3: 'KGZ',
         adj: 'Kyrgyzstani'},
-    LA: {name: 'Laos', cn_name: '老撾', alpha_3: 'LAO', adj: 'Lao, Laotian'},
-    LV: {name: 'Latvia', cn_name: '拉脫維亞', alpha_3: 'LVA', adj: 'Latvian'},
+    LA: {name: 'Laos', cn_name: '老撾', alpha_3: 'LAO', adj: 'Lao, Laotian',
+        cn_name_alias: ['老挝']},
+    LV: {name: 'Latvia', cn_name: '拉脫維亞', alpha_3: 'LVA', adj: 'Latvian',
+        cn_name_alias: ['拉脱维亚']},
     LB: {name: 'Lebanon', cn_name: '黎巴嫩', alpha_3: 'LBN', adj: 'Lebanese'},
     LS: {name: 'Lesotho', cn_name: '莱索托', alpha_3: 'LSO', adj: 'Basotho'},
     LR: {name: 'Liberia', cn_name: '利比里亚', alpha_3: 'LBR',
@@ -3047,8 +3084,9 @@ var base_list = {
     LT: {name: 'Lithuania', cn_name: '立陶宛', alpha_3: 'LTU',
         adj: 'Lithuanian'},
     LU: {name: 'Luxembourg', cn_name: '盧森堡', alpha_3: 'LUX',
-        adj: 'Luxembourgish'},
-    MO: {name: 'Macau', cn_name: '澳門', alpha_3: 'MAC', adj: 'Macanese'},
+        adj: 'Luxembourgish', cn_name_alias: ['卢森堡']},
+    MO: {name: 'Macau', cn_name: '澳門', alpha_3: 'MAC', adj: 'Macanese',
+        cn_name_alias: ['澳门']},
     MK: {name: 'Macedonia', cn_name: '马其顿', alpha_3: 'MKD',
         adj: 'Macedonian'},
     MG: {name: 'Madagascar', cn_name: '马达加斯加', alpha_3: 'MDG',
@@ -3059,24 +3097,26 @@ var base_list = {
     MV: {name: 'Maldives', cn_name: '马尔代夫', alpha_3: 'MDV',
         adj: 'Maldivian'},
     ML: {name: 'Mali', cn_name: '马里', alpha_3: 'MLI', adj: 'Malian'},
-    MT: {name: 'Malta', cn_name: '馬耳他', alpha_3: 'MLT', adj: 'Maltese'},
+    MT: {name: 'Malta', cn_name: '馬耳他', alpha_3: 'MLT', adj: 'Maltese',
+        cn_name_alias: ['马耳他']},
     MH: {name: 'Marshall Islands', cn_name: '馬紹爾群島', alpha_3: 'MHL',
-        adj: 'Marshallese'},
+        adj: 'Marshallese', cn_name_alias: ['马绍尔群岛']},
     MQ: {name: 'Martinique', cn_name: '馬提尼克島', alpha_3: 'MTQ',
-        adj: 'Martinican'},
+        adj: 'Martinican', cn_name_alias: ['马提尼克岛']},
     MR: {name: 'Mauritania', cn_name: '毛里塔尼亚', alpha_3: 'MRT',
         adj: 'Mauritanian'},
     MU: {name: 'Mauritius', cn_name: '毛里求斯', alpha_3: 'MUS',
         adj: 'Mauritian'},
-    YT: {name: 'Mayotte', cn_name: '馬約特島', alpha_3: 'MYT', adj: 'Mahoran'},
+    YT: {name: 'Mayotte', cn_name: '馬約特島', alpha_3: 'MYT', adj: 'Mahoran',
+        cn_name_alias: ['马约特岛']},
     MX: {name: 'Mexico', cn_name: '墨西哥', alpha_3: 'MEX', adj: 'Mexican'},
     FM: {name: 'Micronesia', cn_name: '密克羅尼西亞', alpha_3: 'FSM',
-        adj: 'Micronesian'},
-    MD: {name: 'Moldova', cn_name: '摩爾多瓦', alpha_3: 'MDA',
-        adj: 'Moldovan'},
-    MC: {name: 'Monaco', cn_name: '摩納哥', alpha_3: 'MCO', adj: 'Monacan'},
-    MN: {name: 'Mongolia', cn_name: '蒙古', alpha_3: 'MNG',
-        adj: 'Mongolian'},
+        adj: 'Micronesian', cn_name_alias: ['密克罗尼西亚']},
+    MD: {name: 'Moldova', cn_name: '摩爾多瓦', alpha_3: 'MDA', adj: 'Moldovan',
+        cn_name_alias: ['摩尔多瓦']},
+    MC: {name: 'Monaco', cn_name: '摩納哥', alpha_3: 'MCO', adj: 'Monacan',
+        cn_name_alias: ['摩纳哥']},
+    MN: {name: 'Mongolia', cn_name: '蒙古', alpha_3: 'MNG', adj: 'Mongolian'},
     ME: {name: 'Montenegro', cn_name: '黑山', alpha_3: 'MNE',
         adj: 'Montenegrin'},
     MS: {name: 'Montserrat', cn_name: '蒙特塞拉特', alpha_3: 'MSR'},
@@ -3084,80 +3124,93 @@ var base_list = {
     MZ: {name: 'Mozambique', cn_name: '莫桑比克', alpha_3: 'MOZ',
         adj: 'Mozambican'},
     MM: {name: 'Myanmar (Burma)', cn_name: '緬甸', alpha_3: 'MMR',
-        adj_name: 'Myanmar', adj: 'Burmese'},
+        adj_name: 'Myanmar', adj: 'Burmese', cn_name_alias: ['缅甸']},
     NA: {name: 'Namibia', cn_name: '纳米比亚', alpha_3: 'NAM',
         adj: 'Namibian'},
     NR: {name: 'Nauru', cn_name: '瑙鲁', alpha_3: 'NRU', adj: 'Nauruan'},
-    NP: {name: 'Nepal', cn_name: '尼泊爾', alpha_3: 'NPL', adj: 'Nepali'},
+    NP: {name: 'Nepal', cn_name: '尼泊爾', alpha_3: 'NPL', adj: 'Nepali',
+        cn_name_alias: ['尼泊尔']},
     NL: {name: 'Netherlands', cn_name: '荷兰', alpha_3: 'NLD', adj: 'Dutch'},
-    AN: {name: 'Netherlands Antilles', cn_name: '荷屬安的列斯'},
+    AN: {name: 'Netherlands Antilles', cn_name: '荷屬安的列斯',
+        cn_name_alias: ['荷属安的列斯']},
     NC: {name: 'New Caledonia', cn_name: '新喀里多尼亚', alpha_3: 'NCL',
         adj: 'New Caledonian'},
     NZ: {name: 'New Zealand', cn_name: '新西兰', alpha_3: 'NZL',
         adj: 'Zelanian'},
     NI: {name: 'Nicaragua', cn_name: '尼加拉瓜', alpha_3: 'NIC',
         adj: 'Nicaraguan'},
-    NE: {name: 'Niger', cn_name: '尼日爾', alpha_3: 'NER', adj: 'Nigerien'},
+    NE: {name: 'Niger', cn_name: '尼日爾', alpha_3: 'NER', adj: 'Nigerien',
+        cn_name_alias: ['尼日尔']},
     NG: {name: 'Nigeria', cn_name: '尼日利亚', alpha_3: 'NGA',
         adj: 'Nigerian'},
     NU: {name: 'Niue', cn_name: '纽埃', alpha_3: 'NIU'},
     NF: {name: 'Norfolk Island', cn_name: '诺福克岛', alpha_3: 'NFK'},
-    KP: {name: 'North Korea', cn_name: '北朝鮮', alpha_3: 'PRK'},
+    KP: {name: 'North Korea', cn_name: '北朝鮮', alpha_3: 'PRK',
+        cn_name_alias: ['北朝鲜', '朝鲜', '朝鲜民主主义人民共和国']},
     MP: {name: 'Northern Mariana Islands', cn_name: '北馬里亞納群島',
-        alpha_3: 'MNP', adj: 'Niuean'},
+        alpha_3: 'MNP', adj: 'Niuean', cn_name_alias: ['北马里亚纳群岛']},
     NO: {name: 'Norway', cn_name: '挪威', alpha_3: 'NOR', adj: 'Norwegian'},
     OM: {name: 'Oman', cn_name: '阿曼', alpha_3: 'OMN', adj: 'Omani'},
     PK: {name: 'Pakistan', cn_name: '巴基斯坦', alpha_3: 'PAK',
         adj: 'Pakistani'},
-    PW: {name: 'Palau', cn_name: 'u琉', alpha_3: 'PLW', adj: 'Palauan'},
+    PW: {name: 'Palau', cn_name: '帕劳', alpha_3: 'PLW', adj: 'Palauan'},
     PS: {name: 'Palestine', cn_name: '巴勒斯坦', alpha_3: 'PSE',
         adj: 'Palestinian'},
-    PA: {name: 'Panama', cn_name: '巴拿馬', alpha_3: 'PAN',
-        adj: 'Panamanian'},
+    PA: {name: 'Panama', cn_name: '巴拿馬', alpha_3: 'PAN', adj: 'Panamanian',
+        cn_name_alias: ['巴拿马']},
     PG: {name: 'Papua New Guinea', cn_name: '巴布亞新幾內亞', alpha_3: 'PNG',
-        adj: 'Papuan'},
+        adj: 'Papuan', cn_name_alias: ['巴布亚新几内亚']},
     PY: {name: 'Paraguay', cn_name: '巴拉圭', alpha_3: 'PRY',
         adj: 'Paraguayan'},
-    PE: {name: 'Peru', cn_name: '秘魯', alpha_3: 'PER', adj: 'Peruvian'},
+    PE: {name: 'Peru', cn_name: '秘魯', alpha_3: 'PER', adj: 'Peruvian',
+        cn_name_alias: ['秘鲁']},
     PH: {name: 'Philippines', cn_name: '菲律宾', alpha_3: 'PHL',
         adj: 'Filipino'},
-    PN: {name: 'Pitcairn', cn_name: '皮特凱恩', alpha_3: 'PCN'},
+    PN: {name: 'Pitcairn', cn_name: '皮特凱恩', alpha_3: 'PCN',
+        cn_name_alias: ['皮特凯恩']},
     PL: {name: 'Poland', cn_name: '波兰', alpha_3: 'POL', adj: 'Polish'},
-    PM: {name: 'Saint Pierre and Miquelon', alpha_3: 'SPM'},
+    PM: {name: 'Saint Pierre and Miquelon', alpha_3: 'SPM',
+        cn_name_alias: ['圣皮埃尔和密克隆']},
     PT: {name: 'Portugal', cn_name: '葡萄牙', alpha_3: 'PRT',
         adj: 'Portuguese'},
     PR: {name: 'Puerto Rico', cn_name: '波多黎各', alpha_3: 'PRI',
         adj: 'Puerto Rican'},
     QA: {name: 'Qatar', cn_name: '卡塔尔', alpha_3: 'QAT', adj: 'Qatari'},
-    RE: {name: 'Réunion', cn_name: '團圓', alpha_3: 'REU'},
+    RE: {name: 'Réunion', cn_name: '留尼汪', alpha_3: 'REU',
+        cn_name_alias: ['留尼旺']},
     RO: {name: 'Romania', cn_name: '罗马尼亚', alpha_3: 'ROU',
         adj: 'Romanian'},
-    RU: {name: 'Russia', cn_name: '俄罗斯', alpha_3: 'RUS', adj: 'Russian'},
+    RU: {name: 'Russia', cn_name: '俄罗斯', alpha_3: 'RUS', adj: 'Russian',
+        cn_name_alias: ['俄罗斯联邦']},
     RW: {name: 'Rwanda', cn_name: '卢旺达', alpha_3: 'RWA', adj: 'Rwandan'},
     BL: {name: 'Saint Barthelemy', cn_name: '聖巴托洛繆島', alpha_3: 'BLM',
-        adj_name: 'Saint Barthélemy', adj: 'Barthélemois'},
-    SH: {name: 'Saint Helena', cn_name: '聖海倫娜', alpha_3: 'SHN'},
+        adj_name: 'Saint Barthélemy', adj: 'Barthélemois',
+        cn_name_alias: ['圣巴托洛缪岛']},
+    SH: {name: 'Saint Helena', cn_name: '聖海倫娜', alpha_3: 'SHN',
+        cn_name_alias: ['圣赫勒拿', '圣海伦娜']},
     KN: {name: 'Saint Kitts And Nevis', cn_name: '聖基茨和尼維斯',
-        alpha_3: 'KNA', adj_name: 'Saint Kitts and Nevis',
-        adj: 'Kittitian'},
+        alpha_3: 'KNA', adj_name: 'Saint Kitts and Nevis', adj: 'Kittitian',
+        cn_name_alias: ['圣基茨和尼维斯']},
     LC: {name: 'Saint Lucia', cn_name: '聖盧西亞', alpha_3: 'LCA',
-        adj: 'Saint Lucian'},
+        adj: 'Saint Lucian', cn_name_alias: ['圣卢西亚']},
     MF: {name: 'Saint Martin', cn_name: '聖馬丁', alpha_3: 'MAF',
-        adj: 'Saint-Martinoise'},
+        adj: 'Saint-Martinoise', cn_name_alias: ['圣马丁']},
     VC: {name: 'Saint Vincent And The Grenadines',
         cn_name: '聖文森特和格林納丁斯', alpha_3: 'VCT',
-        adj_name: 'Saint Vincent and the Grenadines', adj: 'Saint Vincentian'},
+        adj_name: 'Saint Vincent and the Grenadines', adj: 'Saint Vincentian',
+        cn_name_alias: ['圣文森特和格林纳丁斯']},
     SM: {name: 'San Marino', cn_name: '圣马力诺', alpha_3: 'SMR',
         adj: 'Sammarinese'},
     ST: {name: 'Sao Tome And Principe', cn_name: '聖多美和普林西比',
-        alpha_3: 'STP'},
+        alpha_3: 'STP', cn_name_alias: ['圣多美和普林西比']},
     SA: {name: 'Saudi Arabia', cn_name: '沙特阿拉伯', alpha_3: 'SAU',
         adj: 'Saudi'},
     SN: {name: 'Senegal', cn_name: '塞内加尔', alpha_3: 'SEN',
         adj: 'Senegalese'},
-    RS: {name: 'Serbia', cn_name: '塞爾維亞', alpha_3: 'SRB', adj: 'Serbian'},
+    RS: {name: 'Serbia', cn_name: '塞爾維亞', alpha_3: 'SRB', adj: 'Serbian',
+        cn_name_alias: ['塞尔维亚']},
     SC: {name: 'Seychelles', cn_name: '塞舌爾', alpha_3: 'SYC',
-        adj: 'Seychellois'},
+        adj: 'Seychellois', cn_name_alias: ['塞舌尔']},
     SL: {name: 'Sierra Leone', cn_name: '塞拉利昂', alpha_3: 'SLE',
         adj: 'Sierra Leonean'},
     SG: {name: 'Singapore', cn_name: '新加坡', alpha_3: 'SGP',
@@ -3165,82 +3218,89 @@ var base_list = {
     SX: {name: 'Sint Maarten (Dutch part)', cn_name: '荷属圣马丁',
         alpha_3: 'SXM'},
     SK: {name: 'Slovak Republic', cn_name: '斯洛伐克共和國', alpha_3: 'SVK',
-        adj_name: 'Slovakia', adj: 'Slovak'},
+        adj_name: 'Slovakia', adj: 'Slovak',
+        cn_name_alias: ['斯洛伐克共和国', '斯洛伐克']},
     SI: {name: 'Slovenia', cn_name: '斯洛文尼亚', alpha_3: 'SVN',
         adj: 'Slovenian'},
     SB: {name: 'Solomon Islands', cn_name: '所羅門群島', alpha_3: 'SLB',
-        adj: 'Solomon Island'},
+        adj: 'Solomon Island', cn_name_alias: ['所罗门群岛']},
     SO: {name: 'Somalia', cn_name: '索马里', alpha_3: 'SOM', adj: 'Somali'},
     ZA: {name: 'South Africa', cn_name: '南非', alpha_3: 'ZAF',
         adj: 'South African'},
     GS: {name: 'South Georgia And South Sandwich Islands',
-        cn_name: '南喬治亞島和南桑威奇群島', alpha_3: 'SGS'},
-    KR: {name: 'South Korea', cn_name: '朝鲜', alpha_3: 'KOR',
-        adj: 'South Korean'},
+        cn_name: '南喬治亞島和南桑威奇群島', alpha_3: 'SGS',
+        cn_name_alias: ['南乔治亚岛和南桑威奇群岛']},
+    KR: {name: 'South Korea', cn_name: '韩国', alpha_3: 'KOR',
+        adj: 'South Korean', cn_name_alias: ['南韩', '大韩民国']},
     SS: {name: 'South Sudan', cn_name: '南蘇丹', alpha_3: 'SSD',
-        adj: 'South Sudanese'},
+        adj: 'South Sudanese', cn_name_alias: ['南苏丹']},
     ES: {name: 'Spain', cn_name: '西班牙', alpha_3: 'ESP', adj: 'Spanish'},
     LK: {name: 'Sri Lanka', cn_name: '斯里蘭卡', alpha_3: 'LKA',
-        adj: 'Sri Lankan'},
+        adj: 'Sri Lankan', cn_name_alias: ['斯里兰卡']},
     SD: {name: 'Sudan', cn_name: '苏丹', alpha_3: 'SDN', adj: 'Sudanese'},
     SR: {name: 'Suriname', cn_name: '蘇里南', alpha_3: 'SUR',
-        adj_name: 'Surinam', adj: 'Surinamese'},
-    SJ: {name: 'Svalbard and Jan Mayen'},
+        adj_name: 'Surinam', adj: 'Surinamese', cn_name_alias: ['苏里南']},
+    SJ: {name: 'Svalbard and Jan Mayen',
+        cn_name_alias: ['斯瓦尔巴群岛和扬马延岛']},
     SZ: {name: 'Swaziland', cn_name: '斯威士兰', alpha_3: 'SWZ', adj: 'Swazi'},
     SE: {name: 'Sweden', cn_name: '瑞典', alpha_3: 'SWE', adj: 'Swedish'},
     CH: {name: 'Switzerland', cn_name: '瑞士', alpha_3: 'CHE', adj: 'Swiss'},
     SY: {name: 'Syria', cn_name: '叙利亚', alpha_3: 'SYR', adj: 'Syrian'},
-    TW: {name: 'Taiwan', cn_name: '台湾省', alpha_3: 'TWN', adj: 'Taiwanese'},
+    TW: {name: 'Taiwan', cn_name: '台湾省', alpha_3: 'TWN', adj: 'Taiwanese',
+        cn_name_alias: ['台湾']},
     TJ: {name: 'Tajikistan', cn_name: '塔吉克斯坦', alpha_3: 'TJK',
         adj: 'Tajikistani'},
     TZ: {name: 'Tanzania', cn_name: '坦桑尼亚', alpha_3: 'TZA',
         adj: 'Tanzanian'},
     TH: {name: 'Thailand', cn_name: '泰国', alpha_3: 'THA', adj: 'Thai'},
     TL: {name: 'Timor-Leste', cn_name: '東帝汶', alpha_3: 'TLS',
-        adj: 'Timorese'},
+        adj: 'Timorese', cn_name_alias: ['东帝汶']},
     TG: {name: 'Togo', cn_name: '多哥', alpha_3: 'TGO', adj: 'Togolese'},
     TK: {name: 'Tokelau', cn_name: '托克劳群岛', alpha_3: 'TKL'},
-    TO: {name: 'Tonga', cn_name: '湯加', alpha_3: 'TON'},
+    TO: {name: 'Tonga', cn_name: '湯加', alpha_3: 'TON',
+        cn_name_alias: ['汤加']},
     TT: {name: 'Trinidad And Tobago', cn_name: '特立尼达和多巴哥',
         alpha_3: 'TTO', adj_name: 'Trinidad and Tobago', adj: 'Trinidadian'},
     TN: {name: 'Tunisia', cn_name: '突尼斯', alpha_3: 'TUN', adj: 'Tunisian'},
     TR: {name: 'Turkey', cn_name: '土耳其', alpha_3: 'TUR', adj: 'Turkish'},
-    TM: {name: 'Turkmenistan', cn_name: '土庫曼斯坦', alpha_3: 'TKM'},
+    TM: {name: 'Turkmenistan', cn_name: '土庫曼斯坦', alpha_3: 'TKM',
+        cn_name_alias: ['土库曼斯坦']},
     TC: {name: 'Turks And Caicos Islands', cn_name: '特克斯和凱科斯群島',
         alpha_3: 'TCA', adj_name: 'Turks and Caicos Islands',
-        adj: 'Turks and Caicos Island'},
-    TV: {name: 'Tuvalu', cn_name: '圖瓦盧', alpha_3: 'TUV'},
-    UG: {name: 'Uganda', cn_name: '烏干達', alpha_3: 'UGA', adj: 'Ugandan'},
-    UA: {name: 'Ukraine', cn_name: '乌克兰', alpha_3: 'UKR',
-        adj: 'Ukrainian'},
+        adj: 'Turks and Caicos Island', cn_name_alias: ['特克斯和凯科斯群岛']},
+    TV: {name: 'Tuvalu', cn_name: '圖瓦盧', alpha_3: 'TUV',
+        cn_name_alias: ['图瓦卢']},
+    UG: {name: 'Uganda', cn_name: '烏干達', alpha_3: 'UGA', adj: 'Ugandan',
+        cn_name_alias: ['乌干达']},
+    UA: {name: 'Ukraine', cn_name: '乌克兰', alpha_3: 'UKR', adj: 'Ukrainian'},
     AE: {name: 'United Arab Emirates', cn_name: '阿拉伯聯合酋長國',
-        alpha_3: 'ARE', adj: 'Emirati'},
-    UK: {name: 'United Kingdom', cn_name: '英国'},
+        alpha_3: 'ARE', adj: 'Emirati',
+        cn_name_alias: ['阿拉伯联合酋长国', '阿联酋']},
+    UK: {name: 'United Kingdom', cn_name: '英国', cn_name_alias: ['联合王国']},
     US: {name: 'United States', cn_name: '美国', alpha_3: 'USA',
-        adj: 'American'},
+        adj: 'American', cn_name_alias: ['美利坚合众国']},
     UM: {name: 'United States Minor Outlying Islands'},
-    UY: {name: 'Uruguay', cn_name: '乌拉圭', alpha_3: 'URY',
-        adj: 'Uruguayan'},
+    UY: {name: 'Uruguay', cn_name: '乌拉圭', alpha_3: 'URY', adj: 'Uruguayan'},
     UZ: {name: 'Uzbekistan', cn_name: '烏茲別克斯坦', alpha_3: 'UZB',
-        adj: 'Uzbekistani'},
+        adj: 'Uzbekistani', cn_name_alias: ['乌兹别克斯坦']},
     VU: {name: 'Vanuatu', cn_name: '瓦努阿圖', alpha_3: 'VUT',
-        adj: 'Vanuatuan'},
+        adj: 'Vanuatuan', cn_name_alias: ['瓦努阿图']},
     VA: {name: 'Vatican City (Holy See)', cn_name: '梵蒂岡（羅馬教廷）',
-        alpha_3: 'VAT'},
+        alpha_3: 'VAT', cn_name_alias: ['梵蒂冈（罗马教廷）']},
     VE: {name: 'Venezuela', cn_name: '委內瑞拉', alpha_3: 'VEN',
-        adj: 'Venezuelan'},
-    VN: {name: 'Vietnam', cn_name: '越南', alpha_3: 'VNM',
-        adj: 'Vietnamese'},
+        adj: 'Venezuelan', cn_name_alias: ['委内瑞拉']},
+    VN: {name: 'Vietnam', cn_name: '越南', alpha_3: 'VNM', adj: 'Vietnamese'},
     VG: {name: 'Virgin Islands (British)', cn_name: '維爾京群島（英國）',
         alpha_3: 'VGB', adj_name: 'Virgin Islands, British',
-        adj: 'British Virgin Island'},
+        adj: 'British Virgin Island', cn_name_alias: ['维尔京群岛（英国）']},
     VI: {name: 'Virgin Islands (US)', cn_name: '維爾京群島（美國）',
         alpha_3: 'VIR', adj_name: 'Virgin Islands, United States',
-        adj: 'U.S. Virgin Island'},
+        adj: 'U.S. Virgin Island', cn_name_alias: ['维尔京群岛（美国）']},
     WF: {name: 'Wallis And Futuna Islands', cn_name: '瓦利斯和富图纳群岛',
         alpha_3: 'WLF'},
     EH: {name: 'Western Sahara', cn_name: '西撒哈拉', alpha_3: 'ESH'},
-    WS: {name: 'Western Samoa', cn_name: '薩摩亞西部', alpha_3: 'WSM'},
+    WS: {name: 'Western Samoa', cn_name: '薩摩亞西部', alpha_3: 'WSM',
+        cn_name_alias: ['萨摩亚西部']},
     YE: {name: 'Yemen', cn_name: '也门', alpha_3: 'YEM', adj: 'Yemeni'},
     ZM: {name: 'Zambia', cn_name: '赞比亚', alpha_3: 'ZMB', adj: 'Zambian'},
     ZW: {name: 'Zimbabwe', cn_name: '津巴布韦', alpha_3: 'ZWE',
@@ -4599,7 +4659,17 @@ E.label2code = function(label){
     return exc[label] || '';
 };
 
+var cn_name_alias_map = Object.fromEntries(Object.entries(base_list)
+    .filter(function(e){ return e[1].cn_name_alias; })
+    .flatMap(function(e){
+        return e[1].cn_name_alias.map(function(alias){
+            return [alias, e[0]];
+        });
+    }));
+
 E.cnlabel2code = function(label){
+    if (cn_name_alias_map[label])
+        return cn_name_alias_map[label];
     for (var i in E.cn_list)
     {
         if (E.cn_list[i]===label)
@@ -16787,6 +16857,31 @@ E.logfmt = function logfmt(obj){
     }).join(' ');
 };
 
+// bash-like split (echo -e "what's" up  => ['echo', '-e', `what's`, 'up'])
+E.split_args = function split_args(str){
+    var word = /(?:[^\s"'\\]|\\.|"(?:\\.|[^"\\])*"|'[^']*')+/g;
+    var unquote = /"((?:\\.|[^"\\])*)"|'([^']*)'|\\(.)/g;
+    var args = [], m, last = 0;
+    function check_gap(gap){
+        if (/\S/.test(gap))
+            throw new Error('split_args: unbalanced quote or escape in: '+str);
+    }
+    while (m = word.exec(str))
+    {
+        check_gap(str.slice(last, m.index));
+        last = word.lastIndex;
+        args.push(m[0].replace(unquote, function(s, dq, sq, esc){
+            if (dq!=null)
+                return dq.replace(/\\([\\"])/g, '$1');
+            if (sq!=null)
+                return sq;
+            return esc;
+        }));
+    }
+    check_gap(str.slice(last));
+    return args;
+};
+
 return E;
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -20455,6 +20550,7 @@ class IPC_server_base {
             zjson: ws_opt.ipc_zjson,
             call_zerr: ws_opt.ipc_call_zerr,
             mux: ws_opt.mux,
+            on_serialize: ws_opt.on_ipc_serialize,
         };
         const specs = Array.isArray(ws_opt.ipc_server)
             ? ws_opt.ipc_server.reduce((o, name)=>(o[name] = true, o), {})
@@ -20487,6 +20583,7 @@ class IPC_server_base {
         this.mux = opt.mux;
         this.zjson = !!opt.zjson;
         this.call_zerr = !!opt.call_zerr;
+        this.on_serialize = opt.on_serialize;
         this.pending = new Set();
         zws.addListener(json_event(this.zjson), v=>this._on_call(v));
         zws.addListener('disconnected', this._on_disconnected.bind(this));
@@ -20545,6 +20642,14 @@ class IPC_server_resp {
             return false;
         zerr(`${this.ipc.ws}: Method ${this.msg.cmd} not defined`);
         return true;
+    }
+    call_response_timed(rv){
+        let on_ser = this.ipc.on_serialize;
+        if (!on_ser)
+            return this.call_response(rv);
+        let t0 = performance.now();
+        this.call_response(rv);
+        on_ser(this.msg.cmd, performance.now()-t0);
     }
     call_response(rv){
         if (this.msg.bin && (rv instanceof Buffer ||
@@ -20632,12 +20737,12 @@ class IPC_server_resp_call extends IPC_server_resp {
         try {
             et = this.exec();
             if (!et || typeof et.then!='function')
-                return void this.call_response(et);
+                return void this.call_response_timed(et);
         } catch(e){ return this.base_fail(e); }
         const _this = this;
         etask(function*IPC_server_handle(){
             _this.assign_info(this);
-            try { _this.call_response(yield et); }
+            try { _this.call_response_timed(yield et); }
             catch(e){ _this.base_fail(e); }
         });
     }
@@ -21583,6 +21688,11 @@ E.prefix = '';
 E.level = L.NOTICE;
 
 var flush_timer;
+var flush_exit_listener;
+var flush_on_exit = function(){
+    if (E.log_buffer)
+        E.log_buffer.flush();
+};
 E.flush = function(){};
 E.set_log_buffer = function(on){
     if (!on)
@@ -21591,13 +21701,27 @@ E.set_log_buffer = function(on){
             return;
         E.flush();
         write_log = E.log_buffer.destroy();
+        E.log_buffer = null;
         E.flush = function(){};
         clearInterval(flush_timer);
+        if (flush_exit_listener)
+        {
+            process.off('exit', flush_on_exit);
+            flush_exit_listener = false;
+        }
         return;
+    }
+    if (!flush_exit_listener)
+    {
+        process.on('exit', flush_on_exit);
+        flush_exit_listener = true;
     }
     E.log_buffer = Log_buffer();
     write_log = E.log_buffer(write_log, 32*1024);
-    E.flush = function log_buffer_flush(){ E.log_buffer.flush(); };
+    E.flush = function log_buffer_flush(){
+        if (E.log_buffer)
+            E.log_buffer.flush();
+    };
     flush_timer = setInterval(E.flush, 1000).unref();
 };
 
@@ -21607,7 +21731,6 @@ var Log_buffer = function(){
     var buf = [];
     var instance = function log_patch(func, limit){
         orig_func = func;
-        process.on('exit', instance.flush);
         return function log_write(string){
             size += Buffer.byteLength(string);
             buf.push(string);
@@ -21622,7 +21745,6 @@ var Log_buffer = function(){
         size = 0;
     };
     instance.destroy = function log_destroy(){
-        process.off('exit', instance.flush);
         buf.length = 0;
         size = 0;
         return orig_func;
@@ -22201,6 +22323,31 @@ E.logfmt = function logfmt(obj){
     return Object.keys(obj).map(function(k){
         return logfmt_format(k)+'='+logfmt_format(obj[k]);
     }).join(' ');
+};
+
+// bash-like split (echo -e "what's" up  => ['echo', '-e', `what's`, 'up'])
+E.split_args = function split_args(str){
+    var word = /(?:[^\s"'\\]|\\.|"(?:\\.|[^"\\])*"|'[^']*')+/g;
+    var unquote = /"((?:\\.|[^"\\])*)"|'([^']*)'|\\(.)/g;
+    var args = [], m, last = 0;
+    function check_gap(gap){
+        if (/\S/.test(gap))
+            throw new Error('split_args: unbalanced quote or escape in: '+str);
+    }
+    while (m = word.exec(str))
+    {
+        check_gap(str.slice(last, m.index));
+        last = word.lastIndex;
+        args.push(m[0].replace(unquote, function(s, dq, sq, esc){
+            if (dq!=null)
+                return dq.replace(/\\([\\"])/g, '$1');
+            if (sq!=null)
+                return sq;
+            return esc;
+        }));
+    }
+    check_gap(str.slice(last));
+    return args;
 };
 
 return E;
@@ -43387,7 +43534,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
       if (!this.state.settings) return null;
       let {
         settings,
-        example_port = 22225
+        example_port = 33335
       } = this.state;
       const {
         zagent,
@@ -43640,7 +43787,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
   exports["default"] = void 0;
   _react = _interopRequireDefault(_react);
   const E = {};
-  E.code = (proxy = 22225, lpm_token, hostname = document.location.hostname) => {
+  E.code = (proxy = 33335, lpm_token, hostname = document.location.hostname) => {
     const auth = text => !(0, _util.is_local)() && lpm_token ? text.replace(/\[LT\]/g, lpm_token).replace(/\[BAT\]/g, 'brd-auth-token') : '';
     const shell_auth = auth('--proxy-user [BAT]:[LT]');
     return {
@@ -43932,7 +44079,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       children: "Bright Data Browser Extension"
     }), ' ', "for automatic proxy configuration."]
   });
-  E.browser = (proxy = 22225, lpm_token, hostname = document.location.hostname) => ({
+  E.browser = (proxy = 33335, lpm_token, hostname = document.location.hostname) => ({
     chrome_win: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_react.default.Fragment, {
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(Extension_recommendation, {
         type: "chrome"
@@ -45545,7 +45692,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
       const upgrade_type = major ? 'major' : 'minor';
       return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.Warning, {
         tooltip: tooltip,
-        id: this.state.ver_last.version,
+        id: ver_last.version,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
           children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_i18n.T, {
             children: "A new"
@@ -45556,7 +45703,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
           }), ' ', /*#__PURE__*/(0, _jsxRuntime.jsx)(_i18n.T, {
             children: "version"
           }), ' ', /*#__PURE__*/(0, _jsxRuntime.jsx)("strong", {
-            children: this.state.ver_last.version
+            children: ver_last.version
           }), ' ', /*#__PURE__*/(0, _jsxRuntime.jsx)(_i18n.T, {
             children: "is available. You are"
           }), ' ', /*#__PURE__*/(0, _jsxRuntime.jsx)("strong", {
@@ -45575,7 +45722,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             })
           })
         }), ver_node && !ver_node.satisfied && !electron && /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-          children: ["To upgrade Proxy Manager, you need to update Node.js to version ", this.state.ver_node.recommended, "."]
+          children: ["To upgrade Proxy Manager, you need to update Node.js to version ", ver_node.recommended, "."]
         })]
       });
     }
@@ -48928,8 +49075,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         },
         new_proxy_port: {
           label: 'Use new proxy port',
-          tooltip: 'Use proxy port 33335 instead of 22225',
-          note: 'This option will be removed and port 33335 become' + ' default in future releases'
+          tooltip: 'Use proxy port 44445 instead of 33335',
+          note: 'This option will be removed and port 44445 become' + ' default in future releases'
         }
       }
     }
@@ -126407,12 +126554,12 @@ function getOppositePlacement(placement) {
   return oppositeSideMap[side] + placement.slice(side.length);
 }
 function expandPaddingObject(padding) {
+  var _padding$top, _padding$right, _padding$bottom, _padding$left;
   return {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    ...padding
+    top: (_padding$top = padding.top) != null ? _padding$top : 0,
+    right: (_padding$right = padding.right) != null ? _padding$right : 0,
+    bottom: (_padding$bottom = padding.bottom) != null ? _padding$bottom : 0,
+    left: (_padding$left = padding.left) != null ? _padding$left : 0
   };
 }
 function getPaddingObject(padding) {
@@ -126580,7 +126727,7 @@ function getParentNode(node) {
 function getNearestOverflowAncestor(node) {
   const parentNode = getParentNode(node);
   if (isLastTraversableNode(parentNode)) {
-    return node.ownerDocument ? node.ownerDocument.body : node.body;
+    return (node.ownerDocument || node).body;
   }
   if (isHTMLElement(parentNode) && isOverflowElement(parentNode)) {
     return parentNode;
@@ -126685,10 +126832,7 @@ function shouldAddVisualOffsets(element, isFixed, floatingOffsetParent) {
   if (isFixed === void 0) {
     isFixed = false;
   }
-  if (!floatingOffsetParent || isFixed && floatingOffsetParent !== getWindow(element)) {
-    return false;
-  }
-  return isFixed;
+  return !!floatingOffsetParent && isFixed && floatingOffsetParent === getWindow(element);
 }
 
 function getBoundingClientRect(element, includeScale, isFixedStrategy, offsetParent) {
@@ -126715,12 +126859,12 @@ function getBoundingClientRect(element, includeScale, isFixedStrategy, offsetPar
   let y = (clientRect.top + visualOffsets.y) / scale.y;
   let width = clientRect.width / scale.x;
   let height = clientRect.height / scale.y;
-  if (domElement) {
+  if (domElement && offsetParent) {
     const win = getWindow(domElement);
-    const offsetWin = offsetParent && isElement(offsetParent) ? getWindow(offsetParent) : offsetParent;
+    const offsetWin = isElement(offsetParent) ? getWindow(offsetParent) : offsetParent;
     let currentWin = win;
     let currentIFrame = getFrameElement(currentWin);
-    while (currentIFrame && offsetParent && offsetWin !== currentWin) {
+    while (currentIFrame && offsetWin !== currentWin) {
       const iframeScale = getScale(currentIFrame);
       const iframeRect = currentIFrame.getBoundingClientRect();
       const css = floating_ui_utils_dom_getComputedStyle(currentIFrame);
@@ -126784,7 +126928,7 @@ function convertOffsetParentRelativeRectToViewportRelativeRect(_ref) {
   let scale = createCoords(1);
   const offsets = createCoords(0);
   const isOffsetParentAnElement = isHTMLElement(offsetParent);
-  if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
+  if (isOffsetParentAnElement || !isFixed) {
     if (getNodeName(offsetParent) !== 'body' || isOverflowElement(documentElement)) {
       scroll = getNodeScroll(offsetParent);
     }
@@ -126805,18 +126949,17 @@ function convertOffsetParentRelativeRectToViewportRelativeRect(_ref) {
 }
 
 function getClientRects(element) {
-  return Array.from(element.getClientRects());
+  return element.getClientRects ? Array.from(element.getClientRects()) : [];
 }
 
 // Gets the entire size of the scrollable document area, even extending outside
 // of the `<html>` and `<body>` rect bounds if horizontally scrollable.
-function getDocumentRect(element) {
-  const html = getDocumentElement(element);
-  const scroll = getNodeScroll(element);
-  const body = element.ownerDocument.body;
+function getDocumentRect(html) {
+  const scroll = getNodeScroll(html);
+  const body = html.ownerDocument.body;
   const width = max(html.scrollWidth, html.clientWidth, body.scrollWidth, body.clientWidth);
   const height = max(html.scrollHeight, html.clientHeight, body.scrollHeight, body.clientHeight);
-  let x = -scroll.scrollLeft + getWindowScrollBarX(element);
+  let x = -scroll.scrollLeft + getWindowScrollBarX(html);
   const y = -scroll.scrollTop;
   if (floating_ui_utils_dom_getComputedStyle(body).direction === 'rtl') {
     x += max(html.clientWidth, body.clientWidth) - width;
@@ -126833,7 +126976,11 @@ function getDocumentRect(element) {
 // calculation is affected by unusual styles.
 // Most scrollbars leave 15-18px of space.
 const SCROLLBAR_MAX = 25;
-function getViewportRect(element, strategy) {
+function getViewportRect(element, strategy, rootBoundary) {
+  if (rootBoundary === void 0) {
+    rootBoundary = 'viewport';
+  }
+  const isLayoutViewport = rootBoundary === 'layoutViewport';
   const win = getWindow(element);
   const html = getDocumentElement(element);
   const visualViewport = win.visualViewport;
@@ -126842,31 +126989,42 @@ function getViewportRect(element, strategy) {
   let x = 0;
   let y = 0;
   if (visualViewport) {
-    width = visualViewport.width;
-    height = visualViewport.height;
-    const visualViewportBased = isWebKit();
-    if (!visualViewportBased || visualViewportBased && strategy === 'fixed') {
-      x = visualViewport.offsetLeft;
-      y = visualViewport.offsetTop;
+    // Client coordinates are relative to the layout viewport, except in
+    // WebKit with an `absolute` strategy, where they are relative to the
+    // visual viewport.
+    const layoutRelativeClientCoords = !isWebKit() || strategy === 'fixed';
+    if (isLayoutViewport) {
+      if (!layoutRelativeClientCoords) {
+        x = -visualViewport.offsetLeft;
+        y = -visualViewport.offsetTop;
+      }
+    } else {
+      width = visualViewport.width;
+      height = visualViewport.height;
+      if (layoutRelativeClientCoords) {
+        x = visualViewport.offsetLeft;
+        y = visualViewport.offsetTop;
+      }
     }
   }
   const windowScrollbarX = getWindowScrollBarX(html);
-  // <html> `overflow: hidden` + `scrollbar-gutter: stable` reduces the
-  // visual width of the <html> but this is not considered in the size
-  // of `html.clientWidth`.
+  // `scrollbar-gutter: stable` on the <html> reserves gutter space that shrinks
+  // the visual width but isn't reflected in `html.clientWidth`, so subtract it.
+  // Only the inline-end (right) gutter can hold the scrollbar; `both-edges` also
+  // reserves an empty inline-start gutter that clips nothing, so exclude just
+  // the one scrollbar-side gutter — halve the measured (two-gutter) total. A
+  // left-side scrollbar (`windowScrollbarX > 0`) is already handled by
+  // `getHTMLOffset`/`visualViewport.width`; skip it here.
   if (windowScrollbarX <= 0) {
     const doc = html.ownerDocument;
     const body = doc.body;
     const bodyStyles = getComputedStyle(body);
     const bodyMarginInline = doc.compatMode === 'CSS1Compat' ? parseFloat(bodyStyles.marginLeft) + parseFloat(bodyStyles.marginRight) || 0 : 0;
-    const clippingStableScrollbarWidth = Math.abs(html.clientWidth - body.clientWidth - bodyMarginInline);
-    if (clippingStableScrollbarWidth <= SCROLLBAR_MAX) {
-      width -= clippingStableScrollbarWidth;
+    const reservedWidth = Math.abs(html.clientWidth - body.clientWidth - bodyMarginInline);
+    const gutter = getComputedStyle(html).scrollbarGutter === 'stable both-edges' ? reservedWidth / 2 : reservedWidth;
+    if (gutter <= SCROLLBAR_MAX) {
+      width -= gutter;
     }
-  } else if (windowScrollbarX <= SCROLLBAR_MAX) {
-    // If the <body> scrollbar is on the left, the width needs to be extended
-    // by the scrollbar amount so there isn't extra space on the right.
-    width += windowScrollbarX;
   }
   return {
     width,
@@ -126881,7 +127039,7 @@ function getInnerBoundingClientRect(element, strategy) {
   const clientRect = getBoundingClientRect(element, true, strategy === 'fixed');
   const top = clientRect.top + element.clientTop;
   const left = clientRect.left + element.clientLeft;
-  const scale = isHTMLElement(element) ? getScale(element) : createCoords(1);
+  const scale = getScale(element);
   const width = element.clientWidth * scale.x;
   const height = element.clientHeight * scale.y;
   const x = left * scale.x;
@@ -126895,8 +127053,8 @@ function getInnerBoundingClientRect(element, strategy) {
 }
 function getClientRectFromClippingAncestor(element, clippingAncestor, strategy) {
   let rect;
-  if (clippingAncestor === 'viewport') {
-    rect = getViewportRect(element, strategy);
+  if (clippingAncestor === 'viewport' || clippingAncestor === 'layoutViewport') {
+    rect = getViewportRect(element, strategy, clippingAncestor);
   } else if (clippingAncestor === 'document') {
     rect = getDocumentRect(getDocumentElement(element));
   } else if (isElement(clippingAncestor)) {
@@ -126912,13 +127070,6 @@ function getClientRectFromClippingAncestor(element, clippingAncestor, strategy) 
   }
   return rectToClientRect(rect);
 }
-function hasFixedPositionAncestor(element, stopNode) {
-  const parentNode = getParentNode(element);
-  if (parentNode === stopNode || !isElement(parentNode) || isLastTraversableNode(parentNode)) {
-    return false;
-  }
-  return floating_ui_utils_dom_getComputedStyle(parentNode).position === 'fixed' || hasFixedPositionAncestor(parentNode, stopNode);
-}
 
 // A "clipping ancestor" is an `overflow` element with the characteristic of
 // clipping (or hiding) child elements. This returns all clipping ancestors
@@ -126929,7 +127080,7 @@ function getClippingElementAncestors(element, cache) {
     return cachedResult;
   }
   let result = getOverflowAncestors(element, [], false).filter(el => isElement(el) && getNodeName(el) !== 'body');
-  let currentContainingBlockComputedStyle = null;
+  let lastKeptComputedStyle = null;
   const elementIsFixed = floating_ui_utils_dom_getComputedStyle(element).position === 'fixed';
   let currentNode = elementIsFixed ? getParentNode(element) : element;
 
@@ -126937,16 +127088,20 @@ function getClippingElementAncestors(element, cache) {
   while (isElement(currentNode) && !isLastTraversableNode(currentNode)) {
     const computedStyle = floating_ui_utils_dom_getComputedStyle(currentNode);
     const currentNodeIsContaining = isContainingBlock(currentNode);
-    if (!currentNodeIsContaining && computedStyle.position === 'fixed') {
-      currentContainingBlockComputedStyle = null;
-    }
-    const shouldDropCurrentNode = elementIsFixed ? !currentNodeIsContaining && !currentContainingBlockComputedStyle : !currentNodeIsContaining && computedStyle.position === 'static' && !!currentContainingBlockComputedStyle && (currentContainingBlockComputedStyle.position === 'absolute' || currentContainingBlockComputedStyle.position === 'fixed') || isOverflowElement(currentNode) && !currentNodeIsContaining && hasFixedPositionAncestor(element, currentNode);
+    // Position of the containing block chain below the current node. A fixed
+    // element whose containing block hasn't been found yet is a fixed chain.
+    const lastPosition = lastKeptComputedStyle ? lastKeptComputedStyle.position : elementIsFixed ? 'fixed' : '';
+
+    // A non-containing ancestor does not clip the element when the chain
+    // below it escapes it: a fixed chain escapes all ancestors up to the
+    // next containing block, an absolute chain escapes static ancestors.
+    const shouldDropCurrentNode = !currentNodeIsContaining && (lastPosition === 'fixed' || lastPosition === 'absolute' && computedStyle.position === 'static');
     if (shouldDropCurrentNode) {
       // Drop non-containing blocks.
       result = result.filter(ancestor => ancestor !== currentNode);
     } else {
-      // Record last containing block for next iteration.
-      currentContainingBlockComputedStyle = computedStyle;
+      // The kept node carries the chain position for the next iteration.
+      lastKeptComputedStyle = computedStyle;
     }
     currentNode = getParentNode(currentNode);
   }
@@ -127006,13 +127161,7 @@ function getRectRelativeToOffsetParent(element, offsetParent, strategy) {
     scrollTop: 0
   };
   const offsets = createCoords(0);
-
-  // If the <body> scrollbar appears on the left (e.g. RTL systems). Use
-  // Firefox with layout.scrollbar.side = 3 in about:config to test this.
-  function setLeftRTLScrollbarOffset() {
-    offsets.x = getWindowScrollBarX(documentElement);
-  }
-  if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
+  if (isOffsetParentAnElement || !isFixed) {
     if (getNodeName(offsetParent) !== 'body' || isOverflowElement(documentElement)) {
       scroll = getNodeScroll(offsetParent);
     }
@@ -127020,12 +127169,13 @@ function getRectRelativeToOffsetParent(element, offsetParent, strategy) {
       const offsetRect = getBoundingClientRect(offsetParent, true, isFixed, offsetParent);
       offsets.x = offsetRect.x + offsetParent.clientLeft;
       offsets.y = offsetRect.y + offsetParent.clientTop;
-    } else if (documentElement) {
-      setLeftRTLScrollbarOffset();
     }
   }
-  if (isFixed && !isOffsetParentAnElement && documentElement) {
-    setLeftRTLScrollbarOffset();
+
+  // If the <body> scrollbar appears on the left (e.g. RTL systems). Use
+  // Firefox with layout.scrollbar.side = 3 in about:config to test this.
+  if (!isOffsetParentAnElement && documentElement) {
+    offsets.x = getWindowScrollBarX(documentElement);
   }
   const htmlOffset = documentElement && !isOffsetParentAnElement && !isFixed ? getHTMLOffset(documentElement, scroll) : createCoords(0);
   const x = rect.left + scroll.scrollLeft - offsets.x - htmlOffset.x;
@@ -127125,7 +127275,7 @@ function rectsAreEqual(a, b) {
 }
 
 // https://samthor.au/2021/observing-dom/
-function observeMove(element, onMove) {
+function observeMove(element, onMove, ancestorResize) {
   let io = null;
   let timeoutId;
   const root = getDocumentElement(element);
@@ -127168,29 +127318,28 @@ function observeMove(element, onMove) {
     let isFirstUpdate = true;
     function handleObserve(entries) {
       const ratio = entries[0].intersectionRatio;
+
+      // The entry is a snapshot, so the reference may have moved since the
+      // intersection was computed (under performance constraints, or between
+      // consecutive frames of a multi-frame layout shift). The reported ratio
+      // and the observed area are stale in that case and cannot be trusted to
+      // detect subsequent movement, so refresh regardless of the ratio.
+      if (!rectsAreEqual(elementRectForRootMargin, element.getBoundingClientRect())) {
+        return refresh();
+      }
       if (ratio !== threshold) {
         if (!isFirstUpdate) {
           return refresh();
         }
         if (!ratio) {
-          // If the reference is clipped, the ratio is 0. Throttle the refresh
-          // to prevent an infinite loop of updates.
+          // If the reference is clipped in place, the ratio is 0. Throttle
+          // the refresh to prevent an infinite loop of updates.
           timeoutId = setTimeout(() => {
             refresh(false, 1e-7);
           }, 1000);
         } else {
           refresh(false, ratio);
         }
-      }
-      if (ratio === 1 && !rectsAreEqual(elementRectForRootMargin, element.getBoundingClientRect())) {
-        // It's possible that even though the ratio is reported as 1, the
-        // element is not actually fully within the IntersectionObserver's root
-        // area anymore. This can happen under performance constraints. This may
-        // be a bug in the browser's IntersectionObserver implementation. To
-        // work around this, we compare the element's bounding rect now with
-        // what it was at the time we created the IntersectionObserver. If they
-        // are not equal then the element moved, so we refresh.
-        refresh();
       }
       isFirstUpdate = false;
     }
@@ -127208,8 +127357,18 @@ function observeMove(element, onMove) {
     }
     io.observe(element);
   }
+  const win = getWindow(element);
+  // The window is a resize ancestor, so when `ancestorResize` is enabled its
+  // listener already runs the update on resize. Here we only need to rebuild
+  // the `IntersectionObserver` for the new root size, skipping a redundant
+  // update. When `ancestorResize` is disabled, this becomes the sole update.
+  const handleResize = () => refresh(ancestorResize);
+  win.addEventListener('resize', handleResize);
   refresh(true);
-  return cleanup;
+  return () => {
+    win.removeEventListener('resize', handleResize);
+    cleanup();
+  };
 }
 
 /**
@@ -127234,12 +127393,10 @@ function autoUpdate(reference, floating, update, options) {
   const referenceEl = unwrapElement(reference);
   const ancestors = ancestorScroll || ancestorResize ? [...(referenceEl ? getOverflowAncestors(referenceEl) : []), ...(floating ? getOverflowAncestors(floating) : [])] : [];
   ancestors.forEach(ancestor => {
-    ancestorScroll && ancestor.addEventListener('scroll', update, {
-      passive: true
-    });
+    ancestorScroll && ancestor.addEventListener('scroll', update);
     ancestorResize && ancestor.addEventListener('resize', update);
   });
-  const cleanupIo = referenceEl && layoutShift ? observeMove(referenceEl, update) : null;
+  const cleanupIo = referenceEl && layoutShift ? observeMove(referenceEl, update, ancestorResize) : null;
   let reobserveFrame = -1;
   let resizeObserver = null;
   if (elementResize) {
@@ -127378,11 +127535,9 @@ const computePosition = (reference, floating, options) => {
   // multiple lifecycle resets re-use the same result. It only lives for a
   // single call. If other functions become expensive, we can add them as well.
   const cache = new Map();
-  const mergedOptions = {
-    platform,
-    ...options
-  };
+  const mergedOptions = options != null ? options : {};
   const platformWithCache = {
+    ...platform,
     ...mergedOptions.platform,
     _c: cache
   };
@@ -156801,6 +156956,23 @@ const undoDepth = depth(0 /* BranchName.Done */);
 The amount of redoable change events available in a given state.
 */
 const redoDepth = depth(1 /* BranchName.Undone */);
+function hasSelection(side) {
+    return function (state) {
+        let histState = state.field(historyField_, false);
+        if (!histState)
+            return false;
+        let branch = side == 0 /* BranchName.Done */ ? histState.done : histState.undone;
+        return branch.length > 0 && branch[0].selectionsAfter.length > 0;
+    };
+}
+/**
+Test whether there is an undoable selection available.
+*/
+const canUndoSelection = hasSelection(0 /* BranchName.Done */);
+/**
+Test whether there is a redoable selection available.
+*/
+const canRedoSelection = hasSelection(0 /* BranchName.Done */);
 // History events store groups of changes or effects that need to be
 // undone/redone together.
 class HistEvent {
@@ -157542,7 +157714,7 @@ const selectAll = ({ state, dispatch }) => {
 Expand the selection to cover entire lines.
 */
 const selectLine = ({ state: state$1, dispatch }) => {
-    let ranges = selectedLineBlocks(state$1).map(({ from, to }) => state.EditorSelection.range(from, Math.min(to + 1, state$1.doc.length)));
+    let ranges = selectedLineBlocks(state$1).map(({ from, to }) => state.EditorSelection.undirectionalRange(from, Math.min(to + 1, state$1.doc.length)));
     dispatch(state$1.update({ selection: state.EditorSelection.create(ranges), userEvent: "select" }));
     return true;
 };
@@ -157565,7 +157737,7 @@ const selectParentSyntax = ({ state: state$1, dispatch }) => {
             if (((node.from < range.from && node.to >= range.to) ||
                 (node.to > range.to && node.from <= range.from)) &&
                 cur.next)
-                return state.EditorSelection.range(node.to, node.from);
+                return state.EditorSelection.undirectionalRange(node.from, node.to);
         }
         return range;
     });
@@ -158243,7 +158415,7 @@ The default keymap. Includes all bindings from
 - Shift-Ctrl-k (Shift-Cmd-k on macOS): [`deleteLine`](https://codemirror.net/6/docs/ref/#commands.deleteLine)
 - Shift-Ctrl-\\ (Shift-Cmd-\\ on macOS): [`cursorMatchingBracket`](https://codemirror.net/6/docs/ref/#commands.cursorMatchingBracket)
 - Ctrl-/ (Cmd-/ on macOS): [`toggleComment`](https://codemirror.net/6/docs/ref/#commands.toggleComment).
-- Shift-Alt-a: [`toggleBlockComment`](https://codemirror.net/6/docs/ref/#commands.toggleBlockComment).
+- Shift-Alt-a (Shift-Ctrl-a on macOS): [`toggleBlockComment`](https://codemirror.net/6/docs/ref/#commands.toggleBlockComment).
 - Ctrl-m (Alt-Shift-m on macOS): [`toggleTabFocusMode`](https://codemirror.net/6/docs/ref/#commands.toggleTabFocusMode).
 */
 const defaultKeymap = [
@@ -158265,7 +158437,7 @@ const defaultKeymap = [
     { key: "Shift-Mod-k", run: deleteLine },
     { key: "Shift-Mod-\\", run: cursorMatchingBracket },
     { key: "Mod-/", run: toggleComment },
-    { key: "Alt-A", run: toggleBlockComment },
+    { key: "Alt-A", mac: "Ctrl-A", run: toggleBlockComment },
     { key: "Ctrl-m", mac: "Shift-Alt-m", run: toggleTabFocusMode },
 ].concat(standardKeymap);
 /**
@@ -158280,6 +158452,8 @@ exports.addCursorAbove = addCursorAbove;
 exports.addCursorBelow = addCursorBelow;
 exports.blockComment = blockComment;
 exports.blockUncomment = blockUncomment;
+exports.canRedoSelection = canRedoSelection;
+exports.canUndoSelection = canUndoSelection;
 exports.copyLineDown = copyLineDown;
 exports.copyLineUp = copyLineUp;
 exports.cursorCharBackward = cursorCharBackward;
@@ -166589,6 +166763,7 @@ class FacetProvider {
             }
         };
     }
+    get extension() { return this; }
 }
 function compareArray(a, b, compare) {
     if (a.length != b.length)
@@ -166786,6 +166961,7 @@ class PrecExtension {
         this.inner = inner;
         this.prec = prec;
     }
+    get extension() { return this; }
 }
 /**
 Extension compartments can be used to make a configuration
@@ -166820,6 +166996,7 @@ class CompartmentInstance {
         this.compartment = compartment;
         this.inner = inner;
     }
+    get extension() { return this; }
 }
 class Configuration {
     constructor(base, compartments, dynamicSlots, address, staticValues, facets) {
@@ -166929,6 +167106,8 @@ function flatten(extension, compartments, newCompartments) {
         else {
             let content = ext.extension;
             if (!content)
+                throw new Error(`Unrecognized extension value in extension set (${ext}).`);
+            if (content == ext)
                 throw new Error(`Unrecognized extension value in extension set (${ext}). This sometimes happens because multiple instances of @codemirror/state are loaded, breaking instanceof checks.`);
             inner(content, prec);
         }
@@ -169524,8 +169703,11 @@ function scanFor(node, off, targetNode, targetOff, dir) {
 function maxOffset(node) {
     return node.nodeType == 3 ? node.nodeValue.length : node.childNodes.length;
 }
-function flattenRect(rect, left) {
-    let x = left ? rect.left : rect.right;
+function flattenRect(rect, toLeft) {
+    let { left, right } = rect;
+    if (left == right)
+        return rect;
+    let x = toLeft ? left : right;
     return { left: x, right: x, top: rect.top, bottom: rect.bottom };
 }
 function windowRect(win) {
@@ -169692,6 +169874,22 @@ class DOMSelectionState {
         this.focusOffset = focusOffset;
     }
 }
+function getScrollStack(target) {
+    let stack = [];
+    for (let cur = target; cur; cur = cur.nodeType == 11 ? cur.host : cur.parentNode) {
+        if (cur.nodeType == 1)
+            stack.push({ node: cur, left: cur.scrollLeft, top: cur.scrollTop });
+    }
+    return stack;
+}
+function restoreScrollStack(stack, vert = true) {
+    for (let { node, left, top } of stack) {
+        if (vert && node.scrollTop != top)
+            node.scrollTop = top;
+        if (node.scrollLeft != left)
+            node.scrollLeft = left;
+    }
+}
 let preventScrollSupported = null;
 // Safari 26 breaks preventScroll support
 if (browser.safari && browser.safari_version >= 26)
@@ -169703,12 +169901,7 @@ function focusPreventScroll(dom) {
         return dom.setActive(); // in IE
     if (preventScrollSupported)
         return dom.focus(preventScrollSupported);
-    let stack = [];
-    for (let cur = dom; cur; cur = cur.parentNode) {
-        stack.push(cur, cur.scrollTop, cur.scrollLeft);
-        if (cur == cur.ownerDocument)
-            break;
-    }
+    let stack = getScrollStack(dom);
     dom.focus(preventScrollSupported == null ? {
         get preventScroll() {
             preventScrollSupported = { preventScroll: true };
@@ -169717,13 +169910,7 @@ function focusPreventScroll(dom) {
     } : undefined);
     if (!preventScrollSupported) {
         preventScrollSupported = false;
-        for (let i = 0; i < stack.length;) {
-            let elt = stack[i++], top = stack[i++], left = stack[i++];
-            if (elt.scrollTop != top)
-                elt.scrollTop = top;
-            if (elt.scrollLeft != left)
-                elt.scrollLeft = left;
-        }
+        restoreScrollStack(stack);
     }
 }
 let scratchRange;
@@ -170790,7 +170977,7 @@ class Tile {
         return this.posBefore(tile) + tile.length;
     }
     covers(side) { return true; }
-    coordsIn(pos, side) { return null; }
+    coordsIn(pos, side, rtl) { return null; }
     domPosFor(off, side) {
         let index = domIndex(this.dom);
         let after = this.length ? off > 0 : side > 0;
@@ -170977,6 +171164,9 @@ class LineTile extends CompositeTile {
     }
     get domAttrs() { return this.attrs; }
     // Find the tile associated with a given position in this line.
+    // Side -2/2 is handled specially, in that it allows the position
+    // returned to be before (-2) or after (2) widgets that would always
+    // be after/before a cursor position.
     resolveInline(pos, side, forCoords) {
         let before = null, beforeOff = -1, after = null, afterOff = -1;
         function scan(tile, pos) {
@@ -170986,12 +171176,12 @@ class LineTile extends CompositeTile {
                     if (child.isComposite()) {
                         scan(child, pos - off);
                     }
-                    else if ((!after || after.isHidden && (side > 0 || forCoords && onSameLine(after, child))) &&
-                        (end > pos || (child.flags & 32 /* TileFlag.After */))) {
+                    else if ((!after || after.isHidden && (side > 0 && !(after.flags & 32 /* TileFlag.After */) || forCoords && onSameLine(after, child))) &&
+                        (end > pos || (child.flags & 32 /* TileFlag.After */) && side <= 1)) {
                         after = child;
                         afterOff = pos - off;
                     }
-                    else if (off < pos || (child.flags & 16 /* TileFlag.Before */) && !child.isHidden) {
+                    else if (off < pos || (child.flags & 16 /* TileFlag.Before */) && !child.isHidden && side >= -1) {
                         before = child;
                         beforeOff = pos - off;
                     }
@@ -171003,11 +171193,11 @@ class LineTile extends CompositeTile {
         let target = ((side < 0 ? before : after) || before || after);
         return target ? { tile: target, offset: target == before ? beforeOff : afterOff } : null;
     }
-    coordsIn(pos, side) {
+    coordsIn(pos, side, rtl) {
         let found = this.resolveInline(pos, side, true);
         if (!found)
             return fallbackRect(this);
-        return found.tile.coordsIn(Math.max(0, found.offset), side);
+        return found.tile.coordsIn(Math.max(0, found.offset), side, rtl);
     }
     domIn(pos, side) {
         let found = this.resolveInline(pos, side);
@@ -171071,7 +171261,7 @@ class TextTile extends Tile {
     }
     isText() { return true; }
     toString() { return JSON.stringify(this.text); }
-    coordsIn(pos, side) {
+    coordsIn(pos, side, rtl) {
         let length = this.dom.nodeValue.length;
         if (pos > length)
             pos = length;
@@ -171081,7 +171271,7 @@ class TextTile extends Tile {
                 if (pos) {
                     from--;
                     flatten = 1;
-                } // FIXME this is wrong in RTL text
+                }
                 else if (to < length) {
                     to++;
                     flatten = -1;
@@ -171100,7 +171290,7 @@ class TextTile extends Tile {
         let rect = rects[(flatten ? flatten < 0 : side >= 0) ? 0 : rects.length - 1];
         if (browser.safari && !flatten && rect.width == 0)
             rect = Array.prototype.find.call(rects, r => r.width) || rect;
-        return flatten ? flattenRect(rect, flatten < 0) : rect || null;
+        return rtl == null ? rect : flattenRect(rect, (flatten ? flatten > 0 : side < 0) == rtl);
     }
     static of(text, dom) {
         let tile = new TextTile(dom || document.createTextNode(text), text);
@@ -171176,7 +171366,10 @@ class WidgetBufferTile extends Tile {
     }
     get isHidden() { return true; }
     get overrideDOMText() { return state.Text.empty; }
-    coordsIn(pos) { return this.dom.getBoundingClientRect(); }
+    coordsIn(pos, side, rtl) {
+        let rect = this.dom.getBoundingClientRect();
+        return rtl == null ? rect : flattenRect(rect, (side > 0) == rtl);
+    }
 }
 // Represents a position in the tile tree.
 class TilePointer {
@@ -171194,20 +171387,21 @@ class TilePointer {
         let { tile, index, beforeBreak, parents } = this;
         while (dist || side > 0) {
             if (!tile.isComposite()) {
-                if (index == tile.length) {
+                let len = tile.length;
+                if (index < len && dist) {
+                    let take = Math.min(dist, len - index);
+                    if (walker)
+                        walker.skip(tile, index, index + take);
+                    dist -= take;
+                    index += take;
+                }
+                if (index == len) {
                     beforeBreak = !!tile.breakAfter;
                     ({ tile, index } = parents.pop());
                     index++;
                 }
                 else if (!dist) {
                     break;
-                }
-                else {
-                    let take = Math.min(dist, tile.length - index);
-                    if (walker)
-                        walker.skip(tile, index, index + take);
-                    dist -= take;
-                    index += take;
                 }
             }
             else if (beforeBreak) {
@@ -171538,8 +171732,8 @@ class TileCache {
     find(cls, test, type = 2 /* Reused.DOM */) {
         let i = cls.bucket;
         let bucket = this.buckets[i], off = this.index[i];
-        for (let j = bucket.length - 1; j >= 0; j--) {
-            // Look at the most recently added items first (last-in, first-out)
+        for (let j = 0; j < bucket.length; j++) {
+            // Look at the most oldest items first (first-in, first-out)
             let index = (j + off) % bucket.length, tile = bucket[index];
             if ((!test || test(tile)) && !this.reused.has(tile)) {
                 bucket.splice(index, 1);
@@ -171742,7 +171936,7 @@ class TileUpdate {
     }
     emit(from, to) {
         let pendingLineAttrs = null;
-        let b = this.builder, markCount = 0;
+        let b = this.builder, markCount = -1;
         let openEnd = state.RangeSet.spans(this.decorations, from, to, {
             point: (from, to, deco, active, openStart, index) => {
                 if (deco instanceof PointDecoration) {
@@ -171793,9 +171987,11 @@ class TileUpdate {
                     }
                     pendingLineAttrs = null;
                 }
+                markCount = active.length;
             }
         });
-        this.openWidget = openEnd > markCount;
+        if (markCount > -1)
+            this.openWidget = openEnd > markCount;
         if (!this.openWidget)
             b.addLineStartIfNotCovered(pendingLineAttrs);
         this.openMarks = openEnd;
@@ -172204,7 +172400,7 @@ class DocView {
     domAtPos(pos, side) {
         let { tile, offset } = this.tile.resolveBlock(pos, side);
         if (tile.isWidget())
-            return tile.domPosFor(pos, side);
+            return tile.domPosFor(offset, side);
         return tile.domIn(offset, side);
     }
     inlineDOMNearPos(pos, side) {
@@ -172241,14 +172437,16 @@ class DocView {
             after = null;
         return before && side < 0 || !after ? before.domIn(beforeOff, side) : after.domIn(afterOff, side);
     }
-    coordsAt(pos, side) {
+    // Get the coord of the element at the given side of the given
+    // position. If rtl is given, flatten it using that text direction.
+    coordsAt(pos, side, rtl) {
         let { tile, offset } = this.tile.resolveBlock(pos, side);
         if (tile.isWidget()) {
             if (tile.widget instanceof BlockGapWidget)
                 return null;
             return tile.coordsInWidget(offset, side, true);
         }
-        return tile.coordsIn(offset, side);
+        return tile.coordsIn(offset, side, rtl);
     }
     lineAt(pos, side) {
         let { tile } = this.tile.resolveBlock(pos, side);
@@ -172422,7 +172620,6 @@ class DocView {
         this.blockWrappers = this.view.state.facet(blockWrappers).map(v => typeof v == "function" ? v(this.view) : v);
     }
     scrollIntoView(target) {
-        var _a;
         if (target.isSnapshot) {
             let ref = this.view.viewState.lineBlockAt(target.range.head);
             this.view.scrollDOM.scrollTop = ref.top - target.yMargin;
@@ -172439,7 +172636,7 @@ class DocView {
             }
         }
         let { range } = target;
-        let rect = this.coordsAt(range.head, (_a = range.assoc) !== null && _a !== void 0 ? _a : (range.empty ? 0 : range.head > range.anchor ? -1 : 1)), other;
+        let rect = this.coordsAt(range.head, range.assoc || (range.head > range.anchor ? -1 : 1)), other;
         if (!rect)
             return;
         if (!range.empty && (other = this.coordsAt(range.anchor, range.anchor > range.head ? -1 : 1)))
@@ -172459,11 +172656,14 @@ class DocView {
         // can affect it. So this tries to kludge around the problem by
         // calling scrollIntoView on the scroll target's line.
         if (window.visualViewport && window.innerHeight - window.visualViewport.height > 1 &&
-            (rect.top > window.pageYOffset + window.visualViewport.offsetTop + window.visualViewport.height ||
-                rect.bottom < window.pageYOffset + window.visualViewport.offsetTop)) {
+            (rect.top > window.visualViewport.offsetTop + window.visualViewport.height ||
+                rect.bottom < window.visualViewport.offsetTop)) {
             let line = this.view.docView.lineAt(range.head, 1);
-            if (line)
+            if (line) {
+                let stack = getScrollStack(line.dom);
                 line.dom.scrollIntoView({ block: "nearest" });
+                restoreScrollStack(stack, false);
+            }
         }
     }
     lineHasWidget(pos) {
@@ -172885,23 +173085,22 @@ class InlineCoordsScan {
         search: while (lo < hi) {
             let dist = hi - lo, mid = (lo + hi) >> 1;
             adjust: if (seen.has(mid)) {
-                let scan = lo + Math.floor(Math.random() * dist);
-                for (let i = 0; i < dist; i++) {
+                for (let i = 1; i < dist; i++) {
+                    let scan = mid + i;
+                    if (scan >= hi)
+                        scan -= dist;
                     if (!seen.has(scan)) {
                         mid = scan;
                         break adjust;
                     }
-                    scan++;
-                    if (scan == hi)
-                        scan = lo; // Wrap around
                 }
                 break search; // No index found, we're done
             }
             seen.add(mid);
-            let rects = getRects(mid);
+            let rects = getRects(mid), side = 0;
             if (rects)
                 for (let i = 0; i < rects.length; i++) {
-                    let rect = rects[i], side = 0;
+                    let rect = rects[i];
                     // Ignore empty rectangles when there are other rectangles
                     if (rect.width == 0 && rects.length > 1)
                         continue;
@@ -172926,12 +173125,12 @@ class InlineCoordsScan {
                         if (off)
                             side = (off < 0) == (this.baseDir == exports.Direction.LTR) ? -1 : 1;
                     }
-                    // Narrow binary search when it is safe to do so
-                    if (side == -1 && (!bidi || this.baseDirAt(positions[mid], 1)))
-                        hi = mid;
-                    else if (side == 1 && (!bidi || this.baseDirAt(positions[mid + 1], -1)))
-                        lo = mid + 1;
                 }
+            // Narrow binary search when it is safe to do so
+            if (side == -1 && (!bidi || this.baseDirAt(positions[mid], 1)))
+                hi = mid;
+            else if (side == 1 && (!bidi || this.baseDirAt(positions[mid + 1], -1)))
+                lo = mid + 1;
         }
         // If no element with y overlap is found, find the nearest element
         // on the y axis, move this.y into it, and retry the scan.
@@ -173481,6 +173680,7 @@ class InputState {
         this.view = view;
         this.lastKeyCode = 0;
         this.lastKeyTime = 0;
+        this.touchActive = false;
         this.lastTouchTime = 0;
         this.lastTouchX = 0;
         this.lastTouchY = 0;
@@ -173492,6 +173692,10 @@ class InputState {
         // (after which we retroactively handle them and reset the DOM) to
         // avoid messing up the virtual keyboard state.
         this.pendingIOSKey = undefined;
+        // Set to a time stap by scroll events when touch isn't active on
+        // iOS, to work around an issue where Safari will abort the scroll
+        // momentum if we set scrollTop
+        this.lastIOSMomentumScroll = 0;
         // When enabled (>-1), tab presses are not given to key handlers,
         // leaving the browser's default behavior. If >0, the mode expires
         // at that timestamp, and any other keypress clears it.
@@ -173922,8 +174126,11 @@ function doPaste(view, input) {
     });
 }
 observers.scroll = view => {
-    view.inputState.lastScrollTop = view.scrollDOM.scrollTop;
-    view.inputState.lastScrollLeft = view.scrollDOM.scrollLeft;
+    let iState = view.inputState;
+    iState.lastScrollTop = view.scrollDOM.scrollTop;
+    iState.lastScrollLeft = view.scrollDOM.scrollLeft;
+    if (browser.ios && !iState.touchActive)
+        iState.lastIOSMomentumScroll = Date.now();
 };
 observers.wheel = observers.mousewheel = view => {
     view.inputState.lastWheelEvent = Date.now();
@@ -173936,6 +174143,7 @@ handlers.keydown = (view, event) => {
 };
 observers.touchstart = (view, e) => {
     let iState = view.inputState, touch = e.targetTouches[0];
+    iState.touchActive = true;
     iState.lastTouchTime = Date.now();
     if (touch) {
         iState.lastTouchX = touch.clientX;
@@ -173945,6 +174153,9 @@ observers.touchstart = (view, e) => {
 };
 observers.touchmove = view => {
     view.inputState.setSelectionOrigin("select.pointer");
+};
+observers.touchend = (view, e) => {
+    view.inputState.touchActive = false;
 };
 handlers.mousedown = (view, event) => {
     view.observer.flush();
@@ -175972,6 +176183,8 @@ const baseTheme$1 = buildTheme("." + baseThemeID, {
         backgroundColor: "#f5f5f5",
         color: "black"
     },
+    ".cm-panels-top": { top: "0" },
+    ".cm-panels-bottom": { bottom: "0" },
     "&light .cm-panels-top": {
         borderBottom: "1px solid #ddd"
     },
@@ -177208,13 +177421,16 @@ class EditorView {
                                 this.viewState.lineBlockAt(scrollAnchorPos).top;
                             let diff = (newAnchorHeight - scrollAnchorHeight) / this.scaleY;
                             if ((diff > 1 || diff < -1) &&
+                                !(browser.ios && this.inputState.lastIOSMomentumScroll > Date.now() - 100) &&
                                 (scroll == this.scrollDOM || this.hasFocus ||
                                     Math.max(this.inputState.lastWheelEvent, this.inputState.lastTouchTime) > Date.now() - 100)) {
                                 scrollOffset = scrollOffset + diff;
-                                if (scroll)
-                                    scroll.scrollTop += diff;
-                                else
+                                if (!scroll)
                                     this.win.scrollBy(0, diff);
+                                else if (scrollAnchorPos < 0)
+                                    scroll.scrollTop = scroll.scrollHeight;
+                                else
+                                    scroll.scrollTop += diff;
                                 scrollAnchorHeight = -1;
                                 continue;
                             }
@@ -177499,12 +177715,9 @@ class EditorView {
     */
     coordsAtPos(pos, side = 1) {
         this.readMeasured();
-        let rect = this.docView.coordsAt(pos, side);
-        if (!rect || rect.left == rect.right)
-            return rect;
         let line = this.state.doc.lineAt(pos), order = this.bidiSpans(line);
         let span = order[BidiSpan.find(order, pos - line.from, -1, side)];
-        return flattenRect(rect, (span.dir == exports.Direction.LTR) == (side > 0));
+        return this.docView.coordsAt(pos, side, span.dir == exports.Direction.RTL);
     }
     /**
     Return the rectangle around a given character. If `pos` does not
@@ -178582,9 +178795,11 @@ const selectionLayer = layer({
     },
     class: "cm-selectionLayer"
 });
+// https://discuss.codemirror.net/t/firefox-153-ignores-transparent-selection-styling/9838
+const selectionBg = browser.gecko && browser.gecko_version == 153 ? "#ffffff01" : "transparent";
 const hideNativeSelection = state.Prec.highest(EditorView.theme({
     ".cm-line": {
-        "& ::selection, &::selection": { backgroundColor: "transparent !important" },
+        "& ::selection, &::selection": { backgroundColor: `${selectionBg} !important` },
         caretColor: "transparent !important"
     },
     ".cm-content": {
@@ -180095,7 +180310,6 @@ class PanelGroup {
         if (!this.dom) {
             this.dom = document.createElement("div");
             this.dom.className = this.top ? "cm-panels cm-panels-top" : "cm-panels cm-panels-bottom";
-            this.dom.style[this.top ? "top" : "bottom"] = "0";
             let parent = this.container || this.view.dom;
             parent.insertBefore(this.dom, this.top ? parent.firstChild : null);
         }
@@ -183131,12 +183345,12 @@ var lr = __webpack_require__(63309);
 var highlight = __webpack_require__(18937);
 
 // This file was generated by lezer-generator. You probably shouldn't edit it.
-const descendantOp = 135,
+const descendantOp = 148,
   Unit = 1,
-  identifier = 136,
-  callee = 137,
+  identifier = 149,
+  callee = 150,
   VariableName = 2,
-  queryIdentifier = 138,
+  queryIdentifier = 151,
   queryVariableName = 3,
   QueryCallee = 4;
 
@@ -183245,32 +183459,32 @@ const cssHighlighting = highlight.styleTags({
 });
 
 // This file was generated by lezer-generator. You probably shouldn't edit it.
-const spec_callee = {__proto__:null,lang:44, "nth-child":44, "nth-last-child":44, "nth-of-type":44, "nth-last-of-type":44, dir:44, "host-context":44, if:90, url:132, "url-prefix":132, domain:132, regexp:132};
-const spec_queryIdentifier = {__proto__:null,or:104, and:104, not:112, only:112, layer:186};
-const spec_QueryCallee = {__proto__:null,selector:118, layer:182};
-const spec_AtKeyword = {__proto__:null,"@import":178, "@media":190, "@charset":194, "@namespace":198, "@keyframes":204, "@supports":216, "@scope":220, "@font-feature-values":226};
-const spec_identifier = {__proto__:null,to:223};
+const spec_callee = {__proto__:null,lang:44, "nth-child":44, "nth-last-child":44, "nth-of-type":44, "nth-last-of-type":44, dir:44, "host-context":44, if:90, url:158, "url-prefix":158, domain:158, regexp:158};
+const spec_queryIdentifier = {__proto__:null,or:104, and:104, not:112, only:112, layer:212};
+const spec_QueryCallee = {__proto__:null,selector:118, style:124, layer:208};
+const spec_AtKeyword = {__proto__:null,"@import":204, "@media":216, "@charset":220, "@namespace":224, "@keyframes":230, "@supports":242, "@scope":246, "@font-feature-values":252};
+const spec_identifier = {__proto__:null,to:249};
 const parser = lr.LRParser.deserialize({
   version: 14,
-  states: "IpQYQdOOO#}QdOOP$UO`OOO%OQaO'#CfOOQP'#Ce'#CeO%VQdO'#CgO%[Q`O'#CgO%aQaO'#FdO&XQdO'#CkO&xQaO'#CcO'SQdO'#CnO'_QdO'#DtO'dQdO'#DvO'oQdO'#D}O'oQdO'#EQOOQP'#Fd'#FdO)OQhO'#EsOOQS'#Fc'#FcOOQS'#Ev'#EvQYQdOOO)VQdO'#EWO*cQhO'#E^O)VQdO'#E`O*jQdO'#EbO*uQdO'#EeO)zQhO'#EkO*}QdO'#EmO+YQdO'#EpO+_QaO'#CfO+fQ`O'#ETO+kQ`O'#FnO+vQdO'#FnQOQ`OOP,QO&jO'#CaPOOO)CAR)CAROOQP'#Ci'#CiOOQP,59R,59RO%VQdO,59ROOQP'#Cm'#CmOOQP,59V,59VO&XQdO,59VO,]QdO,59YO'_QdO,5:`O'dQdO,5:bO'oQdO,5:iO'oQdO,5:kO'oQdO,5:lO'oQdO'#E}O,hQ`O,58}O,pQdO'#ESOOQS,58},58}OOQP'#Cq'#CqOOQO'#Dr'#DrOOQP,59Y,59YO,wQ`O,59YO,|Q`O,59YOOQP'#Du'#DuOOQP,5:`,5:`O-RQpO'#DwO-^QdO'#DxO-cQ`O'#DxO-hQpO,5:bO.RQaO,5:iO.iQaO,5:lOOQW'#D^'#D^O/eQhO'#DgO/xQhO,5;_O)zQhO'#DeO0VQ`O'#DkO0[QhO'#DnOOQW'#Fj'#FjOOQS,5;_,5;_O0aQ`O'#DhOOQS-E8t-E8tOOQ['#Cv'#CvO0fQdO'#CwO0|QdO'#C}O1dQdO'#DQO1zQ!pO'#DSO4TQ!jO,5:rOOQO'#DX'#DXO,|Q`O'#DWO4eQ!nO'#FgO6hQ`O'#DYO6mQ`O'#DoOOQ['#Fg'#FgO6rQhO'#FqO7QQ`O,5:xO7VQ!bO,5:zOOQS'#Ed'#EdO7_Q`O,5:|O7dQdO,5:|OOQO'#Eg'#EgO7lQ`O,5;PO7qQhO,5;VO'oQdO'#DjOOQS,5;X,5;XO0aQ`O,5;XO7yQdO,5;XOOQS'#FU'#FUO8RQdO'#ErO7QQ`O,5;[O8ZQdO,5:oO8kQdO'#FPO8xQ`O,5<YO8xQ`O,5<YPOOO'#Eu'#EuP9TO&jO,58{POOO,58{,58{OOQP1G.m1G.mOOQP1G.q1G.qOOQP1G.t1G.tO,wQ`O1G.tO,|Q`O1G.tOOQP1G/z1G/zO9`QpO1G/|O9hQaO1G0TO:OQaO1G0VO:fQaO1G0WO:|QaO,5;iOOQO-E8{-E8{OOQS1G.i1G.iO;WQ`O,5:nO;]QdO'#DsO;dQdO'#CuOOQO'#Dz'#DzOOQO,5:d,5:dO-^QdO,5:dOOQP1G/|1G/|O)VQdO1G/|O;kQ!jO'#D^O;yQ!bO,59yO<RQhO,5:ROOQO'#Fk'#FkO;|Q!bO,59}O<ZQhO'#FVO)zQhO,59{O)zQhO'#FVO=OQhO1G0yOOQS1G0y1G0yO=YQhO,5:PO>QQhO'#DlOOQW,5:V,5:VOOQW,5:Y,5:YOOQW,5:S,5:SO>[Q!fO'#FhOOQS'#Fh'#FhOOQS'#Ex'#ExO?lQdO,59cOOQ[,59c,59cO@SQdO,59iOOQ[,59i,59iO@jQdO,59lOOQ[,59l,59lOOQ[,59n,59nO)VQdO,59pOAQQhO'#EYOOQW'#EY'#EYOAlQ`O1G0^O4^QhO1G0^OOQ[,59r,59rO)zQhO'#D[OOQ[,59t,59tOAqQ#tO,5:ZOA|QhO'#FROBZQ`O,5<]OOQS1G0d1G0dOOQS1G0f1G0fOOQS1G0h1G0hOBfQ`O1G0hOBkQdO'#EhOOQS1G0k1G0kOOQS1G0q1G0qOBvQaO,5:UO7QQ`O1G0sOOQS1G0s1G0sO0aQ`O1G0sOOQS-E9S-E9SOOQS1G0v1G0vOB}Q!fO1G0ZOCeQ`O'#EVOOQO1G0Z1G0ZOOQO,5;k,5;kOCjQdO,5;kOOQO-E8}-E8}OCwQ`O1G1tPOOO-E8s-E8sPOOO1G.g1G.gOOQP7+$`7+$`OOQP7+%h7+%hO)VQdO7+%hOOQS1G0Y1G0YODSQaO'#FmOD^Q`O,5:_ODcQ!fO'#EwOEaQdO'#FfOEkQ`O,59aOOQO1G0O1G0OOEpQ!bO7+%hO)VQdO1G/eOE{QhO1G/iOOQW1G/m1G/mOOQW1G/g1G/gOF^QhO,5;qOOQW-E9T-E9TOOQS7+&e7+&eOGRQhO'#D^OGaQhO'#FlOGlQ`O'#FlOGqQ`O,5:WOOQS-E8v-E8vOOQ[1G.}1G.}OOQ[1G/T1G/TOOQ[1G/W1G/WOOQ[1G/[1G/[OGvQdO,5:tOOQS7+%x7+%xOG{Q`O7+%xOHQQhO'#D]OHYQ`O,59vO)zQhO,59vOOQ[1G/u1G/uOHbQ`O1G/uOHgQhO,5;mOOQO-E9P-E9POOQS7+&S7+&SOHuQbO'#DSOOQO'#Ej'#EjOITQ`O'#EiOOQO'#Ei'#EiOI`Q`O'#FSOIhQdO,5;SOOQS,5;S,5;SOOQ[1G/p1G/pOOQS7+&_7+&_O7QQ`O7+&_OIsQ!fO'#FOO)VQdO'#FOOJzQdO7+%uOOQO7+%u7+%uOOQO,5:q,5:qOOQO1G1V1G1VOK_Q!bO<<ISOKjQdO'#E|OKtQ`O,5<XOOQP1G/y1G/yOOQS-E8u-E8uOK|QdO'#E{OLWQ`O,5<QOOQ]1G.{1G.{OOQP<<IS<<ISOL`Q`O<<ISOLeQdO7+%POOQO'#D`'#D`OLlQ!bO7+%TOLtQhO'#EzOMRQ`O,5<WO)VQdO,5<WOOQW1G/r1G/rOOQO'#E['#E[OMZQ`O1G0`OOQS<<Id<<IdO)VQdO,59wOMzQhO1G/bOOQ[1G/b1G/bONRQ`O1G/bOOQW-E8w-E8wOOQ[7+%a7+%aOOQO,5;T,5;TOBnQdO'#FTOI`Q`O,5;nOOQS,5;n,5;nOOQS-E9Q-E9QOOQS1G0n1G0nOOQS<<Iy<<IyONZQ!fO,5;jOOQS-E8|-E8|OOQO<<Ia<<IaOOQPAN>nAN>nO! bQ`OAN>nO! gQaO,5;hOOQO-E8z-E8zO! qQdO,5;gOOQO-E8y-E8yOOQW<<Hk<<HkOOQW<<Ho<<HoO! {QhO<<HoO!!^QhO,5;fO!!iQ`O,5;fOOQO-E8x-E8xO!!nQdO1G1rOGvQdO'#FQO!!xQ`O7+%zOOQW7+%z7+%zO!#QQ!bO1G/cOOQ[7+$|7+$|O!#]QhO7+$|P!#dQ`O'#EyOOQO,5;o,5;oOOQO-E9R-E9ROOQS1G1Y1G1YOOQPG24YG24YO!#iQ`OAN>ZO)VQdO1G1QO!#nQ`O7+'^OOQO,5;l,5;lOOQO-E9O-E9OOOQW<<If<<IfOOQ[<<Hh<<HhPOQW,5;e,5;eOOQWG23uG23uO!#vQdO7+&l",
-  stateData: "!$Z~O$QOS$RQQ~OWVO^_O`WOcYOdYOl`OmZOp[O!r]O!u^O!{dO#ReO#TfO#VgO#YhO#`iO#bjO#ekO#|RO$XTO~OQmOWVO^_O`WOcYOdYOl`OmZOp[O!r]O!u^O!{dO#ReO#TfO#VgO#YhO#`iO#bjO#ekO#|lO$XTO~O#z$bP~P!jO$RqO~O`YXcYXdYXmYXpYXsYX!aYX!rYX!uYX#{YX$X[X~OgYX~P$ZO#|sO~O$XuO~O$XuO`$WXc$WXd$WXm$WXp$WXs$WX!a$WX!r$WX!u$WX#{$WXg$WX~O#|vO~O`xOcyOdyOmzOp{O!r|O!u!OO#{}O~Os!RO!a!PO~P&^Of!XO#|!TO#}!UO~O#|!YO~OW!^O#|![O$X!]O~OWVO^_O`WOcYOdYOmZOp[O!r]O!u^O#|RO$XTO~OS!fOc!gOd!gOh!cOs!RO!Y!eO!]!jO$O!bO~On!iO~P(dOQ!tOh!mOp!nOs!oOu!wOw!wO}!uO!d!vO#|!lO#}!rO$]!pO~OS!fOc!gOd!gOh!cO!Y!eO!]!jO$O!bO~Os$eP~P)zOw!|O!d!vO#|!{O~Ow#OO#|#OO~Oh#ROs!RO#c#TO~O#|#VO~Oc!xX~P$ZOc#YO~On#ZO#z$bXr$bX~O#z$bXr$bX~P!jO$S#^O$T#^O$U#`O~Of#eO#|!TO#}!UO~Os!RO!a!PO~Or$bP~P!jOh#oO~Oh#pO~Oo!kX!o!kX$X!mX~O#|#qO~O$X#sO~Oo#tO!o#uO~O`xOcyOdyOmzOp{O~Os!qa!a!qa!r!qa!u!qa#{!qag!qa~P-pOs!ta!a!ta!r!ta!u!ta#{!tag!ta~P-pOS!fOc!gOd!gOh!cO!Y!eO!]!jO~OR#yOu#yOw#yO$O#vO$]!pO~P/POn$PO!U#|O!a#}O~P(dOh$RO~O$O$TO~Oh#RO~O`$WOc$WOg$ZOl$WOm$WOn$WO~P)VO`$WOc$WOl$WOm$WOn$WOo$]O~P)VO`$WOc$WOl$WOm$WOn$WOr$_O~P)VOP$`OSvXcvXdvXhvXnvXyvX!YvX!]vX!}vX#PvX$OvX!WvXQvX`vXgvXlvXmvXpvXsvXuvXwvX}vX!dvX#|vX#}vX$]vXovXrvX!avX#zvX$dvX!pvX~Oy$aO!}$bO#P$cOn$eP~P)zOh#pOS$ZXc$ZXd$ZXn$ZXy$ZX!Y$ZX!]$ZX!}$ZX#P$ZX$O$ZXQ$ZX`$ZXg$ZXl$ZXm$ZXp$ZXs$ZXu$ZXw$ZX}$ZX!d$ZX#|$ZX#}$ZX$]$ZXo$ZXr$ZX!a$ZX#z$ZX$d$ZX!p$ZX~Oh$gO~Oh$iO~O!U#|O!a$jOs$eXn$eX~Os!RO~On$mOy$aO~On$nO~Ow$oO!d!vO~Os$pO~Os!RO!U#|O~Os!RO#c$vO~O#|#VOs#fX~O$d$zOn!wa#z!war!wa~P)VOn#sX#z#sXr#sX~P!jOn#ZO#z$bar$ba~O$S#^O$T#^O$U%RO~Oo%TO!o%UO~Os!qi!a!qi!r!qi!u!qi#{!qig!qi~P-pOs!si!a!si!r!si!u!si#{!sig!si~P-pOs!ti!a!ti!r!ti!u!ti#{!tig!ti~P-pOs#qa!a#qa~P&^Or%VO~Og$aP~P'oOg$YP~P)VOc!SXg!QX!U!QX!W!SX~Oc%_O!W%`O~Og%aO!U#|O~O!U#|OS#yXc#yXd#yXh#yXn#yXs#yX!Y#yX!]#yX!a#yX$O#yX~On%eO!a#}O~P(dO!U#|OS!Xac!Xad!Xah!Xan!Xas!Xa!Y!Xa!]!Xa!a!Xa$O!Xag!Xa~O$O%fOg$`P~P/POy$aOQ$[X`$[Xc$[Xg$[Xh$[Xl$[Xm$[Xn$[Xp$[Xs$[Xu$[Xw$[X}$[X!d$[X#|$[X#}$[X$]$[Xo$[Xr$[X~O`$WOc$WOg%kOl$WOm$WOn$WO~P)VO`$WOc$WOl$WOm$WOn$WOo%lO~P)VO`$WOc$WOl$WOm$WOn$WOr%mO~P)VOh%oOS!|Xc!|Xd!|Xn!|X!Y!|X!]!|X$O!|X~On%pO~Og%uOw%vO!e%vO~Os#uX!a#uXn#uX~P)zO!a$jOs$ean$ea~On%yO~Or&QO#|%{O$]%zO~Og&RO~P&^Oy$aO!a&VO$d$zOn!wi#z!wir!wi~P)VO$c&YO~On#sa#z#sar#sa~P!jOn#ZO#z$bir$bi~O!a&]Og$aX~P&^Og&_O~Oy$aOQ#kXg#kXh#kXp#kXs#kXu#kXw#kX}#kX!a#kX!d#kX#|#kX#}#kX$]#kX~O!a&aOg$YX~P)VOg&cO~Oo&dOy$aO!p&eO~OR#yOu#yOw#yO$O&gO$]!pO~O!U#|OS#yac#yad#yah#yan#yas#ya!Y#ya!]#ya!a#ya$O#ya~Oc!SXg!QX!U!QX!a!QX~O!U#|O!a&iOg$`X~Oc&kO~Og&lO~O#|&mO~On&oO~Oc&pO!U#|O~Og&rOn&qO~Og&uO~O!U#|Os#ua!a#uan#ua~OP$`OsvX!avXgvX~O$]%zOs#]X!a#]X~Os!RO!a&wO~Or&{O#|%{O$]%zO~Oy$aOQ#rXh#rXn#rXp#rXs#rXu#rXw#rX}#rX!a#rX!d#rX#z#rX#|#rX#}#rX$]#rX$d#rXr#rX~O!a&VO$d$zOn!wq#z!wqr!wq~P)VOo'QOy$aO!p'RO~Og#pX!a#pX~P'oO!a&]Og$aa~Og#oX!a#oX~P)VO!a&aOg$Ya~Oo'QO~Og'WO~P)VOg'XO!W'YO~O$O%fOg#nX!a#nX~P/PO!a&iOg$`a~O`'_Og'aO~OS#mac#mad#mah#ma!Y#ma!]#ma$O#ma~Og'cO~PMcOg'cOn'dO~Oy$aOQ#rah#ran#rap#ras#rau#raw#ra}#ra!a#ra!d#ra#z#ra#|#ra#}#ra$]#ra$d#rar#ra~Oo'iO~Og#pa!a#pa~P&^Og#oa!a#oa~P)VOR#yOu#yOw#yO$O&gO$]%zO~O!U#|Og#na!a#na~Oc'kO~O!a&iOg$`i~P)VO`'_Og'oO~Oy$aOg!Pin!Pi~Og'pO~PMcOn'qO~Og'rO~O!a&iOg$`q~Og#nq!a#nq~P)VO$Q!e$R$]`$]y!u~",
-  goto: "4h$fPPPPP$gP$jP$s%V$s%i%{P$sP&R$sPP&XPPP&_&i&iPPPPP&iPP&iP'VP&iP&i(Q&iP(n(q(w(w)Z(wP(wP(wP(w(wP)j(w)vP(w)yPP*m*s$s*y$s+P+P+V+ZPP$sP$s$sP+a,],j,q$jP,zP,}P$jP$jP$jP-T$jP-W-Z-^-e$jP$jPP$jP-j$jP-m-s.S.j.x/O/Y/`/f/l/r/|0S0Y0`0f0lPPPPPPPPPPP0r0{P1q1t2vP3O3x4R4U4XPP4_RrQ_aOPco!R#Z$}q_OP]^co|}!O!P!R#R#Z#o$}&]qSOP]^co|}!O!P!R#R#Z#o$}&]qUOP]^co|}!O!P!R#R#Z#o$}&]QtTR#auQwWR#bxQ!VYR#cyQ#c!XS$f!s!tR%S#e!V!wdf!m!n!o#Y#p#u$Y$[$^$a$y%U%Z%_&V&W&a&f&k&p'U'^'k's!U!wdf!m!n!o#Y#p#u$Y$[$^$a$y%U%Z%_&V&W&a&f&k&p'U'^'k'sU#y!c%`'YU%}$p&P&wR&v%|!V!sdf!m!n!o#Y#p#u$Y$[$^$a$y%U%Z%_&V&W&a&f&k&p'U'^'k'sR$h!uQ%s$gR&s%tq!h`ei!c!d!e!q#|#}$O$R$e$g$j%t&iQ#w!cQ%h$RQ&h%`Q'[&iR'j'YQ#UjQ$U!jQ$t#TR&T$vR$S!f!U!wdf!m!n!o#Y#p#u$Y$[$^$a$y%U%Z%_&V&W&a&f&k&p'U'^'k'sQ!|gR$o!}Q!WYR#dyQ#c!WR%S#dQ!ZZR#fzQ!_[R#g{T!^[{Q#r!]R%]#sQ!SXQ!i`Q#SjQ#m!QQ$P!dQ$l!yQ$r#QQ$u#UQ$x#XQ%e$OQ&S$tQ&y&OQ&|&TR'h&xSnP!RQ#]oQ$|#ZR&Z$}ZmPo!R#Z$}Q${#YQ&X$yR'P&WR$e!qQ&n%oR'm'_R!}gR#PhR$q#PS&O$p&PR'f&wV%|$p&P&wR#XkQ#_qR%Q#_QcOSoP!RU!kco$}R$}#ZQ%Z#pY&`%Z&f'U'^'sQ&f%_Q'U&aQ'^&kR's'kQ$Y!mQ$[!nQ$^!oV%j$Y$[$^Q%t$gR&t%tQ&j%gS']&j'lR'l'^Q&b%ZR'V&bQ&^%WR'T&^Q!QXR#l!QQ&W$yR'O&WQ#[nS%O#[%PR%P#]Q'`&nR'n'`Q$k!xR%x$kQ&P$pR&z&PQ&x&OR'g&xQ#WkR$w#WQ$O!dR%d$O_bOPco!R#Z$}^XOPco!R#Z$}Q!`]Q!a^Q#h|Q#i}Q#j!OQ#k!PQ$s#RQ%W#oR'S&]R%[#pQ!qdQ!zf[$V!m!n!o$Y$[$^Q$y#Yd%Y#p%Z%_&a&f&k'U'^'k'sQ%^#uQ%n$aS&U$y&WQ&[%UQ&}&VR'b&p]$X!m!n!o$Y$[$^Q!d`U!xe!q$eQ#QiQ#x!cS#{!d$OQ$Q!eQ%b#|Q%c#}Q%g$RS%r$g%tQ%w$jR'Z&iQ#z!cQ&h%`R'j'YR%i$RR%X#oQpPR#n!RQ!yeQ$d!qR%q$e",
-  nodeNames: "⚠ Unit VariableName VariableName QueryCallee Comment StyleSheet RuleSet UniversalSelector TagSelector TagName NamespacedTagSelector NamespaceName TagName NestingSelector ClassSelector . ClassName PseudoClassSelector : :: PseudoClassName PseudoClassName ) ( ArgList ValueName ParenthesizedValue AtKeyword # ; ] [ BracketedValue } { BracedValue ColorLiteral NumberLiteral StringLiteral BinaryExpression BinOp CallExpression Callee IfExpression if ArgList IfBranch KeywordQuery FeatureQuery FeatureName BinaryQuery LogicOp ComparisonQuery CompareOp UnaryQuery UnaryQueryOp ParenthesizedQuery SelectorQuery selector ParenthesizedSelector CallQuery ArgList , PseudoQuery CallLiteral CallTag ParenthesizedContent PseudoClassName ArgList IdSelector IdName AttributeSelector AttributeName NamespacedAttribute NamespaceName AttributeName MatchOp MatchFlag ChildSelector ChildOp DescendantSelector SiblingSelector SiblingOp Block Declaration PropertyName Important ImportStatement import Layer layer LayerName layer MediaStatement media CharsetStatement charset NamespaceStatement namespace NamespaceName KeyframesStatement keyframes KeyframeName KeyframeList KeyframeSelector KeyframeRangeName SupportsStatement supports ScopeStatement scope to FontFeatureStatement font-feature-values FontName AtRule Styles",
-  maxTerm: 159,
+  states: "MrQYQdOOO#}QdOOP$UO`OOO%OQaO'#CfOOQP'#Ce'#CeO%VQdO'#CgO%[Q`O'#CgO%aQaO'#FqO&XQdO'#CkO&xQaO'#CcO'SQdO'#CnO'_QdO'#ERO'dQdO'#ETO'oQdO'#E[O'oQdO'#E_OOQP'#Fq'#FqO)RQhO'#FQOOQS'#Fp'#FpOOQS'#FT'#FTQYQdOOO)YQdO'#EeO*iQhO'#EkO)YQdO'#EmO*pQdO'#EoO*{QdO'#ErO)}QhO'#ExO+TQdO'#EzO+`QdO'#E}O+eQaO'#CfO+lQ`O'#EbO+qQ`O'#F}O+|QdO'#F}QOQ`OOP,WO&jO'#CaPOOO)CA`)CA`OOQP'#Ci'#CiOOQP,59R,59RO%VQdO,59ROOQP'#Cm'#CmOOQP,59V,59VO&XQdO,59VO,cQdO,59YO'_QdO,5:mO'dQdO,5:oO'oQdO,5:vO'oQdO,5:xO'oQdO,5:yO'oQdO'#F[O,nQ`O,58}O,vQdO'#EaOOQS,58},58}OOQP'#Cq'#CqOOQO'#EP'#EPOOQP,59Y,59YO,}Q`O,59YO-SQ`O,59YOOQP'#ES'#ESOOQP,5:m,5:mO-XQpO'#EUO-dQdO'#EVO-iQ`O'#EVO-nQpO,5:oO.XQaO,5:vO.oQaO,5:yOOQW'#D^'#D^O/nQhO'#DgO0RQhO,5;lO)}QhO'#DeO0`Q`O'#DnO0eQhO'#D{OOQW'#Fw'#FwOOQS,5;l,5;lO0jQ`O'#DhO0oQ`O'#DkOOQS-E9R-E9ROOQ['#Cv'#CvO0tQdO'#CwO1[QdO'#C}O1rQdO'#DQO2YQ!pO'#DSO4fQ!jO,5;POOQO'#DX'#DXO-SQ`O'#DWO4vQ!nO'#FtO6|Q`O'#DYO7RQ`O'#D|OOQ['#Ft'#FtO7WQhO'#GQO7fQ`O,5;VO7kQ!bO,5;XOOQS'#Eq'#EqO7sQ`O,5;ZO7xQdO,5;ZOOQO'#Et'#EtO8QQ`O,5;^O8VQhO,5;dO'oQdO'#DjOOQS,5;f,5;fO0jQ`O,5;fO8_QdO,5;fOOQS'#Fc'#FcO8gQdO'#FPO7fQ`O,5;iO8oQdO,5:|O9PQdO'#F^O9^Q`O,5<iO9^Q`O,5<iPOOO'#FS'#FSP9iO&jO,58{POOO,58{,58{OOQP1G.m1G.mOOQP1G.q1G.qOOQP1G.t1G.tO,}Q`O1G.tO-SQ`O1G.tOOQP1G0X1G0XO9tQpO1G0ZO9|QaO1G0bO:dQaO1G0dO:zQaO1G0eO;bQaO,5;vOOQO-E9Y-E9YOOQS1G.i1G.iO;lQ`O,5:{O;qQdO'#EQO;xQdO'#CuOOQO'#EX'#EXOOQO,5:q,5:qO-dQdO,5:qOOQP1G0Z1G0ZO)YQdO1G0ZO<PQ!jO'#D^O<_Q!bO,59yO<gQhO,5:ROOQO'#Fx'#FxO<bQ!bO,59}O<oQhO'#FdO)}QhO,59{O)}QhO'#FdO=gQhO1G1WOOQS1G1W1G1WO=qQhO,5:PO>lQhO'#DoOOQW,5:Y,5:YOOQW,5:g,5:gOOQW,5:S,5:SO>vQhO,5:VO?bQ!fO'#FuOOQS'#Fu'#FuOOQS'#FV'#FVO@rQdO,59cOOQ[,59c,59cOAYQdO,59iOOQ[,59i,59iOApQdO,59lOOQ[,59l,59lOOQ[,59n,59nO)YQdO,59pOBWQhO'#EgOOQW'#Eg'#EgOBuQ`O1G0kO4oQhO1G0kOOQ[,59r,59rO)}QhO'#D[OOQ[,59t,59tOBzQ#tO,5:hOCVQhO'#F`OCdQ`O,5<lOOQS1G0q1G0qOOQS1G0s1G0sOOQS1G0u1G0uOCoQ`O1G0uOCtQdO'#EuOOQS1G0x1G0xOOQS1G1O1G1OODPQaO,5:UO7fQ`O1G1QOOQS1G1Q1G1QO0jQ`O1G1QOOQS-E9a-E9aOOQS1G1T1G1TODWQ!fO1G0hODnQ`O'#EdOOQO1G0h1G0hOOQO,5;x,5;xODsQdO,5;xOOQO-E9[-E9[OEQQ`O1G2TPOOO-E9Q-E9QPOOO1G.g1G.gOOQP7+$`7+$`OOQP7+%u7+%uO)YQdO7+%uOOQS1G0g1G0gOE]QaO'#F|OEgQ`O,5:lOElQ!fO'#FUOFjQdO'#FsOFtQ`O,59aOOQO1G0]1G0]OFyQ!bO7+%uO)YQdO1G/eOGUQhO1G/iOOQW1G/m1G/mOOQW1G/g1G/gOGgQhO,5<OOOQW-E9b-E9bOOQS7+&r7+&rOH_QhO'#D^OHmQhO'#F{OHxQ`O'#F{OH}Q`O,5:ZOISQ!bO'#D`O>vQhO'#DmOI_QhO'#DsOIgQhO'#DuOIlQ!jO'#FzOOQO'#Fz'#FzOIwQ`O'#DxOJPQ!bO'#DzOOQO'#Fy'#FyOJUQ`O1G/qOOQS-E9T-E9TOOQ[1G.}1G.}OOQ[1G/T1G/TOOQ[1G/W1G/WOOQ[1G/[1G/[OJZQdO,5;ROOQS7+&V7+&VOJ`Q`O7+&VOJeQhO'#D]OJmQ`O,59vO)}QhO,59vOOQ[1G0S1G0SOJuQ`O1G0SOJzQhO,5;zOOQO-E9^-E9^OOQS7+&a7+&aOKYQbO'#DSOOQO'#Ew'#EwOKhQ`O'#EvOOQO'#Ev'#EvOKsQ`O'#FaOK{QdO,5;aOOQS,5;a,5;aOOQ[1G/p1G/pOOQS7+&l7+&lO7fQ`O7+&lOLWQ!fO'#F]O)YQdO'#F]OM_QdO7+&SOOQO7+&S7+&SOOQO,5;O,5;OOOQO1G1d1G1dOMrQ!bO<<IaOM}QdO'#FZONXQ`O,5<hOOQP1G0W1G0WOOQS-E9S-E9SONaQdO'#FYONkQ`O,5<_OOQ]1G.{1G.{OOQP<<Ia<<IaONsQ`O<<IaONxQdO7+%POOQO'#D`'#D`O! PQ!bO7+%TO! XQhO'#FXO! fQ`O,5<gO)YQdO,5<gOOQW1G/u1G/uO! nQ`O,5:XO>vQhO'#DtOOQO,5:_,5:_O! sQhO,5:aO! {QhO,5:fO)YQdO,5:dOOQW7+%]7+%]OOQO'#Ei'#EiO!!SQ`O1G0mOOQS<<Iq<<IqO)YQdO,59wO!!vQhO1G/bOOQ[1G/b1G/bO!!}Q`O1G/bOOQW-E9U-E9UOOQ[7+%n7+%nOOQO,5;b,5;bOCwQdO'#FbOKsQ`O,5;{OOQS,5;{,5;{OOQS-E9_-E9_OOQS1G0{1G0{OOQS<<JW<<JWO!#VQ!fO,5;wOOQS-E9Z-E9ZOOQO<<In<<InOOQPAN>{AN>{O!$^Q`OAN>{O!$cQaO,5;uOOQO-E9X-E9XO!$mQdO,5;tOOQO-E9W-E9WOOQW<<Hk<<HkOOQW<<Ho<<HoO!$wQhO<<HoO!%YQhO'#D^O!%hQhO,5;sO!%sQ`O,5;sOOQO-E9V-E9VO!%xQdO1G2RO!&SQhO1G/sO!&[Q`O,5:`O>vQhO'#DwOOQO1G/{1G/{O!&aQ!bO1G0QO!&iQdO1G0OOJZQdO'#F_O!&pQ`O7+&XOOQW7+&X7+&XO!&xQ!bO1G/cOOQ[7+$|7+$|O!'TQhO7+$|P!'[Q`O'#FWOOQO,5;|,5;|OOQO-E9`-E9`OOQS1G1g1G1gOOQPG24gG24gO!'aQ`OAN>ZO)YQdO1G1_O!'fQ`O7+'mOOQO1G/z1G/zO!'nQ`O,5:cO!'sQhO7+%lOOQO,5;y,5;yOOQO-E9]-E9]OOQW<<Is<<IsOOQ[<<Hh<<HhPOQW,5;r,5;rOOQWG23uG23uO!'zQdO7+&yOOQO1G/}1G/}OOQO<<IW<<IW",
+  stateData: "!(_~O$_OS$`QQ~OWVO^_O`WOcYOdYOl`OmZOp[O#P]O#S^O#YdO#`eO#bfO#dgO#ghO#miO#ojO#rkO$ZRO$fTO~OQmOWVO^_O`WOcYOdYOl`OmZOp[O#P]O#S^O#YdO#`eO#bfO#dgO#ghO#miO#ojO#rkO$ZlO$fTO~O$X$qP~P!jO$`qO~O`YXcYXdYXmYXpYXsYX!eYX#PYX#SYX$YYX$f[X~OgYX~P$ZO$ZsO~O$fuO~O$fuO`$eXc$eXd$eXm$eXp$eXs$eX!e$eX#P$eX#S$eX$Y$eXg$eX~O$ZvO~O`xOcyOdyOmzOp{O#P|O#S!OO$Y}O~Os!RO!e!PO~P&^Of!XO$Z!TO$[!UO~O$Z!YO~OW!^O$Z![O$f!]O~OWVO^_O`WOcYOdYOmZOp[O#P]O#S^O$ZRO$fTO~OS!fOc!gOd!gOh!cOs!RO!Y!eO!]!jO!`!kO$]!bO~On!iO~P(dOQ!uOh!nOp!oOs!pOu!xOw!xO}!vO!q!wO$Z!mO$[!sO$j!qO~OS!fOc!gOd!gOh!cO!Y!eO!]!jO!`!kO$]!bO~Os$tP~P)}Ow!}O!q!wO$Z!|O~Ow#PO$Z#PO~Oh#SOs!RO#p#UO~O$Z#WO~Oc#VX~P$ZOc#ZO~On#[O$X$qXr$qX~O$X$qXr$qX~P!jO$a#_O$b#_O$c#aO~Of#fO$Z!TO$[!UO~Os!RO!e!PO~Or$qP~P!jOh#pO~Oh#qO~Oo!xX!|!xX$f!zX~O$Z#rO~O$f#tO~Oo#uO!|#vO~O`xOcyOdyOmzOp{O~Os#Oa!e#Oa#P#Oa#S#Oa$Y#Oag#Oa~P-vOs#Ra!e#Ra#P#Ra#S#Ra$Y#Rag#Ra~P-vOS!fOc!gOd!gOh!cO!Y!eO!]!jO!`!kO~OR#zOu#zOw#zO$]#wO$j!qO~P/VOn$QO!U#}O!e$OO~P(dOh$SO~O$]$UO~Oh#SO~Oh$WO~O`$YOc$YOg$]Ol$YOm$YOn$YO~P)YO`$YOc$YOl$YOm$YOn$YOo$_O~P)YO`$YOc$YOl$YOm$YOn$YOr$aO~P)YOP$bOSvXcvXdvXhvXnvXyvX!YvX!]vX!`vX#[vX#^vX$]vX!WvXQvX`vXgvXlvXmvXpvXsvXuvXwvX}vX!qvX$ZvX$[vX$jvXovXrvX!evX$XvX$svX!}vX~Oy$cO#[$dO#^$eOn$tP~P)}Oh#qOS$hXc$hXd$hXn$hXy$hX!Y$hX!]$hX!`$hX#[$hX#^$hX$]$hXQ$hX`$hXg$hXl$hXm$hXp$hXs$hXu$hXw$hX}$hX!q$hX$Z$hX$[$hX$j$hXo$hXr$hX!e$hX$X$hX$s$hX!}$hX~Oh$iO~Oh$kO~O!U#}O!e$lOs$tXn$tX~Os!RO~On$oOy$cO~On$pO~Ow$qO!q!wO~Os$rO~Os!RO!U#}O~Os!RO#p$xO~O$Z#WOs#sX~O$s$|On#Ua$X#Uar#Ua~P)YOn$QX$X$QXr$QX~P!jOn#[O$X$qar$qa~O$a#_O$b#_O$c%TO~Oo%VO!|%WO~Os#Oi!e#Oi#P#Oi#S#Oi$Y#Oig#Oi~P-vOs#Qi!e#Qi#P#Qi#S#Qi$Y#Qig#Qi~P-vOs#Ri!e#Ri#P#Ri#S#Ri$Y#Rig#Ri~P-vOs$Oa!e$Oa~P&^Or%XO~Og$pP~P'oOg$gP~P)YOc!SXg!QX!U!QX!W!SX~Oc%aO!W%bO~Og%cO!U#}O~O!U#}OS$WXc$WXd$WXh$WXn$WXs$WX!Y$WX!]$WX!`$WX!e$WX$]$WX~On%gO!e$OO~P(dO!U#}OS!Xac!Xad!Xah!Xan!Xas!Xa!Y!Xa!]!Xa!`!Xa!e!Xa$]!Xag!Xa~O$]%hOg$oP~P/VOR#zOS!fOh%mOu#zOw#zO!Y%nO$]%lO$j!qO~Oy$cOQ$iX`$iXc$iXg$iXh$iXl$iXm$iXn$iXp$iXs$iXu$iXw$iX}$iX!q$iX$Z$iX$[$iX$j$iXo$iXr$iX~O`$YOc$YOg%wOl$YOm$YOn$YO~P)YO`$YOc$YOl$YOm$YOn$YOo%xO~P)YO`$YOc$YOl$YOm$YOn$YOr%yO~P)YOh%{OS#ZXc#ZXd#ZXn#ZX!Y#ZX!]#ZX!`#ZX$]#ZX~On%|O~Og&ROw&SO!r&SO~Os$SX!e$SXn$SX~P)}O!e$lOs$tan$ta~On&VO~Or&^O$Z&XO$j&WO~Og&_O~P&^Oy$cO!e&cO$s$|On#Ui$X#Uir#Ui~P)YO$r&fO~On$Qa$X$Qar$Qa~P!jOn#[O$X$qir$qi~O!e&iOg$pX~P&^Og&kO~Oy$cOQ#xXg#xXh#xXp#xXs#xXu#xXw#xX}#xX!e#xX!q#xX$Z#xX$[#xX$j#xX~O!e&mOg$gX~P)YOg&oO~Oo&pOy$cO!}&qO~OR#zOu#zOw#zO$]&sO$j!qO~O!U#}OS$Wac$Wad$Wah$Wan$Was$Wa!Y$Wa!]$Wa!`$Wa!e$Wa$]$Wa~Oc!dXg!QX!U!QX!e!QX~O!U#}O!e&uOg$oX~Oc&wO~Og&xO~Oc!mXg!mX!W!SX~OS!fOh&zO~O!U&|O~O!U&|O!W&}Og$nX~Oc'OOg!lX~O!W&}O~Og'PO~O$Z'QO~On'SO~Oc'TO!U#}O~Og'VOn'UO~Og'YO~O!U#}Os$Sa!e$San$Sa~OP$bOsvX!evXgvX~O$j&WOs#jX!e#jX~Os!RO!e'[O~Or'`O$Z&XO$j&WO~Oy$cOQ$PXh$PXn$PXp$PXs$PXu$PXw$PX}$PX!e$PX!q$PX$X$PX$Z$PX$[$PX$j$PX$s$PXr$PX~O!e&cO$s$|On#Uq$X#Uqr#Uq~P)YOo'eOy$cO!}'fO~Og#}X!e#}X~P'oO!e&iOg$pa~Og#|X!e#|X~P)YO!e&mOg$ga~Oo'eO~Og'kO~P)YOg'lO!W'mO~O$]'nOg#{X!e#{X~P/VO!e&uOg$oa~Og'sO~OS!fOh'uO~OS!fO~PGUO`'yOg'{O~OS#zac#zad#zah#za!Y#za!]#za!`#za$]#za~Og'}O~P!![Og'}On(OO~Oy$cOQ$Pah$Pan$Pap$Pas$Pau$Paw$Pa}$Pa!e$Pa!q$Pa$X$Pa$Z$Pa$[$Pa$j$Pa$s$Par$Pa~Oo(TO~Og#}a!e#}a~P&^Og#|a!e#|a~P)YOR#zOu#zOw#zO$]&sO$j&WO~Oc!fXg!QX!U!QX!e!QX~O!U#}Og#{a!e#{a~Oc(VO~O!e&uOg$oi~P)YOg!ai!U!ji~Og(XO~O!W(ZOg!ni~Og!li~P)YO`'yOg(^O~Oy$cOg!Pin!Pi~Og(_O~P!![On(`O~Og(aO~O!e&uOg$oq~Og(cO~OS!fO~P!$wOg#{q!e#{q~P)YO$_!r$`$j`$jy#S~",
+  goto: "7g$uPPPPP$vP$yP%S%f%S%x&[P%SP&b%SPP&hPPP&n&x&xPPPPP&xPP&xP'hP&xP&x(k&xP)Z)^)d)d)v)dP)dP)dP)d)dP*])dP*i*o+e+hP+k*i+n*i+q+w+z,Q+z)d,WPP,|-S%S-Y%S-`-`-f-jPP%SP%S%SP-p.l.y/Q$yP/ZP/^P$yP$yP$yP/d$yP/g/j/m/t$yP$yPP$yP/y$yP/|0S0c0}1]1c1m1s1y2P2V2a2g2m2s2y3PPPPPPPPPPPP3V3`P4U4X5]P5e6_6t+z7Q7T7WPP7^RrQ_aOPco!R#[%Pq_OP]^co|}!O!P!R#S#[#p%P&iqSOP]^co|}!O!P!R#S#[#p%P&iqUOP]^co|}!O!P!R#S#[#p%P&iQtTR#buQwWR#cxQ!VYR#dyQ#d!XS$h!t!uR%U#f!Z!xdf!n!o!p#Z#q#v$[$^$`$c${%W%]%a&c&d&m&r&w'O'T'i'r'x(V(b!Y!xdf!n!o!p#Z#q#v$[$^$`$c${%W%]%a&c&d&m&r&w'O'T'i'r'x(V(bb#z!c$W%b%m&z&}'m'u(ZU&Z$r&]'[R'Z&Y!Z!tdf!n!o!p#Z#q#v$[$^$`$c${%W%]%a&c&d&m&r&w'O'T'i'r'x(V(bR$j!vQ&P$iR'W&Qq!h`ei!c!d!e!r#}$O$P$S$g$i$l&Q&uQ#x!cW%s$W%m&z'uQ&t%bQ'w&}Q(U'mR(d(ZQ#VjQ$V!jQ$v#UR&a$xX%q$W%m&z'up!h`ei!c!d!e!r#}$O$P$S$g$i$l&Q&uW%p$W%m&z'uQ&{%nQ'v&|Q'w&}R(d(ZR$T!fR%j$SR'p&uR&{%nX%o$W%m&z'uR'v&|X%t$W%m&z'uX%r$W%m&z'u!Y!xdf!n!o!p#Z#q#v$[$^$`$c${%W%]%a&c&d&m&r&w'O'T'i'r'x(V(bQ!}gR$q#OQ!WYR#eyQ#d!WR%U#eQ!ZZR#gzQ!_[R#h{T!^[{Q#s!]R%_#tQ!SXQ!i`Q#TjQ#n!QQ$Q!dQ$n!zQ$t#RQ$w#VQ$z#YQ%g$PQ&`$vQ'^&[Q'a&aR(S']SnP!RQ#^oQ%O#[R&g%PZmPo!R#[%PQ$}#ZQ&e${R'd&dR$g!rQ'R%{R(['yR#OgR#QhR$s#QS&[$r&]R(Q'[V&Y$r&]'[R#YkQ#`qR%S#`QcOSoP!RU!lco%PR%P#[Q%]#q[&l%]&r'i'r'x(bQ&r%aQ'i&mQ'r&wQ'x'OR(b(VQ$[!nQ$^!oQ$`!pV%v$[$^$`Q&Q$iR'X&QQ&v%iS'q&v(WR(W'rQ&n%]R'j&nQ&j%YR'h&jQ!QXR#m!QQ&d${R'c&dQ#]nS%Q#]%RR%R#^Q'z'RR(]'zQ$m!yR&U$mQ&]$rR'_&]Q']&[R(R']Q#XkR$y#XQ$P!dR%f$P_bOPco!R#[%P^XOPco!R#[%PQ!`]Q!a^Q#i|Q#j}Q#k!OQ#l!PQ$u#SQ%Y#pR'g&iR%^#qQ!rdQ!{f[$X!n!o!p$[$^$`Q${#Zh%[#q%]%a&m&r&w'O'i'r'x(V(bQ%`#vQ%z$cS&b${&dQ&h%WQ'b&cR'|'T]$Z!n!o!p$[$^$`Q!d`U!ye!r$gQ#RiQ#y!cS#|!d$PQ$R!eQ%d#}Q%e$OQ%i$SS&O$i&QQ&T$lR'o&uQ#{!cW%s$W%m&z'uQ&t%bQ'w&}Q(U'mR(d(ZQ%u$WQ&y%mQ't&zR(Y'uR%k$SR%Z#pQpPR#o!RQ!zeQ$f!rR%}$g",
+  nodeNames: "⚠ Unit VariableName VariableName QueryCallee Comment StyleSheet RuleSet UniversalSelector TagSelector TagName NamespacedTagSelector NamespaceName TagName NestingSelector ClassSelector . ClassName PseudoClassSelector : :: PseudoClassName PseudoClassName ) ( ArgList ValueName ParenthesizedValue AtKeyword # ; ] [ BracketedValue } { BracedValue ColorLiteral NumberLiteral StringLiteral BinaryExpression BinOp CallExpression Callee IfExpression if ArgList IfBranch KeywordQuery FeatureQuery FeatureName BinaryQuery LogicOp ComparisonQuery CompareOp UnaryQuery UnaryQueryOp ParenthesizedQuery SelectorQuery selector ParenthesizedSelector StyleQuery style ParenthesedQuery CallQuery ArgList PropertyName , PropertyName UnaryQuery ParenthesedQuery BinaryQuery ParenthesedQuery ParenthesedQuery StyleFeature PropertyName StyleRange PseudoQuery CallLiteral CallTag ParenthesizedContent PseudoClassName ArgList IdSelector IdName AttributeSelector AttributeName NamespacedAttribute NamespaceName AttributeName MatchOp MatchFlag ChildSelector ChildOp DescendantSelector SiblingSelector SiblingOp Block Declaration PropertyName Important ImportStatement import Layer layer LayerName layer MediaStatement media CharsetStatement charset NamespaceStatement namespace NamespaceName KeyframesStatement keyframes KeyframeName KeyframeList KeyframeSelector KeyframeRangeName SupportsStatement supports ScopeStatement scope to FontFeatureStatement font-feature-values FontName AtRule Styles",
+  maxTerm: 174,
   nodeProps: [
     ["isolate", -2,5,39,""],
     ["openedBy", 23,"(",31,"[",34,"{"],
     ["closedBy", 24,")",32,"]",35,"}"]
   ],
   propSources: [cssHighlighting],
-  skippedNodes: [0,5,117],
+  skippedNodes: [0,5,130],
   repeatNodeCount: 17,
-  tokenData: "K`~R!bOX%ZX^&R^p%Zpq&Rqr)ers)vst+jtu2Xuv%Zvw3Rwx3dxy5Ryz5dz{5i{|6S|}:u}!O;W!O!P;u!P!Q<^!Q![=V![!]>Q!]!^>|!^!_?_!_!`@Z!`!a@n!a!b%Z!b!cAo!c!k%Z!k!lC|!l!u%Z!u!vC|!v!}%Z!}#OD_#O#P%Z#P#QDp#Q#R2X#R#]%Z#]#^ER#^#g%Z#g#hC|#h#o%Z#o#pIf#p#qIw#q#rJ`#r#sJq#s#y%Z#y#z&R#z$f%Z$f$g&R$g#BY%Z#BY#BZ&R#BZ$IS%Z$IS$I_&R$I_$I|%Z$I|$JO&R$JO$JT%Z$JT$JU&R$JU$KV%Z$KV$KW&R$KW&FU%Z&FU&FV&R&FV;'S%Z;'S;=`KY<%lO%Z`%^SOy%jz;'S%j;'S;=`%{<%lO%j`%oS!e`Oy%jz;'S%j;'S;=`%{<%lO%j`&OP;=`<%l%j~&Wh$Q~OX%jX^'r^p%jpq'rqy%jz#y%j#y#z'r#z$f%j$f$g'r$g#BY%j#BY#BZ'r#BZ$IS%j$IS$I_'r$I_$I|%j$I|$JO'r$JO$JT%j$JT$JU'r$JU$KV%j$KV$KW'r$KW&FU%j&FU&FV'r&FV;'S%j;'S;=`%{<%lO%j~'yh$Q~!e`OX%jX^'r^p%jpq'rqy%jz#y%j#y#z'r#z$f%j$f$g'r$g#BY%j#BY#BZ'r#BZ$IS%j$IS$I_'r$I_$I|%j$I|$JO'r$JO$JT%j$JT$JU'r$JU$KV%j$KV$KW'r$KW&FU%j&FU&FV'r&FV;'S%j;'S;=`%{<%lO%jj)jS$dYOy%jz;'S%j;'S;=`%{<%lO%j~)yWOY)vZr)vrs*cs#O)v#O#P*h#P;'S)v;'S;=`+d<%lO)v~*hOw~~*kRO;'S)v;'S;=`*t;=`O)v~*wXOY)vZr)vrs*cs#O)v#O#P*h#P;'S)v;'S;=`+d;=`<%l)v<%lO)v~+gP;=`<%l)vj+oYmYOy%jz!Q%j!Q![,_![!c%j!c!i,_!i#T%j#T#Z,_#Z;'S%j;'S;=`%{<%lO%jj,dY!e`Oy%jz!Q%j!Q![-S![!c%j!c!i-S!i#T%j#T#Z-S#Z;'S%j;'S;=`%{<%lO%jj-XY!e`Oy%jz!Q%j!Q![-w![!c%j!c!i-w!i#T%j#T#Z-w#Z;'S%j;'S;=`%{<%lO%jj.OYuY!e`Oy%jz!Q%j!Q![.n![!c%j!c!i.n!i#T%j#T#Z.n#Z;'S%j;'S;=`%{<%lO%jj.uYuY!e`Oy%jz!Q%j!Q![/e![!c%j!c!i/e!i#T%j#T#Z/e#Z;'S%j;'S;=`%{<%lO%jj/jY!e`Oy%jz!Q%j!Q![0Y![!c%j!c!i0Y!i#T%j#T#Z0Y#Z;'S%j;'S;=`%{<%lO%jj0aYuY!e`Oy%jz!Q%j!Q![1P![!c%j!c!i1P!i#T%j#T#Z1P#Z;'S%j;'S;=`%{<%lO%jj1UY!e`Oy%jz!Q%j!Q![1t![!c%j!c!i1t!i#T%j#T#Z1t#Z;'S%j;'S;=`%{<%lO%jj1{SuY!e`Oy%jz;'S%j;'S;=`%{<%lO%jd2[UOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%jd2uS!oS!e`Oy%jz;'S%j;'S;=`%{<%lO%jb3WS^QOy%jz;'S%j;'S;=`%{<%lO%j~3gWOY3dZw3dwx*cx#O3d#O#P4P#P;'S3d;'S;=`4{<%lO3d~4SRO;'S3d;'S;=`4];=`O3d~4`XOY3dZw3dwx*cx#O3d#O#P4P#P;'S3d;'S;=`4{;=`<%l3d<%lO3d~5OP;=`<%l3dj5WShYOy%jz;'S%j;'S;=`%{<%lO%j~5iOg~n5pUWQyWOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%jj6ZWyW!uQOy%jz!O%j!O!P6s!P!Q%j!Q![9x![;'S%j;'S;=`%{<%lO%jj6xU!e`Oy%jz!Q%j!Q![7[![;'S%j;'S;=`%{<%lO%jj7cY!e`$]YOy%jz!Q%j!Q![7[![!g%j!g!h8R!h#X%j#X#Y8R#Y;'S%j;'S;=`%{<%lO%jj8WY!e`Oy%jz{%j{|8v|}%j}!O8v!O!Q%j!Q![9_![;'S%j;'S;=`%{<%lO%jj8{U!e`Oy%jz!Q%j!Q![9_![;'S%j;'S;=`%{<%lO%jj9fU!e`$]YOy%jz!Q%j!Q![9_![;'S%j;'S;=`%{<%lO%jj:P[!e`$]YOy%jz!O%j!O!P7[!P!Q%j!Q![9x![!g%j!g!h8R!h#X%j#X#Y8R#Y;'S%j;'S;=`%{<%lO%jj:zS!aYOy%jz;'S%j;'S;=`%{<%lO%jj;]WyWOy%jz!O%j!O!P6s!P!Q%j!Q![9x![;'S%j;'S;=`%{<%lO%jj;zU`YOy%jz!Q%j!Q![7[![;'S%j;'S;=`%{<%lO%j~<cTyWOy%jz{<r{;'S%j;'S;=`%{<%lO%j~<yS!e`$R~Oy%jz;'S%j;'S;=`%{<%lO%jj=[[$]YOy%jz!O%j!O!P7[!P!Q%j!Q![9x![!g%j!g!h8R!h#X%j#X#Y8R#Y;'S%j;'S;=`%{<%lO%jj>VUcYOy%jz![%j![!]>i!];'S%j;'S;=`%{<%lO%jj>pSdY!e`Oy%jz;'S%j;'S;=`%{<%lO%jj?RSnYOy%jz;'S%j;'S;=`%{<%lO%jh?dU!WWOy%jz!_%j!_!`?v!`;'S%j;'S;=`%{<%lO%jh?}S!WW!e`Oy%jz;'S%j;'S;=`%{<%lO%jl@bS!WW!oSOy%jz;'S%j;'S;=`%{<%lO%jj@uV!rQ!WWOy%jz!_%j!_!`?v!`!aA[!a;'S%j;'S;=`%{<%lO%jbAcS!rQ!e`Oy%jz;'S%j;'S;=`%{<%lO%jjArYOy%jz}%j}!OBb!O!c%j!c!}CP!}#T%j#T#oCP#o;'S%j;'S;=`%{<%lO%jjBgW!e`Oy%jz!c%j!c!}CP!}#T%j#T#oCP#o;'S%j;'S;=`%{<%lO%jjCW[lY!e`Oy%jz}%j}!OCP!O!Q%j!Q![CP![!c%j!c!}CP!}#T%j#T#oCP#o;'S%j;'S;=`%{<%lO%jhDRS!pWOy%jz;'S%j;'S;=`%{<%lO%jjDdSpYOy%jz;'S%j;'S;=`%{<%lO%jnDuSo^Oy%jz;'S%j;'S;=`%{<%lO%jjEWU!pWOy%jz#a%j#a#bEj#b;'S%j;'S;=`%{<%lO%jbEoU!e`Oy%jz#d%j#d#eFR#e;'S%j;'S;=`%{<%lO%jbFWU!e`Oy%jz#c%j#c#dFj#d;'S%j;'S;=`%{<%lO%jbFoU!e`Oy%jz#f%j#f#gGR#g;'S%j;'S;=`%{<%lO%jbGWU!e`Oy%jz#h%j#h#iGj#i;'S%j;'S;=`%{<%lO%jbGoU!e`Oy%jz#T%j#T#UHR#U;'S%j;'S;=`%{<%lO%jbHWU!e`Oy%jz#b%j#b#cHj#c;'S%j;'S;=`%{<%lO%jbHoU!e`Oy%jz#h%j#h#iIR#i;'S%j;'S;=`%{<%lO%jbIYS$cQ!e`Oy%jz;'S%j;'S;=`%{<%lO%jjIkSsYOy%jz;'S%j;'S;=`%{<%lO%jfI|U$XUOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%jjJeSrYOy%jz;'S%j;'S;=`%{<%lO%jfJvU!uQOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%j`K]P;=`<%l%Z",
-  tokenizers: [descendant, unitToken, identifiers, queryIdentifiers, 1, 2, 3, 4, new lr.LocalTokenGroup("m~RRYZ[z{a~~g~aO$T~~dP!P!Qg~lO$U~~", 28, 142)],
-  topRules: {"StyleSheet":[0,6],"Styles":[1,116]},
-  dynamicPrecedences: {"84":1},
-  specialized: [{term: 137, get: (value) => spec_callee[value] || -1},{term: 138, get: (value) => spec_queryIdentifier[value] || -1},{term: 4, get: (value) => spec_QueryCallee[value] || -1},{term: 28, get: (value) => spec_AtKeyword[value] || -1},{term: 136, get: (value) => spec_identifier[value] || -1}],
-  tokenPrec: 2256
+  tokenData: "K`~R!bOX%ZX^&R^p%Zpq&Rqr)ers)vst+jtu2Xuv%Zvw3Rwx3dxy5Ryz5dz{5i{|6S|}:u}!O;W!O!P;u!P!Q<^!Q![=V![!]>Q!]!^>|!^!_?_!_!`@Z!`!a@n!a!b%Z!b!cAo!c!k%Z!k!lC|!l!u%Z!u!vC|!v!}%Z!}#OD_#O#P%Z#P#QDp#Q#R2X#R#]%Z#]#^ER#^#g%Z#g#hC|#h#o%Z#o#pIf#p#qIw#q#rJ`#r#sJq#s#y%Z#y#z&R#z$f%Z$f$g&R$g#BY%Z#BY#BZ&R#BZ$IS%Z$IS$I_&R$I_$I|%Z$I|$JO&R$JO$JT%Z$JT$JU&R$JU$KV%Z$KV$KW&R$KW&FU%Z&FU&FV&R&FV;'S%Z;'S;=`KY<%lO%Z`%^SOy%jz;'S%j;'S;=`%{<%lO%j`%oS!r`Oy%jz;'S%j;'S;=`%{<%lO%j`&OP;=`<%l%j~&Wh$_~OX%jX^'r^p%jpq'rqy%jz#y%j#y#z'r#z$f%j$f$g'r$g#BY%j#BY#BZ'r#BZ$IS%j$IS$I_'r$I_$I|%j$I|$JO'r$JO$JT%j$JT$JU'r$JU$KV%j$KV$KW'r$KW&FU%j&FU&FV'r&FV;'S%j;'S;=`%{<%lO%j~'yh$_~!r`OX%jX^'r^p%jpq'rqy%jz#y%j#y#z'r#z$f%j$f$g'r$g#BY%j#BY#BZ'r#BZ$IS%j$IS$I_'r$I_$I|%j$I|$JO'r$JO$JT%j$JT$JU'r$JU$KV%j$KV$KW'r$KW&FU%j&FU&FV'r&FV;'S%j;'S;=`%{<%lO%jj)jS$sYOy%jz;'S%j;'S;=`%{<%lO%j~)yWOY)vZr)vrs*cs#O)v#O#P*h#P;'S)v;'S;=`+d<%lO)v~*hOw~~*kRO;'S)v;'S;=`*t;=`O)v~*wXOY)vZr)vrs*cs#O)v#O#P*h#P;'S)v;'S;=`+d;=`<%l)v<%lO)v~+gP;=`<%l)vj+oYmYOy%jz!Q%j!Q![,_![!c%j!c!i,_!i#T%j#T#Z,_#Z;'S%j;'S;=`%{<%lO%jj,dY!r`Oy%jz!Q%j!Q![-S![!c%j!c!i-S!i#T%j#T#Z-S#Z;'S%j;'S;=`%{<%lO%jj-XY!r`Oy%jz!Q%j!Q![-w![!c%j!c!i-w!i#T%j#T#Z-w#Z;'S%j;'S;=`%{<%lO%jj.OYuY!r`Oy%jz!Q%j!Q![.n![!c%j!c!i.n!i#T%j#T#Z.n#Z;'S%j;'S;=`%{<%lO%jj.uYuY!r`Oy%jz!Q%j!Q![/e![!c%j!c!i/e!i#T%j#T#Z/e#Z;'S%j;'S;=`%{<%lO%jj/jY!r`Oy%jz!Q%j!Q![0Y![!c%j!c!i0Y!i#T%j#T#Z0Y#Z;'S%j;'S;=`%{<%lO%jj0aYuY!r`Oy%jz!Q%j!Q![1P![!c%j!c!i1P!i#T%j#T#Z1P#Z;'S%j;'S;=`%{<%lO%jj1UY!r`Oy%jz!Q%j!Q![1t![!c%j!c!i1t!i#T%j#T#Z1t#Z;'S%j;'S;=`%{<%lO%jj1{SuY!r`Oy%jz;'S%j;'S;=`%{<%lO%jd2[UOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%jd2uS!|S!r`Oy%jz;'S%j;'S;=`%{<%lO%jb3WS^QOy%jz;'S%j;'S;=`%{<%lO%j~3gWOY3dZw3dwx*cx#O3d#O#P4P#P;'S3d;'S;=`4{<%lO3d~4SRO;'S3d;'S;=`4];=`O3d~4`XOY3dZw3dwx*cx#O3d#O#P4P#P;'S3d;'S;=`4{;=`<%l3d<%lO3d~5OP;=`<%l3dj5WShYOy%jz;'S%j;'S;=`%{<%lO%j~5iOg~n5pUWQyWOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%jj6ZWyW#SQOy%jz!O%j!O!P6s!P!Q%j!Q![9x![;'S%j;'S;=`%{<%lO%jj6xU!r`Oy%jz!Q%j!Q![7[![;'S%j;'S;=`%{<%lO%jj7cY!r`$jYOy%jz!Q%j!Q![7[![!g%j!g!h8R!h#X%j#X#Y8R#Y;'S%j;'S;=`%{<%lO%jj8WY!r`Oy%jz{%j{|8v|}%j}!O8v!O!Q%j!Q![9_![;'S%j;'S;=`%{<%lO%jj8{U!r`Oy%jz!Q%j!Q![9_![;'S%j;'S;=`%{<%lO%jj9fU!r`$jYOy%jz!Q%j!Q![9_![;'S%j;'S;=`%{<%lO%jj:P[!r`$jYOy%jz!O%j!O!P7[!P!Q%j!Q![9x![!g%j!g!h8R!h#X%j#X#Y8R#Y;'S%j;'S;=`%{<%lO%jj:zS!eYOy%jz;'S%j;'S;=`%{<%lO%jj;]WyWOy%jz!O%j!O!P6s!P!Q%j!Q![9x![;'S%j;'S;=`%{<%lO%jj;zU`YOy%jz!Q%j!Q![7[![;'S%j;'S;=`%{<%lO%j~<cTyWOy%jz{<r{;'S%j;'S;=`%{<%lO%j~<yS!r`$`~Oy%jz;'S%j;'S;=`%{<%lO%jj=[[$jYOy%jz!O%j!O!P7[!P!Q%j!Q![9x![!g%j!g!h8R!h#X%j#X#Y8R#Y;'S%j;'S;=`%{<%lO%jj>VUcYOy%jz![%j![!]>i!];'S%j;'S;=`%{<%lO%jj>pSdY!r`Oy%jz;'S%j;'S;=`%{<%lO%jj?RSnYOy%jz;'S%j;'S;=`%{<%lO%jh?dU!WWOy%jz!_%j!_!`?v!`;'S%j;'S;=`%{<%lO%jh?}S!WW!r`Oy%jz;'S%j;'S;=`%{<%lO%jl@bS!WW!|SOy%jz;'S%j;'S;=`%{<%lO%jj@uV#PQ!WWOy%jz!_%j!_!`?v!`!aA[!a;'S%j;'S;=`%{<%lO%jbAcS#PQ!r`Oy%jz;'S%j;'S;=`%{<%lO%jjArYOy%jz}%j}!OBb!O!c%j!c!}CP!}#T%j#T#oCP#o;'S%j;'S;=`%{<%lO%jjBgW!r`Oy%jz!c%j!c!}CP!}#T%j#T#oCP#o;'S%j;'S;=`%{<%lO%jjCW[lY!r`Oy%jz}%j}!OCP!O!Q%j!Q![CP![!c%j!c!}CP!}#T%j#T#oCP#o;'S%j;'S;=`%{<%lO%jhDRS!}WOy%jz;'S%j;'S;=`%{<%lO%jjDdSpYOy%jz;'S%j;'S;=`%{<%lO%jnDuSo^Oy%jz;'S%j;'S;=`%{<%lO%jjEWU!}WOy%jz#a%j#a#bEj#b;'S%j;'S;=`%{<%lO%jbEoU!r`Oy%jz#d%j#d#eFR#e;'S%j;'S;=`%{<%lO%jbFWU!r`Oy%jz#c%j#c#dFj#d;'S%j;'S;=`%{<%lO%jbFoU!r`Oy%jz#f%j#f#gGR#g;'S%j;'S;=`%{<%lO%jbGWU!r`Oy%jz#h%j#h#iGj#i;'S%j;'S;=`%{<%lO%jbGoU!r`Oy%jz#T%j#T#UHR#U;'S%j;'S;=`%{<%lO%jbHWU!r`Oy%jz#b%j#b#cHj#c;'S%j;'S;=`%{<%lO%jbHoU!r`Oy%jz#h%j#h#iIR#i;'S%j;'S;=`%{<%lO%jbIYS$rQ!r`Oy%jz;'S%j;'S;=`%{<%lO%jjIkSsYOy%jz;'S%j;'S;=`%{<%lO%jfI|U$fUOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%jjJeSrYOy%jz;'S%j;'S;=`%{<%lO%jfJvU#SQOy%jz!_%j!_!`2n!`;'S%j;'S;=`%{<%lO%j`K]P;=`<%l%Z",
+  tokenizers: [descendant, unitToken, identifiers, queryIdentifiers, 1, 2, 3, 4, new lr.LocalTokenGroup("m~RRYZ[z{a~~g~aO$b~~dP!P!Qg~lO$c~~", 28, 155)],
+  topRules: {"StyleSheet":[0,6],"Styles":[1,129]},
+  dynamicPrecedences: {"97":1},
+  specialized: [{term: 150, get: (value) => spec_callee[value] || -1},{term: 151, get: (value) => spec_queryIdentifier[value] || -1},{term: 4, get: (value) => spec_QueryCallee[value] || -1},{term: 28, get: (value) => spec_AtKeyword[value] || -1},{term: 149, get: (value) => spec_identifier[value] || -1}],
+  tokenPrec: 2444
 });
 
 exports.parser = parser;
@@ -186808,7 +187022,7 @@ function nextClusterBreak(str, pos, includeExtending) {
 }
 
 function prevClusterBreak(str, pos, includeExtending) {
-  while (pos > 0) {
+  while (pos > 1) {
     let found = nextClusterBreak(str, pos - 2, includeExtending);
     if (found < pos) return found
     pos--;
@@ -189430,7 +189644,12 @@ function normalize (uri, options) {
  */
 function resolve (baseURI, relativeURI, options) {
   const schemelessOptions = options ? Object.assign({ scheme: 'null' }, options) : { scheme: 'null' }
-  const resolved = resolveComponent(parse(baseURI, schemelessOptions), parse(relativeURI, schemelessOptions), schemelessOptions, true)
+  const { parsed: baseParsed, malformedAuthorityOrPort: baseMalformed } = parseWithStatus(baseURI, schemelessOptions)
+  const { parsed: relativeParsed, malformedAuthorityOrPort: relativeMalformed } = parseWithStatus(relativeURI, schemelessOptions)
+  if (baseMalformed || relativeMalformed) {
+    throw new Error(baseParsed.error || relativeParsed.error || 'URI is malformed.')
+  }
+  const resolved = resolveComponent(baseParsed, relativeParsed, schemelessOptions, true)
   schemelessOptions.skipEscape = true
   return serialize(resolved, schemelessOptions)
 }
@@ -189606,6 +189825,19 @@ function serialize (cmpts, opts) {
 
 const URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u
 
+// Captures the authority component (between "//" and the next "/", "?" or "#"),
+// with or without a scheme prefix, for the literal-backslash rejection below.
+const AUTHORITY_PREFIX = /^(?:[^#/:?]+:)?\/\/([^/?#]*)/
+
+// Captures the leading authority-introducer region after an optional scheme: a
+// run of forward slashes, backslashes, and the characters the WHATWG URL parser
+// removes before parsing (TAB U+0009, LF U+000A, CR U+000D). A valid introducer
+// is exactly "//". Node treats "\" as "/" on special schemes and strips those
+// characters first, so forms like "\\", "/\", "\/", "/<TAB>/", or a leading
+// "<TAB>//" reach an authority in Node while fast-uri's URI_PARSE folds them into
+// the path group (host confusion / SSRF / redirect bypass).
+const AUTHORITY_INTRODUCER_REGION = /^(?:[^#/:?]+:)?([/\\\t\n\r]*)/
+
 /**
  * @param {import('./types/index').URIComponent} parsed
  * @param {RegExpMatchArray} matches
@@ -189649,6 +189881,41 @@ function parseWithStatus (uri, opts) {
       uri = options.scheme + ':' + uri
     } else {
       uri = '//' + uri
+    }
+  }
+
+  // A literal backslash (U+005C) is not a valid RFC 3986 URI character and is
+  // not an authority delimiter. Reject it in the authority rather than
+  // rewriting it: normalizing "\" -> "/" (WHATWG error recovery) could silently
+  // change the resource identified by an otherwise-invalid input, and lets "\"
+  // act as a host delimiter here while Node's native URL parses a different
+  // host (SSRF / redirect / origin-allowlist bypass). Percent-encoded %5C is
+  // untouched and remains valid encoded data.
+  const authorityMatch = uri.match(AUTHORITY_PREFIX)
+  if (authorityMatch !== null && authorityMatch[1].indexOf('\\') !== -1) {
+    parsed.error = 'URI authority must not contain a literal backslash.'
+    malformedAuthorityOrPort = true
+  }
+
+  // Reject a malformed or whitespace-smuggled authority introducer. fast-uri
+  // only recognizes a literal "//"; anything else in the leading separator run
+  // (a backslash, or a "//" that appears only after removing the TAB/LF/CR that
+  // Node strips) means the authority fast-uri parses differs from the one Node's
+  // URL resolves. Reject rather than rewrite, mirroring the literal-backslash
+  // guard above. Percent-encoded forms (%5C, %09) are untouched, valid data.
+  const introducerMatch = uri.match(AUTHORITY_INTRODUCER_REGION)
+  if (introducerMatch !== null) {
+    const region = introducerMatch[1]
+    const normalizedRegion = region.replace(/[\t\n\r]/g, '')
+    // Two or more leading separators introduce an authority.
+    if (normalizedRegion.length >= 2) {
+      if (normalizedRegion.slice(0, 2) !== '//') {
+        parsed.error = parsed.error || 'URI authority must not contain a literal backslash.'
+        malformedAuthorityOrPort = true
+      } else if (region.length !== normalizedRegion.length) {
+        parsed.error = parsed.error || 'URI authority introducer must not contain whitespace.'
+        malformedAuthorityOrPort = true
+      }
     }
   }
 
@@ -189709,7 +189976,7 @@ function parseWithStatus (uri, opts) {
       if (parsed.host && (options.domainHost || (schemeHandler && schemeHandler.domainHost)) && isIP === false && nonSimpleDomain(parsed.host)) {
         // convert Unicode IDN -> ASCII IDN
         try {
-          parsed.host = URL.domainToASCII(parsed.host.toLowerCase())
+          parsed.host = new URL('http://' + parsed.host).hostname
         } catch (e) {
           parsed.error = parsed.error || "Host's domain name can not be converted to ASCII: " + e
         }
@@ -191400,7 +191667,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 134 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/134.0.6998.99 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0 (Edition Yx GX)"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 133 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.4","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1"},{"label":"Edge 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 361 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"}]');
+module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 134 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 129 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"},{"label":"Chrome 134 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/134.0.6998.99 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604.1"},{"label":"Edge 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 361 iOS 18.4.0","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"}]');
 
 /***/ }),
 
@@ -191408,7 +191675,7 @@ module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","val
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.644.172","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"25-Jun-26 09:30:33"}');
+module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.659.528","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"18-Aug-26 17:01:18"}');
 
 /***/ })
 

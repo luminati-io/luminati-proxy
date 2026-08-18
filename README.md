@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.644.172/luminati-proxy-manager-v1.644.172-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.659.528/luminati-proxy-manager-v1.659.528-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -159,7 +159,7 @@ Options:
       --password                   Zone password                        [string]
       --proxy                      Hostname or IP of super proxy
                                          [string] [default: "brd.superproxy.io"]
-      --proxy_port                 Super proxy port    [number] [default: 22225]
+      --proxy_port                 Super proxy port    [number] [default: 33335]
       --proxy_connection_type      Determines what kind of connection will be
                                    used between Proxy Manager and Super Proxy
                                                       [string] [default: "http"]
@@ -230,7 +230,7 @@ Options:
       --mode                       Defines a set of permissible operations
                                    within the UI/API                    [string]
       --dropin                     Create dropin mode proxy port (default:
-                                   22225)              [boolean] [default: true]
+                                   33335)              [boolean] [default: true]
       --dropin_port                Port for dropin mode         [default: 22225]
       --no_usage_stats             Disable collection of usage statistics
                                                       [boolean] [default: false]
@@ -312,7 +312,7 @@ Options:
       --start-upgrader             Install CRON process that checks upgrades
       --stop-upgrader              Removes CRON process that checks upgrades
       --insecure-http-parser       Disables the strict checks
-      --new_proxy_port                                          [default: 33335]
+      --new_proxy_port                                          [default: 44445]
       --proxy_country                                              [default: ""]
       --resolve_proxies_interval                                [default: 10000]
       --info                                                    [default: false]

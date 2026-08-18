@@ -311,6 +311,11 @@ E.prefix = '';
 E.level = L.NOTICE;
 
 var flush_timer;
+var flush_exit_listener;
+var flush_on_exit = function(){
+    if (E.log_buffer)
+        E.log_buffer.flush();
+};
 E.flush = function(){};
 E.set_log_buffer = function(on){
     if (!on)
@@ -319,13 +324,27 @@ E.set_log_buffer = function(on){
             return;
         E.flush();
         write_log = E.log_buffer.destroy();
+        E.log_buffer = null;
         E.flush = function(){};
         clearInterval(flush_timer);
+        if (flush_exit_listener)
+        {
+            process.off('exit', flush_on_exit);
+            flush_exit_listener = false;
+        }
         return;
+    }
+    if (!flush_exit_listener)
+    {
+        process.on('exit', flush_on_exit);
+        flush_exit_listener = true;
     }
     E.log_buffer = Log_buffer();
     write_log = E.log_buffer(write_log, 32*1024);
-    E.flush = function log_buffer_flush(){ E.log_buffer.flush(); };
+    E.flush = function log_buffer_flush(){
+        if (E.log_buffer)
+            E.log_buffer.flush();
+    };
     flush_timer = setInterval(E.flush, 1000).unref();
 };
 
@@ -335,7 +354,6 @@ var Log_buffer = function(){
     var buf = [];
     var instance = function log_patch(func, limit){
         orig_func = func;
-        process.on('exit', instance.flush);
         return function log_write(string){
             size += Buffer.byteLength(string);
             buf.push(string);
@@ -350,7 +368,6 @@ var Log_buffer = function(){
         size = 0;
     };
     instance.destroy = function log_destroy(){
-        process.off('exit', instance.flush);
         buf.length = 0;
         size = 0;
         return orig_func;

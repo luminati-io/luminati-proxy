@@ -5,8 +5,7 @@ const {Agent: http_agent} = require('http');
 const _ = require('lodash4');
 const etask = require('./etask.js');
 const url = require('./url.js');
-const esm_loader = require('./lpm_esm_loader.js');
-let got = esm_loader.require('got').got.extend({
+let got = require('got').got.extend({
     hooks: {
         beforeRequest: [
             opt=>{

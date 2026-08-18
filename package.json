@@ -475,7 +475,6 @@
       "util/lpm_config.js",
       "util/lpm_config_schema.json",
       "util/lpm_config_static.js",
-      "util/lpm_esm_loader.js",
       "util/lpm_file.js",
       "util/lpm_request.js",
       "util/lpm_util.js",
@@ -486,7 +485,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "5139ca3cf2f14abb4f542142a3ac8ae0"
+    "md5": "65d075af5252fcf728b856036240e0da"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -516,5 +515,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.644.172"
+  "version": "1.659.528"
 }

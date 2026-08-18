@@ -539,13 +539,22 @@ const prepare = ()=>etask(function*(){
             }
             switch (agg_fn)
             {
-            case agg_mas_sum_fn:
-                get_vcounter(key)?.inc(c.v);
+            case agg_mas_sum_fn: {
+                const vmetric = get_vcounter(key);
+                if (vmetric)
+                {
+                    vmetric.value = (vmetric.value || 0) + c.v;
+                    vmetric.update('inc', 'none', 'sum');
+                }
                 break;
+            }
             case agg_mas_level_fn: {
                 const vmetric = get_vcounter(key);
-                const vtype = {min_level: 'min', max_level: 'max'}[agg_type]
-                    || 'level';
+                const vtype = {
+                    avg: 'level',
+                    max: 'max',
+                    min: 'min',
+                }[c.agg_tm] || 'level';
                 if (vmetric)
                 {
                     vmetric.value = agg.v;

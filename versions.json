@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.659.528",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Changed 22225 default superproxy proxy to 33335."
+            },
+            {
+                "type": "sparkles",
+                "text": "Removed 22225 superproxy proxy."
+            },
+            {
+                "type": "sparkles",
+                "text": "Added new superproxy port 44445 option."
+            }
+        ]
+    },
+    {
         "ver": "1.644.172",
         "type": "stable",
         "changes": [

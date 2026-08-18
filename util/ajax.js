@@ -44,8 +44,15 @@ E.send = function(opt){
     var ajopt, xhr, xhr_data;
     zerr.debug('ajax('+data_type+') url '+url+' retry '+retry);
     return etask([function(){
-        ajopt = {type: method, url: url, headers: assign({}, opt.headers),
-            dataType: data_type, data: data, timeout: timeout, xhrFields: {}};
+        ajopt = {
+            type: method,
+            url: url,
+            headers: assign({}, opt.headers),
+            dataType: data_type,
+            data: data,
+            timeout: timeout,
+            xhrFields: {},
+        };
         if (opt.content_type)
             ajopt.contentType = opt.content_type;
         if (opt.with_credentials)
@@ -128,11 +135,13 @@ E.send = function(opt){
                 data: xhr_data,
                 xhr: xhr,
                 // legacy
-                error: xhr.statusText||'no_status', message: xhr.responseText,
+                error: xhr.statusText||'no_status',
+                message: xhr.responseText,
             };
         }
-        err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
-            xhr.getResponseHeader('X-Hola-Error');
+        err.x_error = xhr.getResponseHeader ?
+            xhr.getResponseHeader('X-Luminati-Error') ||
+            xhr.getResponseHeader('X-Hola-Error') : undefined;
         throw err;
     }, function(_data){
         var res, t = Date.now()-t0;
@@ -165,8 +174,8 @@ E.send = function(opt){
 
 E.abort = function(aj){ aj.goto('abort'); };
 
-['GET', 'POST', 'PUT', 'DELETE'].forEach(function(m){
-    E[m.toLowerCase()] = function(url, params, opt){
+function build_method(m){
+    return function(url, params, opt){
         url = typeof url=='string' ? {url: url} : url;
         var send_opt = assign({method: m, json: 1}, url, params, opt);
         if (!{get: 1, delete: 1}[send_opt.method.toLowerCase()]
@@ -178,7 +187,12 @@ E.abort = function(aj){ aj.goto('abort'); };
         }
         return E.send(send_opt);
     };
-});
+}
+
+E.get = build_method('GET');
+E.post = build_method('POST');
+E.put = build_method('PUT');
+E.delete = build_method('DELETE');
 
 E.json = function(opt){ return E.send(assign({}, opt, {json: 1})); };
 

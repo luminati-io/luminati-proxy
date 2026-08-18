@@ -380,6 +380,37 @@ E.ip_link_info = (name='')=>{
     return res;
 };
 
+class Local_route {
+    has_ip(ip, iface){
+        const cmd = [BIN_IP, '-4', '-j', 'route', 'show', 'type', 'local',
+            ip, 'dev', iface, 'table', 'local'];
+        return etask(function*(){
+            const out = yield exec.sys(cmd, {out: 'stdout'});
+            let routes = [];
+            try { routes = JSON.parse(out||'[]'); }
+            catch(e){
+                zerr(`ip_route_show '${cmd.join(' ')}' res:${out}, `+
+                    `${zerr.e2s(e)}`);
+            }
+            return !!routes.length;
+        });
+    }
+    add_ip(ip, iface){
+        const _this = this;
+        const cmd = [BIN_IP, '-4', 'route', 'add', 'local', ip,
+            'dev', iface, 'table', 'local'];
+        return etask(function*(){
+            const res = yield exec.sys(cmd, {stdall: true});
+            if (!res.retval)
+                return {ok: true};
+            if (yield _this.has_ip(ip, iface))
+                return {ok: true};
+            return {ok: false, err: res.stderr||res.stdall||'unknown error'};
+        });
+    }
+}
+E.Local_route = Local_route;
+
 E.eth_dev = ()=>{
     let is_ether = ifname=>/^(bond|en|wl|eth)/.test(ifname);
     let ifaces = E.iface_list().filter(is_ether);

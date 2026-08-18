@@ -261,6 +261,31 @@ E.logfmt = function logfmt(obj){
     }).join(' ');
 };
 
+// bash-like split (echo -e "what's" up  => ['echo', '-e', `what's`, 'up'])
+E.split_args = function split_args(str){
+    var word = /(?:[^\s"'\\]|\\.|"(?:\\.|[^"\\])*"|'[^']*')+/g;
+    var unquote = /"((?:\\.|[^"\\])*)"|'([^']*)'|\\(.)/g;
+    var args = [], m, last = 0;
+    function check_gap(gap){
+        if (/\S/.test(gap))
+            throw new Error('split_args: unbalanced quote or escape in: '+str);
+    }
+    while (m = word.exec(str))
+    {
+        check_gap(str.slice(last, m.index));
+        last = word.lastIndex;
+        args.push(m[0].replace(unquote, function(s, dq, sq, esc){
+            if (dq!=null)
+                return dq.replace(/\\([\\"])/g, '$1');
+            if (sq!=null)
+                return sq;
+            return esc;
+        }));
+    }
+    check_gap(str.slice(last));
+    return args;
+};
+
 return E;
 });
 })();

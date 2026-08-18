@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.659.528 Stable
+- :sparkles: Changed 22225 default superproxy proxy to 33335.
+- :sparkles: Removed 22225 superproxy proxy.
+- :sparkles: Added new superproxy port 44445 option.
+
 ## 1.644.172 Stable
 - :star: NodeJS installation version updated to 24.13.0
 - :bug: Fix port crash on startup if rules enabled 

@@ -8,7 +8,7 @@ import {is_local} from './util.js';
 
 const E = {};
 
-E.code = (proxy=22225, lpm_token, hostname=document.location.hostname)=>{
+E.code = (proxy=33335, lpm_token, hostname=document.location.hostname)=>{
     const auth = text=>!is_local() && lpm_token ?
         text.replace(/\[LT\]/g, lpm_token)
         .replace(/\[BAT\]/g, 'brd-auth-token')
@@ -292,7 +292,7 @@ const Extension_recommendation = ({type='chrome'})=>
     {' '}for automatic proxy configuration.
 </Info>;
 
-E.browser = (proxy=22225, lpm_token, hostname=document.location.hostname)=>({
+E.browser = (proxy=33335, lpm_token, hostname=document.location.hostname)=>({
     chrome_win: <React.Fragment>
         <Extension_recommendation type="chrome" />
         <Instructions>

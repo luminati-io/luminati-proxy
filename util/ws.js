@@ -1890,6 +1890,7 @@ class IPC_server_base {
             zjson: ws_opt.ipc_zjson,
             call_zerr: ws_opt.ipc_call_zerr,
             mux: ws_opt.mux,
+            on_serialize: ws_opt.on_ipc_serialize,
         };
         const specs = Array.isArray(ws_opt.ipc_server)
             ? ws_opt.ipc_server.reduce((o, name)=>(o[name] = true, o), {})
@@ -1922,6 +1923,7 @@ class IPC_server_base {
         this.mux = opt.mux;
         this.zjson = !!opt.zjson;
         this.call_zerr = !!opt.call_zerr;
+        this.on_serialize = opt.on_serialize;
         this.pending = new Set();
         zws.addListener(json_event(this.zjson), v=>this._on_call(v));
         zws.addListener('disconnected', this._on_disconnected.bind(this));
@@ -1980,6 +1982,14 @@ class IPC_server_resp {
             return false;
         zerr(`${this.ipc.ws}: Method ${this.msg.cmd} not defined`);
         return true;
+    }
+    call_response_timed(rv){
+        let on_ser = this.ipc.on_serialize;
+        if (!on_ser)
+            return this.call_response(rv);
+        let t0 = performance.now();
+        this.call_response(rv);
+        on_ser(this.msg.cmd, performance.now()-t0);
     }
     call_response(rv){
         if (this.msg.bin && (rv instanceof Buffer ||
@@ -2067,12 +2077,12 @@ class IPC_server_resp_call extends IPC_server_resp {
         try {
             et = this.exec();
             if (!et || typeof et.then!='function')
-                return void this.call_response(et);
+                return void this.call_response_timed(et);
         } catch(e){ return this.base_fail(e); }
         const _this = this;
         etask(function*IPC_server_handle(){
             _this.assign_info(this);
-            try { _this.call_response(yield et); }
+            try { _this.call_response_timed(yield et); }
             catch(e){ _this.base_fail(e); }
         });
     }

@@ -269,12 +269,12 @@ class Upgrade extends Pure_component {
         const tooltip = get_changes_tooltip(changes);
         const major = versions.some(v=>v.type=='dev');
         const upgrade_type = major ? 'major' : 'minor';
-        return <Warning tooltip={tooltip} id={this.state.ver_last.version}>
+        return <Warning tooltip={tooltip} id={ver_last.version}>
           <div>
             <T>A new</T>{' '}
             <strong><T>{upgrade_type}</T></strong>{' '}
             <T>version</T>{' '}
-            <strong>{this.state.ver_last.version}</strong>{' '}
+            <strong>{ver_last.version}</strong>{' '}
             <T>is available. You are</T>{' '}
             <strong>{versions.length}</strong>{' '}
             <T>releases behind the newest version.</T>
@@ -292,7 +292,7 @@ class Upgrade extends Pure_component {
           {ver_node && !ver_node.satisfied && !electron &&
             <div>
               To upgrade Proxy Manager, you need to update Node.js
-              to version {this.state.ver_node.recommended}.
+              to version {ver_node.recommended}.
             </div>
           }
         </Warning>;

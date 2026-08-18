@@ -114,7 +114,7 @@ E.manager_fields = {
     mode: {type: 'string', desc: 'Defines a set of permissible operations '
         +'within the UI/API'},
     dropin: {type: 'boolean', desc: 'Create dropin mode proxy port (default: '
-        +'22225)'},
+        +'33335)'},
     dropin_port: {type: 'integer', desc: 'Port for dropin mode'},
     no_usage_stats: {type: 'boolean', desc: 'Disable collection of usage '
         +'statistics'},
