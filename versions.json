@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.667.356",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Use cryptographically secure API token generation"
+            },
+            {
+                "type": "star",
+                "text": "Improved authentication token security"
+            },
+            {
+                "type": "star",
+                "text": "Added Authorization header support for Proxy Manager API"
+            }
+        ]
+    },
+    {
         "ver": "1.659.528",
         "type": "stable",
         "changes": [

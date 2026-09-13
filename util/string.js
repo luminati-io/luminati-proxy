@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, browser:true*/
+/* global Map */ // eslint-disable-line no-redeclare
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
@@ -180,7 +181,7 @@ E.count = function(s, p){
 };
 
 E.internalize_pool = typeof Map=='function' ? function(){
-    var pool = new Map(); // jshint ignore:line
+    var pool = new Map();
     return function internalize_string(str){
         var v = pool.get(str);
         if (v===undefined)
@@ -284,6 +285,124 @@ E.split_args = function split_args(str){
     }
     check_gap(str.slice(last));
     return args;
+};
+
+E.ntemplate = function(opts){
+    function ws_len(line){
+        var i = 0;
+        while (i<line.length && (line[i]==' ' || line[i]=='\t'))
+            i++;
+        return i;
+    }
+    function strip_indent(line, n){
+        var i = 0;
+        while (i<n && i<line.length && (line[i]==' ' || line[i]=='\t'))
+            i++;
+        return line.slice(i);
+    }
+    function is_blank(line){
+        return !line.trim();
+    }
+    function spaces(n){
+        return new Array(n+1).join(' ');
+    }
+    // consume the structural newline after the opening backtick, keep the
+    // other edge blank lines, indent of the first non-blank line becomes the
+    // base, base is subtracted from the beginning of every line
+    function dedent_block(s){
+        var lines = String(s).split('\n'), i = 0, base;
+        if (lines.length && is_blank(lines[0]))
+            lines.shift();
+        while (i<lines.length && is_blank(lines[i]))
+            i++;
+        if (i>=lines.length)
+            return '';
+        base = ws_len(lines[i]);
+        return lines.map(function(l){
+            return strip_indent(l, base);
+        }).join('\n');
+    }
+    // indent every line except the first
+    function reindent_block(s, indent){
+        return s.split('\n').map(function(l, i){
+            return i && l.trim() ? indent+l : l;
+        }).join('\n');
+    }
+    // render one interpolated value at a given insertion indent
+    function render(v, indent){
+        var s;
+        if (v==null||v===false)
+            return '';
+        if (typeof v=='function')
+            return render(v(impl), indent);
+        if (Array.isArray(v))
+        {
+            return v.map(function(x){ return render(x, indent); })
+                .filter(function(x){ return x!==''; })
+                .join('\n'+indent);
+        }
+        s = String(v);
+        if (s.indexOf('\n')<0)
+            return s;
+        return reindent_block(dedent_block(s), indent);
+    }
+    opts = opts||{};
+    var align = !!opts.align;
+    function impl(strings){
+        var values = Array.prototype.slice.call(arguments, 1);
+        var i, j, skel, lines, mark, out, line, res,
+            last, had, m, cur, indent, parts;
+        if (typeof strings=='string')
+            strings = [strings];
+        if (!align)
+        {
+            res = strings[0];
+            for (i = 0; i<values.length; i++)
+            {
+                res += (values[i]===undefined || values[i]===null
+                    ? '' : String(values[i]))+strings[i+1];
+            }
+            return res;
+        }
+        // 1. glue the literal back together, markers in place of the values
+        skel = strings[0];
+        for (i = 0; i<values.length; i++)
+            skel += '\uE000'+i+'\uE000'+strings[i+1];
+        // 2. dedent: markers are non-blank, so marker lines are kept as-is
+        skel = dedent_block(skel);
+        if (!skel)
+            return '';
+        lines = skel.split('\n');
+        // 3. substitute values, aligned to the indent of the insertion point
+        mark = /\uE000(\d+)\uE000/g;
+        out = [];
+        for (i = 0; i<lines.length; i++)
+        {
+            line = lines[i];
+            res = '';
+            last = 0;
+            had = false;
+            mark.lastIndex = 0;
+            while ((m = mark.exec(line))!==null)
+            {
+                had = true;
+                res += line.slice(last, m.index);
+                cur = res.slice(res.lastIndexOf('\n')+1);
+                indent = is_blank(cur) ? cur : spaces(cur.length);
+                res += render(values[+m[1]], indent);
+                last = mark.lastIndex;
+            }
+            res += line.slice(last);
+            // line held only empty value(s): drop it
+            if (had && !res.trim())
+                continue;
+            parts = res.split('\n');
+            for (j = 0; j<parts.length; j++)
+                out.push(parts[j].replace(/[ \t]+$/, ''));
+        }
+        return out.join('\n');
+    }
+    return impl;
 };
 
 return E;

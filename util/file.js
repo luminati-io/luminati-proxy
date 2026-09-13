@@ -1,12 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
+const StringDecoder = require('string_decoder').StringDecoder;
+const fs = require('fs');
+const crypto = require('crypto');
+const path = require('path');
+const rimraf = require('rimraf');
 const zconf = require('./config.js');
 const array = require('./array.js');
-const crypto = require('crypto');
-const rimraf = require('rimraf');
-const path = require('path');
-const fs = require('fs');
-const StringDecoder = require('string_decoder').StringDecoder;
 const E = exports, assign = Object.assign;
 // file.xxx_e() throw exceptions. file.xxx() return null/false on fail.
 E.errno = 0; // an integer/string error code
@@ -59,19 +59,29 @@ E.fread_line_cb_e = (fd, cb, opt)=>{
     opt = assign({encoding: 'utf8', buf_size: E.read_buf_size}, opt);
     cb = cb||(()=>false);
     let read, buf = Buffer.alloc(opt.buf_size);
-    let strbuf = '', lf_idx, decoder = new StringDecoder(opt.encoding);
+    let line_parts = [], lf_idx, decoder = new StringDecoder(opt.encoding);
     while (read = fs.readSync(fd, buf, 0, buf.length))
     {
-        strbuf += decoder.write(buf.slice(0, read));
-        while ((lf_idx = strbuf.indexOf('\n'))>=0)
+        let chunk = decoder.write(buf.slice(0, read)), start = 0;
+        while ((lf_idx = chunk.indexOf('\n', start))>=0)
         {
-            if (cb(strbuf.slice(0, lf_idx-(strbuf[lf_idx-1]=='\r' ? 1 : 0))))
+            if (start<lf_idx)
+                line_parts.push(chunk.slice(start, lf_idx).replace(/\r$/, ''));
+            else if (line_parts.length)
+            {
+                line_parts[line_parts.length-1] =
+                    line_parts[line_parts.length-1].replace(/\r$/, '');
+            }
+            if (cb(line_parts.join('')))
                 return true;
-            strbuf = strbuf.slice(lf_idx+1);
+            line_parts = [];
+            start = lf_idx+1;
         }
+        if (start<chunk.length)
+            line_parts.push(chunk.slice(start));
     }
-    if (strbuf)
-        cb(strbuf);
+    if (line_parts.length)
+        cb(line_parts.join(''));
     return true;
 };
 E.read_line_cb_e = (filename, cb, opt)=>{

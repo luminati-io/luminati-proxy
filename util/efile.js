@@ -340,20 +340,30 @@ E.fread_line_cb_e = (fd, cb, opt)=>etask(function*fread_line_cb_e(){
     opt = assign({encoding: 'utf8', buf_size: E.read_buf_size}, opt);
     let read, buf = buf_pool.alloc(opt.buf_size);
     this.finally(()=>buf_pool.free(buf));
-    let strbuf = '', lf_idx, decoder = new StringDecoder(opt.encoding);
+    let line_parts = [], lf_idx, decoder = new StringDecoder(opt.encoding);
     while (read = yield E.fread_chunk_e(fd, buf, 0, buf.length))
     {
-        strbuf += decoder.write(buf.slice(0, read));
-        while ((lf_idx = strbuf.indexOf('\n'))>=0)
+        let chunk = decoder.write(buf.slice(0, read)), start = 0;
+        while ((lf_idx = chunk.indexOf('\n', start))>=0)
         {
-            let ln = strbuf.slice(0, lf_idx-(strbuf[lf_idx-1]=='\r' ? 1 : 0));
+            if (start<lf_idx)
+                line_parts.push(chunk.slice(start, lf_idx).replace(/\r$/, ''));
+            else if (line_parts.length)
+            {
+                line_parts[line_parts.length-1] =
+                    line_parts[line_parts.length-1].replace(/\r$/, '');
+            }
+            let ln = line_parts.join('');
+            line_parts = [];
             if (yield cb(ln))
                 return true;
-            strbuf = strbuf.slice(lf_idx+1);
+            start = lf_idx+1;
         }
+        if (start<chunk.length)
+            line_parts.push(chunk.slice(start));
     }
-    if (strbuf)
-        yield cb(strbuf);
+    if (line_parts.length)
+        yield cb(line_parts.join(''));
     return true;
 });
 

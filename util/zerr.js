@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, browser:true*/
+/* global XDomainRequest */
 (function(){
 var define, process, cluster, worker_threads, version;
 var is_node = typeof module=='object' && module.exports && module.children;

@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true, es6:true*/
+'use strict'; /*jslint browser:true, es9:true*/
 
 // XXX azamat/krzysztof: copy pasted from lum/pub/plans.js, fix webpack loader
 // and import it as a whole module

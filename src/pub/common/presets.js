@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true, es6:true*/
+'use strict'; /*jslint browser:true, es9:true*/
 
 const presets = {
     session_long: {

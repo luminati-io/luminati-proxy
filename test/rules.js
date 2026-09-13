@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, mocha:true*/
+'use strict'; /*jslint node:true, mocha:true, es9:true*/
+/* global xdescribe */
 const assert = require('assert');
 const sinon = require('sinon');
 const {Netmask} = require('../util/netmask.js');
@@ -1088,7 +1089,7 @@ describe('rules', ()=>{
             _res=>{
                 let req = args[0];
                 req.min_conn_task.return();
-                req.min_conn_task = {return(){ called=true; }};
+                req.min_conn_task = {return(){ called = true; }};
                 return handle_proxy_resp_org(...args)(_res);
             });
             yield l.test(ping.http.url);

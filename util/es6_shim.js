@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, browser:true, -W103*/
+/* global ArrayBuffer */
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;

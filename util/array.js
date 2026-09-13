@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, browser:true*/
+'use strict'; /*jslint node:true, browser:true, es6:true*/
 (function(){
 var define;
 var is_node_ff = typeof module=='object' && module.exports;
@@ -84,13 +84,15 @@ E.flat_map = function(a, cb){
         return a.flatMap(cb);
     return Array.prototype.concat.apply([], a.map(cb));
 };
-
 E.unique = function(a){
-    var _a = [];
+    var seen = new Set(), _a = [];
     for (var i=0; i<a.length; i++)
     {
-        if (!_a.includes(a[i]))
+        if (!seen.has(a[i]))
+        {
+            seen.add(a[i]);
             _a.push(a[i]);
+        }
     }
     return _a;
 };

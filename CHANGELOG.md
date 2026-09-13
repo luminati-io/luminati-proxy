@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.667.356 Stable
+- :star: Use cryptographically secure API token generation
+- :star: Improved authentication token security
+- :star: Added Authorization header support for Proxy Manager API
+
 ## 1.659.528 Stable
 - :sparkles: Changed 22225 default superproxy proxy to 33335.
 - :sparkles: Removed 22225 superproxy proxy.

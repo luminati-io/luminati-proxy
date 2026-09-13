@@ -149,12 +149,19 @@ class Limit_expiry_map extends Expiry_map {
 E.Limit_expiry_map = Limit_expiry_map;
 
 class Inc_map extends Map {
-    constructor(initial){
+    constructor(initial, opt={}){
         super(initial);
+        this.strict = !!opt.strict;
     }
     inc(key, val=1){
-        this.set(key, (this.get(key)||0)+val);
-        return this;
+        if (this.strict && typeof val !== 'number')
+            throw new TypeError('inc value should be a number');
+        return this.set(key, (this.get(key)||0)+val);
+    }
+    dec(key, val=1){
+        if (this.strict && typeof val !== 'number')
+            throw new TypeError('dec value should be a number');
+        return this.inc(key, -val);
     }
 }
 E.Inc_map = Inc_map;

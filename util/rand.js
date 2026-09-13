@@ -89,6 +89,31 @@ E.rand_element = function(a, s){
         return a[E.rand_range(0, a.length, s)];
 };
 
+E.rand_index_by_weight = function(a, s){
+    if (!a.length)
+        return;
+    var total_weight = 0, i;
+    for (i=0; i<a.length; i++)
+    {
+        if (a[i]>0)
+            total_weight += a[i];
+    }
+    if (!total_weight)
+        return E.rand_range(0, a.length, s);
+    var rand = E.rand_range_f(0, total_weight, s);
+    var last;
+    for (i=0; i<a.length; i++)
+    {
+        if (!(a[i]>0))
+            continue;
+        last = i;
+        rand -= a[i];
+        if (rand<0)
+            return i;
+    }
+    return last;
+};
+
 E.rand_subset = function(a, size, s){
     // Fisher-Yates-Knuth shuffle
     var shuffled = a.slice(0);

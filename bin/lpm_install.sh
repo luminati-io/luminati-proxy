@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.659.528"
+VERSION="1.667.356"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -550,8 +550,14 @@ check_env()
 
 setup_npm_registry()
 {
-    if curl -s http://geo.brdtest.com/mygeo.json | grep -q '"country":"CN"'; then
-        npm config set registry https://r.cnpmjs.org/
+    local geo_response
+    if ! geo_response=$(curl -sSf --proto '=https' \
+        --connect-timeout 5 --max-time 10 \
+        https://geo.brdtest.com/mygeo.json); then
+        return 0
+    fi
+    if printf '%s' "$geo_response" | grep -q '"country":"CN"'; then
+        export npm_config_registry='https://r.cnpmjs.org/'
     fi
 }
 

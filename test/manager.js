@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
+/* global xdescribe */
 const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
