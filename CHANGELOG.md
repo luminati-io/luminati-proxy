@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.668.349 Stable
+- :bug: Prevent rule sanitizer bypass for legacy triggers
+
 ## 1.667.356 Stable
 - :star: Use cryptographically secure API token generation
 - :star: Improved authentication token security

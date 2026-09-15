@@ -15889,6 +15889,8 @@ const gen_function = (name, body)=>{
     return `function ${name}(opt){\n${body}\n}`;
 };
 
+E.NOOP_TRIGGER_CODE = gen_function('trigger', 'return false;');
+
 const pre_actions = E.action_types.filter(a=>!a.type||a.type=='pre')
 .map(a=>a.value);
 const pre_trigger_types = E.trigger_types.filter(tt=>tt.type=='pre')
@@ -16043,13 +16045,13 @@ E.get_sanitizer = ()=>{
 };
 
 E.sanitize = (rules=[])=>{
-    let errs = [];
+    const errs = [];
     for (let i = 0; i < rules.length; i++)
     {
-        let rule = rules[i];
-        if (!rule.trigger_code)
-            continue;
         try {
+            let rule = rules[i];
+            if (!rule.type || !rule.trigger_code)
+                rule = E.migrate_trigger(rule);
             E.get_sanitizer().sanitize(rule.trigger_code);
         } catch(e){
             errs.push([i, e]);
@@ -190430,13 +190432,17 @@ function parseWithStatus (uri, opts) {
       malformedHost = canonicalizeHost(parsed, options, schemeHandler, isIP)
     }
 
-    if (!schemeHandler || (schemeHandler && !schemeHandler.skipNormalize)) {
-      if (uri.indexOf('%') !== -1) {
-        if (parsed.host !== undefined && !malformedIPLiteral) {
-          const host = isIP ? parsed.host : normalizePercentEncoding(parsed.host, true)
-          parsed.host = reescapeHostDelimiters(host, isIP)
-        }
+    if (uri.indexOf('%') !== -1 && parsed.host !== undefined && !malformedIPLiteral) {
+      let host = isIP ? parsed.host : normalizePercentEncoding(parsed.host, true)
+      if (!isIP) {
+        // Fold reg-name case after decoding unreserved octets. The second
+        // pass only restores uppercase hex in escapes that remain encoded.
+        host = normalizePercentEncoding(host.toLowerCase())
       }
+      parsed.host = reescapeHostDelimiters(host, isIP)
+    }
+
+    if (!schemeHandler || (schemeHandler && !schemeHandler.skipNormalize)) {
       if (parsed.path) {
         parsed.path = normalizePathEncoding(parsed.path)
       }
@@ -192430,7 +192436,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 135 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 135 iOS 17.1.1","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/135.0.7049.35 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.4","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1"},{"label":"Edge 135 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 361 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"}]');
+module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 135 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 134 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 135 iOS 17.1.1","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/135.0.7049.35 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604.1"},{"label":"Edge 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 362 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/362.0.741018905 Mobile/15E148 Safari/604.1"}]');
 
 /***/ }),
 
@@ -192438,7 +192444,7 @@ module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","val
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.667.356","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"10-Sep-26 23:46:37"}');
+module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.668.349","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"15-Sep-26 09:43:02"}');
 
 /***/ })
 

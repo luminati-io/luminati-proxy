@@ -103,6 +103,8 @@ const gen_function = (name, body)=>{
     return `function ${name}(opt){\n${body}\n}`;
 };
 
+E.NOOP_TRIGGER_CODE = gen_function('trigger', 'return false;');
+
 const pre_actions = E.action_types.filter(a=>!a.type||a.type=='pre')
 .map(a=>a.value);
 const pre_trigger_types = E.trigger_types.filter(tt=>tt.type=='pre')
@@ -257,13 +259,13 @@ E.get_sanitizer = ()=>{
 };
 
 E.sanitize = (rules=[])=>{
-    let errs = [];
+    const errs = [];
     for (let i = 0; i < rules.length; i++)
     {
-        let rule = rules[i];
-        if (!rule.trigger_code)
-            continue;
         try {
+            let rule = rules[i];
+            if (!rule.type || !rule.trigger_code)
+                rule = E.migrate_trigger(rule);
             E.get_sanitizer().sanitize(rule.trigger_code);
         } catch(e){
             errs.push([i, e]);
