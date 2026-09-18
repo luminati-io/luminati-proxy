@@ -33,7 +33,7 @@ const Howto = withRouter(class Howto extends Pure_component {
     render(){
         if (!this.state.settings)
             return null;
-        let {settings, example_port=33335} = this.state;
+        let {settings, example_port=44445} = this.state;
         const {zagent, cloud_url_address, lpm_token} = settings;
         const option = this.props.match.params.option||'code';
         const cur_title = this.option_to_text[option];

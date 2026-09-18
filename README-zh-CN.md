@@ -108,7 +108,7 @@ Options:
       --password                   Zone password                        [string]
       --proxy                      Hostname or IP of super proxy
                                          [string] [default: "brd.superproxy.io"]
-      --proxy_port                 Super proxy port    [number] [default: 33335]
+      --proxy_port                 Super proxy port    [number] [default: 44445]
       --proxy_connection_type      Determines what kind of connection will be
                                    used between Proxy Manager and Super Proxy
                                                       [string] [default: "http"]
@@ -179,7 +179,7 @@ Options:
       --mode                       Defines a set of permissible operations
                                    within the UI/API                    [string]
       --dropin                     Create dropin mode proxy port (default:
-                                   33335)              [boolean] [default: true]
+                                   44445)              [boolean] [default: true]
       --dropin_port                Port for dropin mode         [default: 22225]
       --no_usage_stats             Disable collection of usage statistics
                                                       [boolean] [default: false]

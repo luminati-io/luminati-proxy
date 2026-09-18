@@ -382,7 +382,7 @@ export const tabs = {
             },
             new_proxy_port: {
                 label: 'Use new proxy port',
-                tooltip: 'Use proxy port 44445 instead of 33335',
+                tooltip: 'Use proxy port 44445 instead of 44445',
                 note: 'This option will be removed and port 44445 become'
                     +' default in future releases',
             },

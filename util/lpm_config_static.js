@@ -70,7 +70,7 @@ conf.server_default = {
     av_check: false,
     test_url: 'http://geo.brdtest.com/mygeo.json',
     proxy: 'brd.superproxy.io',
-    proxy_port: 33335,
+    proxy_port: 44445,
     new_proxy_port: 44445,
     proxy_retry: 2,
     proxy_country: '',

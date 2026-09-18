@@ -82,7 +82,7 @@
           },
           "new_proxy_port": {
             "type": "boolean",
-            "description": "Use new proxy port 33335"
+            "description": "Use new proxy port 44445"
           },
           "proxy_connection_type": {
             "type": "string",
