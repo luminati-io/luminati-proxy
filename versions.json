@@ -33,7 +33,7 @@
         "changes": [
             {
                 "type": "sparkles",
-                "text": "Changed 22225 default superproxy proxy to 33335."
+                "text": "Changed 22225 default superproxy proxy to 44445."
             },
             {
                 "type": "sparkles",
@@ -187,7 +187,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "Add port settings option to use proxy port 33335"
+                "text": "Add port settings option to use proxy port 44445"
             }
         ]
     },

@@ -9,7 +9,7 @@ Proxy manager - Change Log
 - :star: Added Authorization header support for Proxy Manager API
 
 ## 1.659.528 Stable
-- :sparkles: Changed 22225 default superproxy proxy to 33335.
+- :sparkles: Changed 22225 default superproxy proxy to 44445.
 - :sparkles: Removed 22225 superproxy proxy.
 - :sparkles: Added new superproxy port 44445 option.
 
@@ -52,7 +52,7 @@ Proxy manager - Change Log
 - :star: Removed api fallback option
 
 ## 1.519.10 Development Latest
-- :star: Add port settings option to use proxy port 33335
+- :star: Add port settings option to use proxy port 44445
 
 ## 1.517.992 Development Latest
 - :star: Bump bootstrap to 5.x
