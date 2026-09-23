@@ -610,6 +610,10 @@
         "ask_sync_config": {
           "type": "boolean",
           "description": "Ask about config sync"
+        },
+        "new_proxy_cert": {
+          "type": "boolean",
+          "description": "Use the new Proxy Manager CA certificate"
         }
       }
     },

@@ -1,5 +1,10 @@
 Proxy manager - Change Log
 
+## 1.670.998 Stable
+- :boom: IMPORTANT: Added the "Use new proxy certificate" setting under General Settings. Users relying on the bundled CA for SSL analyzing must enable this option and install the new CA on their clients before the automatic switch on September 25, 2026 at 14:28:38 UTC.
+- :star: Improved installers download security
+- :bug: Prevent alternative npm registry from persisting after installation
+
 ## 1.668.349 Stable
 - :bug: Prevent rule sanitizer bypass for legacy triggers
 

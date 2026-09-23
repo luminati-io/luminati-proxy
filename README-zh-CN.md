@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://brightdata.com/static/lpm/luminati-proxy-manager-v1.668.349-setup.exe">代理管理安装器</a>.
+下载 <a href="https://brightdata.com/static/lpm/luminati-proxy-manager-v1.670.998-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 24.13.0版 (最好用x
@@ -225,6 +225,8 @@ Options:
                                    file               [boolean] [default: false]
       --extra_ssl_ips              List of IPs to add to SSL certificate
                                                            [array] [default: []]
+      --new_proxy_cert             Use the new Proxy Manager CA certificate
+                                                      [boolean] [default: false]
       --bw_limit_webhook_url       URL to send webhook messages to when BW limit
                                    is reached                           [string]
       --bw_th_webhook_url          URL to send webhook messages to when BW limit

@@ -155,6 +155,8 @@ E.manager_fields = {
         +'config file'},
     extra_ssl_ips: {type: 'array', desc: 'List of IPs to add to SSL '
         +'certificate'},
+    new_proxy_cert: {type: 'boolean', desc: 'Use the new Proxy Manager '
+        +'CA certificate'},
     bw_limit_webhook_url: {type: 'string', desc: 'URL to send webhook '
         +'messages to when BW limit is reached'},
     bw_th_webhook_url: {type: 'string', desc: 'URL to send webhook messages '

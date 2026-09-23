@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.670.998",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "IMPORTANT: Added the \"Use new proxy certificate\" setting under General Settings. Users relying on the bundled CA for SSL analyzing must enable this option and install the new CA on their clients before the automatic switch on September 25, 2026 at 14:28:38 UTC."
+            },
+            {
+                "type": "star",
+                "text": "Improved installers download security"
+            },
+            {
+                "type": "bug",
+                "text": "Prevent alternative npm registry from persisting after installation"
+            }
+        ]
+    },
+    {
         "ver": "1.668.349",
         "type": "stable",
         "changes": [

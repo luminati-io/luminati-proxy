@@ -567,7 +567,9 @@ class WS extends EventEmitter {
         // XXX vladislavl: behind the proxy this port is not real,
         // but port info almost never important
         this.remote_port = sock.remotePort;
-        zerr.notice(`${this}: connected`);
+        zerr.notice(`${this}: connected`
+            +`${sock.isSessionReused && sock.isSessionReused()
+            ? ' (tls session reuse)' : ''}`);
         if (this.ping)
         {
             this.pong_received = true; // skip first ping expiration
@@ -586,7 +588,8 @@ class WS extends EventEmitter {
     }
     _on_error(event){
         this.reason = event.message||'Network error';
-        if (!is_error_event_silent(event))
+        if (!is_error_event_silent(event, {retry_count: this._retry_count,
+            max_retry_logs: this._max_retry_logs}))
         {
             zerr('%s: got error event (reason=%s, event=%O)', this,
                 this.reason, zutil.omit(event, 'target'));
@@ -841,6 +844,7 @@ class Client extends WS {
         this.no_retry = opt.no_retry;
         this.retry_chances = opt.retry_chances;
         this._retry_count = 0;
+        this._max_retry_logs = zutil.is_lxc()&&3 || Infinity;
         this.lookup = opt.lookup;
         this.lookup_ip = opt.lookup_ip;
         this.fallback = opt.fallback &&
@@ -854,6 +858,9 @@ class Client extends WS {
             ? 50000 : opt.handshake_timeout;
         this.reject_unauthorized = opt.reject_unauthorized;
         this.handshake_timer = undefined;
+        // if passed - it must support get/set methods
+        this.tls_session_cache = opt.tls_session_cache;
+        this._tls_session_key = undefined;
         if (this.agent && this.ignore_tls_eof_while_reading)
         {
             throw new Error('options agent && ignore_tls_eof are not '
@@ -1017,6 +1024,16 @@ class Client extends WS {
                         [{address: lookup_ip, family: v}] : lookup_ip, v));
                 };
             }
+            if (this.tls_session_cache)
+            {
+                const url_data = zurl.parse(url);
+                this._tls_session_key = url_data && url_data.protocol==='wss:'
+                    && `${url_data.hostname}:${url_data.port||'noport'}`;
+                const sess = this._tls_session_key &&
+                    this.tls_session_cache.get(this._tls_session_key);
+                if (sess)
+                    opt.session = sess;
+            }
         }
         if (this.ignore_tls_eof_while_reading)
         {
@@ -1025,8 +1042,11 @@ class Client extends WS {
         }
         if (this.zc)
             this._counter.inc(`${this.zc}_fallback`, url==this.url ? 0 : 1);
-        zerr.notice(`${this}: connecting to ${url}`);
+        if (this._retry_count<this._max_retry_logs)
+            zerr.notice(`${this}: connecting to ${url}`);
         this._assign(new this.impl(url, undefined, opt));
+        if (this._tls_session_key)
+            this._attach_tls_session_listener();
         if (this.handshake_timeout)
         {
             this.handshake_timer = setTimeout(
@@ -1064,7 +1084,7 @@ class Client extends WS {
                         ? this.retry_max() : this.retry_max);
             }
         }
-        if (zerr.is.info())
+        if (this._retry_count<this._max_retry_logs)
             zerr.info(`${this}: will retry in ${delay}ms`);
         this._retry_count++;
         this.reconnect_timer = setTimeout(()=>this._connect(), delay);
@@ -1076,6 +1096,27 @@ class Client extends WS {
         this._retry_count = 0;
         this._retry_instant_used = false;
         super._on_open();
+    }
+    // this must be called synchronously right after initial request created
+    _attach_tls_session_listener(){
+        const ws = this.ws;
+        if (!ws)
+            return;
+        if (ws._socket)
+            return void this._catch_tls_session(ws._socket);
+        const req = ws._req;
+        if (!req)
+            return;
+        if (req.socket)
+            return void this._catch_tls_session(req.socket);
+        req.once('socket', sock=>this._catch_tls_session(sock));
+    }
+    _catch_tls_session(sock){
+        if (!sock || sock._tls_session_caught || !sock.encrypted)
+            return;
+        sock._tls_session_caught = true;
+        sock.on('session', s=>this.tls_session_cache
+            .set(this._tls_session_key, s));
     }
     _on_close(event){
         this._reconnect();
@@ -2669,15 +2710,25 @@ function client_impl(opt){
     return require('ws');
 }
 
-function is_error_event_silent(event){
+function is_error_event_silent(event, ctx){
     for (let {fn} of error_event_silence_patterns)
     {
-        if (fn(event))
+        if (fn(event, ctx))
             return true;
     }
     return false;
 }
 const error_event_silence_patterns = [];
+
+if (zutil.is_lxc())
+{
+    error_event_silence_patterns.push({fn: (event, ctx)=>{
+        let e = event.error;
+        if (e && e.code=='ECONNREFUSED' && ctx.retry_count>=ctx.max_retry_logs)
+            return true;
+        return false;
+    }});
+}
 
 if (zutil.is_mocha())
 {

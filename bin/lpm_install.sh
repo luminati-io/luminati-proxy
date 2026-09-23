@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.668.349"
+VERSION="1.670.998"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -37,6 +37,11 @@ NVM_DIR="$HOME/.nvm"
 LOGFILE="/tmp/lpm_install_$RID.log"
 LOG=""
 RS=""
+HOMEBREW_COMMIT="df3c2556141c012eaba0453ede7a1bd4f05b824c"
+HOMEBREW_INSTALL_SHA256="151a786c066af55f61bd32bd4804470fdb2b872e6a42a8ef1335c29760e37404"
+HOMEBREW_UNINSTALL_SHA256="81db8de757490be1815ddd8af7c1cf6aafd5d15f87e77be766a00dd0968a061e"
+HOMEBREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/${HOMEBREW_COMMIT}/install.sh"
+HOMEBREW_UNINSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/${HOMEBREW_COMMIT}/uninstall.sh"
 
 case "$(uname -s)" in
 Linux*)
@@ -217,33 +222,63 @@ retry_sudo_cmd()
 download_script()
 {
     local url=$1 out_path=$2
-    rm $out_path 2> /dev/null
+    local ret=1
+    rm -f -- "$out_path"
     for ((i=0; i<NETWORK_RETRY; i++)); do
         zerr "download_script $url retry: $i"
+
         if is_cmd_defined "curl"; then
-            run_cmd "curl -fsSL $url -o $out_path"
+            run_cmd "curl -fsSL \
+                --proto '=https' --proto-redir '=https' \
+                --connect-timeout 10 --max-time 300 \
+                '$url' -o '$out_path'"
         else
-            run_cmd "wget -q ${WGET_FLAG} $url -O $out_path"
+            run_cmd "wget -q --https-only ${WGET_FLAG} \
+                --timeout=300 '$url' -O '$out_path'"
         fi
         ret=$?
         if ((!ret)); then
-            return $ret
+            return 0
         fi
     done
-    if ((ret)); then NETWORK_ERROR=1; fi
-    return $ret
+    NETWORK_ERROR=1
+    rm -f -- "$out_path"
+    return "$ret"
 }
 
 run_script()
 {
-    local name=$1 url=$2 lang=$3
+    local name=$1 url=$2 lang=$3 expected_sha256=$4
+    local ret actual_sha256
+    local script_path="/tmp/lpm_install_${name}_${RID}"
     if [ -z "$lang" ]; then
         lang="sh"
     fi
-    local script_path="/tmp/lpm_install_$name_$RID"
-    download_script "$url" "$script_path"
-    retry_cmd "cat $script_path | $lang"
-    rm $script_path
+    if ! download_script "$url" "$script_path"; then
+        echo "could not download $name install script" >&2
+        perr "download_script_error" "$name"
+        rm -f -- "$script_path"
+        return 1
+    fi
+    if [ -n "$expected_sha256" ]; then
+        actual_sha256=$(shasum -a 256 "$script_path" 2>/dev/null |
+            awk '{print $1}')
+
+        if [[ "$actual_sha256" != "$expected_sha256" ]]; then
+            echo "$name script integrity verification failed" >&2
+            echo "expected: $expected_sha256" >&2
+            echo "actual:   ${actual_sha256:-unavailable}" >&2
+            perr "script_checksum_error" \
+                "name=$name expected=$expected_sha256 "\
+"actual=${actual_sha256:-unavailable}"
+            rm -f -- "$script_path"
+            return 1
+        fi
+    fi
+    run_cmd "'$lang' '$script_path'"
+    ret=$?
+    rm -f -- "$script_path"
+    return "$ret"
 }
 
 check_linux_distr()
@@ -433,18 +468,66 @@ install_nave()
     fi
     echo "installing nave..."
     perr "install_nave"
-    run_cmd "mkdir -p ~/.nave"
+    local nave_version="3.5.6"
+    local nave_commit="0a484a5dada1180410cf67c04843cc43c0b0b22d"
+    local nave_sha256="083cbae791e8700d4d1afff401c3e5f14d5813695de81e78c86693a62ef253c1"
+    local nave_url="https://raw.githubusercontent.com/isaacs/nave/"\
+"${nave_commit}/nave.sh"
     local nave_path="$HOME/.nave/nave.sh"
-    download_script "http://github.com/isaacs/nave/raw/main/nave.sh" \
-        "$nave_path"
-    run_cmd "chmod +x $nave_path"
-    sudo_cmd "ln -s $nave_path /usr/local/bin/nave"
-    sudo_cmd "mkdir -p /usr/local/{share/man,bin,lib/node,include/node}"
+    local actual_sha256
+    if ! run_cmd "mkdir -p '$HOME/.nave'"; then
+        echo "could not create $HOME/.nave" >&2
+        perr "install_nave_mkdir_error"
+        return 1
+    fi
+    rm -f -- "$nave_path"
+    if ! retry_cmd "curl -fsSL \
+        --proto '=https' --proto-redir '=https' \
+        --connect-timeout 10 --max-time 300 \
+        '$nave_url' -o '$nave_path'"; then
+        echo "could not download nave $nave_version" >&2
+        perr "install_nave_download_error"
+        rm -f -- "$nave_path"
+        return 1
+    fi
+    actual_sha256=$(shasum -a 256 "$nave_path" 2>/dev/null |
+        awk '{print $1}')
+    if [[ "$actual_sha256" != "$nave_sha256" ]]; then
+        echo "nave integrity verification failed" >&2
+        echo "expected: $nave_sha256" >&2
+        echo "actual:   ${actual_sha256:-unavailable}" >&2
+        perr "install_nave_checksum_error" \
+            "expected=$nave_sha256 actual=${actual_sha256:-unavailable}"
+        rm -f -- "$nave_path"
+        return 1
+    fi
+    if ! run_cmd "chmod 0755 '$nave_path'"; then
+        echo "could not make nave executable" >&2
+        perr "install_nave_chmod_error"
+        rm -f -- "$nave_path"
+        return 1
+    fi
+    if ! sudo_cmd \
+        "mkdir -p /usr/local/{share/man,bin,lib/node,include/node}"; then
+        echo "could not create nave system directories" >&2
+        perr "install_nave_system_dirs_error"
+        return 1
+    fi
+    if ! sudo_cmd "ln -sfn '$nave_path' /usr/local/bin/nave"; then
+        echo "could not create /usr/local/bin/nave" >&2
+        perr "install_nave_link_error"
+        return 1
+    fi
+    return 0
 }
 
 install_nave_node()
 {
-    install_nave
+    if ! install_nave; then
+        perr "install_error_nave"
+        echo "could not install nave"
+        exit 1
+    fi
     echo "installing nave node $NODE_VER..."
     perr "install_nave_node"
     sudo_cmd "rm -rf ~/.nave/cache/$NODE_VER"
@@ -456,6 +539,7 @@ install_nave_node()
         exit 1
     fi
 }
+
 
 install_node_yum()
 {
@@ -485,8 +569,14 @@ install_npm()
 {
     echo "installing npm..."
     perr "install_npm"
-    run_script "install_npm" "https://www.npmjs.com/install.sh"
+    if ! run_script "install_npm" \
+        "https://www.npmjs.com/install.sh"; then
+        echo "could not install npm" >&2
+        perr "install_error_npm"
+        return 1
+    fi
     UPDATE_NPM=1
+    return 0
 }
 
 install_wget()
@@ -517,9 +607,15 @@ install_brew()
 {
     echo "installing brew..."
     perr "install_brew"
-    run_script "install_brew" \
-        "https://raw.githubusercontent.com/Homebrew/install/master/install" \
-        "ruby"
+
+    if ! run_script "install_brew" "$HOMEBREW_INSTALL_URL" "bash" \
+        "$HOMEBREW_INSTALL_SHA256"; then
+        echo "could not install brew" >&2
+        perr "install_error_brew"
+        return 1
+    fi
+
+    return 0
 }
 
 update_npm()
@@ -565,7 +661,7 @@ deps_install()
 {
     echo "installing deps..."
     if ((INSTALL_BREW)); then
-        install_brew
+        install_brew || return 1
     fi
     if ((INSTALL_WGET)); then
         install_wget
@@ -581,7 +677,7 @@ deps_install()
         check_npm
     fi
     if ((INSTALL_NPM)); then
-        install_npm
+        install_npm || return 1
     fi
     setup_npm_registry
     if ((UPDATE_NPM)); then
@@ -591,6 +687,7 @@ deps_install()
         reinstall_node_mac
     fi
     install_build_tools
+    return 0
 }
 
 lpm_clean()
@@ -677,20 +774,27 @@ dev_setup()
         sys_rm "perl-Digest-SHA"
     fi
     if ((OS_MAC)); then
-        run_script "remove_brew" \
-            "https://raw.githubusercontent.com/Homebrew/install/master/uninstall" \
-            "ruby"
+        if ! run_script "remove_brew" "$HOMEBREW_UNINSTALL_URL" "bash" \
+            "$HOMEBREW_UNINSTALL_SHA256"; then
+            echo "could not remove brew" >&2
+            perr "remove_error_brew"
+            return 1
+        fi
     fi
-    rm -rf $HOME/.nvm
+    rm -rf "$HOME/.nvm"
     if prompt "Remove node and all node modules?" n; then
-        sudo_cmd "rm -rf $lib_path/node $lib_path/node_modules"
+        sudo_cmd "rm -rf '$lib_path/node' '$lib_path/node_modules'"
     fi
     if prompt "Remove npm and nave cache dirs" n; then
-        sudo_cmd "rm -rf $lib_path/node $lib_path/node_modules ~/.npm ~/.nave"
+        sudo_cmd \
+            "rm -rf '$lib_path/node' '$lib_path/node_modules' \
+            '$HOME/.npm' '$HOME/.nave'"
     fi
-    if prompt "Remove proxy-manager, npm, nave, node links from /usr/local/bin"\
-        n; then
-        sudo_cmd "rm -rf /usr/local/bin/{pmgr,proxy-manager,luminati,liminati-proxy,npm,nave,node}"
+    if prompt "Remove proxy-manager, npm, nave, node links from "\
+"/usr/local/bin" n; then
+        sudo_cmd \
+            "rm -rf /usr/local/bin/{pmgr,proxy-manager,luminati,\
+liminati-proxy,npm,nave,node}"
     fi
     setup
 }
@@ -705,7 +809,11 @@ setup()
         exit 0
     fi
     zerr "deps_install"
-    deps_install
+    if ! deps_install; then
+        echo "could not install Proxy Manager dependencies" >&2
+        perr "install_error_deps"
+        exit 1
+    fi
     lpm_clean
     lpm_install
     check_install
@@ -761,7 +869,10 @@ main()
         ;;
     dev-setup)
         if prompt "Clean machine from pmgr install and setup again?" n; then
-           dev_setup
+            if ! dev_setup; then
+                perr "dev_setup_error"
+                exit 1
+            fi
         fi
         ;;
     esac

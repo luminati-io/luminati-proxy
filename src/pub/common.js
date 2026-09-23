@@ -20,8 +20,8 @@ import {bytes_format, report_exception, Clipboard} from './util.js';
 import CP_ipc from './cp_ipc.js';
 
 export const www_api = 'https://brightdata.com';
-export const www_help = 'https://help.brightdata.com';
-export const lpm_faq_article = '12632549957649';
+export const www_help = 'https://docs.brightdata.com/products/proxy-manager';
+export const lpm_faq_article = 'introduction';
 
 export const Copy_icon = ({text})=>{
     let tt_timeout = null;
@@ -351,7 +351,7 @@ export const Faq_link = with_www_api(props=>{
         {
             const article = props.article || lpm_faq_article;
             const anchor = props.anchor ? `#${props.anchor}` : '';
-            url = `${props.www_help}/hc/en-us/articles/${article}${anchor}`;
+            url = `${props.www_help}/${article}${anchor}`;
         }
         window.open(url, '_blank');
     };
