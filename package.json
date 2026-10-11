@@ -211,8 +211,6 @@
   "lpm": {
     "files": [
       ".npmrc",
-      "bin/ca-new.crt",
-      "bin/ca-new.key",
       "bin/ca.crt",
       "bin/ca.key",
       "bin/cert_gen.sh",
@@ -480,6 +478,7 @@
       "util/lpm_file.js",
       "util/lpm_request.js",
       "util/lpm_util.js",
+      "util/require_alias.js",
       "util/rules_util.js",
       "util/takeup_util.js",
       "webpack.common.js",
@@ -487,7 +486,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "b63ca8dbaca147275caa4f38fbb1ab5e"
+    "md5": "893e0c6fe0f1656bd5fa53e614def68e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -517,5 +516,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.670.998"
+  "version": "1.676.810"
 }

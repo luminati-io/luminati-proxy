@@ -304,6 +304,20 @@ function log_tail_push(msg){
 var zerr_format = function(args){
     return args.length<=1 ? args[0] : sprintf.apply(null, args); };
 
+var ts_sec_start = 0;
+var ts_sec_str = '';
+var ts_now = E.t.ts_now = function(){
+    var now = Date.now();
+    var ms = now-ts_sec_start;
+    if (ms>999 || ms<0)
+    {
+        ms = now%1000;
+        ts_sec_start = now-ms;
+        ts_sec_str = date.to_sql_ms(ts_sec_start).slice(0, -3);
+    }
+    return ts_sec_str+(ms>99 ? ms : ms>9 ? '0'+ms : '00'+ms);
+};
+
 if (is_node)
 { // zerr-node
 E.ZEXIT_LOG_DIR = env.ZEXIT_LOG_DIR||'/tmp/zexit_logs';
@@ -335,6 +349,8 @@ E.set_log_buffer = function(on){
         }
         return;
     }
+    if (E.log_buffer)
+        return;
     if (!flush_exit_listener)
     {
         process.on('exit', flush_on_exit);
@@ -356,7 +372,7 @@ var Log_buffer = function(){
     var instance = function log_patch(func, limit){
         orig_func = func;
         return function log_write(string){
-            size += Buffer.byteLength(string);
+            size += string.length;
             buf.push(string);
             if (size > limit)
                 instance.flush();
@@ -364,7 +380,10 @@ var Log_buffer = function(){
     };
     instance.flush = function log_flush(){
         if (size)
-            orig_func(buf.join('\n'));
+        {
+            buf.push('');
+            orig_func(buf.join('\n'), true);
+        }
         buf.length = 0;
         size = 0;
     };
@@ -406,7 +425,7 @@ for (var lpk in L)
 
 var __zerr = function(level, args){
     var msg = zerr_format(args);
-    var ts = E.hide_timestamp ? '' : date.to_sql_ms()+' ';
+    var ts = E.hide_timestamp ? '' : ts_now()+' ';
     var res = systemd_level(level)+E.prefix+ts+level_prefix[level]+msg;
     write_log(res);
     log_tail_push(res);
@@ -414,7 +433,7 @@ var __zerr = function(level, args){
 
 // simplified nodejs console.error
 // https://github.com/nodejs/node/blob/5fad0b93667ffc6e4def52996b9529ac99b26319/lib/internal/console/constructor.js#L381
-var write_log = function(string){
+var write_log = function(string, has_nl){
     // There may be an error occurring synchronously (e.g. for files or TTYs
     // on POSIX systems) or asynchronously (e.g. pipes on POSIX systems), so
     // handle both situations.
@@ -423,7 +442,8 @@ var write_log = function(string){
         // errors.
         if (process.stderr.listenerCount('error') === 0)
             process.stderr.once('error', noop);
-        process.stderr.write(string+'\n', stderr_error_handler);
+        process.stderr.write(has_nl ? string : string+'\n',
+            stderr_error_handler);
     } catch(e){
         // Console is a debugging utility, so it swallowing errors is not
         // desirable even in edge cases such as low stack space.
@@ -473,7 +493,7 @@ E.set_logger = function(logger){
     __zerr = function(level, args){
         var msg = zerr_format(args);
         logger(level, msg);
-        log_tail_push(E.prefix+date.to_sql_ms()+': '+msg);
+        log_tail_push(E.prefix+ts_now()+': '+msg);
     };
 };
 
@@ -491,7 +511,7 @@ E.wrap_time_logger = function(){
         else
             log_fn = console.debug;
         log_fn.call(log_fn,
-            date.to_sql_ms().toString() + ' ' + LINV[level].toString() + ': '
+            ts_now() + ' ' + LINV[level].toString() + ': '
                 + msg.toString()
         );
     });
@@ -613,7 +633,7 @@ _zerr = function(l, args){
          * differnt than sprintf % options) */
         s = (fmt+(fmt_args.length ? ' '+E.json(fmt_args) : ''))
         .substr(0, 1024);
-        var prefix = (E.hide_timestamp ? '' : date.to_sql_ms()+' ')
+        var prefix = (E.hide_timestamp ? '' : ts_now()+' ')
         +L_STR[l]+': ';
         if (E.is(l))
         {

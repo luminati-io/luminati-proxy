@@ -192,7 +192,6 @@ describe('rules trigger_code sanitizer', ()=>{
                     function is_asset(url){
                         return /\\.(png|jpg|css|js)$/.test(url);
                     }
-
                     function trigger(opt){
                         return is_asset(opt.url);
                     }
@@ -206,7 +205,6 @@ describe('rules trigger_code sanitizer', ()=>{
                             return /\\.(png|jpg|css|js)$/.test(url);
                         return /\\.(png|jpg|css)$/.test(url);
                     }
-
                     function trigger(opt){
                         return is_asset(opt.url);
                     }
@@ -216,7 +214,6 @@ describe('rules trigger_code sanitizer', ()=>{
                 name: 'top-level const',
                 code: `
                     const DOMAINS = ['a.test', 'b.test'];
-
                     function trigger(opt){
                         return DOMAINS.some(d=>opt.url.includes(d));
                     }
@@ -268,6 +265,67 @@ describe('rules trigger_code sanitizer', ()=>{
                     }
                 `,
             },
+            {
+                name: 'globals used as callees in logical, conditional and '
+                    +'sequence expressions',
+                code: `
+                    function trigger(opt){
+                        const has_url = opt.url
+                            && Object.keys(opt).length > 0;
+                        const has_values = typeof Object === 'function'
+                            ? Object.values(opt).length > 0
+                            : false;
+                        const has_entries = (
+                            Object.keys(opt),
+                            Object.entries(opt).length > 0
+                        );
+                        const status = Number(opt.status) || 0;
+                        const limit = Math.max(status, 200);
+                        const is_array = Array.isArray(opt.headers);
+                        return !!has_url || has_values || has_entries
+                            || limit >= 200 || is_array;
+                    }
+                `,
+            },
+            {
+                name: 'sequence expression returns its final value',
+                code: `
+                    function trigger(opt){
+                        const has_keys = (
+                            Object.keys(opt),
+                            Object.entries(opt).length > 0
+                        );
+                        return has_keys;
+                    }
+                `,
+            },
+            {
+                name: 'global callee inside an outer call argument',
+                code: `
+                    function trigger(opt){
+                        return Math.max(Object.keys(opt).length, 0) > 0;
+                    }
+                `,
+            },
+            {
+                name: 'global used only as a ternary test',
+                code: `
+                    function trigger(opt){
+                        return Object
+                            ? Object.keys(opt).length > 0
+                            : false;
+                    }
+                `,
+            },
+            {
+                name: 'global discarded before the final sequence value',
+                code: `
+                    function trigger(opt){
+                        const result = (Object, true);
+                        return result;
+                    }
+                `,
+            },
         ];
         it('accepts all allowed trigger language features', ()=>{
             const failures = [];
@@ -282,6 +340,21 @@ describe('rules trigger_code sanitizer', ()=>{
             assert.equal(failures.length, 0,
                 'Sanitizer rejected valid trigger_code feature classes:\n\n'
                 +failures.join('\n\n'));
+        });
+        it('sanitizes generated triggers for ordinary rule fields', ()=>{
+            const cases = [
+                ['status', {status: '^4\\d\\d$'}],
+                ['max_req_time', {max_req_time: 2000}],
+                ['min_req_time', {min_req_time: 100}],
+                ['body', {body: 'captcha'}],
+                ['url', {url: 'example\\.com'}],
+            ];
+            for (const [name, rule] of cases)
+            {
+                const errors = rules_util.sanitize([rule]);
+                assert.equal(errors.length, 0,
+                    `${name}: ${errors[0] && errors[0][1].message}`);
+            }
         });
     });
     describe('unsafe code must be rejected by sanitizer policy', ()=>{
@@ -400,6 +473,50 @@ describe('rules trigger_code sanitizer', ()=>{
             reject('alias a global method', `
                 function trigger(opt){ var k = Object.keys; return !!k; }
             `, 'global_alias Object');
+            reject('Object passed as call argument', `
+                var leak = (O)=>O.getOwnPropertyDescriptor(
+                    O.getPrototypeOf(O.keys), 'constructor').value;
+                var result = leak(Object)('return 7')();
+                function trigger(opt){
+                    return result===7;
+                }
+            `, 'global_alias Object');
+            reject('alias via logical expression', `
+                const alias = true && Object;
+                function trigger(opt){ return !!alias; }
+            `, 'global_alias Object');
+            reject('alias via tagged-template substitution', `
+                const take = (strings, value)=>value;
+                const alias = take\`\${Object}\`;
+                function trigger(opt){ return !!alias; }
+            `, 'global_alias Object');
+            reject('alias via final sequence expression', `
+                const alias = (true, Object);
+                function trigger(opt){ return !!alias; }
+            `, 'global_alias Object');
+            reject('alias via conditional branch', `
+                function trigger(opt){
+                    const alias = opt.status ? Object : null;
+                    return !!alias;
+                }
+            `, 'global_alias Object');
+            reject('global passed to constructor argument', `
+                function trigger(opt){
+                    return new RegExp(Object).test(opt.url);
+                }
+            `, 'global_alias Object');
+            reject('global passed through conditional call argument', `
+                const take = value=>!!value;
+                function trigger(opt){
+                    return take(opt.status ? Object : null);
+                }
+            `, 'global_alias Object');
+            reject('alias via conditional branch Math', `
+                function trigger(opt){
+                    const alias = opt.status ? Math : null;
+                    return !!alias;
+                }
+            `, 'global_alias Math');
         });
         it('allows mutating opt and code-declared locals', ()=>{
             accept('mutate opt + locals', `
@@ -759,7 +876,7 @@ describe('rules', ()=>{
                     url,
                     method: 'POST',
                     headers,
-                    body: payload_str
+                    body: payload_str,
                 }));
             }));
             it('does not send payload in GET requests', ()=>
@@ -772,7 +889,7 @@ describe('rules', ()=>{
                 assert.ok(!r);
                 sinon.assert.calledWith(req_stub, sinon.match({
                     url,
-                    method: 'GET'
+                    method: 'GET',
                 }));
             }));
             it('sends request with custom payload with IP', ()=>
@@ -794,7 +911,7 @@ describe('rules', ()=>{
                     url,
                     method: 'POST',
                     headers,
-                    body: payload_str
+                    body: payload_str,
                 }));
             }));
         });
@@ -1070,7 +1187,7 @@ describe('rules', ()=>{
         it('connection timeout', ()=>etask(function*(){
             l = yield lum({rules: [
                 {action_type: 'retry', min_conn_time: 0.1,
-                trigger_type: 'min_conn_time', action: {}}
+                trigger_type: 'min_conn_time', action: {}},
             ]});
             l.on('retry', opt=>{
                 this.return();
@@ -1081,7 +1198,7 @@ describe('rules', ()=>{
         it('connection timeout trigger suspended', ()=>etask(function*(){
             l = yield lum({rules: [
                 {action_type: 'retry', min_conn_time: 100000,
-                trigger_type: 'min_conn_time', action: {}}
+                trigger_type: 'min_conn_time', action: {}},
             ]});
             let called;
             const handle_proxy_resp_org = l.handle_proxy_resp.bind(l);

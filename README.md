@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.670.998/luminati-proxy-manager-v1.670.998-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.676.810/luminati-proxy-manager-v1.676.810-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -155,7 +155,7 @@ Options:
       --password                   Zone password                        [string]
       --proxy                      Hostname or IP of super proxy
                                          [string] [default: "brd.superproxy.io"]
-      --proxy_port                 Super proxy port    [number] [default: 33335]
+      --proxy_port                 Super proxy port    [number] [default: 44445]
       --proxy_connection_type      Determines what kind of connection will be
                                    used between Proxy Manager and Super Proxy
                                                       [string] [default: "http"]
@@ -226,7 +226,7 @@ Options:
       --mode                       Defines a set of permissible operations
                                    within the UI/API                    [string]
       --dropin                     Create dropin mode proxy port (default:
-                                   33335)              [boolean] [default: true]
+                                   22225)              [boolean] [default: true]
       --dropin_port                Port for dropin mode         [default: 22225]
       --no_usage_stats             Disable collection of usage statistics
                                                       [boolean] [default: false]
@@ -272,8 +272,6 @@ Options:
                                    file               [boolean] [default: false]
       --extra_ssl_ips              List of IPs to add to SSL certificate
                                                            [array] [default: []]
-      --new_proxy_cert             Use the new Proxy Manager CA certificate
-                                                      [boolean] [default: false]
       --bw_limit_webhook_url       URL to send webhook messages to when BW limit
                                    is reached                           [string]
       --bw_th_webhook_url          URL to send webhook messages to when BW limit
@@ -290,9 +288,10 @@ Options:
                                    zone-based usernames in the format
                                    brd-customer-...-zone-...:password
                                                       [boolean] [default: false]
-      --sanitize_rules             Validate rules trigger_code against the JS
-                                   sanitizer and reject unsafe code before it
-                                   runs.              [boolean] [default: false]
+      --sanitize_rules             Deprecated no-op. Rule sanitization is
+                                   enabled by default [boolean] [default: false]
+      --no_sanitize_rules          Disable JS sanitization of rule trigger_code
+                                                      [boolean] [default: false]
       --no-www                     Disable local web
       --no-config                  Working without a config file
   -d, --daemon, --start-daemon     Start as a daemon
@@ -310,7 +309,6 @@ Options:
       --start-upgrader             Install CRON process that checks upgrades
       --stop-upgrader              Removes CRON process that checks upgrades
       --insecure-http-parser       Disables the strict checks
-      --new_proxy_port                                          [default: 44445]
       --proxy_country                                              [default: ""]
       --resolve_proxies_interval                                [default: 10000]
       --info                                                    [default: false]

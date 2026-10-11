@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.670.998",
+        "version": "1.676.810",
         "title": "Proxy Manager",
         "license": {
             "name": "MIT",
@@ -998,6 +998,79 @@
                 "responses": {
                     "200": {
                         "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/refresh_sessions": {
+            "post": {
+                "description": "Refresh sessions on multiple proxy ports.",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If specified, all requested ports must belong to this user."
+                    },
+                    {
+                        "name": "options",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["ports"],
+                            "properties": {
+                                "ports": {
+                                    "type": "array",
+                                    "description": "Existing proxy port numbers to refresh.",
+                                    "minItems": 1,
+                                    "maxItems": 100,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 65535
+                                    },
+                                    "example": [24000, 24001]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sessions refreshed. Each key is a proxy port number.",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "properties": {
+                                    "session_id": {
+                                        "type": "string",
+                                        "description": "New session ID."
+                                    },
+                                    "rotate_session": {
+                                        "type": "boolean",
+                                        "description": "True when session rotation is enabled; session_id is then omitted."
+                                    }
+                                }
+                            }
+                        },
+                        "examples": {
+                            "application/json": {
+                                "24000": {"session_id": "24000_1"},
+                                "24001": {"rotate_session": true}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ports: malformed, duplicate, too many, nonexistent, or belonging to a different user.",
+                        "schema": {"type": "string"}
+                    },
+                    "403": {
+                        "description": "Access denied."
                     }
                 }
             }

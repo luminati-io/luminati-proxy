@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, mocha:true*/
+'use strict'; /*jslint node:true, mocha:true, es9: true*/
 const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
@@ -34,6 +34,10 @@ const E = module.exports = {};
 E.keys = forge.pki.rsa.generateKeyPair(2048);
 E.keys.privateKeyPem = forge.pki.privateKeyToPem(E.keys.privateKey);
 E.keys.publicKeyPem = forge.pki.publicKeyToPem(E.keys.publicKey);
+
+E.max_workers = 2;
+
+E.stub_cpus = sb=>sb.stub(os, 'cpus').returns(Array(E.max_workers).fill({}));
 
 E.init_lum = proxy=>opt=>etask(function*(){
     opt = opt||{};
@@ -400,6 +404,10 @@ E.app_with_args = (args, opt={})=>etask(function*(){
     manager.lpm_f.get_lb_ips = ()=>{
         manager.lpm_f.emit('lb_ips', []);
     };
+    manager.lpm_f.get_compliance_conf = ()=>{};
+    // avoid external zagent registration in tests unless explicitly enabled
+    if (opt.register_online !== true)
+        manager.zagent_server.register_online = ()=>{};
     if (start_manager!==false)
         yield manager.start();
     return {manager};
@@ -457,7 +465,7 @@ E.init_app_with_proxies = app_with_config=>(proxies, cli)=>etask(function*(){
     return yield app_with_config({config: {proxies}, cli});
 });
 
-E.api = (_path, method, data, json, headers)=>etask(function*(){
+E.api = (_path, method, data, json, headers, req_opt)=>etask(function*(){
     const admin = 'http://127.0.0.1:'+Manager.default.www;
     const opt = {
         url: admin+'/'+_path,
@@ -465,26 +473,29 @@ E.api = (_path, method, data, json, headers)=>etask(function*(){
         json,
         body: data,
         headers: headers || {'x-lpm-fake': true},
+        ...req_opt,
     };
     return yield etask.nfn_apply(request, [opt]);
 });
 
 E.api_json = (_path, opt={})=>etask(function*(){
-    return yield E.api(_path, opt.method, opt.body, true, opt.headers);
+    return yield E.api(_path, opt.method, opt.body, true, opt.headers,
+        opt.req_opt);
 });
 
-E.json = (_path, method, data)=>etask(function*(){
-    const res = yield E.api(_path, method, data, true);
+E.json = (_path, method, data, req_opt)=>etask(function*(){
+    const res = yield E.api(_path, method, data, true, null, req_opt);
     assert.equal(res.statusCode, 200);
     return res.body;
 });
 
-E.make_user_req = (port=24000, status=200)=>{
+E.make_user_req = (port=24000, status=200, req_opt)=>{
     return E.api_json('api/test/'+port, {
         method: 'POST',
         body: {
             url: 'http://lumtest.com/myip.json',
             headers: {'x-lpm-fake': true, 'x-lpm-fake-status': status},
         },
+        req_opt,
     });
 };

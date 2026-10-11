@@ -19,14 +19,19 @@ E.is_linux = /^linux/.test(process.platform);
 E.is_zlinux = E.is_linux && !/ARCH=ANDROID/.test(zconf.CONFIG_MAKEFLAGS);
 E.is_android = E.is_linux && !E.is_zlinux;
 
-let check_file = (dst, opt)=>{
+let check_file_e = (dst, opt)=>{
     opt = opt||{};
     if (opt.rm_rf)
-        E.rm_rf(dst);
+        E.rm_rf_e(dst);
     if (opt.mkdirp)
         E.mkdirp_file_e(dst);
     if (opt.unlink)
-        E.unlink(dst);
+    {
+        // unlink is best-effort: dst may legitimately not exist yet (e.g.
+        // first build); only propagate errors other than "already gone"
+        try { E.unlink_e(dst); }
+        catch(e){ if (e.code!='ENOENT') throw e; }
+    }
 };
 
 let FileError = (msg, code)=>{
@@ -117,7 +122,7 @@ E.write_e = (file, data, opt)=>{
     if (typeof data == 'number')
         data = ''+data;
     opt = opt||{};
-    check_file(file, opt);
+    check_file_e(file, opt);
     fs.writeFileSync(file, data, opt);
     return true;
 };
@@ -125,7 +130,7 @@ E.write_atomic_e = (file, data, opt)=>{
     if (typeof data == 'number')
         data = ''+data;
     opt = opt||{};
-    check_file(file, opt);
+    check_file_e(file, opt);
     let tmpfile = file+'.'+(1000000*Math.random()|0)+'.tmp';
     try {
         fs.writeFileSync(tmpfile, data, opt);
@@ -145,7 +150,7 @@ E.append_e = (file, data, opt)=>{
     if (typeof data == 'number')
         data = ''+data;
     opt = opt||{};
-    check_file(file, opt);
+    check_file_e(file, opt);
     fs.appendFileSync(file, data, opt);
     return true;
 };
@@ -258,7 +263,7 @@ function copy_file(src, dst, opt){
             console.log(`Skipping copy (src is not newer): ${src}->${dst}`);
         return true;
     }
-    check_file(dst, opt);
+    check_file_e(dst, opt);
     mode = 'mode' in opt ? opt.mode : stat.mode & 0o777;
     fdw = fs.openSync(dst, 'w', mode);
     try {
@@ -303,7 +308,7 @@ E.link_e = (src, dst, opt)=>{
     opt = opt||{};
     src = E.normalize(src);
     dst = E.normalize(dst);
-    check_file(dst, opt);
+    check_file_e(dst, opt);
     try { fs.linkSync(src, dst); }
     catch(e){
         if (opt.no_copy)
@@ -331,7 +336,7 @@ E.symlink_e = (src, dst, opt)=>{
         return E.link_e(src, dst, opt);
     src = E.normalize(src);
     dst = E.normalize(dst);
-    check_file(dst, opt);
+    check_file_e(dst, opt);
     let target = src;
     if (!opt.keep_relative)
         target = fs.realpathSync(src);
@@ -581,6 +586,7 @@ E.is_subdir = (root, sub)=>{
         sub[nroot]===undefined || sub[nroot]=='/');
 };
 E.chown_e = (src, opt)=>{
+    opt = opt||{};
     let stat = fs.statSync(src);
     let owner = get_owner(stat, opt);
     if (owner)

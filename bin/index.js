@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
+require('../util/require_alias.js');
 require('../util/conf.js');
 require('./polyfill.js');
 const lpm_util = require('../util/lpm_util.js');

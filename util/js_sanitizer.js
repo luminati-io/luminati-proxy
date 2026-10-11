@@ -326,9 +326,54 @@ const is_alias_position = (p, top)=>{
         return p.argument===top;
     case 'ArrowFunctionExpression':
         return p.body===top;
+    case 'CallExpression':
+    case 'NewExpression':
+        return p.arguments.includes(top);
+    case 'LogicalExpression':
+        return p.left===top || p.right===top;
+    case 'ConditionalExpression':
+        return p.consequent===top || p.alternate===top;
+    case 'SequenceExpression':
+        return p.expressions[p.expressions.length-1]===top;
     default:
         return false;
     }
+};
+
+const is_call_argument = (node, ancestors)=>{
+    let child = node;
+    for (let i = ancestors.length-2; i>=0; i--)
+    {
+        const p = ancestors[i];
+        if (p.type=='CallExpression' || p.type=='NewExpression')
+        {
+            if (p.arguments.includes(child))
+                return true;
+            if (p.callee===child)
+                return false;
+        }
+        if (p.type=='TaggedTemplateExpression' && p.tag===child)
+            return false;
+        child = p;
+    }
+    return false;
+};
+
+const is_tagged_template_substitution = (node, ancestors)=>{
+    let child = node;
+    for (let i = ancestors.length-2; i>=0; i--)
+    {
+        const p = ancestors[i];
+        const parent = ancestors[i-1];
+        if (p.type=='TemplateLiteral' && p.expressions.includes(child)
+            && parent && parent.type=='TaggedTemplateExpression'
+            && parent.quasi===p)
+        {
+            return true;
+        }
+        child = p;
+    }
+    return false;
 };
 
 const classify_global_ref = (node, parent, grandparent, scope, ancestors)=>{
@@ -342,6 +387,10 @@ const classify_global_ref = (node, parent, grandparent, scope, ancestors)=>{
     const write = WRITE_PARENT[p.type];
     if (write && write(p, top))
         return {kind: 'mutation', name: node.name};
+    if (is_tagged_template_substitution(node, ancestors))
+        return {kind: 'alias', name: node.name};
+    if (is_call_argument(node, ancestors))
+        return {kind: 'alias', name: node.name};
     if (is_alias_position(p, top))
         return {kind: 'alias', name: node.name};
 };

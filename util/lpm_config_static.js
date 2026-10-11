@@ -9,8 +9,6 @@ const cloud_default = {
     request_stats: false,
 };
 
-const NEW_PROXY_CERT_ROLLOUT_TS = Date.parse('2026-09-25T14:28:38Z');
-
 const conf = {
     version: undefined,
     is_win: process.platform=='win32',
@@ -56,7 +54,6 @@ const conf = {
             version: 'v',
         },
     },
-    new_proxy_cert_rollout_ts: NEW_PROXY_CERT_ROLLOUT_TS,
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
     'version', 'ask_sync_config');
@@ -73,8 +70,7 @@ conf.server_default = {
     av_check: false,
     test_url: 'http://geo.brdtest.com/mygeo.json',
     proxy: 'brd.superproxy.io',
-    proxy_port: 33335,
-    new_proxy_port: 44445,
+    proxy_port: 44445,
     proxy_retry: 2,
     proxy_country: '',
     socket_inactivity_timeout: 120000,
@@ -101,7 +97,6 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     www_whitelist_ips: [],
     whitelist_ips: [],
     extra_ssl_ips: [],
-    new_proxy_cert: Date.now()>=NEW_PROXY_CERT_ROLLOUT_TS,
     dropin: true,
     dropin_port: 22225,
     no_usage_stats: false,
@@ -131,6 +126,7 @@ conf.manager_default = Object.assign({}, conf.server_default, {
     api_parameter_limit: 10000,
     zone_auth_passthru: false,
     sanitize_rules: false,
+    no_sanitize_rules: false,
 });
 delete conf.manager_default.port;
 

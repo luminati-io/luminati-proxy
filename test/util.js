@@ -473,9 +473,11 @@ describe('js_sanitizer', ()=>{
             reject(san(), 'var f = function(){ return Object; }',
                 'global_alias Object');
         });
-        it('treats a call argument as safe (not an alias)', ()=>{
-            accept(san(), 'foo(Object)');
-            accept(san(), 'Object.keys(opt)');
+        it('blocks passing external globals as call arguments', ()=>{
+            reject(san(), 'foo(Object)', 'global_alias Object');
+        });
+        it('allows calling global methods with a local argument', ()=>{
+            accept(san(), 'const opt = {}; Object.keys(opt);');
         });
         it('treats spread of a global as safe (copies values)', ()=>{
             accept(san(), 'var a = [...Object]');

@@ -1,5 +1,14 @@
 Proxy manager - Change Log
 
+## 1.676.810 Stable
+- :boom: Removed the legacy bundled CA certificate and certificate migration. Proxy Manager now uses only the new bundled CA. Clients that trusted the old CA for SSL analyzing must install and trust the new CA
+- :boom: Changed the default Super Proxy port to 44445
+- :boom: Rule trigger_code sanitization is now enabled by default
+- :star: Added 'POST /api/v2/refresh_sessions' to refresh sessions on multiple proxy ports in one request
+- :bug: Fix proxy examples to use configured port and show a message when no ports are awailable and dropin mode is disabled
+- :bug: Prevent rule sanitizer bypass through aliased global references
+- :bug: Prevent per-user authentication bypass when the password is missing
+
 ## 1.670.998 Stable
 - :boom: IMPORTANT: Added the "Use new proxy certificate" setting under General Settings. Users relying on the bundled CA for SSL analyzing must enable this option and install the new CA on their clients before the automatic switch on September 25, 2026 at 14:28:38 UTC.
 - :star: Improved installers download security

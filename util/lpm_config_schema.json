@@ -80,10 +80,6 @@
             "type": "integer",
             "description": "Super proxy port"
           },
-          "new_proxy_port": {
-            "type": "boolean",
-            "description": "Use new proxy port 33335"
-          },
           "proxy_connection_type": {
             "type": "string",
             "enum": ["http", "https", "socks"],
@@ -610,10 +606,6 @@
         "ask_sync_config": {
           "type": "boolean",
           "description": "Ask about config sync"
-        },
-        "new_proxy_cert": {
-          "type": "boolean",
-          "description": "Use the new Proxy Manager CA certificate"
         }
       }
     },

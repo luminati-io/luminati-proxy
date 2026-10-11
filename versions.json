@@ -1,5 +1,39 @@
 [
     {
+        "ver": "1.676.810",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Removed the legacy bundled CA certificate and certificate migration. Proxy Manager now uses only the new bundled CA. Clients that trusted the old CA for SSL analyzing must install and trust the new CA"
+            },
+            {
+                "type": "boom",
+                "text": "Changed the default Super Proxy port to 44445"
+            },
+            {
+                "type": "boom",
+                "text": "Rule trigger_code sanitization is now enabled by default"
+            },
+            {
+                "type": "star",
+                "text": "Added 'POST /api/v2/refresh_sessions' to refresh sessions on multiple proxy ports in one request"
+            },
+            {
+                "type": "bug",
+                "text": "Fix proxy examples to use configured port and show a message when no ports are awailable and dropin mode is disabled"
+            },
+            {
+                "type": "bug",
+                "text": "Prevent rule sanitizer bypass through aliased global references"
+            },
+            {
+                "type": "bug",
+                "text": "Prevent per-user authentication bypass when the password is missing"
+            }
+        ]
+    },
+    {
         "ver": "1.670.998",
         "type": "stable",
         "changes": [

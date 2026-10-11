@@ -755,6 +755,55 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.670.998', v=>{
+        it(`removes legacy new_proxy_cert attribute`, ()=>{
+            const migrated = migrations[v]({
+                _defaults: {new_proxy_cert: true, logs: 100},
+                proxies: [{port: 24000}],
+            });
+            assert.deepEqual(migrated, {
+                _defaults: {logs: 100},
+                proxies: [{port: 24000}],
+            });
+        });
+        it(`removes legacy new_proxy_port attribute`, ()=>{
+            const migrated = migrations[v]({
+                _defaults: {new_proxy_port: true, logs: 100},
+                proxies: [{new_proxy_port: true, port: 24000}],
+            });
+            assert.deepEqual(migrated, {
+                _defaults: {logs: 100},
+                proxies: [{port: 24000}],
+            });
+        });
+        it(`removes common proxy_port attribute`, ()=>{
+            const migrated = migrations[v]({
+                _defaults: {proxy_port: 22225, logs: 100},
+                proxies: [
+                    {proxy_port: 22225, port: 24000},
+                ],
+            });
+            assert.deepEqual(migrated, {
+                _defaults: {proxy_port: 44445, logs: 100},
+                proxies: [
+                    {proxy_port: 44445, port: 24000},
+                ],
+            });
+        });
+        it(`keeps custom proxy_port attribute`, ()=>{
+            const conf = {
+                _defaults: {proxy_port: 12345, logs: 100},
+                proxies: [
+                    {proxy_port: 33335, port: 24001},
+                    {proxy_port: 44445, port: 24002},
+                    {proxy_port: 12345, port: 24003},
+                    {proxy_port: 22225, ext_proxies: [1], port: 24004},
+                ],
+            };
+            const migrated = migrations[v](conf);
+            assert.deepEqual(migrated, conf);
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

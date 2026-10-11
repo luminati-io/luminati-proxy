@@ -908,8 +908,8 @@ E.prototype.wait = function(timeout){
 E.prototype.wait_child = function(child, timeout, cond, opt){
     if (typeof timeout=='function')
     {
-        cond = timeout;
         opt = cond;
+        cond = timeout;
         timeout = 0;
     }
     else if (typeof timeout=='object')

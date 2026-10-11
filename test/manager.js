@@ -28,7 +28,8 @@ const user_agent = require('../util/user_agent.js');
 const lpm_util = require('../util/lpm_util.js');
 const util_lib = require('../lib/util.js');
 const {assert_has, http_proxy, app_with_args, init_app_with_config, api_json,
-    json, init_app_with_proxies, make_user_req} = require('./common.js');
+    json, init_app_with_proxies, make_user_req, stub_cpus,
+} = require('./common.js');
 const api_base = 'https://'+pkg.api_domain;
 const {SEC} = date.ms;
 
@@ -56,7 +57,7 @@ describe('manager', function(){
     beforeEach(()=>{
         temp_files = [];
         sb = sinon.createSandbox();
-        os_cpus_stub = sb.stub(os, 'cpus').returns([1, 1]);
+        os_cpus_stub = stub_cpus(sb);
         nock(api_base).get('/').times(2).reply(200, {});
         nock(api_base).get('/lpm/server_conf').query(true).reply(200, {});
         app_with_config = init_app_with_config(temp_files);

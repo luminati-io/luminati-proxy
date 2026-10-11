@@ -114,7 +114,7 @@ E.manager_fields = {
     mode: {type: 'string', desc: 'Defines a set of permissible operations '
         +'within the UI/API'},
     dropin: {type: 'boolean', desc: 'Create dropin mode proxy port (default: '
-        +'33335)'},
+        +'22225)'},
     dropin_port: {type: 'integer', desc: 'Port for dropin mode'},
     no_usage_stats: {type: 'boolean', desc: 'Disable collection of usage '
         +'statistics'},
@@ -155,8 +155,6 @@ E.manager_fields = {
         +'config file'},
     extra_ssl_ips: {type: 'array', desc: 'List of IPs to add to SSL '
         +'certificate'},
-    new_proxy_cert: {type: 'boolean', desc: 'Use the new Proxy Manager '
-        +'CA certificate'},
     bw_limit_webhook_url: {type: 'string', desc: 'URL to send webhook '
         +'messages to when BW limit is reached'},
     bw_th_webhook_url: {type: 'string', desc: 'URL to send webhook messages '
@@ -170,7 +168,9 @@ E.manager_fields = {
     zone_auth_passthru: {type: 'boolean', desc: 'Allow passthrough proxy'
         +' authentication using zone-based usernames in the format'
         +' brd-customer-...-zone-...:password'},
-    sanitize_rules: {type: 'boolean', desc: 'Validate rules trigger_code '
-        +'against the JS sanitizer and reject unsafe code before it runs.'},
+    sanitize_rules: {type: 'boolean', desc: 'Deprecated no-op. Rule '
+        +'sanitization is enabled by default'},
+    no_sanitize_rules: {type: 'boolean', desc: 'Disable JS sanitization of '
+        +'rule trigger_code'},
 };
 return E; }); // eslint-disable-line

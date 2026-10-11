@@ -829,10 +829,17 @@ class Client extends WS {
         this.impl = client_impl({is_rn, is_node});
         this.url = url;
         this.servername = opt.servername;
-        this.ca = opt.ca;
-        this.cert = opt.cert;
-        this.key = opt.key;
-        this.get_tls_context = opt.get_tls_context;
+        // if this option passed, then get_tls_context/ca/cert/key
+        // will be ignored for consistency
+        if (opt.tls_secure_context)
+            this.tls_secure_context = opt.tls_secure_context;
+        else
+        {
+            this.ca = opt.ca;
+            this.cert = opt.cert;
+            this.key = opt.key;
+            this.get_tls_context = opt.get_tls_context;
+        }
         this.retry_interval = opt.retry_interval||10000;
         this.retry_max = opt.retry_max||this.retry_interval;
         this.retry_instant = !!opt.retry_instant;
@@ -1003,7 +1010,9 @@ class Client extends WS {
             opt.agent = this.agent;
             opt.perMessageDeflate = this.deflate;
             opt.servername = this.servername;
-            if (this.get_tls_context)
+            if (this.tls_secure_context)
+                opt.secureContext = this.tls_secure_context;
+            else if (this.get_tls_context)
             {
                 const {cert, key} = this.get_tls_context();
                 opt.cert = cert;

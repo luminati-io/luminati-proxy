@@ -30,12 +30,21 @@ const Howto = withRouter(class Howto extends Pure_component {
         proxy_tester: 'Test Proxy Manager from here',
     };
     back_btn_click = ()=>this.props.history.push({pathname: '/overview'});
+    show_warning = ()=>{
+      const option = this.props.match.params.option||'code';
+      const is_code_browser = option=='code'||option=='browser';
+      let {settings, example_port} = this.state||{};
+      return is_code_browser&&!settings.dropin&&!example_port;
+    };
     render(){
         if (!this.state.settings)
-            return null;
-        let {settings, example_port=33335} = this.state;
-        const {zagent, cloud_url_address, lpm_token} = settings;
+          return null;
+        let {settings, example_port} = this.state||{};
+        const {zagent, cloud_url_address, lpm_token} = settings||{};
         const option = this.props.match.params.option||'code';
+        const port = example_port
+          ? example_port
+          : settings.dropin&&settings.dropin_port;
         const cur_title = this.option_to_text[option];
         const hostname = zagent ? cloud_url_address : undefined;
         const lpm_token_value = (lpm_token||'').split('|')[0];
@@ -79,7 +88,9 @@ const Howto = withRouter(class Howto extends Pure_component {
                 <Instructions
                   hostname={hostname}
                   lpm_token={lpm_token_value}
-                  port={example_port}
+                  port={port}
+                  show_warning={this.show_warning()}
+                  warning={<Proxy_port_warn />}
                   test_event={test_event}>
                   {this.props.children}
                 </Instructions>
@@ -102,6 +113,17 @@ const Cert_warn = ()=>{
   }/>;
 };
 
+const Proxy_port_warn = ()=>{
+  return <Warning text={
+    <React.Fragment>
+      <span>
+        {'No proxy port is configured. '+
+        'Please create a proxy port or enable dropin mode to continue.'}
+      </span>
+    </React.Fragment>
+  }/>;
+};
+
 const Lang_btn = props=>{
     const class_names = 'btn btn_lpm btn_lpm_small btn_lang'
     +(props.active ? ' active' : '');
@@ -115,7 +137,9 @@ class Code_instructions extends Pure_component {
         this.props.history.push({pathname});
     };
     render(){
-        const {port, lpm_token, hostname} = this.props;
+        const {port, lpm_token, hostname, show_warning, warning} = this.props;
+        if (show_warning)
+          return warning;
         const lang = this.props.match.params.suboption||'shell';
         const Lang_btn_clickable = props=>
             <span onClick={()=>this.click_lang(props.lang)}>
@@ -168,7 +192,9 @@ class Browser_instructions extends Pure_component {
         this.props.history.push({pathname});
     };
     render(){
-        const {port, lpm_token, hostname} = this.props;
+        const {port, lpm_token, hostname, show_warning, warning} = this.props;
+        if (show_warning)
+          return warning;
         const browser = this.props.match.params.suboption||'chrome_win';
         return <div className="browser_instructions">
               <div className="header_well">

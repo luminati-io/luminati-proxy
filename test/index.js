@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, mocha:true*/
+'use strict'; /*jslint node:true, mocha:true, es9:true*/
 const assert = require('assert');
 const dns = require('dns');
 const net = require('net');
@@ -427,7 +427,7 @@ describe('proxy', ()=>{
                 port: 24000,
                 url: ping.http.url,
                 method: 'GET',
-                super_proxy: '127.0.0.1:20001'
+                super_proxy: '127.0.0.1:20001',
             }));
             t('https connect', ()=>ping.https.url, ()=>({
                 port: 24000,
@@ -784,6 +784,177 @@ describe('proxy', ()=>{
                     assert(error.includes('not allowed by ruleset'));
                 }));
             });
+            it('rejects colonless lpm_user credentials', etask._fn(function*(){
+                l = yield lum();
+                sandbox.stub(l.wl_ips, 'contains').returns(false);
+                sandbox.stub(l, 'get_req_remote_ip').returns('192.0.2.10');
+                const req = {
+                    headers: {
+                        'proxy-authorization': 'Basic '+
+                            Buffer.from('X-lpm_user').toString('base64'),
+                    },
+                };
+                assert.equal(l.is_whitelisted(req), false);
+            }));
+            it('accepts valid lpm_user credentials', etask._fn(function*(){
+                l = yield lum({
+                    user: 'alice',
+                    user_password: 'secret',
+                    whitelist_ips: [],
+                });
+                const auth = 'Basic '+Buffer.from('alice:secret')
+                    .toString('base64');
+                const res = yield l.test({
+                    url: test_url.http,
+                    no_usage: true,
+                    headers: {'proxy-authorization': auth},
+                });
+                assert.equal(res.statusCode, 200);
+            }));
+            it('authorizes on the target port', etask._fn(function*(){
+                const target_port = 24001;
+                let target, retry_handler;
+                this.finally(etask._fn(function*(){
+                    if (retry_handler && l)
+                        l.removeListener('retry', retry_handler);
+                    if (target)
+                    {
+                        target.removeListener('retry', retry_handler);
+                        if (l && l.worker)
+                            delete l.worker.servers[target_port];
+                        yield target.stop();
+                    }
+                }));
+                l = yield lum({
+                    user: 'alice',
+                    user_password: 'alice_pw',
+                    whitelist_ips: [],
+                    lb_ips: ['127.0.0.1'],
+                });
+                l.worker.servers[l.opt.port] = l;
+                retry_handler = data=>{
+                    const other_srv = l.worker.servers[data.port];
+                    if (!other_srv)
+                        return;
+                    other_srv.lpm_request(data.req, data.res, data.head,
+                        data.post, data.opt);
+                };
+                l.on('retry', retry_handler);
+                target = new Server(Object.assign({}, l.opt, {
+                    port: target_port,
+                    listen_port: target_port,
+                    user: 'bob',
+                    user_password: 'bob_pw',
+                    whitelist_ips: ['192.0.2.99'],
+                }), l.worker);
+                l.worker.servers[target_port] = target;
+                target.on('retry', retry_handler);
+                yield target.listen();
+                const send = (user, password, route)=>l.test({
+                    url: test_url.http,
+                    no_usage: true,
+                    // The test client connects over loopback, which may be
+                    // whitelisted by default. Use PROXY v2 to supply a
+                    // non-whitelisted client IP and test target-port
+                    // credential authorization rather than IP-based access.
+                    lb_data: proxy_v2_encode({
+                        src_addr: '10.0.0.10',
+                        dst_addr: '127.0.0.1',
+                        src_port: 1234,
+                        dst_port: l.port,
+                        family: 'ipv4',
+                    }),
+                    headers: {
+                        'proxy-authorization': 'Basic '+
+                            Buffer.from(`${user}:${password}`)
+                            .toString('base64'),
+                        ...route && {'x-lpm-route': String(route)},
+                    },
+                });
+                let res = yield send('alice', 'alice_pw');
+                assert.equal(res.statusCode, 200);
+                res = yield send('alice', 'alice_pw', target_port);
+                assert.equal(res.statusCode, 407);
+                res = yield send('bob', 'bob_pw', target_port);
+                assert.equal(res.statusCode, 200);
+            }));
+            it('authorizes CONNECT on the target port', etask._fn(function*(){
+                const target_port = 24001;
+                let target;
+                this.finally(etask._fn(function*(){
+                    if (!target)
+                        return;
+                    delete l?.worker?.servers[target_port];
+                    yield target.stop();
+                }));
+                l = yield lum({
+                    ssl: true,
+                    user: 'alice',
+                    user_password: 'alice_pw',
+                    whitelist_ips: [],
+                    lb_ips: ['127.0.0.1'],
+                });
+                target = new Server(Object.assign({}, l.opt, {
+                    port: target_port,
+                    listen_port: target_port,
+                    user: 'bob',
+                    user_password: 'bob_pw',
+                    whitelist_ips: ['192.0.2.99'],
+                }), l.worker);
+                l.worker.servers[target_port] = target;
+                yield target.listen();
+                const send = (user, password, route)=>etask(function*(){
+                    const socket = net.connect(l.port, '127.0.0.1');
+                    socket.setTimeout(5000, ()=>this.throw(
+                        new Error('CONNECT request timed out')));
+                    socket.once('error', e=>this.throw(e));
+                    let response = Buffer.alloc(0);
+                    socket.on('data', data=>{
+                        response = Buffer.concat([response, data]);
+                        const end = response.indexOf('\r\n\r\n');
+                        if (end===-1)
+                            return;
+                        const status_line = response.subarray(0, end)
+                            .toString('latin1').split('\r\n')[0];
+                        const match = status_line.match(
+                            /^HTTP\/\d(?:\.\d)?\s+(\d+)/);
+                        socket.destroy();
+                        if (!match)
+                        {
+                            return this.throw(new Error(
+                                `Unexpected response: ${status_line}`));
+                        }
+                        this.continue(Number(match[1]));
+                    });
+                    socket.once('connect', ()=>{
+                        const headers = [
+                            'CONNECT lumtest.com:443 HTTP/1.1',
+                            'Host: lumtest.com:443',
+                            'Proxy-Authorization: Basic '+
+                                Buffer.from(`${user}:${password}`)
+                                    .toString('base64'),
+                            ...route ? [`x-lpm-route: ${route}`] : [],
+                            '',
+                            '',
+                        ].join('\r\n');
+                        const lb_data = proxy_v2_encode({
+                            src_addr: '10.0.0.10',
+                            dst_addr: '127.0.0.1',
+                            src_port: 1234,
+                            dst_port: l.port,
+                            family: 'ipv4',
+                        });
+                        socket.write(Buffer.concat([lb_data,
+                            Buffer.from(headers)]));
+                    });
+                    return yield this.wait();
+                });
+                assert.equal(yield send('alice', 'alice_pw'), 200);
+                assert.equal(yield send('alice', 'alice_pw', target_port),
+                    407);
+                assert.equal(yield send('bob', 'bob_pw', target_port), 200);
+            }));
+
         });
         describe('proxy_resolve', ()=>{
             const dns_resolve = dns.resolve;
@@ -974,7 +1145,7 @@ describe('proxy', ()=>{
             rules = rules || [{
                 action: {ban_ip: 60*ms.MIN, retry: true},
                 status,
-                url: 'lumtest.com'
+                url: 'lumtest.com',
             }];
             l = yield lum({rules});
             let retry_count = 0;
@@ -992,7 +1163,7 @@ describe('proxy', ()=>{
         t('should prioritize', null, [{
             action: {url: 'http://lumtest.com/fail_url'},
             status: '200',
-            url: 'lumtest.com'
+            url: 'lumtest.com',
         }, {
             action: {ban_ip: 60*ms.MIN, retry: true},
             status: '200',

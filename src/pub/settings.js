@@ -2,12 +2,10 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
 import React, {useState} from 'react';
-import {Labeled_controller, Loader_small, Alert} from './common.js';
-import setdb from '../../util/setdb.js';
-import zurl from '../../util/url.js';
-import {report_exception} from './util.js';
 import _ from 'lodash4';
 import $ from 'jquery';
+import setdb from '../../util/setdb.js';
+import zurl from '../../util/url.js';
 import {Select_zone, Pins} from './common/controls.js';
 import Warnings_modal from './common/warnings_modal.js';
 import {Modal} from './common/modals.js';
@@ -17,6 +15,8 @@ import {tips} from './proxy_edit/fields.js';
 import './css/settings.less';
 import {T} from './common/i18n.js';
 import {main as Api} from './api.js';
+import {report_exception} from './util.js';
+import {Labeled_controller, Loader_small, Alert} from './common.js';
 
 export default function Settings(props){
     const [show_alert, set_show_alert] = useState(false);
@@ -91,8 +91,6 @@ const tooltips = {
         is reached`,
     socket_inactivity_timeout: 'The amount of milliseconds a socket can be'
         +' inactive before it times out and closes',
-    new_proxy_cert: 'Use new certificate for SSL termination '
-      +'(default true from 25 Sep 2026 14:28:38 UTC)',
 };
 
 for (let f in tooltips)
@@ -389,17 +387,6 @@ class Form extends Pure_component {
             disabled={s.zagent}
             faq={{anchor: 'sync_configuration'}}
           />
-          {Date.now()<s.new_proxy_cert_rollout_ts &&
-            <Labeled_controller
-              val={s.new_proxy_cert}
-              type="yes_no"
-              on_change_wrapper={this.on_change_handler('new_proxy_cert')}
-              label="Use new proxy certificate"
-              default={false}
-              tooltip={tooltips.new_proxy_cert}
-              faq={{article: 'certificate-migration'}}
-            />
-          }
           {s.zagent && <Labeled_controller
             val={s.bw_limit_webhook_url || ''}
             allow_empty_url

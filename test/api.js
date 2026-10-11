@@ -20,7 +20,7 @@ const pkg = require('../package.json');
 const puppeteer = require('../lib/puppeteer.js');
 const consts = require('../lib/consts.js');
 const {assert_has, app_with_args, init_app_with_config, api_json, json,
-    init_app_with_proxies, api} = require('./common.js');
+    init_app_with_proxies, api, stub_cpus} = require('./common.js');
 const api_base = 'https://'+pkg.api_domain;
 
 describe('api', function(){
@@ -46,6 +46,7 @@ describe('api', function(){
     beforeEach(()=>{
         temp_files = [];
         sb = sinon.createSandbox();
+        stub_cpus(sb);
         nock(api_base).get('/').times(2).reply(200, {});
         nock(api_base).get('/lpm/server_conf').query(true).reply(200, {});
         app_with_config = init_app_with_config(temp_files);
@@ -63,11 +64,55 @@ describe('api', function(){
         const res = yield api('ssl');
         assert_has(res.headers, {
             'content-type': 'application/x-x509-ca-cert',
-            'content-disposition': 'filename=luminati.crt',
+            'content-disposition': 'filename=brightdata.crt',
         }, 'headers mismatch');
         assert.equal(res.body, fs.readFileSync(crt_path),
             'certificate mismatch');
     }));
+    it('cloud ssl', etask._fn(function*(_this){
+        app = yield app_with_args(['--zagent']);
+        const res = yield api('ssl', 'GET', null, false, null,
+            {followRedirect: false});
+        assert.equal(res.statusCode, 302, 'status code mismatch');
+        assert.equal(res.headers.location,
+            'https://brightdata.com/static/brightdata_proxy_ca.zip',
+            'certificate url mismatch');
+    }));
+    describe('route marks', ()=>{
+        it('bypasses IP auth for marked routes',
+        etask._fn(function*(_this){
+            app = yield app_with_args();
+            sb.stub(app.manager, 'whitelist_auth').returns(false);
+            sb.stub(app.manager, 'user_auth').returns(false);
+            const version = yield api_json('api/version');
+            const settings = yield api_json('api/settings');
+            assert.equal(version.statusCode, 200);
+            assert.equal(settings.statusCode, 403);
+        }));
+        it('bypasses local login for marked routes',
+        etask._fn(function*(_this){
+            app = yield app_with_args(['--local_login']);
+            const defaults = yield api_json('api/defaults');
+            const settings = yield api_json('api/settings');
+            assert.equal(defaults.statusCode, 200);
+            assert.equal(settings.statusCode, 403);
+            assert.equal(settings.headers['x-lpm-local-login'],
+                'Unauthorized');
+        }));
+        it('allows reseller users on marked routes',
+        etask._fn(function*(_this){
+            app = yield app_with_proxies([{port: 24000}],
+                {zagent: true, reseller: true});
+            sb.stub(app.manager, 'user_auth').returns(true);
+            const refresh = yield api_json('api/refresh_sessions', {
+                method: 'post',
+                body: {ports: [24000]},
+            });
+            const settings = yield api_json('api/settings');
+            assert.equal(refresh.statusCode, 200);
+            assert.equal(settings.statusCode, 403);
+        }));
+    });
     describe('version info', ()=>{
         it('current', ()=>etask(function*(){
             app = yield app_with_args();
@@ -307,6 +352,63 @@ describe('api', function(){
             t('does not return session_id when rotating',
                 {rotate_session: true}, {code: 204});
         });
+        describe('refresh_sessions_many', ()=>{
+            const url = 'api/refresh_sessions';
+            const post = (ports, suffix='')=>api_json(url+suffix, {
+                method: 'post',
+                body: {ports},
+            });
+            beforeEach(etask._fn(function*(_this){
+                app = yield app_with_proxies([
+                    {port: 24000},
+                    {port: 24001, rotate_session: true},
+                ]);
+            }));
+            it('refreshes all requested ports', etask._fn(function*(_this){
+                const p1 = app.manager.proxy_ports[24000];
+                const p2 = app.manager.proxy_ports[24001];
+                const prev1 = p1.session_id;
+                const prev2 = p2.session_id;
+                const res = yield post([24000, 24001]);
+                assert.equal(res.statusCode, 200);
+                assert.deepStrictEqual(res.body, {
+                    24000: {session_id: `24000_${prev1+1}`},
+                    24001: {rotate_session: true},
+                });
+                assert.equal(p1.session_id, prev1+1);
+                assert.equal(p2.session_id, prev2+1);
+            }));
+            it('rejects invalid input', etask._fn(function*(_this){
+                const refresh = sb.spy(app.manager.proxy_ports[24000],
+                    'refresh_sessions');
+                const cases = [
+                    {ports: [], error: 'Invalid ports param'},
+                    {ports: [24000, '24001'], error: 'Invalid ports param'},
+                    {ports: [24000, 24000.5], error: 'Invalid ports param'},
+                    {ports: [24000, 24000], error: 'Duplicated ports'},
+                    {ports: Array.from({length: 101}, (_, i)=>1000+i),
+                        error: 'Too many ports'},
+                    {ports: [24000, 29999],
+                        error: 'Invalid proxy ports: 29999'},
+                ];
+                for (const {ports, error} of cases)
+                {
+                    const res = yield post(ports);
+                    assert.equal(res.statusCode, 400);
+                    assert.equal(res.body, error);
+                }
+                sinon.assert.notCalled(refresh);
+            }));
+            it('rejects ports of another user', etask._fn(function*(_this){
+                const refresh = sb.spy(app.manager.proxy_ports[24000],
+                    'refresh_sessions');
+                const res = yield post([24000], '?user=other');
+                assert.equal(res.statusCode, 400);
+                assert.equal(res.body, 'Invalid proxy ports: 24000');
+                sinon.assert.notCalled(refresh);
+            }));
+        });
+
     });
     // XXX igors: remove after migration
     const har_log_tests = function(_this, prefix){
