@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, browser:true*//*global Map, BigInt*/
 (function(){
-var define, hash, assert, zerr, vm;
+var define, assert, crypto, zerr, vm, bfj;
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = typeof global=='object' && !!global.nativeRequire ||
     typeof navigator=='object' && navigator.product=='ReactNative';
@@ -28,11 +28,13 @@ if (!is_node)
 else
 {
     require('./config.js');
-    zerr = require('./zerr.js');
-    hash = require('crypto');
-    assert = require('assert');
-    vm = require('vm');
     define = require('./require_node.js').define(module, '../');
+    zerr = require('./zerr.js');
+    assert = require('assert');
+    crypto = require('crypto');
+    vm = require('vm');
+    try { bfj = require('bfj'); }
+    catch(e){} // XXX: temp fix for bat
 }
 define(['/util/util.js', '/util/date.js'], function(zutil, date){
 var E = {};
@@ -76,8 +78,8 @@ E.o = function(oct_str){ return parseInt(oct_str, 8); };
 E.hash = function(buf, hash_len, encoding, type){
     type = type||'sha256';
     // update() ignores encoding if buf is a Buffer
-    return hash.createHash(type).update(buf, encoding||'utf8')
-    .digest('hex').slice(0, hash_len);
+    return crypto.createHash(type).update(buf, encoding||'utf8')
+        .digest('hex').slice(0, hash_len);
 };
 
 E.encode_base64_shift = function(data, charset){
@@ -803,8 +805,7 @@ function deref_obj(obj){
 // If you're not sure, consult with someone with security experience and get
 // a second opinion.
 E.JSON_parse = function(s, opt){
-    opt = Object.assign({date: true, re: true, bigint: true,
-        dangerous_func: false, inf: true, circular: true}, opt);
+    opt = Object.assign({}, json_parse_opt_defaults, opt);
     var has_circular;
     var ret = JSON.parse(s, function(k, v){
         v = parse_leaf(v, opt);
@@ -816,6 +817,26 @@ E.JSON_parse = function(s, opt){
         deref_obj(ret);
     return ret;
 };
+
+E.bfj_parse = function(stream, opt){
+    opt = Object.assign({}, json_parse_opt_defaults, opt);
+    var has_circular;
+    return bfj.parse(stream, {
+        reviver: function(k, v){
+            v = parse_leaf(v, opt);
+            if (v && typeof v.__Ref__=='string')
+                has_circular = true;
+            return v;
+        },
+    }).then(function(ret){
+        if (has_circular && opt.circular)
+            deref_obj(ret);
+        return ret;
+    });
+};
+
+const json_parse_opt_defaults = {date: true, re: true, bigint: true,
+    dangerous_func: false, inf: true, circular: true};
 
 // Note about opt.dangerous_func
 // DO NOT TURN THIS ON if you are dealing with any code path which might

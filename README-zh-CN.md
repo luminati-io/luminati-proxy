@@ -39,7 +39,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://brightdata.com/static/lpm/luminati-proxy-manager-v1.676.810-setup.exe">代理管理安装器</a>.
+下载 <a href="https://brightdata.com/static/lpm/luminati-proxy-manager-v1.679.135-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 24.13.0版 (最好用x
@@ -264,6 +264,7 @@ Options:
       --insecure-http-parser       Disables the strict checks
       --proxy_country                                              [default: ""]
       --resolve_proxies_interval                                [default: 10000]
+      --ignore_browser_ssl_errors                               [default: false]
       --info                                                    [default: false]
       --av_server                                               [default: false]
       --cn                                                      [default: false]

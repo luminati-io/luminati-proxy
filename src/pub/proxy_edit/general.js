@@ -209,6 +209,10 @@ export default class General extends Pure_component {
                 id="flex_tls_reject_unauthorized"
               />
             }
+            {!zagent && <Config
+                type="yes_no"
+                id="ignore_browser_ssl_errors"
+              />}
             {form.ssl && av_server &&
               <Config
                 type="yes_no"

@@ -337,6 +337,10 @@ export const tabs = {
                 tooltip: `Create a proxy port for every selected Proxy Manager
                     user configured in control panel`,
             },
+            ignore_browser_ssl_errors: {
+                label: 'Ignore browser SSL errors',
+                tooltip: `Ignore verification fails`,
+            },
             iface: {
                 label: 'Interface',
                 tooltip: 'Define a specific network interface on which '

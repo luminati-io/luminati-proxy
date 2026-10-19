@@ -36,7 +36,7 @@ Please report issues or bugs to your account manager or from our [help center](h
 ## Installation
 
 ### Windows
-Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.676.810/luminati-proxy-manager-v1.676.810-setup.exe)
+Download the [Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.679.135/luminati-proxy-manager-v1.679.135-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -311,6 +311,7 @@ Options:
       --insecure-http-parser       Disables the strict checks
       --proxy_country                                              [default: ""]
       --resolve_proxies_interval                                [default: 10000]
+      --ignore_browser_ssl_errors                               [default: false]
       --info                                                    [default: false]
       --av_server                                               [default: false]
       --cn                                                      [default: false]

@@ -34,6 +34,10 @@
             "type": "boolean",
             "description": "Create a proxy port for every selected user"
           },
+          "ignore_browser_ssl_errors": {
+            "type": "boolean",
+            "description": "Ignore verification fails"
+          },
           "users": {
             "type": "array",
             "items": {"type": "string"},

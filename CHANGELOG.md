@@ -1,5 +1,9 @@
 Proxy manager - Change Log
 
+## 1.679.135 Stable
+- :star: Added an option to ignore browser SSL errors
+- :bug: Show a warning when the selected proxy preset is incompatible with the zone
+
 ## 1.676.810 Stable
 - :boom: Removed the legacy bundled CA certificate and certificate migration. Proxy Manager now uses only the new bundled CA. Clients that trusted the old CA for SSL analyzing must install and trust the new CA
 - :boom: Changed the default Super Proxy port to 44445

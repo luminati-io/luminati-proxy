@@ -1107,7 +1107,7 @@ describe('proxy', ()=>{
             it('brd_user_hide_headers_brd', ()=>etask(function*(){
                 l = yield lum(opts);
                 const auth = 'Basic '+Buffer
-                    .from('brd-customer-abc-zone-static:t2')
+                    .from('brd-customer-abc-zone-static:xyz')
                     .toString('base64');
                 let r = yield l.test({headers: {'proxy-authorization': auth}});
                 assert.equal(r.statusCode, 200);

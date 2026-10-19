@@ -12,14 +12,14 @@ import {ms} from '../../../util/date.js';
 import setdb from '../../../util/setdb.js';
 import {qw} from '../../../util/string.js';
 import {Loader, Loader_small, Preset_description, Ext_tooltip,
-    Checkbox, Faq_link, Alert} from '../common.js';
+    Checkbox, Faq_link, Alert, Warning} from '../common.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import presets from '../common/presets.js';
 import Tooltip from '../common/tooltip.js';
 import {Modal} from '../common/modals.js';
 import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
-import {report_exception, bind_all, is_local} from '../util.js';
+import {report_exception, bind_all} from '../util.js';
 import ws from '../ws.js';
 import {main as Api} from '../api.js';
 import Warnings_modal from '../common/warnings_modal.js';
@@ -454,6 +454,7 @@ const Index = withRouter(class Index extends Pure_component {
                 is_changed={this.state.is_changed}
                 saving={this.state.saving}
                 save={()=>$('#save_port_confirmation_modal').modal('show')}
+                zagent={gs.zagent}
               />
               <Nav_tabs_wrapper zagent={gs.zagent} />
             </div>
@@ -643,9 +644,13 @@ class Nav extends Pure_component {
     };
     update_zone = new_zone=>{
         let new_preset;
+        const curr_preset = this.props.form.preset;
         const curr_zone = this.props.form.zone;
-        if (this.is_unblocker(curr_zone) && !this.is_unblocker(new_zone))
+        if ((this.is_unblocker(curr_zone)||curr_preset=='unblocker')
+            && !this.is_unblocker(new_zone))
+        {
             new_preset = presets.get_default().key;
+        }
         else if (!this.is_unblocker(curr_zone) && this.is_unblocker(new_zone))
             new_preset = 'unblocker';
         if (this.props.form.ips.length || this.props.form.vips.length)
@@ -677,10 +682,12 @@ class Nav extends Pure_component {
             ()=>$('#confirm_modal').modal('show'));
     }
     render(){
-        const opts = presets.opts(this.is_unblocker(this.props.form.zone));
+        const opts = presets.opts(this.is_unblocker(this.props.form.zone)
+            ||this.props.form.preset=='unblocker');
         const preset = this.props.form.preset;
         const is_unblocker = this.props.plan.type=='unblocker';
         const preset_disabled = this.props.disabled;
+        const show_warn = this.props.form.preset=='unblocker'&&!is_unblocker;
         return <div className="nav">
           <Select_zone
             val={this.props.form.zone}
@@ -703,7 +710,7 @@ class Nav extends Pure_component {
             }
             faq={{article: '12583049659025', anchor: 'preset'}}
           />
-          {is_local() &&
+          {!this.props.zagent &&
             <Open_browser_btn port={this.props.form.port}/>
           }
           <button className="btn btn_lpm btn_lpm_primary"
@@ -712,6 +719,9 @@ class Nav extends Pure_component {
             <T>Save changes</T>
           </button>
           <Confirmation_modal on_ok={this.state.confirm_action}/>
+          {show_warn && <Warning text={
+            'The selected preset is not compatible with this zone. '+
+            'Please select a compatible preset.'}/>}
         </div>;
     }
 }

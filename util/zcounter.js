@@ -815,6 +815,8 @@ E.flush = ()=>etask(function*zcounter_flush(){
                 JSON.stringify({world, metrics: entry.item}));
         }
     }
+    if (vcounter)
+        yield vcounter.flush();
 });
 
 let agent_conf, agent_num = +env.AGENT_NUM;

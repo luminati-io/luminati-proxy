@@ -81,6 +81,7 @@ conf.server_default = {
     max_ban_retries: 10,
     multiply_vips: false,
     multiply_users: false,
+    ignore_browser_ssl_errors: false,
     multiply: 0,
     rotate_session: false,
     session: true,
