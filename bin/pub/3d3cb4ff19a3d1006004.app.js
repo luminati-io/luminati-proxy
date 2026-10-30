@@ -156206,7 +156206,7 @@ const commitCharacters = state.Prec.highest(view.EditorView.domEventHandlers({
     keydown(event, view) {
         let field = view.state.field(completionState, false);
         if (!field || !field.open || field.open.disabled || field.open.selected < 0 ||
-            event.key.length > 1 || event.ctrlKey && !(windows && event.altKey) || event.metaKey)
+            !event.key || event.key.length > 1 || event.ctrlKey && !(windows && event.altKey) || event.metaKey)
             return false;
         let option = field.open.options[field.open.selected];
         let result = field.active.find(a => a.source == option.source);
@@ -170247,14 +170247,19 @@ function scrollRectIntoView(dom, rect, side, x, y, xMargin, yMargin, ltr) {
     for (let cur = dom, stop = false; cur && !stop;) {
         if (isElt(cur)) { // Element
             let bounding, top = cur == doc.body;
-            let scaleX = 1, scaleY = 1;
+            let scaleX = 1, scaleY = 1, xScroll = true, yScroll = true;
             if (top) {
                 bounding = windowRect(win);
             }
             else {
-                if (/^(fixed|sticky)$/.test(getComputedStyle(cur).position))
+                let style = getComputedStyle(cur);
+                if (/^(fixed|sticky)$/.test(style.position))
                     stop = true;
-                if (cur.scrollHeight <= cur.clientHeight && cur.scrollWidth <= cur.clientWidth) {
+                if (cur.scrollHeight <= cur.clientHeight || !/auto|scroll/.test(style.overflowY))
+                    yScroll = false;
+                if (cur.scrollWidth <= cur.clientWidth || !/auto|scroll/.test(style.overflowX))
+                    xScroll = false;
+                if (!xScroll && !yScroll) {
                     cur = cur.assignedSlot || cur.parentNode;
                     continue;
                 }
@@ -170265,7 +170270,8 @@ function scrollRectIntoView(dom, rect, side, x, y, xMargin, yMargin, ltr) {
                     top: rect.top, bottom: rect.top + cur.clientHeight * scaleY };
             }
             let moveX = 0, moveY = 0;
-            if (y == "nearest") {
+            if (!yScroll) ;
+            else if (y == "nearest") {
                 if (rect.top < bounding.top + yMargin) {
                     moveY = rect.top - (bounding.top + yMargin);
                     if (side > 0 && rect.bottom > bounding.bottom + moveY)
@@ -170284,7 +170290,8 @@ function scrollRectIntoView(dom, rect, side, x, y, xMargin, yMargin, ltr) {
                         rect.bottom - boundingHeight + yMargin;
                 moveY = targetTop - bounding.top;
             }
-            if (x == "nearest") {
+            if (!xScroll) ;
+            else if (x == "nearest") {
                 if (rect.left < bounding.left + xMargin) {
                     moveX = rect.left - (bounding.left + xMargin);
                     if (side > 0 && rect.right > bounding.right + moveX)
@@ -170349,9 +170356,9 @@ function scrollableParents(dom, getX = true) {
             break;
         }
         else if (isElt(cur)) {
-            if (!y && cur.scrollHeight > cur.clientHeight)
+            if (!y && cur.scrollHeight > cur.clientHeight && /scroll|auto/.test(getComputedStyle(cur).overflowY))
                 y = cur;
-            if (getX && !x && cur.scrollWidth > cur.clientWidth)
+            if (getX && !x && cur.scrollWidth > cur.clientWidth && /scroll|auto/.test(getComputedStyle(cur).overflowX))
                 x = cur;
             cur = cur.assignedSlot || cur.parentNode;
         }
@@ -171037,7 +171044,6 @@ function autoDirection(text, from, to) {
         if (type == 2 /* T.R */ || type == 4 /* T.AL */)
             return RTL;
     }
-    return LTR;
 }
 
 const clickAddsSelectionRange = state.Facet.define();
@@ -171263,8 +171269,6 @@ function getIsolatedRanges(view, line) {
             let level = result;
             for (let i = active.length - 1; i >= 0; i--, open--) {
                 let direction = active[i].spec.bidiIsolate, update;
-                if (direction == null)
-                    direction = autoDirection(line.text, from, to);
                 if (open > 0 && level.length &&
                     (update = level[level.length - 1]).to == from && update.direction == direction) {
                     update.to = to;
@@ -171278,7 +171282,28 @@ function getIsolatedRanges(view, line) {
             }
         }
     });
-    return result;
+    return resolveIsolates(line.text, result);
+}
+function resolveIsolates(text, isolates) {
+    for (let i of isolates) {
+        if (i.direction == null) {
+            for (let pos = i.from, j = 0; pos < i.to; j++) {
+                let nextInner = j < i.inner.length ? i.inner[j] : null;
+                let dir = autoDirection(text, pos, nextInner ? nextInner.from : i.to);
+                if (dir) {
+                    i.direction = dir;
+                    break;
+                }
+                if (!nextInner)
+                    break;
+                pos = nextInner.to;
+            }
+            if (i.direction == null)
+                i.direction = exports.Direction.LTR;
+        }
+        resolveIsolates(text, i.inner);
+    }
+    return isolates;
 }
 const scrollMargins = state.Facet.define();
 function getScrollMargins(view) {
@@ -173395,12 +173420,12 @@ function moveToLineBoundary(view, start, forward, includeWrap) {
     if (coords) {
         let editorRect = view.dom.getBoundingClientRect();
         let direction = view.textDirectionAt(block.from);
-        let pos = view.posAtCoords({ x: forward == (direction == exports.Direction.LTR) ? editorRect.right - 1 : editorRect.left + 1,
+        let pos = view.posAndSideAtCoords({ x: forward == (direction == exports.Direction.LTR) ? editorRect.right - 1 : editorRect.left + 1,
             y: (coords.top + coords.bottom) / 2 });
-        if (pos != null)
-            return state.EditorSelection.cursor(pos, forward ? -1 : 1);
+        if (pos)
+            return state.EditorSelection.cursor(pos.pos, pos.assoc);
     }
-    return state.EditorSelection.cursor(forward ? block.to : block.from, forward ? -1 : 1);
+    return state.EditorSelection.cursor(forward ? block.to : block.from, forward ? 1 : -1);
 }
 function moveByChar(view, start, forward, by) {
     let line = view.state.doc.lineAt(start.head), spans = view.bidiSpans(line);
@@ -176009,7 +176034,7 @@ class ViewState {
     updateScaler() {
         let scaler = this.scaler;
         this.scaler = this.heightMap.height <= 7000000 /* VP.MaxDOMHeight */ ? IdScaler :
-            new BigScaler(this.heightOracle, this.heightMap, this.viewports);
+            BigScaler.get(this.heightOracle, this.heightMap, this.viewports);
         return scaler.eq(this.scaler) ? 0 : 2 /* UpdateFlag.Height */;
     }
     updateViewportLines() {
@@ -176385,7 +176410,7 @@ class ViewState {
             : (this.scrollParent ? this.scrollParent.getBoundingClientRect().top : 0) - this.view.contentDOM.getBoundingClientRect().top;
     }
     scrollAnchorAt(scrollOffset) {
-        let block = this.lineBlockAtHeight(scrollOffset + 8);
+        let block = this.lineBlockAtHeight(scrollOffset + 12 - this.paddingTop);
         return block.from >= this.viewport.from || this.viewportLines[0].top - scrollOffset > 200 ? block : this.viewportLines[0];
     }
     elementAtHeight(height) {
@@ -176471,20 +176496,27 @@ function staticDeco(state$1) {
 // regions outside the viewports so that the total height is
 // VP.MaxDOMHeight.
 class BigScaler {
-    constructor(oracle, heightMap, viewports) {
+    constructor(scale, viewports) {
+        this.scale = scale;
+        this.viewports = viewports;
+    }
+    static get(oracle, heightMap, viewports) {
         let vpHeight = 0, base = 0, domBase = 0;
-        this.viewports = viewports.map(({ from, to }) => {
+        let vps = viewports.map(({ from, to }) => {
             let top = heightMap.lineAt(from, QueryType.ByPos, oracle, 0, 0).top;
             let bottom = heightMap.lineAt(to, QueryType.ByPos, oracle, 0, 0).bottom;
             vpHeight += bottom - top;
             return { from, to, top, bottom, domTop: 0, domBottom: 0 };
         });
-        this.scale = (7000000 /* VP.MaxDOMHeight */ - vpHeight) / (heightMap.height - vpHeight);
-        for (let obj of this.viewports) {
-            obj.domTop = domBase + (obj.top - base) * this.scale;
+        if (heightMap.height - vpHeight < 10)
+            return IdScaler;
+        let scale = (7000000 /* VP.MaxDOMHeight */ - vpHeight) / (heightMap.height - vpHeight);
+        for (let obj of vps) {
+            obj.domTop = domBase + (obj.top - base) * scale;
             domBase = obj.domBottom = obj.domTop + (obj.bottom - obj.top);
             base = obj.bottom;
         }
+        return new BigScaler(scale, vps);
     }
     toDOM(n) {
         for (let i = 0, base = 0, domBase = 0;; i++) {
@@ -176939,7 +176971,7 @@ class DOMObserver {
     }
     onScroll(e) {
         if (this.intersecting)
-            this.flush(false);
+            this.flush(this.pendingRecords().length > 0);
         if (this.editContext)
             this.view.requestMeasure(this.editContext.measureReq);
         this.onScrollChanged(e);
@@ -181051,6 +181083,8 @@ function createDialog(view, config, result) {
     if (config.class)
         panel.className = config.class;
     panel.classList.add("cm-dialog");
+    let focus = typeof config.focus == "string" ? content.querySelector(config.focus)
+        : config.focus ? content.querySelector("input") || content.querySelector("button") : null;
     function done(form) {
         if (panel.contains(panel.ownerDocument.activeElement))
             view.focus();
@@ -181060,18 +181094,14 @@ function createDialog(view, config, result) {
         dom: panel,
         top: config.top,
         mount: () => {
-            if (config.focus) {
-                let focus;
-                if (typeof config.focus == "string")
-                    focus = content.querySelector(config.focus);
-                else
-                    focus = content.querySelector("input") || content.querySelector("button");
-                if (focus && "select" in focus)
+            if (focus) {
+                if ("select" in focus)
                     focus.select();
-                else if (focus && "focus" in focus)
+                else if ("focus" in focus)
                     focus.focus();
             }
-        }
+        },
+        destroy: () => result(null)
     };
 }
 
@@ -183033,13 +183063,16 @@ function buildTree(data) {
             cursor.next();
             let localChildren = [], localPositions = [];
             let localInRepeat = id >= minRepeatType ? id : -1;
-            let lastGroup = 0, lastEnd = end;
+            let lastGroup = 0, lastEnd = end, groupLookAhead = lookAheadAtStart;
             while (cursor.pos > endPos) {
                 if (localInRepeat >= 0 && cursor.id == localInRepeat && cursor.size >= 0) {
                     if (cursor.end <= lastEnd - maxBufferLength) {
-                        makeRepeatLeaf(localChildren, localPositions, start, lastGroup, cursor.end, lastEnd, localInRepeat, lookAheadAtStart, contextAtStart);
+                        makeRepeatLeaf(localChildren, localPositions, start, lastGroup, cursor.end, lastEnd, localInRepeat, groupLookAhead, contextAtStart);
                         lastGroup = localChildren.length;
                         lastEnd = cursor.end;
+                        // The buffer is read backwards, so the current look-ahead is
+                        // the one recorded after the next group's end.
+                        groupLookAhead = lookAhead;
                     }
                     cursor.next();
                 }
@@ -183051,7 +183084,7 @@ function buildTree(data) {
                 }
             }
             if (localInRepeat >= 0 && lastGroup > 0 && lastGroup < localChildren.length)
-                makeRepeatLeaf(localChildren, localPositions, start, lastGroup, start, lastEnd, localInRepeat, lookAheadAtStart, contextAtStart);
+                makeRepeatLeaf(localChildren, localPositions, start, lastGroup, start, lastEnd, localInRepeat, groupLookAhead, contextAtStart);
             localChildren.reverse();
             localPositions.reverse();
             if (localInRepeat > -1 && lastGroup > 0) {
@@ -183104,7 +183137,7 @@ function buildTree(data) {
                 if (!lastI && last.type == type && last.length == length)
                     return last;
                 if (lookAheadProp = last.prop(NodeProp.lookAhead))
-                    lookAhead = positions[lastI] + last.length + lookAheadProp;
+                    lookAhead = positions[lastI] + last.length + lookAheadProp - length;
             }
             return makeTree(type, children, positions, length, lookAhead, contextHash);
         };
@@ -190241,22 +190274,30 @@ module.exports = crelt;
 "use strict";
 
 
-const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, serializePathEncoding, normalizeQueryFragmentEncoding, encodeQuery, encodeFragment, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = __webpack_require__(17248)
+const { normalizeIPv6, removeDotSegments, removeDotSegmentsRelative, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, serializePathEncoding, normalizeQueryFragmentEncoding, encodeQuery, encodeFragment, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = __webpack_require__(17248)
 const { SCHEMES, getSchemeHandler } = __webpack_require__(86869)
 
 const VALID_SCHEME = /^[A-Za-z][A-Za-z0-9+.-]*$/u
 const MALFORMED_SCHEME_ERROR = 'URI scheme is malformed.'
+const MALFORMED_HOST_ERROR = 'URI host is malformed.'
+// ASCII characters outside the RFC 3986 reg-name set (unreserved, sub-delims
+// and "%" for pct-encoded): C0 controls, space, DEL, and "#/:<>?@[\]^`{|}.
+const FORBIDDEN_DOMAIN_HOST_CHARACTER = /[\0-\x20"#/:<>?@[\\\]^`{|}\x7F]/u
 
 /**
+ * RFC 3986 section 3.1 does not allow percent-encoding in a scheme, so the
+ * scheme is validated as-is and never decoded. Decoding would let inert input
+ * such as `%6Aavascript:` become a live `javascript:` scheme.
+ *
  * @param {string} scheme
  * @returns {string}
  */
-function decodeValidScheme (scheme) {
-  const decodedScheme = unescape(String(scheme))
-  if (!VALID_SCHEME.test(decodedScheme)) {
+function validateScheme (scheme) {
+  const stringScheme = String(scheme)
+  if (!VALID_SCHEME.test(stringScheme)) {
     throw new TypeError(MALFORMED_SCHEME_ERROR)
   }
-  return decodedScheme
+  return stringScheme
 }
 
 /**
@@ -190317,6 +190358,12 @@ function resolve (baseURI, relativeURI, options) {
   const resolvedHost = resolved.host
   const resolvedHostIsIP = resolvedHost !== undefined && resolvedHost !== '' &&
     (isIPv4(resolvedHost) || normalizeIPv6(resolvedHost).isIPV6)
+  // Inputs are parsed scheme-neutrally, so delimiters and controls in a domain
+  // host are only detected here, once the final scheme is known. They always
+  // fail closed, including in percent-encoded hosts.
+  if (hasForbiddenDomainHost(resolved, options || {}, resolvedSchemeHandler, resolvedHostIsIP)) {
+    throw new Error(MALFORMED_HOST_ERROR)
+  }
   canonicalizeHost(resolved, options || {}, resolvedSchemeHandler, resolvedHostIsIP)
   // Percent escapes in an ASCII reg-name are encoded data. The WHATWG hostname
   // parser can reject them even though fast-uri preserves them safely as RFC
@@ -190374,14 +190421,17 @@ function resolveComponent (base, relative, options, skipNormalization) {
         if (relative.path[0] === '/') {
           target.path = removeDotSegments(relative.path)
         } else {
-          if ((base.userinfo !== undefined || base.host !== undefined || base.port !== undefined) && !base.path) {
+          const baseHasAuthority = base.userinfo !== undefined || base.host !== undefined || base.port !== undefined
+          if (baseHasAuthority && !base.path) {
             target.path = '/' + relative.path
           } else if (!base.path) {
             target.path = relative.path
           } else {
             target.path = base.path.slice(0, base.path.lastIndexOf('/') + 1) + relative.path
           }
-          target.path = removeDotSegments(target.path)
+          target.path = base.scheme === undefined && !baseHasAuthority && target.path[0] !== '/'
+            ? removeDotSegmentsRelative(target.path)
+            : removeDotSegments(target.path)
         }
         target.query = relative.query
       }
@@ -190437,7 +190487,7 @@ function serialize (cmpts, opts) {
   const uriTokens = []
 
   if (component.scheme) {
-    component.scheme = decodeValidScheme(component.scheme)
+    component.scheme = validateScheme(component.scheme)
   }
 
   // find scheme handler
@@ -190447,7 +190497,11 @@ function serialize (cmpts, opts) {
   if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(component, options)
 
   const hasAuthority = component.userinfo !== undefined || component.host !== undefined || component.port !== undefined
-  const pathNoScheme = !options.skipEscape && component.scheme === undefined && !hasAuthority
+  // A reference with no emitted scheme is path-noscheme: a bare ':' in its
+  // first path segment would reparse as a scheme (RFC 3986 3.3/4.2). Enforced
+  // under skipEscape too (resolve()), so the reapply below gates on this flag.
+  const schemelessReference = (component.scheme === undefined || options.reference === 'suffix') && !hasAuthority
+  const pathNoScheme = !options.skipEscape && schemelessReference
 
   if (component.path !== undefined) {
     if (!options.skipEscape) {
@@ -190459,7 +190513,7 @@ function serialize (cmpts, opts) {
 
   if (options.reference !== 'suffix' && component.scheme) {
     // Scheme handlers may replace the scheme during serialization.
-    component.scheme = decodeValidScheme(component.scheme)
+    component.scheme = validateScheme(component.scheme)
     uriTokens.push(component.scheme, ':')
   }
 
@@ -190479,13 +190533,18 @@ function serialize (cmpts, opts) {
     let s = component.path
 
     if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) {
-      s = removeDotSegments(s)
+      // A relative-path reference keeps its unresolvable leading ".." segments
+      // and must never become root-relative (RFC 3986 section 5.2.4 applies to
+      // merged target paths, not to the reference itself).
+      s = schemelessReference && s[0] !== '/'
+        ? removeDotSegmentsRelative(s)
+        : removeDotSegments(s)
     }
 
     // Dot-segment removal can expose a colon that was not originally in the
     // first segment (for example, "./a:b"). Reapply path-noscheme encoding so
     // the serialized relative reference cannot be reparsed as a URI scheme.
-    if (pathNoScheme) {
+    if (schemelessReference) {
       s = serializePathEncoding(s, true)
     }
 
@@ -190600,6 +190659,11 @@ function hasMalformedComponentPercentEncoding (matches) {
  * @returns {boolean} whether host conversion failed
  */
 function canonicalizeHost (parsed, options, schemeHandler, isIP) {
+  if (hasForbiddenDomainHost(parsed, options, schemeHandler, isIP)) {
+    parsed.error = parsed.error || MALFORMED_HOST_ERROR
+    return true
+  }
+
   if (
     !options.unicodeSupport &&
     (!schemeHandler || !schemeHandler.unicodeSupport) &&
@@ -190609,14 +190673,60 @@ function canonicalizeHost (parsed, options, schemeHandler, isIP) {
     isIP === false &&
     nonSimpleDomain(parsed.host)
   ) {
+    let url
     try {
-      parsed.host = new URL('http://' + parsed.host).hostname
+      url = new URL('http://' + parsed.host)
     } catch (e) {
       parsed.error = parsed.error || "Host's domain name can not be converted to ASCII: " + e
       return true
     }
+    // The WHATWG parser must have read the whole input as a host. Anything
+    // else means it found a delimiter fast-uri did not, so its hostname would
+    // describe a different authority.
+    if (!isHostOnlyURL(url)) {
+      parsed.error = parsed.error || MALFORMED_HOST_ERROR
+      return true
+    }
+    parsed.host = url.hostname
   }
   return false
+}
+
+/**
+ * Whether a domain host contains an ASCII character that RFC 3986 does not
+ * allow in a reg-name (unreserved, sub-delims, or pct-encoded). Such a host is
+ * rejected instead of being handed to the WHATWG URL parser, which would treat
+ * "@" as a userinfo delimiter (silently dropping the data before it) and strip
+ * TAB, LF, and CR. Non-ASCII characters remain allowed for IDNs.
+ *
+ * @param {import('./types/index').URIComponent} parsed
+ * @param {import('./types/index').Options} options
+ * @param {{ domainHost?: boolean }|undefined} schemeHandler
+ * @param {boolean} isIP
+ * @returns {boolean}
+ */
+function hasForbiddenDomainHost (parsed, options, schemeHandler, isIP) {
+  return Boolean(
+    parsed.host &&
+    isIP === false &&
+    !isIPLiteral(parsed.host) &&
+    (options.domainHost || (schemeHandler && schemeHandler.domainHost)) &&
+    FORBIDDEN_DOMAIN_HOST_CHARACTER.test(parsed.host)
+  )
+}
+
+/**
+ * @param {URL} url
+ * @returns {boolean}
+ */
+function isHostOnlyURL (url) {
+  return url.username === '' &&
+    url.password === '' &&
+    url.port === '' &&
+    url.pathname === '/' &&
+    url.search === '' &&
+    url.hash === '' &&
+    url.hostname !== ''
 }
 
 /**
@@ -190701,9 +190811,8 @@ function parseWithStatus (uri, opts) {
     parsed.fragment = matches[8]
 
     if (parsed.scheme !== undefined) {
-      const decodedScheme = unescape(parsed.scheme)
-      if (VALID_SCHEME.test(decodedScheme)) {
-        parsed.scheme = decodedScheme.toLowerCase()
+      if (VALID_SCHEME.test(parsed.scheme)) {
+        parsed.scheme = parsed.scheme.toLowerCase()
       } else {
         parsed.error = parsed.error || MALFORMED_SCHEME_ERROR
         malformedScheme = true
@@ -190737,7 +190846,7 @@ function parseWithStatus (uri, opts) {
         parsed.host = isIP ? ipv6result.host : ipv6result.host.toLowerCase()
 
         if (malformedIPLiteral) {
-          parsed.error = parsed.error || 'URI host is malformed.'
+          parsed.error = parsed.error || MALFORMED_HOST_ERROR
           malformedAuthorityOrPort = true
         }
       } else {
@@ -190774,7 +190883,11 @@ function parseWithStatus (uri, opts) {
         // pass only restores uppercase hex in escapes that remain encoded.
         host = normalizePercentEncoding(host.toLowerCase())
       }
-      parsed.host = reescapeHostDelimiters(host, isIP)
+      // Resolution parses both inputs with the internal `null` scheme before
+      // the effective scheme is known. Keep raw host delimiters for that step
+      // so resolve() can reject them for domain-host schemes; the resolved
+      // authority is encoded when it is serialized.
+      parsed.host = isIP || options.scheme !== 'null' ? reescapeHostDelimiters(host, isIP) : host
     }
 
     if (!schemeHandler || (schemeHandler && !schemeHandler.skipNormalize)) {
@@ -191506,6 +191619,57 @@ function removeDotSegments (path) {
 }
 
 /**
+ * Removes dot segments from the path of a relative reference (a path that does
+ * not start with "/") without changing what it resolves to against any base.
+ * Unlike `removeDotSegments`, leading ".." segments that cannot be collapsed
+ * are kept, the result never becomes root-relative, and a result that would be
+ * empty or start with an empty segment is prefixed with "." (an empty path
+ * means "same document" and a leading "//" would introduce an authority).
+ *
+ * @param {string} path
+ * @returns {string}
+ */
+function removeDotSegmentsRelative (path) {
+  if (path === '' || path[0] === '/') {
+    return removeDotSegments(path)
+  }
+
+  const segments = path.split('/')
+  const last = segments.length - 1
+  /** @type {string[]} */
+  const output = []
+  let trailingDirectory = false
+
+  for (let i = 0; i <= last; i++) {
+    const segment = segments[i]
+    if (segment === '.' || segment === '..') {
+      if (segment === '..') {
+        if (output.length !== 0 && output[output.length - 1] !== '..') {
+          output.pop()
+        } else {
+          output.push('..')
+        }
+      }
+      trailingDirectory = i === last
+    } else {
+      output.push(segment)
+    }
+  }
+
+  if (trailingDirectory && output[output.length - 1] !== '..') {
+    output.push('')
+  }
+  if (output.length === 0 || output[0] === '' || output[0].includes(':')) {
+    // An empty path, a leading empty segment ("//"), or a first segment
+    // containing ":" (which would be mistaken for a scheme, RFC 3986 section
+    // 4.2) must stay behind a "." segment so the reference keeps its meaning.
+    output.unshift('.')
+  }
+
+  return output.join('/')
+}
+
+/**
  * Re-escape RFC 3986 gen-delims that must not appear literally in the host.
  * After the URI regex parses, these characters cannot be literal in the host
  * field, so any that appear after decoding came from percent-encoding and
@@ -191900,6 +192064,7 @@ module.exports = {
   encodeFragment,
   escapePreservingEscapes,
   removeDotSegments,
+  removeDotSegmentsRelative,
   isIPv4,
   isUUID,
   normalizeIPv6,
@@ -192776,7 +192941,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 135 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 129 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"},{"label":"Chrome 135 iOS 18.4.0","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/135.0.7049.36 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.4","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1"},{"label":"Edge 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 361 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"}]');
+module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 134 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/134.0.6998.99 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604.1"},{"label":"Edge 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 361 iOS 18.4.0","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"}]');
 
 /***/ }),
 
@@ -192784,7 +192949,7 @@ module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","val
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.679.135","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"16-Oct-26 12:18:40"}');
+module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.683.887","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"30-Oct-26 06:46:07"}');
 
 /***/ })
 

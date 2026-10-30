@@ -59,11 +59,11 @@
     "@babel/plugin-transform-modules-commonjs": "7.27.1",
     "user-agents": "~1.1.496",
     "colors": "1.4.0",
-    "body-parser": "1.20.3",
+    "body-parser": "1.20.9",
     "electron-updater": "6.3.9",
     "express": "^4.21.0",
     "helmet": "8.1.0",
-    "express-rate-limit": "8.5.2",
+    "express-rate-limit": "8.7.1",
     "express-session": "1.18.1",
     "connect-loki": "1.2.0",
     "flag-icons": "6.4.4",
@@ -486,7 +486,7 @@
       "webpack.dev.js",
       "webpack.prod.js"
     ],
-    "md5": "4717a71cd86bc22ee92ad6916a7a7739"
+    "md5": "94c5b37368822ccf40a59805c15ed6fb"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -516,5 +516,5 @@
     "build": "webpack --env production",
     "dev": "webpack --env development"
   },
-  "version": "1.679.135"
+  "version": "1.683.887"
 }

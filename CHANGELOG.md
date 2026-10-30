@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.683.887 Stable
+- :star: Remove query string authentication support for Proxy Manager API
+
 ## 1.679.135 Stable
 - :star: Added an option to ignore browser SSL errors
 - :bug: Show a warning when the selected proxy preset is incompatible with the zone
