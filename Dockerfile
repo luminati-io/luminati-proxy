@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM node:24.13.0-bookworm
+FROM node:24.22.2-bookworm
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 

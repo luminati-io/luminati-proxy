@@ -2683,6 +2683,7 @@ E.bfj_parse = function(stream, opt){
     opt = Object.assign({}, json_parse_opt_defaults, opt);
     var has_circular;
     return bfj.parse(stream, {
+        yieldRate: opt.yield_rate,
         reviver: function(k, v){
             v = parse_leaf(v, opt);
             if (v && typeof v.__Ref__=='string')
@@ -183080,6 +183081,16 @@ function buildTree(data) {
                     takeFlatNode(start, endPos, localChildren, localPositions);
                 }
                 else {
+                    // If the next entry is a reused node matching the local
+                    // repeat, flush a repeat leaf and move lastGroup past it
+                    if (localInRepeat >= 0 && cursor.size == -1 /* SpecialRecord.Reuse */ &&
+                        reused[cursor.id].type == nodeSet.types[localInRepeat]) {
+                        if (lastGroup < localChildren.length)
+                            makeRepeatLeaf(localChildren, localPositions, start, lastGroup, cursor.end, lastEnd, localInRepeat, groupLookAhead, contextAtStart);
+                        lastGroup = localChildren.length + 1;
+                        lastEnd = cursor.start;
+                        groupLookAhead = lookAhead;
+                    }
                     takeNode(start, endPos, localChildren, localPositions, localInRepeat, depth + 1);
                 }
             }
@@ -183769,7 +183780,7 @@ class StructureCursor {
     moveTo(pos) {
         let { cursor } = this, p = pos - this.offset;
         while (!this.done && cursor.from < p) {
-            if (cursor.to >= p && cursor.enter(p, 1, exports.IterMode.IncludeAnonymous | exports.IterMode.IgnoreOverlays | exports.IterMode.ExcludeBuffers)) ;
+            if (cursor.to >= p && cursor.enter(p, 1, exports.IterMode.IncludeAnonymous | exports.IterMode.IgnoreMounts | exports.IterMode.IgnoreOverlays | exports.IterMode.ExcludeBuffers)) ;
             else if (cursor.to <= p) {
                 if (!cursor.next(false))
                     this.done = true;
@@ -183795,15 +183806,21 @@ class StructureCursor {
         return false;
     }
 }
+// The end of the range in which a fragment's nodes can be reused. For
+// a tree from a stopped parse, that is no further than the stop
+// position (in tree coordinates, so it is mapped to the document).
+function fragEnd(frag) {
+    let stopped = frag.tree.prop(stoppedInner);
+    return stopped == null ? frag.to : Math.min(frag.to, stopped - frag.offset);
+}
 class FragmentCursor {
     constructor(fragments) {
-        var _a;
         this.fragments = fragments;
         this.curTo = 0;
         this.fragI = 0;
         if (fragments.length) {
             let first = this.curFrag = fragments[0];
-            this.curTo = (_a = first.tree.prop(stoppedInner)) !== null && _a !== void 0 ? _a : first.to;
+            this.curTo = fragEnd(first);
             this.inner = new StructureCursor(first.tree, -first.offset);
         }
         else {
@@ -183816,14 +183833,13 @@ class FragmentCursor {
         return this.curFrag && this.curFrag.from <= node.from && this.curTo >= node.to && this.inner.hasNode(node);
     }
     nextFrag() {
-        var _a;
         this.fragI++;
         if (this.fragI == this.fragments.length) {
             this.curFrag = this.inner = null;
         }
         else {
             let frag = this.curFrag = this.fragments[this.fragI];
-            this.curTo = (_a = frag.tree.prop(stoppedInner)) !== null && _a !== void 0 ? _a : frag.to;
+            this.curTo = fragEnd(frag);
             this.inner = new StructureCursor(frag.tree, -frag.offset);
         }
     }
@@ -186792,6 +186808,8 @@ class FragmentCursor {
                 this.nextFragment();
                 return null;
             }
+            if (pos < this.safeFrom)
+                return null;
             let top = this.trees[last], index = this.index[last];
             if (index == top.children.length) {
                 this.trees.pop();
@@ -186817,9 +186835,6 @@ class FragmentCursor {
                         }
                         if (start == pos)
                             return next;
-                    }
-                    else if (start == pos) {
-                        return null;
                     }
                 }
                 this.index[last]++;
@@ -192941,7 +192956,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 134 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 134 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/134.0.6998.99 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604.1"},{"label":"Edge 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 361 iOS 18.4.0","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"}]');
+module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 66 Windows 7","value":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36"},{"label":"Chrome 134 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36"},{"label":"Chrome 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Chrome 129 Linux","value":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"},{"label":"Chrome 135 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/135.0.7049.35 Mobile/15E148 Safari/604.1"},{"label":"Chrome 134 Chromium OS 14541.0.0","value":"Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"},{"label":"Opera 117 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0"},{"label":"Opera 88 Android 10","value":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36 OPR/88.0.0.0"},{"label":"Firefox 136 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 Linux","value":"Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Firefox 136 OSX 10.15","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0"},{"label":"Safari 18 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15"},{"label":"Mobile Safari 18 iOS 18.3.2","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604.1"},{"label":"Edge 134 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Edge 134 OSX 10.15.7","value":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"},{"label":"Yandex 25 Windows 10","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"},{"label":"GSA 361 iOS 18.4.0","value":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/361.0.737942756 Mobile/15E148 Safari/604.1"}]');
 
 /***/ }),
 
@@ -192949,7 +192964,7 @@ module.exports = /*#__PURE__*/JSON.parse('[{"label":"Chrome 134 Windows 10","val
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.683.887","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"30-Oct-26 06:46:07"}');
+module.exports = /*#__PURE__*/JSON.parse('{"ZON_VERSION":"1.684.881","CONFIG_MAKEFLAGS":"DIST=APP RELEASE=y CONFIG_LPM=y TOKEN_SIGN=y CONFIG_WIN_SDK=n CONFIG_BATREQ=y CONFIG_BAT_CYCLE=y CONFIG_BAT_PLATFORM=app_win64_lpm","CONFIG_BUILD_DATE":"02-Nov-26 13:48:29"}');
 
 /***/ })
 

@@ -8,6 +8,7 @@ const date = require('./date.js');
 const etask = require('./etask.js');
 const file = require('./file.js');
 const queue = require('./queue.js');
+const sprintf = require('./sprintf.js');
 const zerr = require('./zerr.js');
 const zutil = require('./util.js');
 const env = process.env, ef = etask.ef, ms = date.ms;
@@ -374,6 +375,13 @@ function mas_agg_counters(worker_counters){
 }
 
 E.on_send = [];
+// monitoring sprintf format cache size growing with formats built at runtime,
+// e.g. zerr(`${name} %s`, v)
+E.on_send.push(()=>{
+    E.glob_set_level('sprintf_cache_n', sprintf.cache_n, 'max', 'avg');
+    E.glob_set_level('sprintf_cache_n_max', sprintf.cache_n, 'max', 'max',
+        'max');
+});
 
 const eco_ts = {};
 

@@ -1,5 +1,8 @@
 Proxy manager - Change Log
 
+## 1.684.881 Stable
+- :star: NodeJS installation version updated to 24.22.2
+
 ## 1.683.887 Stable
 - :star: Remove query string authentication support for Proxy Manager API
 

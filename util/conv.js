@@ -822,6 +822,7 @@ E.bfj_parse = function(stream, opt){
     opt = Object.assign({}, json_parse_opt_defaults, opt);
     var has_circular;
     return bfj.parse(stream, {
+        yieldRate: opt.yield_rate,
         reviver: function(k, v){
             v = parse_leaf(v, opt);
             if (v && typeof v.__Ref__=='string')
